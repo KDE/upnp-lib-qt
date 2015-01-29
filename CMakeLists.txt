@@ -10,7 +10,9 @@ include(KDEFrameworkCompilerSettings)
 include(KDECMakeSettings)
 
 set(REQUIRED_QT_VERSION "5.3.0")
-find_package(Qt5 ${REQUIRED_QT_VERSION} CONFIG REQUIRED Core)
+find_package(Qt5 ${REQUIRED_QT_VERSION} CONFIG REQUIRED Core Network)
+
+find_package(KDSoap CONFIG REQUIRED)
 
 find_package(Qt5Test ${REQUIRED_QT_VERSION} CONFIG)
 

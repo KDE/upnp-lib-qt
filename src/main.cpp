@@ -19,29 +19,33 @@
 
 #include <QtCore/QCoreApplication>
 
-#include <QtCore/QDebug>
+#include "upnplistenner.h"
 
-#include "upnp.h"
+#include <KDSoapClient/KDSoapClientInterface.h>
 
 int main(int argc, char *argv[])
 {
     QCoreApplication app(argc, argv);
 
-    int res = UpnpInit2(nullptr, 0);
-    if (res == UPNP_E_SUCCESS) {
-        qDebug() << "success";
-    } else {
-        qDebug() << "fail";
-    }
+    KDSoapClientInterface clientInterface(QStringLiteral("http://127.0.0.1:49494/upnp/control/rendertransport1"), QStringLiteral("urn:schemas-upnp-org:service:AVTransport:1"));
 
-    res = UpnpFinish();
-    if (res == UPNP_E_SUCCESS) {
-        qDebug() << "success";
-        return 0;
-    } else {
-        qDebug() << "fail";
-        return 1;
-    }
+    clientInterface.setSoapVersion(KDSoapClientInterface::SOAP1_1);
+    clientInterface.setStyle(KDSoapClientInterface::RPCStyle);
+
+    KDSoapMessage message;
+    message.addArgument(QStringLiteral("InstanceID"), QStringLiteral("0"));
+    message.addArgument(QStringLiteral("Speed"), QStringLiteral("1"));
+    clientInterface.call(QStringLiteral("Play"), message, QStringLiteral("urn:schemas-upnp-org:service:AVTransport:1#Play"));
+
+/*
+    UpnpListenner::UpnpInit();
+
+    UpnpListenner *myListenner = new UpnpListenner;
+*/
+
+    app.exec();
+
+    UpnpListenner::UpnpFinish();
 
     return 0;
 }
