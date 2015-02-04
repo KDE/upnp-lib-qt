@@ -17,31 +17,37 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#include "upnplistenner.h"
-#include "upnpservicecaller.h"
-#include "upnpdevicediscovery.h"
+#ifndef UPNPDEVICEDISCOVERY_H
+#define UPNPDEVICEDISCOVERY_H
 
-#include <QtWidgets/QApplication>
+#include <QtCore/QObject>
 
-#include <QtQml/QQmlApplicationEngine>
-#include <QtQml/QQmlEngine>
-#include <QtQml>
+class UpnpDeviceDiscoveryPrivate;
+class QNetworkReply;
 
-int main(int argc, char *argv[])
+class UpnpDeviceDiscovery : public QObject
 {
-    QApplication app(argc, argv);
+    Q_OBJECT
 
-    UpnpListenner::UpnpInit();
+public:
+    explicit UpnpDeviceDiscovery(QObject *parent = 0);
 
-    qmlRegisterType<UpnpListenner>("org.mgallien.QmlExtension", 1, 0, "UpnpListenner");
-    qmlRegisterType<UpnpDeviceDiscovery>("org.mgallien.QmlExtension", 1, 0, "UpnpDeviceDiscovery");
-    qmlRegisterType<UpnpServiceCaller>("org.mgallien.QmlExtension", 1, 0, "UpnpServiceCaller");
+    ~UpnpDeviceDiscovery();
 
-    QQmlApplicationEngine engine(QUrl(QStringLiteral("./main.qml")));
+Q_SIGNALS:
 
-    app.exec();
+public Q_SLOTS:
 
-    UpnpListenner::UpnpFinish();
+    void downloadAndParseDeviceDescription(const QUrl &serviceUrl);
 
-    return 0;
-}
+private Q_SLOTS:
+
+    void finishedDownload(QNetworkReply *reply);
+
+private:
+
+    UpnpDeviceDiscoveryPrivate *d;
+
+};
+
+#endif // UPNPDEVICEDISCOVERY_H

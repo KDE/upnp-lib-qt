@@ -1,6 +1,9 @@
 set(upnp-player-qt_SOURCES
     main.cpp
     upnplistenner.cpp
+    upnpservicecaller.cpp
+    upnpdevicediscovery.cpp
+    main.qml
 )
 
 link_directories(${LIBUPNP_LIBRARY_DIRS})
@@ -13,6 +16,9 @@ target_link_libraries(upnp-player-qt
     LINK_PRIVATE
         Qt5::Core
         Qt5::Network
+        Qt5::Quick
+        Qt5::Widgets
+        Qt5::Xml
         KDSoap::kdsoap
         ${LIBUPNP_LIBRARIES}
 )
