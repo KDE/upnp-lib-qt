@@ -43,6 +43,21 @@ class UpnpServiceDescription : public QObject
                WRITE setServiceId
                NOTIFY serviceIdChanged)
 
+    Q_PROPERTY(QVariant SCPDURL
+               READ SCPDURL
+               WRITE setSCPDURL
+               NOTIFY SCPDURLChanged)
+
+    Q_PROPERTY(QVariant controlURL
+               READ controlURL
+               WRITE setControlURL
+               NOTIFY controlURLChanged)
+
+    Q_PROPERTY(QVariant eventSubURL
+               READ eventSubURL
+               WRITE setEventSubURL
+               NOTIFY eventSubURLChanged)
+
 public:
 
     explicit UpnpServiceDescription(QObject *parent = 0);
@@ -57,11 +72,29 @@ public:
 
     const QVariant& serviceId() const;
 
+    void setSCPDURL(const QVariant &newSCPDURL);
+
+    const QVariant& SCPDURL() const;
+
+    void setControlURL(const QVariant &newControlURL);
+
+    const QVariant& controlURL() const;
+
+    void setEventSubURL(const QVariant &newEventSubURL);
+
+    const QVariant& eventSubURL() const;
+
 Q_SIGNALS:
 
     void serviceTypeChanged();
 
     void serviceIdChanged();
+
+    void SCPDURLChanged();
+
+    void controlURLChanged();
+
+    void eventSubURLChanged();
 
 public Q_SLOTS:
 

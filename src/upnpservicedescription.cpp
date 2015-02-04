@@ -31,7 +31,7 @@ class UpnpServiceDescriptionPrivate
 public:
 
     UpnpServiceDescriptionPrivate()
-        : mNetworkAccess(), mServiceType(), mServiceId()
+        : mNetworkAccess(), mServiceType(), mServiceId(), mSCPDURL(), mControlURL(), mEventSubURL()
     {
     }
 
@@ -40,6 +40,12 @@ public:
     QVariant mServiceType;
 
     QVariant mServiceId;
+
+    QVariant mSCPDURL;
+
+    QVariant mControlURL;
+
+    QVariant mEventSubURL;
 };
 
 UpnpServiceDescription::UpnpServiceDescription(QObject *parent)
@@ -72,6 +78,39 @@ void UpnpServiceDescription::setServiceId(const QVariant &newServiceId)
 const QVariant &UpnpServiceDescription::serviceId() const
 {
     return d->mServiceId;
+}
+
+void UpnpServiceDescription::setSCPDURL(const QVariant &newSCPDURL)
+{
+    d->mSCPDURL = newSCPDURL;
+    Q_EMIT SCPDURLChanged();
+}
+
+const QVariant &UpnpServiceDescription::SCPDURL() const
+{
+    return d->mSCPDURL;
+}
+
+void UpnpServiceDescription::setControlURL(const QVariant &newControlURL)
+{
+    d->mControlURL = newControlURL;
+    Q_EMIT controlURLChanged();
+}
+
+const QVariant &UpnpServiceDescription::controlURL() const
+{
+    return d->mControlURL;
+}
+
+void UpnpServiceDescription::setEventSubURL(const QVariant &newEventSubURL)
+{
+    d->mEventSubURL = newEventSubURL;
+    Q_EMIT eventSubURLChanged();
+}
+
+const QVariant &UpnpServiceDescription::eventSubURL() const
+{
+    return d->mEventSubURL;
 }
 
 void UpnpServiceDescription::downloadAndParseServiceDescription(const QUrl &serviceUrl)
