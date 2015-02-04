@@ -161,20 +161,20 @@ int UpnpListenner::upnpInternalCallBack(Upnp_EventType EventType, void *Event)
     switch(EventType)
     {
     case UPNP_CONTROL_ACTION_REQUEST:
-        qDebug() << "UPNP_CONTROL_ACTION_REQUEST";
+        //qDebug() << "UPNP_CONTROL_ACTION_REQUEST";
         break;
     case UPNP_CONTROL_ACTION_COMPLETE:
-        qDebug() << "UPNP_CONTROL_ACTION_COMPLETE";
+        //qDebug() << "UPNP_CONTROL_ACTION_COMPLETE";
         break;
     case UPNP_CONTROL_GET_VAR_REQUEST:
-        qDebug() << "UPNP_CONTROL_GET_VAR_REQUEST";
+        //qDebug() << "UPNP_CONTROL_GET_VAR_REQUEST";
         break;
     case UPNP_CONTROL_GET_VAR_COMPLETE:
-        qDebug() << "UPNP_CONTROL_GET_VAR_COMPLETE";
+        //qDebug() << "UPNP_CONTROL_GET_VAR_COMPLETE";
         break;
     case UPNP_DISCOVERY_ADVERTISEMENT_ALIVE:
     {
-        qDebug() << "UPNP_DISCOVERY_ADVERTISEMENT_ALIVE";
+        //qDebug() << "UPNP_DISCOVERY_ADVERTISEMENT_ALIVE";
         Upnp_Discovery *searchResult = static_cast<Upnp_Discovery*>(Event);
 
         const int oldSize = d->mDiscoveryResults.size();
@@ -190,7 +190,7 @@ int UpnpListenner::upnpInternalCallBack(Upnp_EventType EventType, void *Event)
     }
     case UPNP_DISCOVERY_ADVERTISEMENT_BYEBYE:
     {
-        qDebug() << "UPNP_DISCOVERY_ADVERTISEMENT_BYEBYE";
+        //qDebug() << "UPNP_DISCOVERY_ADVERTISEMENT_BYEBYE";
         Upnp_Discovery *searchResult = static_cast<Upnp_Discovery*>(Event);
 
         auto it = d->mDiscoveryResults.find(*searchResult);
@@ -204,7 +204,7 @@ int UpnpListenner::upnpInternalCallBack(Upnp_EventType EventType, void *Event)
     }
     case UPNP_DISCOVERY_SEARCH_RESULT:
     {
-        qDebug() << "UPNP_DISCOVERY_SEARCH_RESULT";
+        //qDebug() << "UPNP_DISCOVERY_SEARCH_RESULT";
         Upnp_Discovery *searchResult = static_cast<Upnp_Discovery*>(Event);
 
         const int oldSize = d->mDiscoveryResults.size();
@@ -214,6 +214,7 @@ int UpnpListenner::upnpInternalCallBack(Upnp_EventType EventType, void *Event)
         if (oldSize < d->mDiscoveryResults.size()) {
             auto it = d->mDiscoveryResults.find(*searchResult);
 
+#if 0
             qDebug() << "new service";
             qDebug() << "DeviceId:" << searchResult->DeviceId;
             qDebug() << "DeviceType:" << searchResult->DeviceType;
@@ -226,6 +227,7 @@ int UpnpListenner::upnpInternalCallBack(Upnp_EventType EventType, void *Event)
             qDebug() << "ErrCode:" << searchResult->ErrCode;
             qDebug() << "Expires:" << searchResult->Expires;
             qDebug() << "DestAddr:" << QHostAddress(reinterpret_cast<const sockaddr *>(&searchResult->DestAddr));
+#endif
 
             Q_EMIT newService(*it);
         }
@@ -233,29 +235,29 @@ int UpnpListenner::upnpInternalCallBack(Upnp_EventType EventType, void *Event)
         break;
     }
     case UPNP_DISCOVERY_SEARCH_TIMEOUT:
-        qDebug() << "UPNP_DISCOVERY_SEARCH_TIMEOUT";
+        //qDebug() << "UPNP_DISCOVERY_SEARCH_TIMEOUT";
         Q_EMIT searchTimeOut();
         break;
     case UPNP_EVENT_SUBSCRIPTION_REQUEST:
-        qDebug() << "UPNP_EVENT_SUBSCRIPTION_REQUEST";
+        //qDebug() << "UPNP_EVENT_SUBSCRIPTION_REQUEST";
         break;
     case UPNP_EVENT_RECEIVED:
-        qDebug() << "UPNP_EVENT_RECEIVED";
+        //qDebug() << "UPNP_EVENT_RECEIVED";
         break;
     case UPNP_EVENT_RENEWAL_COMPLETE:
-        qDebug() << "UPNP_EVENT_RENEWAL_COMPLETE";
+        //qDebug() << "UPNP_EVENT_RENEWAL_COMPLETE";
         break;
     case UPNP_EVENT_SUBSCRIBE_COMPLETE:
-        qDebug() << "UPNP_EVENT_SUBSCRIBE_COMPLETE";
+        //qDebug() << "UPNP_EVENT_SUBSCRIBE_COMPLETE";
         break;
     case UPNP_EVENT_UNSUBSCRIBE_COMPLETE:
-        qDebug() << "UPNP_EVENT_UNSUBSCRIBE_COMPLETE";
+        //qDebug() << "UPNP_EVENT_UNSUBSCRIBE_COMPLETE";
         break;
     case UPNP_EVENT_AUTORENEWAL_FAILED:
-        qDebug() << "UPNP_EVENT_AUTORENEWAL_FAILED";
+        //qDebug() << "UPNP_EVENT_AUTORENEWAL_FAILED";
         break;
     case UPNP_EVENT_SUBSCRIPTION_EXPIRED:
-        qDebug() << "UPNP_EVENT_SUBSCRIPTION_EXPIRED";
+        //qDebug() << "UPNP_EVENT_SUBSCRIPTION_EXPIRED";
         break;
     }
 

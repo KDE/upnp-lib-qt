@@ -34,14 +34,8 @@ ApplicationWindow {
         id: myListenner
     }
 
-    UpnpDeviceDiscovery {
+    UpnpDeviceDescription {
         id: deviceParser
-    }
-
-    UpnpServiceCaller {
-        id: serviceCaller
-        endPoint: 'http://127.0.0.1:49494/upnp/control/rendertransport1'
-        messageNamespace: 'urn:schemas-upnp-org:service:AVTransport:1'
     }
 
     Button {

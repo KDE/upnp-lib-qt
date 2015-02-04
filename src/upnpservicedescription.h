@@ -17,28 +17,55 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#ifndef UPNPDEVICEDISCOVERY_H
-#define UPNPDEVICEDISCOVERY_H
+#ifndef UPNPSERVICECALLER_H
+#define UPNPSERVICECALLER_H
 
 #include <QtCore/QObject>
+#include <QtCore/QString>
+#include <QtCore/QVariant>
+#include <QtCore/QVariantList>
+#include <QtCore/QUrl>
 
-class UpnpDeviceDiscoveryPrivate;
+class UpnpServiceDescriptionPrivate;
 class QNetworkReply;
 
-class UpnpDeviceDiscovery : public QObject
+class UpnpServiceDescription : public QObject
 {
     Q_OBJECT
 
-public:
-    explicit UpnpDeviceDiscovery(QObject *parent = 0);
+    Q_PROPERTY(QVariant serviceType
+               READ serviceType
+               WRITE setServiceType
+               NOTIFY serviceTypeChanged)
 
-    ~UpnpDeviceDiscovery();
+    Q_PROPERTY(QVariant serviceId
+               READ serviceId
+               WRITE setServiceId
+               NOTIFY serviceIdChanged)
+
+public:
+
+    explicit UpnpServiceDescription(QObject *parent = 0);
+
+    ~UpnpServiceDescription();
+
+    void setServiceType(const QVariant &newServiceType);
+
+    const QVariant& serviceType() const;
+
+    void setServiceId(const QVariant &newServiceId);
+
+    const QVariant& serviceId() const;
 
 Q_SIGNALS:
 
+    void serviceTypeChanged();
+
+    void serviceIdChanged();
+
 public Q_SLOTS:
 
-    void downloadAndParseDeviceDescription(const QUrl &serviceUrl);
+    void downloadAndParseServiceDescription(const QUrl &serviceUrl);
 
 private Q_SLOTS:
 
@@ -46,8 +73,7 @@ private Q_SLOTS:
 
 private:
 
-    UpnpDeviceDiscoveryPrivate *d;
-
+    UpnpServiceDescriptionPrivate *d;
 };
 
-#endif // UPNPDEVICEDISCOVERY_H
+#endif // UPNPSERVICECALLER_H

@@ -1,8 +1,8 @@
 set(upnp-player-qt_SOURCES
     main.cpp
     upnplistenner.cpp
-    upnpservicecaller.cpp
-    upnpdevicediscovery.cpp
+    upnpservicedescription.cpp
+    upnpdevicedescription.cpp
     main.qml
 )
 
