@@ -37,6 +37,8 @@ int main(int argc, char *argv[])
     qmlRegisterType<UpnpDeviceDescription>("org.mgallien.QmlExtension", 1, 0, "UpnpDeviceDescription");
     qmlRegisterType<UpnpServiceDescription>("org.mgallien.QmlExtension", 1, 0, "UpnpServiceDescription");
 
+    qRegisterMetaType<QPointer<UpnpServiceDescription> >();
+
     QQmlApplicationEngine engine(QUrl(QStringLiteral("./main.qml")));
 
     app.exec();

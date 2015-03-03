@@ -20,18 +20,47 @@
 #include "upnpservicedescription.h"
 
 #include <KDSoapClient/KDSoapClientInterface.h>
+#include <KDSoapClient/KDSoapMessage.h>
 
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtNetwork/QNetworkReply>
 
 #include <QtXml/QDomDocument>
 
+enum class UpnpArgumentDirection
+{
+    In,
+    Out,
+};
+
+class UpnpActionArgumentDescription
+{
+public:
+
+    QString mName;
+
+    UpnpArgumentDirection mDirection;
+
+    bool mIsReturnValue;
+
+    QString mRelatedStateVariable;
+};
+
+class UpnpActionDescription
+{
+public:
+
+    QString mName;
+
+    QList<UpnpActionArgumentDescription> mArguments;
+};
+
 class UpnpServiceDescriptionPrivate
 {
 public:
 
     UpnpServiceDescriptionPrivate()
-        : mNetworkAccess(), mServiceType(), mServiceId(), mSCPDURL(), mControlURL(), mEventSubURL()
+        : mNetworkAccess(), mServiceType(), mServiceId(), mBaseURL(), mSCPDURL(), mControlURL(), mEventSubURL(), mActions()
     {
     }
 
@@ -41,11 +70,15 @@ public:
 
     QVariant mServiceId;
 
+    QVariant mBaseURL;
+
     QVariant mSCPDURL;
 
     QVariant mControlURL;
 
     QVariant mEventSubURL;
+
+    QMap<QString, UpnpActionDescription> mActions;
 };
 
 UpnpServiceDescription::UpnpServiceDescription(QObject *parent)
@@ -56,6 +89,17 @@ UpnpServiceDescription::UpnpServiceDescription(QObject *parent)
 UpnpServiceDescription::~UpnpServiceDescription()
 {
     delete d;
+}
+
+void UpnpServiceDescription::setBaseURL(const QVariant &newBaseURL)
+{
+    d->mBaseURL = newBaseURL;
+    Q_EMIT baseURLChanged();
+}
+
+const QVariant &UpnpServiceDescription::baseURL() const
+{
+    return d->mBaseURL;
 }
 
 void UpnpServiceDescription::setServiceType(const QVariant &newServiceType)
@@ -113,6 +157,25 @@ const QVariant &UpnpServiceDescription::eventSubURL() const
     return d->mEventSubURL;
 }
 
+void UpnpServiceDescription::callAction(const QString &action)
+{
+    qDebug() << "hello";
+
+    QUrl controlUrl(d->mBaseURL.toUrl());
+    controlUrl.setPath(d->mControlURL.toString());
+
+    qDebug() << "url:" << controlUrl;
+
+    KDSoapClientInterface clientInterface(controlUrl.toString(), d->mServiceType.toString());
+    clientInterface.setSoapVersion(KDSoapClientInterface::SOAP1_1);
+    clientInterface.setStyle(KDSoapClientInterface::RPCStyle);
+
+    KDSoapMessage message;
+    message.addArgument(QStringLiteral("InstanceID"), QStringLiteral("0"));
+    KDSoapMessage answer = clientInterface.call(action, message, d->mServiceType.toString() + QStringLiteral("#") + action);
+    qDebug() << "answer" << answer;
+}
+
 void UpnpServiceDescription::downloadAndParseServiceDescription(const QUrl &serviceUrl)
 {
     qDebug() << "UpnpServiceCaller::downloadAndParseServiceDescription" << serviceUrl;
@@ -123,9 +186,70 @@ void UpnpServiceDescription::finishedDownload(QNetworkReply *reply)
 {
     qDebug() << "UpnpServiceCaller::finishedDownload" << reply->url();
     if (reply->isFinished() && reply->error() == QNetworkReply::NoError) {
+        qDebug() << "serviceId" << d->mServiceId;
+        qDebug() << "serviceType" << d->mServiceType;
+        qDebug() << "SCPDURL" << d->mSCPDURL;
+        qDebug() << "controlURL" << d->mControlURL;
+        qDebug() << "eventSubURL" << d->mEventSubURL;
+
         QDomDocument serviceDescriptionDocument;
         serviceDescriptionDocument.setContent(reply);
-        qDebug() << serviceDescriptionDocument.toString();
+
+        const QDomElement &scpdRoot = serviceDescriptionDocument.documentElement();
+
+        const QDomElement &actionListRoot = scpdRoot.firstChildElement(QStringLiteral("actionList"));
+        QDomNode currentChild = actionListRoot.firstChild();
+        while (!currentChild.isNull()) {
+            const QDomNode &nameNode = currentChild.firstChildElement(QStringLiteral("name"));
+
+            QString actionName;
+            if (!nameNode.isNull()) {
+                actionName = nameNode.toElement().text();
+            }
+
+            d->mActions[actionName].mName = actionName;
+
+            const QDomNode &argumentListNode = currentChild.firstChildElement(QStringLiteral("argumentList"));
+            QDomNode argumentNode = argumentListNode.firstChild();
+            while (!argumentNode.isNull()) {
+                const QDomNode &argumentNameNode = argumentNode.firstChildElement(QStringLiteral("name"));
+                const QDomNode &argumentDirectionNode = argumentNode.firstChildElement(QStringLiteral("direction"));
+                const QDomNode &argumentRetvalNode = argumentNode.firstChildElement(QStringLiteral("retval"));
+                const QDomNode &argumentRelatedStateVariableNode = argumentNode.firstChildElement(QStringLiteral("relatedStateVariable"));
+
+                UpnpActionArgumentDescription newArgument;
+                newArgument.mName = argumentNameNode.toElement().text();
+                newArgument.mDirection = (argumentDirectionNode.toElement().text() == QStringLiteral("in") ? UpnpArgumentDirection::In : UpnpArgumentDirection::Out);
+                newArgument.mIsReturnValue = !argumentRetvalNode.isNull();
+                newArgument.mRelatedStateVariable = argumentRelatedStateVariableNode.toElement().text();
+
+                d->mActions[actionName].mArguments.push_back(newArgument);
+
+                argumentNode = argumentNode.nextSibling();
+            }
+
+            qDebug() << "new service: " << d->mActions[actionName].mName;
+            for (auto itArg = d->mActions[actionName].mArguments.begin(); itArg != d->mActions[actionName].mArguments.end(); ++itArg) {
+                qDebug() << "argument: " << itArg->mName;
+                qDebug() << "direction: " << (itArg->mDirection == UpnpArgumentDirection::In ? "In" : "Out");
+                qDebug() << "state variable: " << itArg->mRelatedStateVariable;
+                qDebug() << (itArg->mIsReturnValue ? "is return value" : "");
+            }
+            qDebug() << "\n";
+
+            currentChild = currentChild.nextSibling();
+        }
+
+        const QDomElement &serviceStateTableRoot = scpdRoot.firstChildElement(QStringLiteral("serviceStateTable"));
+        currentChild = serviceStateTableRoot.firstChild();
+        while (!currentChild.isNull()) {
+            const QDomNode &nameNode = currentChild.firstChildElement(QStringLiteral("name"));
+            if (!nameNode.isNull()) {
+                qDebug() << "state variable name" << nameNode.toElement().text();
+            }
+
+            currentChild = currentChild.nextSibling();
+        }
     }
 }
 

@@ -24,6 +24,7 @@
 
 class UpnpDeviceDiscoveryPrivate;
 class QNetworkReply;
+class UpnpServiceDescription;
 
 class UpnpDeviceDescription : public QObject
 {
@@ -105,6 +106,8 @@ public:
     const QVariant& serialNumber();
 
     const QVariant& URLBase();
+
+    Q_INVOKABLE UpnpServiceDescription* serviceById(const QString &serviceId) const;
 
 Q_SIGNALS:
 

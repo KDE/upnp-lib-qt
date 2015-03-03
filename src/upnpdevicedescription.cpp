@@ -26,6 +26,7 @@
 
 #include <QtXml/QDomDocument>
 
+#include <QtCore/QDebug>
 #include <QtCore/QList>
 #include <QtCore/QMap>
 #include <QtCore/QPointer>
@@ -143,6 +144,11 @@ const QVariant &UpnpDeviceDescription::URLBase()
     return d->mURLBase;
 }
 
+UpnpServiceDescription* UpnpDeviceDescription::serviceById(const QString &serviceId) const
+{
+    return d->mServices[serviceId].data();
+}
+
 void UpnpDeviceDescription::downloadAndParseDeviceDescription(const QUrl &serviceUrl)
 {
     qDebug() << "UpnpDeviceDiscovery::downloadAndParseServiceDescription" << serviceUrl;
@@ -221,48 +227,44 @@ void UpnpDeviceDescription::finishedDownload(QNetworkReply *reply)
         }
         Q_EMIT URLBaseChanged();
 
-        if (!deviceDescriptionDocument.documentElement().firstChildElement(QStringLiteral("URLBase")).isNull()) {
-            qDebug() << "base url" << deviceDescriptionDocument.documentElement().firstChildElement(QStringLiteral("URLBase")).nodeName();
-            qDebug() << "base url" << deviceDescriptionDocument.documentElement().firstChildElement(QStringLiteral("URLBase")).nodeType();
-            qDebug() << "base url" << deviceDescriptionDocument.documentElement().firstChildElement(QStringLiteral("URLBase")).toElement().text();
+        auto serviceList = deviceDescriptionDocument.elementsByTagName(QStringLiteral("service"));
+        for (int serviceIndex = 0; serviceIndex < serviceList.length(); ++serviceIndex) {
+            const QDomNode &serviceNode(serviceList.at(serviceIndex));
+            if (!serviceNode.isNull()) {
+                QPointer<UpnpServiceDescription> newService(new UpnpServiceDescription);
 
-            const QString &deviceBaseUrl(deviceDescriptionDocument.documentElement().firstChildElement(QStringLiteral("URLBase")).toElement().text());
-            auto serviceList = deviceDescriptionDocument.elementsByTagName(QStringLiteral("service"));
-            for (int serviceIndex = 0; serviceIndex < serviceList.length(); ++serviceIndex) {
-                const QDomNode &serviceNode(serviceList.at(serviceIndex));
-                if (!serviceNode.isNull()) {
-                    QPointer<UpnpServiceDescription> newService(new UpnpServiceDescription);
+                newService->setBaseURL(d->mURLBase);
 
-                    const QDomNode &serviceTypeNode = serviceNode.firstChildElement(QStringLiteral("serviceType"));
-                    if (!serviceTypeNode.isNull()) {
-                        newService->setServiceType(serviceTypeNode.toElement().text());
-                    }
-
-                    const QDomNode &serviceIdNode = serviceNode.firstChildElement(QStringLiteral("serviceId"));
-                    if (!serviceIdNode.isNull()) {
-                        newService->setServiceId(serviceIdNode.toElement().text());
-                    }
-
-                    const QDomNode &SCPDURLNode = serviceNode.firstChildElement(QStringLiteral("SCPDURL"));
-                    if (!SCPDURLNode.isNull()) {
-                        newService->setSCPDURL(SCPDURLNode.toElement().text());
-                    }
-
-                    const QDomNode &controlURLNode = serviceNode.firstChildElement(QStringLiteral("controlURL"));
-                    if (!controlURLNode.isNull()) {
-                        newService->setControlURL(controlURLNode.toElement().text());
-                    }
-
-                    const QDomNode &eventSubURLNode = serviceNode.firstChildElement(QStringLiteral("eventSubURL"));
-                    if (!eventSubURLNode.isNull()) {
-                        newService->setEventSubURL(eventSubURLNode.toElement().text());
-                    }
-
-                    QUrl serviceUrl(d->mURLBase.toUrl());
-                    serviceUrl.setPath(newService->SCPDURL().toString());
-
-                    newService->downloadAndParseServiceDescription(serviceUrl);
+                const QDomNode &serviceTypeNode = serviceNode.firstChildElement(QStringLiteral("serviceType"));
+                if (!serviceTypeNode.isNull()) {
+                    newService->setServiceType(serviceTypeNode.toElement().text());
                 }
+
+                const QDomNode &serviceIdNode = serviceNode.firstChildElement(QStringLiteral("serviceId"));
+                if (!serviceIdNode.isNull()) {
+                    newService->setServiceId(serviceIdNode.toElement().text());
+                }
+
+                const QDomNode &SCPDURLNode = serviceNode.firstChildElement(QStringLiteral("SCPDURL"));
+                if (!SCPDURLNode.isNull()) {
+                    newService->setSCPDURL(SCPDURLNode.toElement().text());
+                }
+
+                const QDomNode &controlURLNode = serviceNode.firstChildElement(QStringLiteral("controlURL"));
+                if (!controlURLNode.isNull()) {
+                    newService->setControlURL(controlURLNode.toElement().text());
+                }
+
+                const QDomNode &eventSubURLNode = serviceNode.firstChildElement(QStringLiteral("eventSubURL"));
+                if (!eventSubURLNode.isNull()) {
+                    newService->setEventSubURL(eventSubURLNode.toElement().text());
+                }
+
+                QUrl serviceUrl(d->mURLBase.toUrl());
+                serviceUrl.setPath(newService->SCPDURL().toString());
+
+                newService->downloadAndParseServiceDescription(serviceUrl);
+                d->mServices[serviceIdNode.toElement().text()] = newService;
             }
         }
     }

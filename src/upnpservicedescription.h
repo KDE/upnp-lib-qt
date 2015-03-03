@@ -43,6 +43,11 @@ class UpnpServiceDescription : public QObject
                WRITE setServiceId
                NOTIFY serviceIdChanged)
 
+    Q_PROPERTY(QVariant baseURL
+               READ baseURL
+               WRITE setBaseURL
+               NOTIFY baseURLChanged)
+
     Q_PROPERTY(QVariant SCPDURL
                READ SCPDURL
                WRITE setSCPDURL
@@ -64,6 +69,10 @@ public:
 
     ~UpnpServiceDescription();
 
+    void setBaseURL(const QVariant &newBaseURL);
+
+    const QVariant& baseURL() const;
+
     void setServiceType(const QVariant &newServiceType);
 
     const QVariant& serviceType() const;
@@ -84,11 +93,15 @@ public:
 
     const QVariant& eventSubURL() const;
 
+    Q_INVOKABLE void callAction(const QString &action);
+
 Q_SIGNALS:
 
     void serviceTypeChanged();
 
     void serviceIdChanged();
+
+    void baseURLChanged();
 
     void SCPDURLChanged();
 

@@ -43,4 +43,11 @@ ApplicationWindow {
         text: "Test"
         onClicked: deviceParser.downloadAndParseDeviceDescription('http://127.0.0.1:49494/description.xml')
     }
+
+    Button {
+        id: callButton
+        anchors.top: backButton.bottom
+        text: "Call Action"
+        onClicked: deviceParser.serviceById("urn:upnp-org:serviceId:ConnectionManager").callAction("PrepareForConnection")
+    }
 }
