@@ -3,6 +3,7 @@ set(upnp-player-qt_SOURCES
     upnplistenner.cpp
     upnpservicedescription.cpp
     upnpdevicedescription.cpp
+    upnphttpserver.cpp
     main.qml
 )
 
@@ -20,6 +21,7 @@ target_link_libraries(upnp-player-qt
         Qt5::Widgets
         Qt5::Xml
         KDSoap::kdsoap
+        KDSoap::kdsoap-server
         ${LIBUPNP_LIBRARIES}
 )
 
