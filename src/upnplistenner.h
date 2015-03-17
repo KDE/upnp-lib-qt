@@ -35,7 +35,7 @@ public:
 
     static bool UpnpInit();
 
-    static void UpnpFinish();
+    static void UpnpDiscoveryFinish();
 
     int upnpError() const;
 
@@ -48,6 +48,11 @@ Q_SIGNALS:
     void removedService(const Upnp_Discovery &serviceDiscovery);
 
 public Q_SLOTS:
+
+    /**
+     * @brief searchAllUpnpDevice will trigger a search for all upnp device
+     */
+    bool searchAllUpnpDevice();
 
     /**
      * @brief searchUpnpContentDirectory will trigger a search for upnp service of MediaServer (UPNP/DLNA)
@@ -65,5 +70,7 @@ private:
 
     UpnpListennerPrivate *d;
 };
+
+Q_DECLARE_METATYPE(Upnp_Discovery)
 
 #endif // UPNPLISTENNER_H

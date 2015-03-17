@@ -62,10 +62,6 @@ UpnpListenner::UpnpListenner(QObject *parent)
     } else {
         qDebug() << "fail";
     }
-
-    searchUpnpContentDirectory();
-
-    searchUpnpPlayerControl();
 }
 
 UpnpListenner::~UpnpListenner()
@@ -85,14 +81,27 @@ bool UpnpListenner::UpnpInit()
     return (res == UPNP_E_SUCCESS);
 }
 
-void UpnpListenner::UpnpFinish()
+void UpnpListenner::UpnpDiscoveryFinish()
 {
-    UpnpFinish();
+    ::UpnpFinish();
 }
 
 int UpnpListenner::upnpError() const
 {
     return d->mUpnpLibraryStatus;
+}
+
+bool UpnpListenner::searchAllUpnpDevice()
+{
+    d->mUpnpLibraryStatus = UpnpSearchAsync(d->mClientHandle, 60, "ssdp:all", this);
+
+    if (d->mUpnpLibraryStatus == UPNP_E_SUCCESS) {
+        qDebug() << "success";
+    } else {
+        qDebug() << "fail";
+    }
+
+    return d->mUpnpLibraryStatus == UPNP_E_SUCCESS;
 }
 
 bool UpnpListenner::searchUpnpContentDirectory()
@@ -179,11 +188,29 @@ int UpnpListenner::upnpInternalCallBack(Upnp_EventType EventType, void *Event)
 
         const int oldSize = d->mDiscoveryResults.size();
 
-        d->mDiscoveryResults.insert(*searchResult);
+        if (searchResult->DeviceType[0] != 0) {
+            d->mDiscoveryResults.insert(*searchResult);
 
-        if (oldSize < d->mDiscoveryResults.size()) {
-            auto it = d->mDiscoveryResults.find(*searchResult);
-            Q_EMIT newService(*it);
+            if (oldSize < d->mDiscoveryResults.size()) {
+                auto it = d->mDiscoveryResults.find(*searchResult);
+
+#if 0
+                qDebug() << "new service";
+                qDebug() << "DeviceId:" << searchResult->DeviceId;
+                qDebug() << "DeviceType:" << searchResult->DeviceType;
+                qDebug() << "ServiceType:" << searchResult->ServiceType;
+                qDebug() << "ServiceVer:" << searchResult->ServiceVer;
+                qDebug() << "Location:" << searchResult->Location;
+                qDebug() << "Os:" << searchResult->Os;
+                qDebug() << "Date:" << searchResult->Date;
+                qDebug() << "Ext:" << searchResult->Ext;
+                qDebug() << "ErrCode:" << searchResult->ErrCode;
+                qDebug() << "Expires:" << searchResult->Expires;
+                qDebug() << "DestAddr:" << QHostAddress(reinterpret_cast<const sockaddr *>(&searchResult->DestAddr));
+#endif
+
+                Q_EMIT newService(*it);
+            }
         }
 
         break;

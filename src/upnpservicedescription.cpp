@@ -25,6 +25,9 @@
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtNetwork/QNetworkReply>
 
+#include <QtCore/QBuffer>
+#include <QtCore/QTextStream>
+
 #include <QtXml/QDomDocument>
 
 enum class UpnpArgumentDirection
@@ -157,23 +160,47 @@ const QVariant &UpnpServiceDescription::eventSubURL() const
     return d->mEventSubURL;
 }
 
-void UpnpServiceDescription::callAction(const QString &action)
+void UpnpServiceDescription::callAction(const QString &action, const QList<QVariant> &arguments)
 {
-    qDebug() << "hello";
+    auto itAction = d->mActions.find(action);
+    if (itAction != d->mActions.end()) {
+        QUrl controlUrl(d->mBaseURL.toUrl());
+        controlUrl.setPath(d->mControlURL.toString());
 
-    QUrl controlUrl(d->mBaseURL.toUrl());
-    controlUrl.setPath(d->mControlURL.toString());
+        const UpnpActionDescription &actionDescription(itAction.value());
 
-    qDebug() << "url:" << controlUrl;
+        KDSoapClientInterface clientInterface(controlUrl.toString(), d->mServiceType.toString());
+        clientInterface.setSoapVersion(KDSoapClientInterface::SOAP1_1);
+        clientInterface.setStyle(KDSoapClientInterface::RPCStyle);
 
-    KDSoapClientInterface clientInterface(controlUrl.toString(), d->mServiceType.toString());
-    clientInterface.setSoapVersion(KDSoapClientInterface::SOAP1_1);
-    clientInterface.setStyle(KDSoapClientInterface::RPCStyle);
+        KDSoapMessage message;
 
-    KDSoapMessage message;
-    message.addArgument(QStringLiteral("InstanceID"), QStringLiteral("0"));
-    KDSoapMessage answer = clientInterface.call(action, message, d->mServiceType.toString() + QStringLiteral("#") + action);
-    qDebug() << "answer" << answer;
+        auto itArgumentName = actionDescription.mArguments.begin();
+        auto itArgumentValue = arguments.begin();
+        for (; itArgumentName != actionDescription.mArguments.end(); ++itArgumentName) {
+            message.addArgument(itArgumentName->mName, itArgumentValue->toString());
+
+            ++itArgumentValue;
+            if (itArgumentValue == arguments.end()) {
+                break;
+            }
+        }
+
+        KDSoapMessage answer = clientInterface.call(action, message, d->mServiceType.toString() + QStringLiteral("#") + action);
+    }
+}
+
+void UpnpServiceDescription::subscribeEvents()
+{
+    QUrl eventUrl(d->mBaseURL.toUrl());
+    eventUrl.setPath(d->mEventSubURL.toString());
+
+    QNetworkRequest myRequest(eventUrl);
+    myRequest.setRawHeader("CALLBACK", "<http://127.0.0.1:42424>");
+    myRequest.setRawHeader("NT", "upnp:event");
+    myRequest.setRawHeader("TIMEOUT", "Second-infinite");
+
+    d->mNetworkAccess.sendCustomRequest(myRequest, "SUBSCRIBE");
 }
 
 void UpnpServiceDescription::downloadAndParseServiceDescription(const QUrl &serviceUrl)
@@ -186,11 +213,13 @@ void UpnpServiceDescription::finishedDownload(QNetworkReply *reply)
 {
     qDebug() << "UpnpServiceCaller::finishedDownload" << reply->url();
     if (reply->isFinished() && reply->error() == QNetworkReply::NoError) {
+#if 0
         qDebug() << "serviceId" << d->mServiceId;
         qDebug() << "serviceType" << d->mServiceType;
         qDebug() << "SCPDURL" << d->mSCPDURL;
         qDebug() << "controlURL" << d->mControlURL;
         qDebug() << "eventSubURL" << d->mEventSubURL;
+#endif
 
         QDomDocument serviceDescriptionDocument;
         serviceDescriptionDocument.setContent(reply);
@@ -228,6 +257,7 @@ void UpnpServiceDescription::finishedDownload(QNetworkReply *reply)
                 argumentNode = argumentNode.nextSibling();
             }
 
+#if 0
             qDebug() << "new service: " << d->mActions[actionName].mName;
             for (auto itArg = d->mActions[actionName].mArguments.begin(); itArg != d->mActions[actionName].mArguments.end(); ++itArg) {
                 qDebug() << "argument: " << itArg->mName;
@@ -236,10 +266,12 @@ void UpnpServiceDescription::finishedDownload(QNetworkReply *reply)
                 qDebug() << (itArg->mIsReturnValue ? "is return value" : "");
             }
             qDebug() << "\n";
+#endif
 
             currentChild = currentChild.nextSibling();
         }
 
+#if 0
         const QDomElement &serviceStateTableRoot = scpdRoot.firstChildElement(QStringLiteral("serviceStateTable"));
         currentChild = serviceStateTableRoot.firstChild();
         while (!currentChild.isNull()) {
@@ -250,6 +282,7 @@ void UpnpServiceDescription::finishedDownload(QNetworkReply *reply)
 
             currentChild = currentChild.nextSibling();
         }
+#endif
     }
 }
 

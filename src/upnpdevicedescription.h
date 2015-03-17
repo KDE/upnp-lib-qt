@@ -30,6 +30,11 @@ class UpnpDeviceDescription : public QObject
 {
     Q_OBJECT
 
+    Q_PROPERTY(QString UUID
+               READ UUID
+               WRITE setUUID
+               NOTIFY UUIDChanged)
+
     Q_PROPERTY(QVariant UDN
                READ UDN
                NOTIFY UDNChanged)
@@ -83,6 +88,10 @@ public:
 
     ~UpnpDeviceDescription();
 
+    const QString& UUID() const;
+
+    void setUUID(const QString &uuid);
+
     const QVariant& UDN();
 
     const QVariant& UPC();
@@ -111,29 +120,31 @@ public:
 
 Q_SIGNALS:
 
-    void UDNChanged();
+    void UUIDChanged();
 
-    void UPCChanged();
+    void UDNChanged(const QString &uuid);
 
-    void deviceTypeChanged();
+    void UPCChanged(const QString &uuid);
 
-    void friendlyNameChanged();
+    void deviceTypeChanged(const QString &uuid);
 
-    void manufacturerChanged();
+    void friendlyNameChanged(const QString &uuid);
 
-    void manufacturerURLChanged();
+    void manufacturerChanged(const QString &uuid);
 
-    void modelDescriptionChanged();
+    void manufacturerURLChanged(const QString &uuid);
 
-    void modelNameChanged();
+    void modelDescriptionChanged(const QString &uuid);
 
-    void modelNumberChanged();
+    void modelNameChanged(const QString &uuid);
 
-    void modelURLChanged();
+    void modelNumberChanged(const QString &uuid);
 
-    void serialNumberChanged();
+    void modelURLChanged(const QString &uuid);
 
-    void URLBaseChanged();
+    void serialNumberChanged(const QString &uuid);
+
+    void URLBaseChanged(const QString &uuid);
 
 public Q_SLOTS:
 

@@ -37,11 +37,13 @@ class UpnpDeviceDiscoveryPrivate
 public:
 
     UpnpDeviceDiscoveryPrivate()
-        : mNetworkAccess(), mDiscoveryResults(), mUDN(), mUPC(), mDeviceType(), mFriendlyName(),
-          mManufacturer(), mManufacturerURL(), mModelDescription(), mModelName(), mModelNumber(),
-          mModelURL(), mSerialNumber(), mURLBase()
+        : mUUID(QStringLiteral("")), mNetworkAccess(), mDiscoveryResults(), mUDN(QStringLiteral("")), mUPC(QStringLiteral("")), mDeviceType(QStringLiteral("")), mFriendlyName(QStringLiteral("")),
+          mManufacturer(QStringLiteral("")), mManufacturerURL(QStringLiteral("")), mModelDescription(QStringLiteral("")), mModelName(QStringLiteral("")), mModelNumber(QStringLiteral("")),
+          mModelURL(QStringLiteral("")), mSerialNumber(QStringLiteral("")), mURLBase(QStringLiteral(""))
     {
     }
+
+    QString mUUID;
 
     QNetworkAccessManager mNetworkAccess;
 
@@ -82,6 +84,17 @@ UpnpDeviceDescription::UpnpDeviceDescription(QObject *parent) : QObject(parent),
 UpnpDeviceDescription::~UpnpDeviceDescription()
 {
     delete d;
+}
+
+const QString &UpnpDeviceDescription::UUID() const
+{
+    return d->mUUID;
+}
+
+void UpnpDeviceDescription::setUUID(const QString &uuid)
+{
+    d->mUUID = uuid;
+    Q_EMIT UUIDChanged();
 }
 
 const QVariant &UpnpDeviceDescription::UDN()
@@ -151,17 +164,14 @@ UpnpServiceDescription* UpnpDeviceDescription::serviceById(const QString &servic
 
 void UpnpDeviceDescription::downloadAndParseDeviceDescription(const QUrl &serviceUrl)
 {
-    qDebug() << "UpnpDeviceDiscovery::downloadAndParseServiceDescription" << serviceUrl;
     d->mNetworkAccess.get(QNetworkRequest(serviceUrl));
 }
 
 void UpnpDeviceDescription::finishedDownload(QNetworkReply *reply)
 {
-    qDebug() << "UpnpDeviceDiscovery::finishedDownload" << reply->url();
     if (reply->isFinished() && reply->error() == QNetworkReply::NoError) {
         QDomDocument deviceDescriptionDocument;
         deviceDescriptionDocument.setContent(reply);
-        qDebug() << deviceDescriptionDocument.toString();
 
         const QDomElement &documentRoot = deviceDescriptionDocument.documentElement();
 
@@ -185,57 +195,58 @@ void UpnpDeviceDescription::finishedDownload(QNetworkReply *reply)
             currentChild = currentChild.nextSibling();
         }
 
-        qDebug() << "device description" << deviceDescription;
-
         d->mUDN = deviceDescription[QStringLiteral("UDN")];
-        Q_EMIT UDNChanged();
+        Q_EMIT UDNChanged(d->mUUID);
 
         d->mUPC = deviceDescription[QStringLiteral("UPC")];
-        Q_EMIT UPCChanged();
+        Q_EMIT UPCChanged(d->mUUID);
 
         d->mDeviceType = deviceDescription[QStringLiteral("deviceType")];
-        Q_EMIT deviceTypeChanged();
+        Q_EMIT deviceTypeChanged(d->mUUID);
 
         d->mFriendlyName = deviceDescription[QStringLiteral("friendlyName")];
-        Q_EMIT friendlyNameChanged();
+        qDebug() << "friendlyName" << d->mFriendlyName;
+        Q_EMIT friendlyNameChanged(d->mUUID);
 
         d->mManufacturer = deviceDescription[QStringLiteral("manufacturer")];
-        Q_EMIT manufacturerChanged();
+        Q_EMIT manufacturerChanged(d->mUUID);
 
         d->mManufacturerURL = deviceDescription[QStringLiteral("manufacturerURL")];
-        Q_EMIT manufacturerURLChanged();
+        Q_EMIT manufacturerURLChanged(d->mUUID);
 
         d->mModelDescription = deviceDescription[QStringLiteral("modelDescription")];
-        Q_EMIT modelDescriptionChanged();
+        Q_EMIT modelDescriptionChanged(d->mUUID);
 
         d->mModelName = deviceDescription[QStringLiteral("modelName")];
-        Q_EMIT modelNameChanged();
+        Q_EMIT modelNameChanged(d->mUUID);
 
         d->mModelNumber = deviceDescription[QStringLiteral("modelNumber")];
-        Q_EMIT modelNumberChanged();
+        Q_EMIT modelNumberChanged(d->mUUID);
 
         d->mModelURL = deviceDescription[QStringLiteral("modelURL")];
-        Q_EMIT modelURLChanged();
+        Q_EMIT modelURLChanged(d->mUUID);
 
         d->mSerialNumber = deviceDescription[QStringLiteral("serialNumber")];
-        Q_EMIT serialNumberChanged();
+        qDebug() << "SerialNumber" << d->mSerialNumber;
+        Q_EMIT serialNumberChanged(d->mUUID);
 
         if (deviceDescription[QStringLiteral("URLBase")].isValid() && !deviceDescription[QStringLiteral("URLBase")].toString().isEmpty()) {
             d->mURLBase = deviceDescription[QStringLiteral("URLBase")];
         } else {
             d->mURLBase = reply->url().adjusted(QUrl::RemovePath);
         }
-        Q_EMIT URLBaseChanged();
+        Q_EMIT URLBaseChanged(d->mUUID);
 
         auto serviceList = deviceDescriptionDocument.elementsByTagName(QStringLiteral("service"));
         for (int serviceIndex = 0; serviceIndex < serviceList.length(); ++serviceIndex) {
             const QDomNode &serviceNode(serviceList.at(serviceIndex));
             if (!serviceNode.isNull()) {
-                QPointer<UpnpServiceDescription> newService(new UpnpServiceDescription);
-
-                newService->setBaseURL(d->mURLBase);
+                QPointer<UpnpServiceDescription> newService;
 
                 const QDomNode &serviceTypeNode = serviceNode.firstChildElement(QStringLiteral("serviceType"));
+                newService = new UpnpServiceDescription;
+
+                newService->setBaseURL(d->mURLBase);
                 if (!serviceTypeNode.isNull()) {
                     newService->setServiceType(serviceTypeNode.toElement().text());
                 }

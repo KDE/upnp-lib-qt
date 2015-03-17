@@ -20,6 +20,8 @@
 #include "upnplistenner.h"
 #include "upnpservicedescription.h"
 #include "upnpdevicedescription.h"
+#include "upnpdevicemodel.h"
+#include "upnpbasictypes.h"
 
 #include <QtWidgets/QApplication>
 
@@ -36,14 +38,17 @@ int main(int argc, char *argv[])
     qmlRegisterType<UpnpListenner>("org.mgallien.QmlExtension", 1, 0, "UpnpListenner");
     qmlRegisterType<UpnpDeviceDescription>("org.mgallien.QmlExtension", 1, 0, "UpnpDeviceDescription");
     qmlRegisterType<UpnpServiceDescription>("org.mgallien.QmlExtension", 1, 0, "UpnpServiceDescription");
+    qmlRegisterType<UpnpDeviceModel>("org.mgallien.QmlExtension", 1, 0, "UpnpDeviceModel");
 
     qRegisterMetaType<QPointer<UpnpServiceDescription> >();
+    qRegisterMetaType<A_ARG_TYPE_InstanceID>();
+    qRegisterMetaType<Upnp_Discovery>();
 
     QQmlApplicationEngine engine(QUrl(QStringLiteral("./main.qml")));
 
     app.exec();
 
-    UpnpListenner::UpnpFinish();
+    UpnpListenner::UpnpDiscoveryFinish();
 
     return 0;
 }

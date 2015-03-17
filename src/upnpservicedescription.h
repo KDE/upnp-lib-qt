@@ -93,7 +93,9 @@ public:
 
     const QVariant& eventSubURL() const;
 
-    Q_INVOKABLE void callAction(const QString &action);
+    Q_INVOKABLE void callAction(const QString &action, const QList<QVariant> &arguments);
+
+    Q_INVOKABLE void subscribeEvents();
 
 Q_SIGNALS:
 

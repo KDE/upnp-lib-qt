@@ -4,6 +4,8 @@ set(upnp-player-qt_SOURCES
     upnpservicedescription.cpp
     upnpdevicedescription.cpp
     upnphttpserver.cpp
+    upnpdevicemodel.cpp
+    upnpbasictypes.h
     main.qml
 )
 
