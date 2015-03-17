@@ -4,6 +4,7 @@ set(upnp-player-qt_SOURCES
     upnpservicedescription.cpp
     upnpdevicedescription.cpp
     upnphttpserver.cpp
+    upnpservereventobject.cpp
     upnpcontrolrenderingcontrol.cpp
     upnpcontrolavtransport.cpp
     upnpcontrolswitchpower.cpp

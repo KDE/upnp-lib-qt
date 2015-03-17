@@ -26,9 +26,13 @@
 
 class UpnpHttpServer : public KDSoapServer
 {
+    Q_OBJECT
 public:
-    UpnpHttpServer();
-    ~UpnpHttpServer();
+    UpnpHttpServer(QObject * parent = 0);
+
+    virtual ~UpnpHttpServer();
+
+    QObject* createServerObject() Q_DECL_OVERRIDE;
 };
 
 #endif // UPNPHTTPSERVER_H

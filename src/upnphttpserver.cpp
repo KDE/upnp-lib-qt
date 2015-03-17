@@ -18,8 +18,9 @@
  */
 
 #include "upnphttpserver.h"
+#include "upnpservereventobject.h"
 
-UpnpHttpServer::UpnpHttpServer()
+UpnpHttpServer::UpnpHttpServer(QObject *parent) : KDSoapServer(parent)
 {
 
 }
@@ -27,6 +28,11 @@ UpnpHttpServer::UpnpHttpServer()
 UpnpHttpServer::~UpnpHttpServer()
 {
 
+}
+
+QObject *UpnpHttpServer::createServerObject()
+{
+    return new UpnpServerEventObject();
 }
 
 #include "moc_upnphttpserver.cpp"
