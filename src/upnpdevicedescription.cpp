@@ -20,6 +20,8 @@
 #include "upnpdevicedescription.h"
 
 #include "upnpservicedescription.h"
+#include "upnpcontrolavtransport.h"
+#include "upnpcontrolswitchpower.h"
 
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtNetwork/QNetworkReply>
@@ -244,7 +246,19 @@ void UpnpDeviceDescription::finishedDownload(QNetworkReply *reply)
                 QPointer<UpnpServiceDescription> newService;
 
                 const QDomNode &serviceTypeNode = serviceNode.firstChildElement(QStringLiteral("serviceType"));
-                newService = new UpnpServiceDescription;
+                if (!serviceTypeNode.isNull()) {
+                    if (serviceTypeNode.toElement().text() == QStringLiteral("urn:schemas-upnp-org:service:AVTransport:1")) {
+                        newService = new UpnpControlAVTransport;
+                    } else if (serviceTypeNode.toElement().text() == QStringLiteral("urn:schemas-upnp-org:service:RenderingControl:1")) {
+                        newService = new UpnpControlSwitchPower;
+                    } else if (serviceTypeNode.toElement().text() == QStringLiteral("urn:schemas-upnp-org:service:SwitchPower:1")) {
+                        newService = new UpnpControlSwitchPower;
+                    } else {
+                        newService = new UpnpServiceDescription;
+                    }
+                } else {
+                    newService = new UpnpServiceDescription;
+                }
 
                 newService->setBaseURL(d->mURLBase);
                 if (!serviceTypeNode.isNull()) {

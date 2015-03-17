@@ -4,6 +4,9 @@ set(upnp-player-qt_SOURCES
     upnpservicedescription.cpp
     upnpdevicedescription.cpp
     upnphttpserver.cpp
+    upnpcontrolrenderingcontrol.cpp
+    upnpcontrolavtransport.cpp
+    upnpcontrolswitchpower.cpp
     upnpdevicemodel.cpp
     upnpbasictypes.h
     main.qml
