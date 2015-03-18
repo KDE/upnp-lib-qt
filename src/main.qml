@@ -43,10 +43,6 @@ ApplicationWindow {
         }
     }
 
-    UpnpDeviceDescription {
-        id: deviceParser
-    }
-
     Component {
         id: rowDelegate
         Item {
@@ -67,8 +63,11 @@ ApplicationWindow {
             anchors.leftMargin: 4
             anchors.left: parent.left
             anchors.right: parent.right
+
+            property UpnpControlSwitchPower upnpService
+
             Label {
-                id: name
+                id: nameLabel
                 anchors.top: parent.top
                 anchors.left: parent.left
                 anchors.right: parent.right
@@ -83,9 +82,10 @@ ApplicationWindow {
                 font.pointSize: 12
             }
             Label {
-                anchors.top: name.bottom
+                id: deviceTypeLabel
+                anchors.top: nameLabel.bottom
                 anchors.bottom: parent.bottom
-                anchors.right: name.right
+                anchors.right: nameLabel.right
                 anchors.rightMargin: 8
                 anchors.leftMargin: 2
                 color: styleData.textColor
@@ -95,64 +95,103 @@ ApplicationWindow {
                 height: 15
                 visible: styleData.selected
             }
+            Button {
+                id: setTargetButton
+                text: "Set Target"
+                anchors.top: nameLabel.bottom
+                anchors.bottom: parent.bottom
+                anchors.right: deviceTypeLabel.left
+
+                onClicked: {
+                    if (upnpService == undefined) upnpService = deviceModel.getDeviceDescription(model.uuid).serviceById('urn:upnp-org:serviceId:SwitchPower:1')
+                    if (upnpService != undefined) upnpService.setTarget(true)
+                }
+            }
+            Button {
+                id: getTargetButton
+                text: "Get Target"
+                anchors.top: nameLabel.bottom
+                anchors.bottom: parent.bottom
+                anchors.right: setTargetButton.left
+
+                onClicked: {
+                    if (upnpService == undefined) upnpService = deviceModel.getDeviceDescription(model.uuid).serviceById('urn:upnp-org:serviceId:SwitchPower:1')
+                    if (upnpService != undefined) upnpService.getTarget()
+                }
+            }
+            Button {
+                id: getStatusButton
+                text: "Get Status"
+                anchors.top: nameLabel.bottom
+                anchors.bottom: parent.bottom
+                anchors.right: getTargetButton.left
+
+                onClicked: {
+                    if (upnpService == undefined) upnpService = deviceModel.getDeviceDescription(model.uuid).serviceById('urn:upnp-org:serviceId:SwitchPower:1')
+                    if (upnpService != undefined) upnpService.getStatus()
+                }
+            }
+            Connections {
+                target: upnpService
+
+                onGetStatusFinished: {
+                    console.log("success is ", success)
+                    console.log("status is ", status)
+                }
+            }
         }
     }
 
-    Row {
-        id: row1
+    StackView {
+        id: stackView
+        anchors.fill: parent
 
-        Button {
-            id: backButton
-            text: "Test"
-            onClicked: deviceParser.downloadAndParseDeviceDescription('http://192.168.5.2:42478/a619bc5b-952e-434e-9bf9-d9fa5662be68.xml')
-        }
-
-        Button {
-            id: callButton
-            width: 80
-            height: 25
-            anchors.top: backButton.bottom
-            text: "Call Action"
-            anchors.topMargin: 6
-            onClicked: deviceParser.serviceById("urn:upnp-org:serviceId:ConnectionManager").callAction("PrepareForConnection", ["0"])
-        }
-
-        Button {
-            id: subscribeButton
-            width: 80
-            height: 25
-            anchors.top: backButton.bottom
-            text: "Call Subscribe"
-            anchors.topMargin: 6
-            onClicked:
+        delegate: StackViewDelegate {
+            function transitionFinished(properties)
             {
-                deviceParser.serviceById("urn:upnp-org:serviceId:ConnectionManager").subscribeEvents()
-                deviceParser.serviceById("urn:upnp-org:serviceId:AVTransport").subscribeEvents()
-                deviceParser.serviceById("urn:upnp-org:serviceId:RenderingControl").subscribeEvents()
+                properties.exitItem.opacity = 1
+            }
+
+            pushTransition: StackViewTransition {
+                PropertyAnimation {
+                    target: enterItem
+                    property: "opacity"
+                    from: 0
+                    to: 1
+                }
+                PropertyAnimation {
+                    target: exitItem
+                    property: "opacity"
+                    from: 1
+                    to: 0
+                }
             }
         }
 
-        Button {
-            id: button1
-            text: "Button"
-            anchors.top: backButton.bottom
-            anchors.topMargin: 6
-            onClicked: deviceParser.serviceById("urn:upnp-org:serviceId:SwitchPower:1").SetTarget(true)
-        }
+        // Implements back key navigation
+        focus: true
+        Keys.onReleased: if (event.key === Qt.Key_Back && stackView.depth > 1) {
 
-        TableView {
-            id: peersView
-            model: deviceModel
-            itemDelegate: deviceDelegate
-            rowDelegate: rowDelegate
-            width: 200
-            height: 400
-            headerVisible: false
-            TableViewColumn
-            {
-                width: peersView.width - 2
-                resizable: false
-                movable: false
+                             stackView.pop();
+                             event.accepted = true;
+                         }
+
+        initialItem: Item {
+            width: parent.width
+            height: parent.height
+            TableView {
+                id: peersView
+                model: deviceModel
+                itemDelegate: deviceDelegate
+                rowDelegate: rowDelegate
+                anchors.fill: parent
+                headerVisible: false
+                TableViewColumn
+                {
+                    width: peersView.width - 2
+                    resizable: false
+                    movable: false
+                }
             }
         }
     }

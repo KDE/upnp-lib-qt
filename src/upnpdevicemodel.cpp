@@ -67,6 +67,7 @@ QHash<int, QByteArray> UpnpDeviceModel::roleNames() const
 
     roles[static_cast<int>(ColumnsRoles::NameRole)] = "name";
     roles[static_cast<int>(ColumnsRoles::TypeRole)] = "upnpType";
+    roles[static_cast<int>(ColumnsRoles::uuidRole)] = "uuid";
 
     return roles;
 }
@@ -108,6 +109,8 @@ QVariant UpnpDeviceModel::data(const QModelIndex &index, int role) const
         return d->mAllHostsDescription[d->mAllHostsUUID[index.row()]]->friendlyName();
     case ColumnsRoles::TypeRole:
         return d->mAllHostsDescription[d->mAllHostsUUID[index.row()]]->deviceType();
+    case ColumnsRoles::uuidRole:
+        return d->mAllHostsUUID[index.row()];
     }
 
     return QVariant();
@@ -126,6 +129,17 @@ void UpnpDeviceModel::setListenner(UpnpListenner *listenner)
     d->mListenner = listenner;
     connect(d->mListenner, &UpnpListenner::newService, this, &UpnpDeviceModel::newDevice);
     connect(d->mListenner, &UpnpListenner::removedService, this, &UpnpDeviceModel::removedDevice);
+}
+
+UpnpDeviceDescription *UpnpDeviceModel::getDeviceDescription(const QString &uuid) const
+{
+    int deviceIndex = d->mAllHostsUUID.indexOf(uuid);
+
+    if (deviceIndex == -1) {
+        return nullptr;
+    }
+
+    return d->mAllHostsDescription[uuid];
 }
 
 void UpnpDeviceModel::newDevice(const Upnp_Discovery &deviceDiscovery)

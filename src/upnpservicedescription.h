@@ -20,6 +20,8 @@
 #ifndef UPNPSERVICECALLER_H
 #define UPNPSERVICECALLER_H
 
+#include <KDSoapClient/KDSoapPendingCall.h>
+
 #include <QtCore/QObject>
 #include <QtCore/QString>
 #include <QtCore/QVariant>
@@ -93,7 +95,7 @@ public:
 
     const QVariant& eventSubURL() const;
 
-    Q_INVOKABLE void callAction(const QString &action, const QList<QVariant> &arguments);
+    Q_INVOKABLE KDSoapPendingCall callAction(const QString &action, const QList<QVariant> &arguments);
 
     Q_INVOKABLE void subscribeEvents();
 

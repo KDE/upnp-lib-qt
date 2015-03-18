@@ -25,6 +25,7 @@
 
 class UpnpDeviceModelPrivate;
 class UpnpListenner;
+class UpnpDeviceDescription;
 
 class UpnpDeviceModel : public QAbstractListModel
 {
@@ -39,6 +40,7 @@ public:
     enum ColumnsRoles {
         NameRole = Qt::UserRole + 1,
         TypeRole,
+        uuidRole,
     };
 
     explicit UpnpDeviceModel(QObject *parent = 0);
@@ -56,6 +58,8 @@ public:
     UpnpListenner* listenner() const;
 
     void setListenner(UpnpListenner *listenner);
+
+    Q_INVOKABLE UpnpDeviceDescription* getDeviceDescription(const QString &uuid)const;
 
 Q_SIGNALS:
 

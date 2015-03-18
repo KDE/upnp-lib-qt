@@ -19,6 +19,9 @@
 
 #include "upnpcontrolswitchpower.h"
 
+#include <KDSoapClient/KDSoapPendingCall.h>
+#include <KDSoapClient/KDSoapPendingCallWatcher.h>
+
 UpnpControlSwitchPower::UpnpControlSwitchPower(QObject *parent) : UpnpServiceDescription(parent)
 {
 
@@ -29,19 +32,52 @@ UpnpControlSwitchPower::~UpnpControlSwitchPower()
 
 }
 
-void UpnpControlSwitchPower::SetTarget(bool newTargetValue)
+void UpnpControlSwitchPower::setTarget(bool newTargetValue)
 {
-    callAction(QStringLiteral("SetTarget"), {newTargetValue});
+    const KDSoapPendingCall &pendingAnswer(callAction(QStringLiteral("SetTarget"), {newTargetValue}));
+
+    KDSoapPendingCallWatcher *replyHandler = new KDSoapPendingCallWatcher(pendingAnswer, this);
+
+    connect(replyHandler, &KDSoapPendingCallWatcher::finished, this, &UpnpControlSwitchPower::finishedSetTargetCall);
 }
 
-void UpnpControlSwitchPower::GetTarget()
+void UpnpControlSwitchPower::getTarget()
 {
-    callAction(QStringLiteral("GetTarget"), {});
+    const KDSoapPendingCall &pendingAnswer(callAction(QStringLiteral("GetTarget"), {}));
+
+    KDSoapPendingCallWatcher *replyHandler = new KDSoapPendingCallWatcher(pendingAnswer, this);
+
+    connect(replyHandler, &KDSoapPendingCallWatcher::finished, this, &UpnpControlSwitchPower::finishedGetTargetCall);
 }
 
-void UpnpControlSwitchPower::GetStatus()
+void UpnpControlSwitchPower::getStatus()
 {
-    callAction(QStringLiteral("GetStatus"), {});
+    const KDSoapPendingCall &pendingAnswer(callAction(QStringLiteral("GetStatus"), {}));
+
+    KDSoapPendingCallWatcher *replyHandler = new KDSoapPendingCallWatcher(pendingAnswer, this);
+
+    connect(replyHandler, &KDSoapPendingCallWatcher::finished, this, &UpnpControlSwitchPower::finishedGetStatusCall);
+}
+
+void UpnpControlSwitchPower::finishedSetTargetCall(KDSoapPendingCallWatcher *self)
+{
+    self->deleteLater();
+
+    Q_EMIT setTargetFinished(!self->returnMessage().isFault());
+}
+
+void UpnpControlSwitchPower::finishedGetTargetCall(KDSoapPendingCallWatcher *self)
+{
+    self->deleteLater();
+
+    Q_EMIT getTargetFinished(!self->returnMessage().isFault(), self->returnValue().toBool());
+}
+
+void UpnpControlSwitchPower::finishedGetStatusCall(KDSoapPendingCallWatcher *self)
+{
+    self->deleteLater();
+
+    Q_EMIT getStatusFinished(!self->returnMessage().isFault(), self->returnValue().toBool());
 }
 
 #include "moc_upnpcontrolswitchpower.cpp"

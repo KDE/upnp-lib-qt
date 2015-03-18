@@ -63,7 +63,7 @@ class UpnpServiceDescriptionPrivate
 public:
 
     UpnpServiceDescriptionPrivate()
-        : mNetworkAccess(), mServiceType(), mServiceId(), mBaseURL(), mSCPDURL(), mControlURL(), mEventSubURL(), mActions()
+        : mNetworkAccess(), mServiceType(), mServiceId(), mBaseURL(), mSCPDURL(), mControlURL(), mEventSubURL(), mActions(), mInterface(nullptr)
     {
     }
 
@@ -82,6 +82,8 @@ public:
     QVariant mEventSubURL;
 
     QMap<QString, UpnpActionDescription> mActions;
+
+    KDSoapClientInterface *mInterface;
 };
 
 UpnpServiceDescription::UpnpServiceDescription(QObject *parent)
@@ -91,6 +93,7 @@ UpnpServiceDescription::UpnpServiceDescription(QObject *parent)
 }
 UpnpServiceDescription::~UpnpServiceDescription()
 {
+    delete d->mInterface;
     delete d;
 }
 
@@ -160,24 +163,20 @@ const QVariant &UpnpServiceDescription::eventSubURL() const
     return d->mEventSubURL;
 }
 
-void UpnpServiceDescription::callAction(const QString &action, const QList<QVariant> &arguments)
+KDSoapPendingCall UpnpServiceDescription::callAction(const QString &action, const QList<QVariant> &arguments)
 {
+    QUrl controlUrl(d->mBaseURL.toUrl());
+    controlUrl.setPath(d->mControlURL.toString());
+
+    KDSoapMessage message;
+
     auto itAction = d->mActions.find(action);
     if (itAction != d->mActions.end()) {
-        QUrl controlUrl(d->mBaseURL.toUrl());
-        controlUrl.setPath(d->mControlURL.toString());
-
         const UpnpActionDescription &actionDescription(itAction.value());
-
-        KDSoapClientInterface clientInterface(controlUrl.toString(), d->mServiceType.toString());
-        clientInterface.setSoapVersion(KDSoapClientInterface::SOAP1_1);
-        clientInterface.setStyle(KDSoapClientInterface::RPCStyle);
-
-        KDSoapMessage message;
 
         auto itArgumentName = actionDescription.mArguments.begin();
         auto itArgumentValue = arguments.begin();
-        for (; itArgumentName != actionDescription.mArguments.end(); ++itArgumentName) {
+        for (; itArgumentName != actionDescription.mArguments.end() && itArgumentValue != arguments.end(); ++itArgumentName) {
             message.addArgument(itArgumentName->mName, itArgumentValue->toString());
 
             ++itArgumentValue;
@@ -185,9 +184,15 @@ void UpnpServiceDescription::callAction(const QString &action, const QList<QVari
                 break;
             }
         }
-
-        KDSoapMessage answer = clientInterface.call(action, message, d->mServiceType.toString() + QStringLiteral("#") + action);
     }
+
+    if (!d->mInterface) {
+        d->mInterface = new KDSoapClientInterface(controlUrl.toString(), d->mServiceType.toString());
+        d->mInterface->setSoapVersion(KDSoapClientInterface::SOAP1_1);
+        d->mInterface->setStyle(KDSoapClientInterface::RPCStyle);
+    }
+
+    return d->mInterface->asyncCall(action, message, d->mServiceType.toString() + QStringLiteral("#") + action);
 }
 
 void UpnpServiceDescription::subscribeEvents()

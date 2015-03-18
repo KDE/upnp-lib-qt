@@ -34,11 +34,27 @@ public:
 
 public Q_SLOTS:
 
-    void SetTarget(bool newTargetValue);
+    void setTarget(bool newTargetValue);
 
-    void GetTarget();
+    void getTarget();
 
-    void GetStatus();
+    void getStatus();
+
+Q_SIGNALS:
+
+    void setTargetFinished(bool success);
+
+    void getTargetFinished(bool success, bool target);
+
+    void getStatusFinished(bool success, bool status);
+
+private Q_SLOTS:
+
+    void finishedSetTargetCall(KDSoapPendingCallWatcher *self);
+
+    void finishedGetTargetCall(KDSoapPendingCallWatcher *self);
+
+    void finishedGetStatusCall(KDSoapPendingCallWatcher *self);
 
 };
 
