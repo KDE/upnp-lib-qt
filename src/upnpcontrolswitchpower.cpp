@@ -107,10 +107,8 @@ void UpnpControlSwitchPower::finishedGetStatusCall(KDSoapPendingCallWatcher *sel
 
 void UpnpControlSwitchPower::parseEventNotification(const QString &eventName, const QString &eventValue)
 {
-    qDebug() << "UpnpControlSwitchPower::parseEventNotification" << eventName << eventValue;
     if (eventName == QStringLiteral("Status")) {
         d->mStatus = (eventValue == QStringLiteral("1"));
-        qDebug() << "UpnpControlSwitchPower::parseEventNotification status property:" << d->mStatus;
         Q_EMIT statusChanged();
     }
 }
