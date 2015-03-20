@@ -17,7 +17,7 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#include "upnpservicedescription.h"
+#include "upnpabstractservicedescription.h"
 #include "upnphttpserver.h"
 #include "upnpservereventobject.h"
 
@@ -63,11 +63,11 @@ public:
     QList<UpnpActionArgumentDescription> mArguments;
 };
 
-class UpnpServiceDescriptionPrivate
+class UpnpAbstractServiceDescriptionPrivate
 {
 public:
 
-    UpnpServiceDescriptionPrivate()
+    UpnpAbstractServiceDescriptionPrivate()
         : mNetworkAccess(), mServiceType(), mServiceId(), mBaseURL(), mSCPDURL(), mControlURL(),
           mEventSubURL(), mActions(), mInterface(nullptr), mEventServer()
     {
@@ -96,10 +96,10 @@ public:
     QHostAddress mPublicAddress;
 };
 
-UpnpServiceDescription::UpnpServiceDescription(QObject *parent)
-    : QObject(parent), d(new UpnpServiceDescriptionPrivate)
+UpnpAbstractServiceDescription::UpnpAbstractServiceDescription(QObject *parent)
+    : QObject(parent), d(new UpnpAbstractServiceDescriptionPrivate)
 {
-    connect(&d->mNetworkAccess, &QNetworkAccessManager::finished, this, &UpnpServiceDescription::finishedDownload);
+    connect(&d->mNetworkAccess, &QNetworkAccessManager::finished, this, &UpnpAbstractServiceDescription::finishedDownload);
 
     d->mEventServer.setService(this);
 
@@ -116,79 +116,79 @@ UpnpServiceDescription::UpnpServiceDescription(QObject *parent)
     }
 }
 
-UpnpServiceDescription::~UpnpServiceDescription()
+UpnpAbstractServiceDescription::~UpnpAbstractServiceDescription()
 {
     delete d->mInterface;
     delete d;
 }
 
-void UpnpServiceDescription::setBaseURL(const QVariant &newBaseURL)
+void UpnpAbstractServiceDescription::setBaseURL(const QVariant &newBaseURL)
 {
     d->mBaseURL = newBaseURL;
     Q_EMIT baseURLChanged();
 }
 
-const QVariant &UpnpServiceDescription::baseURL() const
+const QVariant &UpnpAbstractServiceDescription::baseURL() const
 {
     return d->mBaseURL;
 }
 
-void UpnpServiceDescription::setServiceType(const QVariant &newServiceType)
+void UpnpAbstractServiceDescription::setServiceType(const QVariant &newServiceType)
 {
     d->mServiceType = newServiceType;
     Q_EMIT serviceTypeChanged();
 }
 
-const QVariant &UpnpServiceDescription::serviceType() const
+const QVariant &UpnpAbstractServiceDescription::serviceType() const
 {
     return d->mServiceType;
 }
 
-void UpnpServiceDescription::setServiceId(const QVariant &newServiceId)
+void UpnpAbstractServiceDescription::setServiceId(const QVariant &newServiceId)
 {
     d->mServiceId = newServiceId;
     Q_EMIT serviceIdChanged();
 }
 
-const QVariant &UpnpServiceDescription::serviceId() const
+const QVariant &UpnpAbstractServiceDescription::serviceId() const
 {
     return d->mServiceId;
 }
 
-void UpnpServiceDescription::setSCPDURL(const QVariant &newSCPDURL)
+void UpnpAbstractServiceDescription::setSCPDURL(const QVariant &newSCPDURL)
 {
     d->mSCPDURL = newSCPDURL;
     Q_EMIT SCPDURLChanged();
 }
 
-const QVariant &UpnpServiceDescription::SCPDURL() const
+const QVariant &UpnpAbstractServiceDescription::SCPDURL() const
 {
     return d->mSCPDURL;
 }
 
-void UpnpServiceDescription::setControlURL(const QVariant &newControlURL)
+void UpnpAbstractServiceDescription::setControlURL(const QVariant &newControlURL)
 {
     d->mControlURL = newControlURL;
     Q_EMIT controlURLChanged();
 }
 
-const QVariant &UpnpServiceDescription::controlURL() const
+const QVariant &UpnpAbstractServiceDescription::controlURL() const
 {
     return d->mControlURL;
 }
 
-void UpnpServiceDescription::setEventSubURL(const QVariant &newEventSubURL)
+void UpnpAbstractServiceDescription::setEventSubURL(const QVariant &newEventSubURL)
 {
     d->mEventSubURL = newEventSubURL;
     Q_EMIT eventSubURLChanged();
 }
 
-const QVariant &UpnpServiceDescription::eventSubURL() const
+const QVariant &UpnpAbstractServiceDescription::eventSubURL() const
 {
     return d->mEventSubURL;
 }
 
-KDSoapPendingCall UpnpServiceDescription::callAction(const QString &action, const QList<QVariant> &arguments)
+KDSoapPendingCall UpnpAbstractServiceDescription::callAction(const QString &action, const QList<QVariant> &arguments)
 {
     QUrl controlUrl(d->mBaseURL.toUrl());
     controlUrl.setPath(d->mControlURL.toString());
@@ -220,7 +220,7 @@ KDSoapPendingCall UpnpServiceDescription::callAction(const QString &action, cons
     return d->mInterface->asyncCall(action, message, d->mServiceType.toString() + QStringLiteral("#") + action);
 }
 
-void UpnpServiceDescription::subscribeEvents()
+void UpnpAbstractServiceDescription::subscribeEvents()
 {
     QUrl eventUrl(d->mBaseURL.toUrl());
     eventUrl.setPath(d->mEventSubURL.toString());
@@ -243,7 +243,7 @@ void UpnpServiceDescription::subscribeEvents()
     d->mNetworkAccess.sendCustomRequest(myRequest, "SUBSCRIBE");
 }
 
-void UpnpServiceDescription::handleEventNotification(const QByteArray &requestData, const QMap<QByteArray, QByteArray> &headers)
+void UpnpAbstractServiceDescription::handleEventNotification(const QByteArray &requestData, const QMap<QByteArray, QByteArray> &headers)
 {
     qDebug() << "UpnpServiceDescription::handleEventNotification";
     const QString &requestAnswer(QString::fromLatin1(requestData));
@@ -265,24 +265,14 @@ void UpnpServiceDescription::handleEventNotification(const QByteArray &requestDa
     }
 }
 
-void UpnpServiceDescription::downloadAndParseServiceDescription(const QUrl &serviceUrl)
+void UpnpAbstractServiceDescription::downloadAndParseServiceDescription(const QUrl &serviceUrl)
 {
-    qDebug() << "UpnpServiceCaller::downloadAndParseServiceDescription" << serviceUrl;
     d->mNetworkAccess.get(QNetworkRequest(serviceUrl));
 }
 
-void UpnpServiceDescription::finishedDownload(QNetworkReply *reply)
+void UpnpAbstractServiceDescription::finishedDownload(QNetworkReply *reply)
 {
-    qDebug() << "UpnpServiceCaller::finishedDownload" << reply->url();
     if (reply->isFinished() && reply->error() == QNetworkReply::NoError) {
-#if 0
-        qDebug() << "serviceId" << d->mServiceId;
-        qDebug() << "serviceType" << d->mServiceType;
-        qDebug() << "SCPDURL" << d->mSCPDURL;
-        qDebug() << "controlURL" << d->mControlURL;
-        qDebug() << "eventSubURL" << d->mEventSubURL;
-#endif
-
         QDomDocument serviceDescriptionDocument;
         serviceDescriptionDocument.setContent(reply);
 
@@ -319,17 +309,6 @@ void UpnpServiceDescription::finishedDownload(QNetworkReply *reply)
                 argumentNode = argumentNode.nextSibling();
             }
 
-#if 0
-            qDebug() << "new service: " << d->mActions[actionName].mName;
-            for (auto itArg = d->mActions[actionName].mArguments.begin(); itArg != d->mActions[actionName].mArguments.end(); ++itArg) {
-                qDebug() << "argument: " << itArg->mName;
-                qDebug() << "direction: " << (itArg->mDirection == UpnpArgumentDirection::In ? "In" : "Out");
-                qDebug() << "state variable: " << itArg->mRelatedStateVariable;
-                qDebug() << (itArg->mIsReturnValue ? "is return value" : "");
-            }
-            qDebug() << "\n";
-#endif
-
             currentChild = currentChild.nextSibling();
         }
 
@@ -348,9 +327,9 @@ void UpnpServiceDescription::finishedDownload(QNetworkReply *reply)
     }
 }
 
-void UpnpServiceDescription::parseEventNotification(const QString &eventName, const QString &eventValue)
+void UpnpAbstractServiceDescription::parseEventNotification(const QString &eventName, const QString &eventValue)
 {
     qDebug() << "one variable" << eventName << eventValue;
 }
 
-#include "moc_upnpservicedescription.cpp"
+#include "moc_upnpabstractservicedescription.cpp"

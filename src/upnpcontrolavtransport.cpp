@@ -21,7 +21,7 @@
 
 #include <QtCore/QDebug>
 
-UpnpControlAVTransport::UpnpControlAVTransport(QObject *parent) : UpnpServiceDescription(parent)
+UpnpControlAVTransport::UpnpControlAVTransport(QObject *parent) : UpnpAbstractServiceDescription(parent)
 {
 
 }

@@ -24,7 +24,7 @@
 
 #include <QObject>
 
-class UpnpServiceDescription;
+class UpnpAbstractServiceDescription;
 class UpnpServerEventObjectPrivate;
 
 class UpnpServerEventObject : public QObject, public KDSoapServerObjectInterface
@@ -46,7 +46,7 @@ public:
 
     bool processCustomVerbRequest(const QByteArray &requestData, const QMap<QByteArray, QByteArray> &headers) Q_DECL_OVERRIDE;
 
-    void setService(UpnpServiceDescription *service);
+    void setService(UpnpAbstractServiceDescription *service);
 
 private:
 

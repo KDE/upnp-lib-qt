@@ -19,13 +19,13 @@
 
 #include "upnphttpserver.h"
 #include "upnpservereventobject.h"
-#include "upnpservicedescription.h"
+#include "upnpabstractservicedescription.h"
 
 class UpnpHttpServerPrivate
 {
 public:
 
-    UpnpServiceDescription *mService;
+    UpnpAbstractServiceDescription *mService;
 };
 
 UpnpHttpServer::UpnpHttpServer(QObject *parent) : KDSoapServer(parent), d(new UpnpHttpServerPrivate)
@@ -45,7 +45,7 @@ QObject *UpnpHttpServer::createServerObject()
     return newObject;
 }
 
-void UpnpHttpServer::setService(UpnpServiceDescription *service)
+void UpnpHttpServer::setService(UpnpAbstractServiceDescription *service)
 {
     d->mService = service;
 }

@@ -1,7 +1,7 @@
 set(upnp-player-qt_SOURCES
     main.cpp
     upnplistenner.cpp
-    upnpservicedescription.cpp
+    upnpabstractservicedescription.cpp
     upnpdevicedescription.cpp
     upnphttpserver.cpp
     upnpservereventobject.cpp

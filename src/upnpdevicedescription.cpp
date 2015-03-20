@@ -19,7 +19,7 @@
 
 #include "upnpdevicedescription.h"
 
-#include "upnpservicedescription.h"
+#include "upnpabstractservicedescription.h"
 #include "upnpcontrolavtransport.h"
 #include "upnpcontrolswitchpower.h"
 
@@ -75,7 +75,7 @@ public:
 
     QVariant mURLBase;
 
-    QMap<QString, QPointer<UpnpServiceDescription> > mServices;
+    QMap<QString, QPointer<UpnpAbstractServiceDescription> > mServices;
 };
 
 UpnpDeviceDescription::UpnpDeviceDescription(QObject *parent) : QObject(parent), d(new UpnpDeviceDiscoveryPrivate)
@@ -159,7 +159,7 @@ const QVariant &UpnpDeviceDescription::URLBase()
     return d->mURLBase;
 }
 
-UpnpServiceDescription* UpnpDeviceDescription::serviceById(const QString &serviceId) const
+UpnpAbstractServiceDescription* UpnpDeviceDescription::serviceById(const QString &serviceId) const
 {
     return d->mServices[serviceId].data();
 }
@@ -243,7 +243,7 @@ void UpnpDeviceDescription::finishedDownload(QNetworkReply *reply)
         for (int serviceIndex = 0; serviceIndex < serviceList.length(); ++serviceIndex) {
             const QDomNode &serviceNode(serviceList.at(serviceIndex));
             if (!serviceNode.isNull()) {
-                QPointer<UpnpServiceDescription> newService;
+                QPointer<UpnpAbstractServiceDescription> newService;
 
                 const QDomNode &serviceTypeNode = serviceNode.firstChildElement(QStringLiteral("serviceType"));
                 if (!serviceTypeNode.isNull()) {
@@ -254,10 +254,10 @@ void UpnpDeviceDescription::finishedDownload(QNetworkReply *reply)
                     } else if (serviceTypeNode.toElement().text() == QStringLiteral("urn:schemas-upnp-org:service:SwitchPower:1")) {
                         newService = new UpnpControlSwitchPower;
                     } else {
-                        newService = new UpnpServiceDescription;
+                        newService = new UpnpAbstractServiceDescription;
                     }
                 } else {
-                    newService = new UpnpServiceDescription;
+                    newService = new UpnpAbstractServiceDescription;
                 }
 
                 newService->setBaseURL(d->mURLBase);

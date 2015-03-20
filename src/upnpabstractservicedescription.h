@@ -17,8 +17,8 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#ifndef UPNPSERVICECALLER_H
-#define UPNPSERVICECALLER_H
+#ifndef UPNPABSTRACTSERVICEDESCRIPTION_H
+#define UPNPABSTRACTSERVICEDESCRIPTION_H
 
 #include <KDSoapClient/KDSoapPendingCall.h>
 
@@ -28,11 +28,11 @@
 #include <QtCore/QVariantList>
 #include <QtCore/QUrl>
 
-class UpnpServiceDescriptionPrivate;
+class UpnpAbstractServiceDescriptionPrivate;
 class QNetworkReply;
 class QHostInfo;
 
-class UpnpServiceDescription : public QObject
+class UpnpAbstractServiceDescription : public QObject
 {
     Q_OBJECT
 
@@ -68,9 +68,9 @@ class UpnpServiceDescription : public QObject
 
 public:
 
-    explicit UpnpServiceDescription(QObject *parent = 0);
+    explicit UpnpAbstractServiceDescription(QObject *parent = 0);
 
-    ~UpnpServiceDescription();
+    ~UpnpAbstractServiceDescription();
 
     void setBaseURL(const QVariant &newBaseURL);
 
@@ -130,7 +130,7 @@ protected:
 
 private:
 
-    UpnpServiceDescriptionPrivate *d;
+    UpnpAbstractServiceDescriptionPrivate *d;
 };
 
 #endif // UPNPSERVICECALLER_H
