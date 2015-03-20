@@ -91,6 +91,7 @@ void UpnpControlSwitchPower::finishedGetTargetCall(KDSoapPendingCallWatcher *sel
 {
     self->deleteLater();
 
+    d->mTarget = self->returnValue().toBool();
     Q_EMIT getTargetFinished(!self->returnMessage().isFault(), self->returnValue().toBool());
 }
 
@@ -99,6 +100,9 @@ void UpnpControlSwitchPower::finishedGetStatusCall(KDSoapPendingCallWatcher *sel
     self->deleteLater();
 
     Q_EMIT getStatusFinished(!self->returnMessage().isFault(), self->returnValue().toBool());
+
+    d->mStatus = self->returnValue().toBool();
+    Q_EMIT statusChanged();
 }
 
 void UpnpControlSwitchPower::parseEventNotification(const QString &eventName, const QString &eventValue)
