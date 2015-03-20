@@ -120,10 +120,6 @@ public Q_SLOTS:
 
     void downloadAndParseServiceDescription(const QUrl &serviceUrl);
 
-    void lookedUp(const QHostInfo &hostInfo);
-
-    void handleAddresses();
-
 private Q_SLOTS:
 
     void finishedDownload(QNetworkReply *reply);

@@ -28,6 +28,7 @@
 #include <QtNetwork/QNetworkReply>
 #include <QtNetwork/QHostInfo>
 #include <QtNetwork/QDnsLookup>
+#include <QtNetwork/QNetworkInterface>
 
 #include <QtCore/QBuffer>
 #include <QtCore/QTextStream>
@@ -92,10 +93,6 @@ public:
 
     UpnpHttpServer mEventServer;
 
-    QHostInfo mLocalHostInfo;
-
-    QDnsLookup mLookup;
-
     QHostAddress mPublicAddress;
 };
 
@@ -103,18 +100,20 @@ UpnpServiceDescription::UpnpServiceDescription(QObject *parent)
     : QObject(parent), d(new UpnpServiceDescriptionPrivate)
 {
     connect(&d->mNetworkAccess, &QNetworkAccessManager::finished, this, &UpnpServiceDescription::finishedDownload);
-    qDebug() << "UpnpServiceDescription::UpnpServiceDescription" << QHostInfo::localHostName();
-    QHostInfo::lookupHost(QHostInfo::localHostName(), this, SLOT(lookedUp(QHostInfo)));
-    d->mLookup.setType(QDnsLookup::A);
-    d->mLookup.setName(QHostInfo::localHostName());
-
-    connect(&d->mLookup, &QDnsLookup::finished, this, &UpnpServiceDescription::handleAddresses);
-
-    d->mLookup.lookup();
 
     d->mEventServer.setService(this);
 
     d->mEventServer.listen(QHostAddress::Any);
+
+    const QList<QHostAddress> &list = QNetworkInterface::allAddresses();
+    for (auto address = list.begin(); address != list.end(); ++address) {
+        if (!address->isLoopback()) {
+            if (address->protocol() == QAbstractSocket::IPv4Protocol) {
+                d->mPublicAddress = *address;
+                break;
+            }
+        }
+    }
 }
 
 UpnpServiceDescription::~UpnpServiceDescription()
@@ -231,11 +230,7 @@ void UpnpServiceDescription::subscribeEvents()
     if (!d->mPublicAddress.isNull()) {
         webServerAddess += d->mPublicAddress.toString();
     } else {
-        if (!d->mLocalHostInfo.addresses().empty()) {
-            webServerAddess += d->mLocalHostInfo.addresses().first().toString();
-        } else {
-            webServerAddess += QStringLiteral("127.0.0.1");
-        }
+        webServerAddess += QStringLiteral("127.0.0.1");
     }
 
     webServerAddess += QStringLiteral(":") + QString::number(d->mEventServer.serverPort()) + QStringLiteral(">");
@@ -274,20 +269,6 @@ void UpnpServiceDescription::downloadAndParseServiceDescription(const QUrl &serv
 {
     qDebug() << "UpnpServiceCaller::downloadAndParseServiceDescription" << serviceUrl;
     d->mNetworkAccess.get(QNetworkRequest(serviceUrl));
-}
-
-void UpnpServiceDescription::lookedUp(const QHostInfo &hostInfo)
-{
-    d->mLocalHostInfo = hostInfo;
-}
-
-void UpnpServiceDescription::handleAddresses()
-{
-    if (d->mLookup.error() == QDnsLookup::NoError) {
-        if (!d->mLookup.hostAddressRecords().empty()) {
-            d->mPublicAddress = d->mLookup.hostAddressRecords().first().value();
-        }
-    }
 }
 
 void UpnpServiceDescription::finishedDownload(QNetworkReply *reply)
