@@ -19,6 +19,7 @@
 
 #include "upnplistenner.h"
 #include "upnpdevicedescription.h"
+#include "upnpabstractservicedescription.h"
 #include "upnpdevicemodel.h"
 #include "upnpbasictypes.h"
 #include "upnpcontrolswitchpower.h"
@@ -37,6 +38,7 @@ int main(int argc, char *argv[])
 
     qmlRegisterType<UpnpListenner>("org.mgallien.QmlExtension", 1, 0, "UpnpListenner");
     qmlRegisterType<UpnpDeviceDescription>("org.mgallien.QmlExtension", 1, 0, "UpnpDeviceDescription");
+    qmlRegisterType<UpnpAbstractServiceDescription>("org.mgallien.QmlExtension", 1, 0, "UpnpAbstractServiceDescription");
     qmlRegisterType<UpnpDeviceModel>("org.mgallien.QmlExtension", 1, 0, "UpnpDeviceModel");
     qmlRegisterType<UpnpControlSwitchPower>("org.mgallien.QmlExtension", 1, 0, "UpnpControlSwitchPower");
 
