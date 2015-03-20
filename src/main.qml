@@ -59,6 +59,7 @@ ApplicationWindow {
     Component {
         id: deviceDelegate
         Item {
+            id: serviceItem
             anchors.rightMargin: 4
             anchors.leftMargin: 4
             anchors.left: parent.left
@@ -95,16 +96,30 @@ ApplicationWindow {
                 height: 15
                 visible: styleData.selected
             }
+            Label {
+                id: statusLabel
+                anchors.top: nameLabel.bottom
+                anchors.bottom: parent.bottom
+                anchors.right: deviceTypeLabel.left
+                anchors.rightMargin: 8
+                anchors.leftMargin: 2
+                color: styleData.textColor
+                text: ''
+                horizontalAlignment: Text.AlignRight
+                verticalAlignment: Text.AlignVCenter
+                height: 15
+            }
+
             Button {
                 id: setTargetButton
                 text: "Set Target"
                 anchors.top: nameLabel.bottom
                 anchors.bottom: parent.bottom
-                anchors.right: deviceTypeLabel.left
+                anchors.right: statusLabel.left
 
                 onClicked: {
                     if (upnpService == undefined) upnpService = deviceModel.getDeviceDescription(model.uuid).serviceById('urn:upnp-org:serviceId:SwitchPower:1')
-                    if (upnpService != undefined) upnpService.setTarget(true)
+                    if (upnpService != undefined) upnpService.setTarget(statusLabel.text != 'on')
                 }
             }
             Button {
@@ -131,12 +146,36 @@ ApplicationWindow {
                     if (upnpService != undefined) upnpService.getStatus()
                 }
             }
+            Button {
+                id: subscribeButton
+                text: "Subscribe"
+                anchors.top: nameLabel.bottom
+                anchors.bottom: parent.bottom
+                anchors.right: getStatusButton.left
+
+                onClicked: {
+                    if (upnpService == undefined) upnpService = deviceModel.getDeviceDescription(model.uuid).serviceById('urn:upnp-org:serviceId:SwitchPower:1')
+                    if (upnpService != undefined) upnpService.subscribeEvents()
+                }
+            }
+
             Connections {
                 target: upnpService
 
                 onGetStatusFinished: {
                     console.log("success is ", success)
                     console.log("status is ", status)
+                }
+            }
+
+            Connections {
+                target: upnpService
+
+                onStatusChanged: {
+                    if (upnpService.status)
+                        statusLabel.text = 'on'
+                    else
+                        statusLabel.text = 'off'
                 }
             }
         }

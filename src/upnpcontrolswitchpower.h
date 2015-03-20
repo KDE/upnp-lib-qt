@@ -23,14 +23,28 @@
 #include "upnpservicedescription.h"
 #include "upnpbasictypes.h"
 
+class UpnpControlSwitchPowerPrivate;
+
 class UpnpControlSwitchPower : public UpnpServiceDescription
 {
     Q_OBJECT
+
+    Q_PROPERTY(bool target
+               READ target)
+
+    Q_PROPERTY(QVariant status
+               READ status
+               NOTIFY statusChanged)
+
 public:
 
     explicit UpnpControlSwitchPower(QObject *parent = 0);
 
     virtual ~UpnpControlSwitchPower();
+
+    bool status() const;
+
+    bool target() const;
 
 public Q_SLOTS:
 
@@ -48,6 +62,8 @@ Q_SIGNALS:
 
     void getStatusFinished(bool success, bool status);
 
+    void statusChanged();
+
 private Q_SLOTS:
 
     void finishedSetTargetCall(KDSoapPendingCallWatcher *self);
@@ -55,6 +71,14 @@ private Q_SLOTS:
     void finishedGetTargetCall(KDSoapPendingCallWatcher *self);
 
     void finishedGetStatusCall(KDSoapPendingCallWatcher *self);
+
+protected:
+
+    void parseEventNotification(const QString &eventName, const QString &eventValue) Q_DECL_OVERRIDE;
+
+private:
+
+    UpnpControlSwitchPowerPrivate *d;
 
 };
 

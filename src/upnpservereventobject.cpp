@@ -19,16 +19,25 @@
 
 #include "upnpservereventobject.h"
 
+#include "upnpservicedescription.h"
+
 #include <QtCore/QDebug>
 
-UpnpServerEventObject::UpnpServerEventObject(QObject *parent) : QObject(parent), KDSoapServerObjectInterface()
+class UpnpServerEventObjectPrivate
 {
+public:
 
+    UpnpServiceDescription *mService;
+};
+
+UpnpServerEventObject::UpnpServerEventObject(QObject *parent) : QObject(parent), KDSoapServerObjectInterface(), d(new UpnpServerEventObjectPrivate)
+{
+    d->mService = nullptr;
 }
 
 UpnpServerEventObject::~UpnpServerEventObject()
 {
-
+    delete d;
 }
 
 void UpnpServerEventObject::processRequest(const KDSoapMessage &request, KDSoapMessage &response, const QByteArray &soapAction)
@@ -50,9 +59,15 @@ void UpnpServerEventObject::processRequestWithPath(const KDSoapMessage &request,
 
 bool UpnpServerEventObject::processCustomVerbRequest(const QByteArray &requestData, const QMap<QByteArray, QByteArray> &headers)
 {
-    qDebug() << "UpnpServerEventObject::processCustomVerbRequest" << requestData << headers;
+    qDebug() << "UpnpServerEventObject::processCustomVerbRequest";
+    d->mService->handleEventNotification(requestData, headers);
 
     return true;
+}
+
+void UpnpServerEventObject::setService(UpnpServiceDescription *service)
+{
+    d->mService = service;
 }
 
 #include "moc_upnpservereventobject.cpp"

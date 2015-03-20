@@ -30,6 +30,7 @@
 
 class UpnpServiceDescriptionPrivate;
 class QNetworkReply;
+class QHostInfo;
 
 class UpnpServiceDescription : public QObject
 {
@@ -99,6 +100,8 @@ public:
 
     Q_INVOKABLE void subscribeEvents();
 
+    void handleEventNotification(const QByteArray &requestData, const QMap<QByteArray, QByteArray> &headers);
+
 Q_SIGNALS:
 
     void serviceTypeChanged();
@@ -117,9 +120,17 @@ public Q_SLOTS:
 
     void downloadAndParseServiceDescription(const QUrl &serviceUrl);
 
+    void lookedUp(const QHostInfo &hostInfo);
+
+    void handleAddresses();
+
 private Q_SLOTS:
 
     void finishedDownload(QNetworkReply *reply);
+
+protected:
+
+    virtual void parseEventNotification(const QString &eventName, const QString &eventValue);
 
 private:
 

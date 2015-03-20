@@ -18,12 +18,16 @@
  */
 
 #include "upnpservicedescription.h"
+#include "upnphttpserver.h"
+#include "upnpservereventobject.h"
 
 #include <KDSoapClient/KDSoapClientInterface.h>
 #include <KDSoapClient/KDSoapMessage.h>
 
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtNetwork/QNetworkReply>
+#include <QtNetwork/QHostInfo>
+#include <QtNetwork/QDnsLookup>
 
 #include <QtCore/QBuffer>
 #include <QtCore/QTextStream>
@@ -63,7 +67,8 @@ class UpnpServiceDescriptionPrivate
 public:
 
     UpnpServiceDescriptionPrivate()
-        : mNetworkAccess(), mServiceType(), mServiceId(), mBaseURL(), mSCPDURL(), mControlURL(), mEventSubURL(), mActions(), mInterface(nullptr)
+        : mNetworkAccess(), mServiceType(), mServiceId(), mBaseURL(), mSCPDURL(), mControlURL(),
+          mEventSubURL(), mActions(), mInterface(nullptr), mEventServer()
     {
     }
 
@@ -84,13 +89,34 @@ public:
     QMap<QString, UpnpActionDescription> mActions;
 
     KDSoapClientInterface *mInterface;
+
+    UpnpHttpServer mEventServer;
+
+    QHostInfo mLocalHostInfo;
+
+    QDnsLookup mLookup;
+
+    QHostAddress mPublicAddress;
 };
 
 UpnpServiceDescription::UpnpServiceDescription(QObject *parent)
     : QObject(parent), d(new UpnpServiceDescriptionPrivate)
 {
     connect(&d->mNetworkAccess, &QNetworkAccessManager::finished, this, &UpnpServiceDescription::finishedDownload);
+    qDebug() << "UpnpServiceDescription::UpnpServiceDescription" << QHostInfo::localHostName();
+    QHostInfo::lookupHost(QHostInfo::localHostName(), this, SLOT(lookedUp(QHostInfo)));
+    d->mLookup.setType(QDnsLookup::A);
+    d->mLookup.setName(QHostInfo::localHostName());
+
+    connect(&d->mLookup, &QDnsLookup::finished, this, &UpnpServiceDescription::handleAddresses);
+
+    d->mLookup.lookup();
+
+    d->mEventServer.setService(this);
+
+    d->mEventServer.listen(QHostAddress::Any);
 }
+
 UpnpServiceDescription::~UpnpServiceDescription()
 {
     delete d->mInterface;
@@ -200,18 +226,68 @@ void UpnpServiceDescription::subscribeEvents()
     QUrl eventUrl(d->mBaseURL.toUrl());
     eventUrl.setPath(d->mEventSubURL.toString());
 
+    QString webServerAddess(QStringLiteral("<http://"));
+
+    if (!d->mPublicAddress.isNull()) {
+        webServerAddess += d->mPublicAddress.toString();
+    } else {
+        if (!d->mLocalHostInfo.addresses().empty()) {
+            webServerAddess += d->mLocalHostInfo.addresses().first().toString();
+        } else {
+            webServerAddess += QStringLiteral("127.0.0.1");
+        }
+    }
+
+    webServerAddess += QStringLiteral(":") + QString::number(d->mEventServer.serverPort()) + QStringLiteral(">");
+
     QNetworkRequest myRequest(eventUrl);
-    myRequest.setRawHeader("CALLBACK", "<http://127.0.0.1:42424>");
+    myRequest.setRawHeader("CALLBACK", webServerAddess.toUtf8());
     myRequest.setRawHeader("NT", "upnp:event");
-    myRequest.setRawHeader("TIMEOUT", "Second-infinite");
+    myRequest.setRawHeader("TIMEOUT", "Second-600");
 
     d->mNetworkAccess.sendCustomRequest(myRequest, "SUBSCRIBE");
+}
+
+void UpnpServiceDescription::handleEventNotification(const QByteArray &requestData, const QMap<QByteArray, QByteArray> &headers)
+{
+    qDebug() << "UpnpServiceDescription::handleEventNotification";
+    const QString &requestAnswer(QString::fromLatin1(requestData));
+
+    QDomDocument requestDocument;
+    requestDocument.setContent(requestAnswer);
+
+    const QDomElement &eventRoot = requestDocument.documentElement();
+
+    const QDomElement &propertysetRoot = eventRoot.firstChildElement();
+    if (!propertysetRoot.isNull()) {
+        const QDomElement &propertyNode = propertysetRoot.firstChildElement();
+        if (!propertyNode.isNull()) {
+            QDomNode currentChild = propertyNode.firstChild();
+            if (!currentChild.isNull()) {
+                parseEventNotification(propertyNode.tagName(), currentChild.toCharacterData().data());
+            }
+        }
+    }
 }
 
 void UpnpServiceDescription::downloadAndParseServiceDescription(const QUrl &serviceUrl)
 {
     qDebug() << "UpnpServiceCaller::downloadAndParseServiceDescription" << serviceUrl;
     d->mNetworkAccess.get(QNetworkRequest(serviceUrl));
+}
+
+void UpnpServiceDescription::lookedUp(const QHostInfo &hostInfo)
+{
+    d->mLocalHostInfo = hostInfo;
+}
+
+void UpnpServiceDescription::handleAddresses()
+{
+    if (d->mLookup.error() == QDnsLookup::NoError) {
+        if (!d->mLookup.hostAddressRecords().empty()) {
+            d->mPublicAddress = d->mLookup.hostAddressRecords().first().value();
+        }
+    }
 }
 
 void UpnpServiceDescription::finishedDownload(QNetworkReply *reply)
@@ -289,6 +365,11 @@ void UpnpServiceDescription::finishedDownload(QNetworkReply *reply)
         }
 #endif
     }
+}
+
+void UpnpServiceDescription::parseEventNotification(const QString &eventName, const QString &eventValue)
+{
+    qDebug() << "one variable" << eventName << eventValue;
 }
 
 #include "moc_upnpservicedescription.cpp"

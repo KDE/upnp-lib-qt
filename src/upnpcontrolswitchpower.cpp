@@ -22,14 +22,35 @@
 #include <KDSoapClient/KDSoapPendingCall.h>
 #include <KDSoapClient/KDSoapPendingCallWatcher.h>
 
-UpnpControlSwitchPower::UpnpControlSwitchPower(QObject *parent) : UpnpServiceDescription(parent)
-{
+#include <QtCore/QDebug>
 
+class UpnpControlSwitchPowerPrivate
+{
+public:
+
+    bool mStatus;
+
+    bool mTarget;
+};
+
+UpnpControlSwitchPower::UpnpControlSwitchPower(QObject *parent) : UpnpServiceDescription(parent), d(new UpnpControlSwitchPowerPrivate)
+{
+    d->mStatus = false;
+    d->mTarget = false;
 }
 
 UpnpControlSwitchPower::~UpnpControlSwitchPower()
 {
+}
 
+bool UpnpControlSwitchPower::status() const
+{
+    return d->mStatus;
+}
+
+bool UpnpControlSwitchPower::target() const
+{
+    return d->mTarget;
 }
 
 void UpnpControlSwitchPower::setTarget(bool newTargetValue)
@@ -78,6 +99,16 @@ void UpnpControlSwitchPower::finishedGetStatusCall(KDSoapPendingCallWatcher *sel
     self->deleteLater();
 
     Q_EMIT getStatusFinished(!self->returnMessage().isFault(), self->returnValue().toBool());
+}
+
+void UpnpControlSwitchPower::parseEventNotification(const QString &eventName, const QString &eventValue)
+{
+    qDebug() << "UpnpControlSwitchPower::parseEventNotification" << eventName << eventValue;
+    if (eventName == QStringLiteral("Status")) {
+        d->mStatus = (eventValue == QStringLiteral("1"));
+        qDebug() << "UpnpControlSwitchPower::parseEventNotification status property:" << d->mStatus;
+        Q_EMIT statusChanged();
+    }
 }
 
 #include "moc_upnpcontrolswitchpower.cpp"

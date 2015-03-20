@@ -24,6 +24,9 @@
 
 #include <QtCore/QObject>
 
+class UpnpServiceDescription;
+class UpnpHttpServerPrivate;
+
 class UpnpHttpServer : public KDSoapServer
 {
     Q_OBJECT
@@ -33,6 +36,12 @@ public:
     virtual ~UpnpHttpServer();
 
     QObject* createServerObject() Q_DECL_OVERRIDE;
+
+    void setService(UpnpServiceDescription *service);
+
+private:
+
+    UpnpHttpServerPrivate *d;
 };
 
 #endif // UPNPHTTPSERVER_H

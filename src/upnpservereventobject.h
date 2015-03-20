@@ -24,6 +24,9 @@
 
 #include <QObject>
 
+class UpnpServiceDescription;
+class UpnpServerEventObjectPrivate;
+
 class UpnpServerEventObject : public QObject, public KDSoapServerObjectInterface
 {
     Q_OBJECT
@@ -42,6 +45,12 @@ public:
     void processRequestWithPath(const KDSoapMessage &request, KDSoapMessage &response, const QByteArray &soapAction, const QString &path) Q_DECL_OVERRIDE;
 
     bool processCustomVerbRequest(const QByteArray &requestData, const QMap<QByteArray, QByteArray> &headers) Q_DECL_OVERRIDE;
+
+    void setService(UpnpServiceDescription *service);
+
+private:
+
+    UpnpServerEventObjectPrivate *d;
 };
 
 #endif // UPNPSERVEREVENTOBJECT_H

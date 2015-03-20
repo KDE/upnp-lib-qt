@@ -19,10 +19,18 @@
 
 #include "upnphttpserver.h"
 #include "upnpservereventobject.h"
+#include "upnpservicedescription.h"
 
-UpnpHttpServer::UpnpHttpServer(QObject *parent) : KDSoapServer(parent)
+class UpnpHttpServerPrivate
 {
+public:
 
+    UpnpServiceDescription *mService;
+};
+
+UpnpHttpServer::UpnpHttpServer(QObject *parent) : KDSoapServer(parent), d(new UpnpHttpServerPrivate)
+{
+    d->mService = nullptr;
 }
 
 UpnpHttpServer::~UpnpHttpServer()
@@ -32,7 +40,14 @@ UpnpHttpServer::~UpnpHttpServer()
 
 QObject *UpnpHttpServer::createServerObject()
 {
-    return new UpnpServerEventObject();
+    UpnpServerEventObject *newObject = new UpnpServerEventObject;
+    newObject->setService(d->mService);
+    return newObject;
+}
+
+void UpnpHttpServer::setService(UpnpServiceDescription *service)
+{
+    d->mService = service;
 }
 
 #include "moc_upnphttpserver.cpp"
