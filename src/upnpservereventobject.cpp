@@ -42,27 +42,36 @@ UpnpServerEventObject::~UpnpServerEventObject()
 
 void UpnpServerEventObject::processRequest(const KDSoapMessage &request, KDSoapMessage &response, const QByteArray &soapAction)
 {
-    qDebug() << "UpnpServerEventObject::processRequest";
+    Q_UNUSED(request);
+    Q_UNUSED(response);
+    Q_UNUSED(request);
+    Q_UNUSED(soapAction);
 }
 
 QIODevice *UpnpServerEventObject::processFileRequest(const QString &path, QByteArray &contentType)
 {
-    qDebug() << "UpnpServerEventObject::processFileRequest";
-
+    Q_UNUSED(path);
+    Q_UNUSED(contentType);
     return nullptr;
 }
 
 void UpnpServerEventObject::processRequestWithPath(const KDSoapMessage &request, KDSoapMessage &response, const QByteArray &soapAction, const QString &path)
 {
-    qDebug() << "UpnpServerEventObject::processRequestWithPath";
+    Q_UNUSED(request);
+    Q_UNUSED(response);
+    Q_UNUSED(soapAction);
+    Q_UNUSED(path);
 }
 
 bool UpnpServerEventObject::processCustomVerbRequest(const QByteArray &requestData, const QMap<QByteArray, QByteArray> &headers)
 {
-    qDebug() << "UpnpServerEventObject::processCustomVerbRequest";
-    d->mService->handleEventNotification(requestData, headers);
+    if (d->mService) {
+        d->mService->handleEventNotification(requestData, headers);
 
-    return true;
+        return true;
+    } else {
+        return false;
+    }
 }
 
 void UpnpServerEventObject::setService(UpnpAbstractServiceDescription *service)
