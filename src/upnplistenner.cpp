@@ -21,18 +21,9 @@
 
 #include <QtNetwork/QHostAddress>
 
+#include <QtCore/QHash>
 #include <QtCore/QDebug>
 #include <QtCore/QSet>
-
-uint qHash(const Upnp_Discovery &discovery, uint seed = 0)
-{
-    return qHashBits(&discovery, sizeof(discovery), seed);
-}
-
-bool operator==(const Upnp_Discovery &first, const Upnp_Discovery &second)
-{
-    return strncmp(first.DeviceId, second.DeviceId, sizeof(first.DeviceId)) == 0;
-}
 
 class UpnpListennerPrivate
 {
@@ -41,7 +32,7 @@ public:
 
     UpnpClient_Handle mClientHandle;
 
-    QSet<Upnp_Discovery> mDiscoveryResults;
+    QHash<QString, Upnp_Discovery> mDiscoveryResults;
 };
 
 int upnpCallBack(Upnp_EventType EventType,void *Event,void *Cookie)
@@ -182,18 +173,26 @@ int UpnpListenner::upnpInternalCallBack(Upnp_EventType EventType, void *Event)
         //qDebug() << "UPNP_CONTROL_GET_VAR_COMPLETE";
         break;
     case UPNP_DISCOVERY_ADVERTISEMENT_ALIVE:
+    case UPNP_DISCOVERY_SEARCH_RESULT:
     {
-        //qDebug() << "UPNP_DISCOVERY_ADVERTISEMENT_ALIVE";
         Upnp_Discovery *searchResult = static_cast<Upnp_Discovery*>(Event);
 
-        const int oldSize = d->mDiscoveryResults.size();
+        if (searchResult->DeviceType[0] == 0) {
+            break;
+        }
 
-        if (searchResult->DeviceType[0] != 0) {
-            d->mDiscoveryResults.insert(*searchResult);
+        qDebug() << "UPNP_DISCOVERY_SEARCH_RESULT" << "UPNP_DISCOVERY_ADVERTISEMENT_ALIVE";
 
-            if (oldSize < d->mDiscoveryResults.size()) {
-                auto it = d->mDiscoveryResults.find(*searchResult);
+        const QString &deviceIdString(QString::fromLatin1(searchResult->DeviceId));
 
+        auto itDiscovery = d->mDiscoveryResults.find(deviceIdString);
+        if (itDiscovery == d->mDiscoveryResults.end()) {
+            d->mDiscoveryResults[deviceIdString] = *searchResult;
+
+            qDebug() << "new service";
+            qDebug() << "DeviceId:" << searchResult->DeviceId;
+            qDebug() << "DeviceType:" << searchResult->DeviceType;
+            qDebug() << "Expires:" << searchResult->Expires;
 #if 0
                 qDebug() << "new service";
                 qDebug() << "DeviceId:" << searchResult->DeviceId;
@@ -209,60 +208,48 @@ int UpnpListenner::upnpInternalCallBack(Upnp_EventType EventType, void *Event)
                 qDebug() << "DestAddr:" << QHostAddress(reinterpret_cast<const sockaddr *>(&searchResult->DestAddr));
 #endif
 
-                Q_EMIT newService(*it);
-            }
+                Q_EMIT newService(d->mDiscoveryResults[deviceIdString]);
         }
 
         break;
     }
     case UPNP_DISCOVERY_ADVERTISEMENT_BYEBYE:
     {
-        //qDebug() << "UPNP_DISCOVERY_ADVERTISEMENT_BYEBYE";
+        qDebug() << "UPNP_DISCOVERY_ADVERTISEMENT_BYEBYE";
         Upnp_Discovery *searchResult = static_cast<Upnp_Discovery*>(Event);
 
-        auto it = d->mDiscoveryResults.find(*searchResult);
-        if (it != d->mDiscoveryResults.end()) {
-            Q_EMIT removedService(*it);
-
-            d->mDiscoveryResults.erase(it);
-        }
-
-        break;
-    }
-    case UPNP_DISCOVERY_SEARCH_RESULT:
-    {
-        //qDebug() << "UPNP_DISCOVERY_SEARCH_RESULT";
-        Upnp_Discovery *searchResult = static_cast<Upnp_Discovery*>(Event);
-
-        const int oldSize = d->mDiscoveryResults.size();
-
-        d->mDiscoveryResults.insert(*searchResult);
-
-        if (oldSize < d->mDiscoveryResults.size()) {
-            auto it = d->mDiscoveryResults.find(*searchResult);
-
+        qDebug() << "removed service";
+        qDebug() << "DeviceId:" << searchResult->DeviceId;
+        qDebug() << "DeviceType:" << searchResult->DeviceType;
+        qDebug() << "Expires:" << searchResult->Expires;
 #if 0
-            qDebug() << "new service";
-            qDebug() << "DeviceId:" << searchResult->DeviceId;
-            qDebug() << "DeviceType:" << searchResult->DeviceType;
-            qDebug() << "ServiceType:" << searchResult->ServiceType;
-            qDebug() << "ServiceVer:" << searchResult->ServiceVer;
-            qDebug() << "Location:" << searchResult->Location;
-            qDebug() << "Os:" << searchResult->Os;
-            qDebug() << "Date:" << searchResult->Date;
-            qDebug() << "Ext:" << searchResult->Ext;
-            qDebug() << "ErrCode:" << searchResult->ErrCode;
-            qDebug() << "Expires:" << searchResult->Expires;
-            qDebug() << "DestAddr:" << QHostAddress(reinterpret_cast<const sockaddr *>(&searchResult->DestAddr));
+        qDebug() << "ServiceType:" << searchResult->ServiceType;
+        qDebug() << "ServiceVer:" << searchResult->ServiceVer;
+        qDebug() << "Location:" << searchResult->Location;
+        qDebug() << "Os:" << searchResult->Os;
+        qDebug() << "Date:" << searchResult->Date;
+        qDebug() << "Ext:" << searchResult->Ext;
+        qDebug() << "ErrCode:" << searchResult->ErrCode;
+        qDebug() << "Expires:" << searchResult->Expires;
+        qDebug() << "DestAddr:" << QHostAddress(reinterpret_cast<const sockaddr *>(&searchResult->DestAddr));
 #endif
 
-            Q_EMIT newService(*it);
+
+        const QString &deviceIdString(QString::fromLatin1(searchResult->DeviceId));
+
+        auto itDiscovery = d->mDiscoveryResults.find(deviceIdString);
+        if (itDiscovery != d->mDiscoveryResults.end()) {
+            Q_EMIT removedService(*itDiscovery);
+
+            qDebug() << "UPNP_DISCOVERY_ADVERTISEMENT_BYEBYE" << searchResult->DeviceId;
+
+            d->mDiscoveryResults.erase(itDiscovery);
         }
 
         break;
     }
     case UPNP_DISCOVERY_SEARCH_TIMEOUT:
-        //qDebug() << "UPNP_DISCOVERY_SEARCH_TIMEOUT";
+        qDebug() << "UPNP_DISCOVERY_SEARCH_TIMEOUT";
         Q_EMIT searchTimeOut();
         break;
     case UPNP_EVENT_SUBSCRIPTION_REQUEST:
@@ -275,7 +262,7 @@ int UpnpListenner::upnpInternalCallBack(Upnp_EventType EventType, void *Event)
         //qDebug() << "UPNP_EVENT_RENEWAL_COMPLETE";
         break;
     case UPNP_EVENT_SUBSCRIBE_COMPLETE:
-        //qDebug() << "UPNP_EVENT_SUBSCRIBE_COMPLETE";
+        qDebug() << "UPNP_EVENT_SUBSCRIBE_COMPLETE";
         break;
     case UPNP_EVENT_UNSUBSCRIBE_COMPLETE:
         //qDebug() << "UPNP_EVENT_UNSUBSCRIBE_COMPLETE";

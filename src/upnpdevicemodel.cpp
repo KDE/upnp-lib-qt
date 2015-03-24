@@ -129,6 +129,7 @@ void UpnpDeviceModel::setListenner(UpnpListenner *listenner)
     d->mListenner = listenner;
     connect(d->mListenner, &UpnpListenner::newService, this, &UpnpDeviceModel::newDevice);
     connect(d->mListenner, &UpnpListenner::removedService, this, &UpnpDeviceModel::removedDevice);
+    connect(d->mListenner, &UpnpListenner::searchTimeOut, this, &UpnpDeviceModel::searchTimeOut);
 }
 
 UpnpDeviceDescription *UpnpDeviceModel::getDeviceDescription(const QString &uuid) const
@@ -175,7 +176,25 @@ void UpnpDeviceModel::newDevice(const Upnp_Discovery &deviceDiscovery)
 
 void UpnpDeviceModel::removedDevice(const Upnp_Discovery &deviceDiscovery)
 {
+    const QString &deviceIdString(QString::fromUtf8(deviceDiscovery.DeviceId));
+    qDebug() << "UpnpDeviceModel::removedDevice" << deviceIdString;
 
+    auto deviceIndex = d->mAllHostsUUID.indexOf(deviceIdString);
+    if (deviceIndex != -1) {
+        beginRemoveRows(QModelIndex(), deviceIndex, deviceIndex);
+        d->mAllHostsUUID.removeAt(deviceIndex);
+        d->mAllHosts.remove(deviceIdString);
+        d->mAllHostsDescription.remove(deviceIdString);
+        endRemoveRows();
+    }
+}
+
+void UpnpDeviceModel::searchTimeOut()
+{
+    if (d->mListenner) {
+        qDebug() << "UpnpDeviceModel::searchTimeOut";
+        d->mListenner->searchAllUpnpDevice();
+    }
 }
 
 void UpnpDeviceModel::deviceDescriptionChanged(const QString &uuid)

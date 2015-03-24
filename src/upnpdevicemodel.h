@@ -71,6 +71,8 @@ private Q_SLOTS:
 
     void removedDevice(const Upnp_Discovery &deviceDiscovery);
 
+    void searchTimeOut();
+
     void deviceDescriptionChanged(const QString &uuid);
 
 private:
