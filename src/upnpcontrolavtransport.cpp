@@ -105,12 +105,12 @@ void UpnpControlAVTransport::Previous(quint32 InstanceID)
 
 void UpnpControlAVTransport::SetPlayMode(quint32 InstanceID, const QString &NewPlayMode)
 {
-    callAction(QStringLiteral("SetPlayMode"), {InstanceID});
+    callAction(QStringLiteral("SetPlayMode"), {InstanceID, NewPlayMode});
 }
 
 void UpnpControlAVTransport::SetRecordQualityMode(quint32 InstanceID, const QString &NewRecordQualityMode)
 {
-    callAction(QStringLiteral("SetRecordQualityMode"), {InstanceID});
+    callAction(QStringLiteral("SetRecordQualityMode"), {InstanceID, NewRecordQualityMode});
 }
 
 void UpnpControlAVTransport::GetCurrentTransportActions(quint32 InstanceID)
