@@ -30,10 +30,12 @@
 #include <QtNetwork/QDnsLookup>
 #include <QtNetwork/QNetworkInterface>
 
+#include <QtXml/QDomDocument>
+
+#include <QtCore/QTimer>
+#include <QtCore/QPointer>
 #include <QtCore/QBuffer>
 #include <QtCore/QTextStream>
-
-#include <QtXml/QDomDocument>
 
 enum class UpnpArgumentDirection
 {
@@ -68,8 +70,9 @@ class UpnpAbstractServiceDescriptionPrivate
 public:
 
     UpnpAbstractServiceDescriptionPrivate()
-        : mNetworkAccess(), mServiceType(), mServiceId(), mBaseURL(), mSCPDURL(), mControlURL(),
-          mEventSubURL(), mActions(), mInterface(nullptr), mEventServer()
+        : mNetworkAccess(), mServiceType(), mServiceId(), mBaseURL(), mSCPDURL(), mControlSubURL(),
+          mFullControlSubURL(), mEventSubURL(), mFullEventSubURL(), mActions(), mInterface(nullptr),
+          mEventServer(), mPublicAddress(), mRealEventSubscriptionTimeout(0), mEventSubscriptionTimer(nullptr)
     {
     }
 
@@ -83,9 +86,13 @@ public:
 
     QVariant mSCPDURL;
 
-    QVariant mControlURL;
+    QVariant mControlSubURL;
+
+    QUrl mFullControlSubURL;
 
     QVariant mEventSubURL;
+
+    QUrl mFullEventSubURL;
 
     QMap<QString, UpnpActionDescription> mActions;
 
@@ -94,6 +101,10 @@ public:
     UpnpHttpServer mEventServer;
 
     QHostAddress mPublicAddress;
+
+    int mRealEventSubscriptionTimeout;
+
+    QPointer<QTimer> mEventSubscriptionTimer;
 };
 
 UpnpAbstractServiceDescription::UpnpAbstractServiceDescription(QObject *parent)
@@ -168,18 +179,22 @@ const QVariant &UpnpAbstractServiceDescription::SCPDURL() const
 
 void UpnpAbstractServiceDescription::setControlURL(const QVariant &newControlURL)
 {
-    d->mControlURL = newControlURL;
+    d->mControlSubURL = newControlURL;
+    d->mFullControlSubURL = d->mBaseURL.toUrl();
+    d->mFullControlSubURL.setPath(d->mControlSubURL.toString());
     Q_EMIT controlURLChanged();
 }
 
 const QVariant &UpnpAbstractServiceDescription::controlURL() const
 {
-    return d->mControlURL;
+    return d->mControlSubURL;
 }
 
 void UpnpAbstractServiceDescription::setEventSubURL(const QVariant &newEventSubURL)
 {
     d->mEventSubURL = newEventSubURL;
+    d->mFullEventSubURL = d->mBaseURL.toUrl();
+    d->mFullEventSubURL.setPath(d->mEventSubURL.toString());
     Q_EMIT eventSubURLChanged();
 }
 
@@ -190,9 +205,6 @@ const QVariant &UpnpAbstractServiceDescription::eventSubURL() const
 
 KDSoapPendingCall UpnpAbstractServiceDescription::callAction(const QString &action, const QList<QVariant> &arguments)
 {
-    QUrl controlUrl(d->mBaseURL.toUrl());
-    controlUrl.setPath(d->mControlURL.toString());
-
     KDSoapMessage message;
 
     auto itAction = d->mActions.find(action);
@@ -212,7 +224,7 @@ KDSoapPendingCall UpnpAbstractServiceDescription::callAction(const QString &acti
     }
 
     if (!d->mInterface) {
-        d->mInterface = new KDSoapClientInterface(controlUrl.toString(), d->mServiceType.toString());
+        d->mInterface = new KDSoapClientInterface(d->mFullControlSubURL.toString(), d->mServiceType.toString());
         d->mInterface->setSoapVersion(KDSoapClientInterface::SOAP1_1);
         d->mInterface->setStyle(KDSoapClientInterface::RPCStyle);
     }
@@ -220,10 +232,9 @@ KDSoapPendingCall UpnpAbstractServiceDescription::callAction(const QString &acti
     return d->mInterface->asyncCall(action, message, d->mServiceType.toString() + QStringLiteral("#") + action);
 }
 
-void UpnpAbstractServiceDescription::subscribeEvents()
+void UpnpAbstractServiceDescription::subscribeEvents(int duration)
 {
-    QUrl eventUrl(d->mBaseURL.toUrl());
-    eventUrl.setPath(d->mEventSubURL.toString());
+    qDebug() << "UpnpAbstractServiceDescription::subscribeEvents" << duration;
 
     QString webServerAddess(QStringLiteral("<http://"));
 
@@ -235,17 +246,20 @@ void UpnpAbstractServiceDescription::subscribeEvents()
 
     webServerAddess += QStringLiteral(":") + QString::number(d->mEventServer.serverPort()) + QStringLiteral(">");
 
-    QNetworkRequest myRequest(eventUrl);
+    QNetworkRequest myRequest(d->mFullEventSubURL);
     myRequest.setRawHeader("CALLBACK", webServerAddess.toUtf8());
     myRequest.setRawHeader("NT", "upnp:event");
-    myRequest.setRawHeader("TIMEOUT", "Second-600");
+    QString timeoutDefinition(QStringLiteral("Second-"));
+    timeoutDefinition += QString::number(duration);
+    myRequest.setRawHeader("TIMEOUT", timeoutDefinition.toLatin1());
 
     d->mNetworkAccess.sendCustomRequest(myRequest, "SUBSCRIBE");
 }
 
 void UpnpAbstractServiceDescription::handleEventNotification(const QByteArray &requestData, const QMap<QByteArray, QByteArray> &headers)
 {
-    qDebug() << "UpnpServiceDescription::handleEventNotification";
+    Q_UNUSED(headers)
+
     const QString &requestAnswer(QString::fromLatin1(requestData));
 
     QDomDocument requestDocument;
@@ -273,58 +287,78 @@ void UpnpAbstractServiceDescription::downloadAndParseServiceDescription(const QU
 void UpnpAbstractServiceDescription::finishedDownload(QNetworkReply *reply)
 {
     if (reply->isFinished() && reply->error() == QNetworkReply::NoError) {
-        QDomDocument serviceDescriptionDocument;
-        serviceDescriptionDocument.setContent(reply);
+        if (reply->url() == d->mFullEventSubURL) {
+            if (reply->hasRawHeader("TIMEOUT")) {
+                if (reply->rawHeader("TIMEOUT").startsWith("Second-")) {
+                    d->mRealEventSubscriptionTimeout = reply->rawHeader("TIMEOUT").mid(7).toInt();
 
-        const QDomElement &scpdRoot = serviceDescriptionDocument.documentElement();
-
-        const QDomElement &actionListRoot = scpdRoot.firstChildElement(QStringLiteral("actionList"));
-        QDomNode currentChild = actionListRoot.firstChild();
-        while (!currentChild.isNull()) {
-            const QDomNode &nameNode = currentChild.firstChildElement(QStringLiteral("name"));
-
-            QString actionName;
-            if (!nameNode.isNull()) {
-                actionName = nameNode.toElement().text();
+                    if (!d->mEventSubscriptionTimer) {
+                        d->mEventSubscriptionTimer = new QTimer;
+                        connect(d->mEventSubscriptionTimer.data(), &QTimer::timeout, this, &UpnpAbstractServiceDescription::eventSubscriptionTimeout);
+                        d->mEventSubscriptionTimer->setInterval(1000 * (d->mRealEventSubscriptionTimeout > 60 ? d->mRealEventSubscriptionTimeout - 60 : d->mRealEventSubscriptionTimeout));
+                        d->mEventSubscriptionTimer->start();
+                    }
+                }
             }
+        } else {
+            QDomDocument serviceDescriptionDocument;
+            serviceDescriptionDocument.setContent(reply);
 
-            d->mActions[actionName].mName = actionName;
+            const QDomElement &scpdRoot = serviceDescriptionDocument.documentElement();
 
-            const QDomNode &argumentListNode = currentChild.firstChildElement(QStringLiteral("argumentList"));
-            QDomNode argumentNode = argumentListNode.firstChild();
-            while (!argumentNode.isNull()) {
-                const QDomNode &argumentNameNode = argumentNode.firstChildElement(QStringLiteral("name"));
-                const QDomNode &argumentDirectionNode = argumentNode.firstChildElement(QStringLiteral("direction"));
-                const QDomNode &argumentRetvalNode = argumentNode.firstChildElement(QStringLiteral("retval"));
-                const QDomNode &argumentRelatedStateVariableNode = argumentNode.firstChildElement(QStringLiteral("relatedStateVariable"));
+            const QDomElement &actionListRoot = scpdRoot.firstChildElement(QStringLiteral("actionList"));
+            QDomNode currentChild = actionListRoot.firstChild();
+            while (!currentChild.isNull()) {
+                const QDomNode &nameNode = currentChild.firstChildElement(QStringLiteral("name"));
 
-                UpnpActionArgumentDescription newArgument;
-                newArgument.mName = argumentNameNode.toElement().text();
-                newArgument.mDirection = (argumentDirectionNode.toElement().text() == QStringLiteral("in") ? UpnpArgumentDirection::In : UpnpArgumentDirection::Out);
-                newArgument.mIsReturnValue = !argumentRetvalNode.isNull();
-                newArgument.mRelatedStateVariable = argumentRelatedStateVariableNode.toElement().text();
+                QString actionName;
+                if (!nameNode.isNull()) {
+                    actionName = nameNode.toElement().text();
+                }
 
-                d->mActions[actionName].mArguments.push_back(newArgument);
+                d->mActions[actionName].mName = actionName;
 
-                argumentNode = argumentNode.nextSibling();
+                const QDomNode &argumentListNode = currentChild.firstChildElement(QStringLiteral("argumentList"));
+                QDomNode argumentNode = argumentListNode.firstChild();
+                while (!argumentNode.isNull()) {
+                    const QDomNode &argumentNameNode = argumentNode.firstChildElement(QStringLiteral("name"));
+                    const QDomNode &argumentDirectionNode = argumentNode.firstChildElement(QStringLiteral("direction"));
+                    const QDomNode &argumentRetvalNode = argumentNode.firstChildElement(QStringLiteral("retval"));
+                    const QDomNode &argumentRelatedStateVariableNode = argumentNode.firstChildElement(QStringLiteral("relatedStateVariable"));
+
+                    UpnpActionArgumentDescription newArgument;
+                    newArgument.mName = argumentNameNode.toElement().text();
+                    newArgument.mDirection = (argumentDirectionNode.toElement().text() == QStringLiteral("in") ? UpnpArgumentDirection::In : UpnpArgumentDirection::Out);
+                    newArgument.mIsReturnValue = !argumentRetvalNode.isNull();
+                    newArgument.mRelatedStateVariable = argumentRelatedStateVariableNode.toElement().text();
+
+                    d->mActions[actionName].mArguments.push_back(newArgument);
+
+                    argumentNode = argumentNode.nextSibling();
+                }
+
+                currentChild = currentChild.nextSibling();
             }
-
-            currentChild = currentChild.nextSibling();
-        }
 
 #if 0
-        const QDomElement &serviceStateTableRoot = scpdRoot.firstChildElement(QStringLiteral("serviceStateTable"));
-        currentChild = serviceStateTableRoot.firstChild();
-        while (!currentChild.isNull()) {
-            const QDomNode &nameNode = currentChild.firstChildElement(QStringLiteral("name"));
-            if (!nameNode.isNull()) {
-                qDebug() << "state variable name" << nameNode.toElement().text();
-            }
+            const QDomElement &serviceStateTableRoot = scpdRoot.firstChildElement(QStringLiteral("serviceStateTable"));
+            currentChild = serviceStateTableRoot.firstChild();
+            while (!currentChild.isNull()) {
+                const QDomNode &nameNode = currentChild.firstChildElement(QStringLiteral("name"));
+                if (!nameNode.isNull()) {
+                    qDebug() << "state variable name" << nameNode.toElement().text();
+                }
 
-            currentChild = currentChild.nextSibling();
-        }
+                currentChild = currentChild.nextSibling();
+            }
 #endif
+        }
     }
+}
+
+void UpnpAbstractServiceDescription::eventSubscriptionTimeout()
+{
+    subscribeEvents(d->mRealEventSubscriptionTimeout);
 }
 
 void UpnpAbstractServiceDescription::parseEventNotification(const QString &eventName, const QString &eventValue)

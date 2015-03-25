@@ -98,7 +98,7 @@ public:
 
     Q_INVOKABLE KDSoapPendingCall callAction(const QString &action, const QList<QVariant> &arguments);
 
-    Q_INVOKABLE void subscribeEvents();
+    Q_INVOKABLE void subscribeEvents(int duration);
 
     void handleEventNotification(const QByteArray &requestData, const QMap<QByteArray, QByteArray> &headers);
 
@@ -123,6 +123,8 @@ public Q_SLOTS:
 private Q_SLOTS:
 
     void finishedDownload(QNetworkReply *reply);
+
+    void eventSubscriptionTimeout();
 
 protected:
 

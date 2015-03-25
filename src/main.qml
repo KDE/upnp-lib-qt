@@ -155,7 +155,7 @@ ApplicationWindow {
 
                 onClicked: {
                     if (upnpService == undefined) upnpService = deviceModel.getDeviceDescription(model.uuid).serviceById('urn:upnp-org:serviceId:SwitchPower:1')
-                    if (upnpService != undefined) upnpService.subscribeEvents()
+                    if (upnpService != undefined) upnpService.subscribeEvents(600)
                 }
             }
 
