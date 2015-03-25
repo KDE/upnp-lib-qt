@@ -17,7 +17,7 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#include "upnplistenner.h"
+#include "upnpssdpengine.h"
 
 #include <QtNetwork/QHostAddress>
 
@@ -25,7 +25,7 @@
 #include <QtCore/QDebug>
 #include <QtCore/QSet>
 
-class UpnpListennerPrivate
+class UpnpSsdpEnginePrivate
 {
 public:
     int mUpnpLibraryStatus;
@@ -38,14 +38,14 @@ public:
 int upnpCallBack(Upnp_EventType EventType,void *Event,void *Cookie)
 {
     if (Cookie) {
-        return static_cast<UpnpListenner*>(Cookie)->upnpInternalCallBack(EventType, Event);
+        return static_cast<UpnpSsdpEngine*>(Cookie)->upnpInternalCallBack(EventType, Event);
     }
 
     return -1;
 }
 
-UpnpListenner::UpnpListenner(QObject *parent)
-    : QObject(parent), d(new UpnpListennerPrivate)
+UpnpSsdpEngine::UpnpSsdpEngine(QObject *parent)
+    : QObject(parent), d(new UpnpSsdpEnginePrivate)
 {
     d->mUpnpLibraryStatus = UpnpRegisterClient(&upnpCallBack, this, &d->mClientHandle);
     if (d->mUpnpLibraryStatus == UPNP_E_SUCCESS) {
@@ -55,12 +55,12 @@ UpnpListenner::UpnpListenner(QObject *parent)
     }
 }
 
-UpnpListenner::~UpnpListenner()
+UpnpSsdpEngine::~UpnpSsdpEngine()
 {
     delete d;
 }
 
-bool UpnpListenner::UpnpInit()
+bool UpnpSsdpEngine::UpnpInit()
 {
     int res = UpnpInit2(nullptr, 0);
     if (res == UPNP_E_SUCCESS) {
@@ -72,17 +72,17 @@ bool UpnpListenner::UpnpInit()
     return (res == UPNP_E_SUCCESS);
 }
 
-void UpnpListenner::UpnpDiscoveryFinish()
+void UpnpSsdpEngine::UpnpDiscoveryFinish()
 {
     ::UpnpFinish();
 }
 
-int UpnpListenner::upnpError() const
+int UpnpSsdpEngine::upnpError() const
 {
     return d->mUpnpLibraryStatus;
 }
 
-bool UpnpListenner::searchAllUpnpDevice()
+bool UpnpSsdpEngine::searchAllUpnpDevice()
 {
     d->mUpnpLibraryStatus = UpnpSearchAsync(d->mClientHandle, 60, "ssdp:all", this);
 
@@ -95,7 +95,7 @@ bool UpnpListenner::searchAllUpnpDevice()
     return d->mUpnpLibraryStatus == UPNP_E_SUCCESS;
 }
 
-bool UpnpListenner::searchUpnpContentDirectory()
+bool UpnpSsdpEngine::searchUpnpContentDirectory()
 {
     d->mUpnpLibraryStatus = UpnpSearchAsync(d->mClientHandle, 60, "urn:schemas-upnp-org:device:MediaServer:1", this);
 
@@ -120,7 +120,7 @@ bool UpnpListenner::searchUpnpContentDirectory()
     return (d->mUpnpLibraryStatus == UPNP_E_SUCCESS);
 }
 
-bool UpnpListenner::searchUpnpPlayerControl()
+bool UpnpSsdpEngine::searchUpnpPlayerControl()
 {
     d->mUpnpLibraryStatus = UpnpSearchAsync(d->mClientHandle, 60, "urn:schemas-upnp-org:device:MediaRenderer:1", this);
 
@@ -156,7 +156,7 @@ bool UpnpListenner::searchUpnpPlayerControl()
     return (d->mUpnpLibraryStatus == UPNP_E_SUCCESS);
 }
 
-int UpnpListenner::upnpInternalCallBack(Upnp_EventType EventType, void *Event)
+int UpnpSsdpEngine::upnpInternalCallBack(Upnp_EventType EventType, void *Event)
 {
     switch(EventType)
     {
@@ -279,4 +279,4 @@ int UpnpListenner::upnpInternalCallBack(Upnp_EventType EventType, void *Event)
     return 0;
 }
 
-#include "moc_upnplistenner.cpp"
+#include "moc_upnpssdpengine.cpp"

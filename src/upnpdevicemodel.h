@@ -24,14 +24,14 @@
 #include "upnp.h"
 
 class UpnpDeviceModelPrivate;
-class UpnpListenner;
+class UpnpSsdpEngine;
 class UpnpDeviceDescription;
 
 class UpnpDeviceModel : public QAbstractListModel
 {
     Q_OBJECT
 
-    Q_PROPERTY(UpnpListenner *listenner
+    Q_PROPERTY(UpnpSsdpEngine *listenner
                READ listenner
                WRITE setListenner)
 
@@ -55,9 +55,9 @@ public:
 
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const Q_DECL_OVERRIDE;
 
-    UpnpListenner* listenner() const;
+    UpnpSsdpEngine* listenner() const;
 
-    void setListenner(UpnpListenner *listenner);
+    void setListenner(UpnpSsdpEngine *listenner);
 
     Q_INVOKABLE UpnpDeviceDescription* getDeviceDescription(const QString &uuid)const;
 

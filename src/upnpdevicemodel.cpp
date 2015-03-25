@@ -18,7 +18,7 @@
  */
 
 #include "upnpdevicemodel.h"
-#include "upnplistenner.h"
+#include "upnpssdpengine.h"
 #include "upnpdevicedescription.h"
 
 #include <QtCore/QHash>
@@ -38,7 +38,7 @@ public:
 
     QList<QString> mAllHostsUUID;
 
-    UpnpListenner *mListenner;
+    UpnpSsdpEngine *mListenner;
 };
 
 UpnpDeviceModel::UpnpDeviceModel(QObject *parent)
@@ -116,20 +116,20 @@ QVariant UpnpDeviceModel::data(const QModelIndex &index, int role) const
     return QVariant();
 }
 
-UpnpListenner *UpnpDeviceModel::listenner() const
+UpnpSsdpEngine *UpnpDeviceModel::listenner() const
 {
     return d->mListenner;
 }
 
-void UpnpDeviceModel::setListenner(UpnpListenner *listenner)
+void UpnpDeviceModel::setListenner(UpnpSsdpEngine *listenner)
 {
     if (d->mListenner) {
         disconnect(d->mListenner);
     }
     d->mListenner = listenner;
-    connect(d->mListenner, &UpnpListenner::newService, this, &UpnpDeviceModel::newDevice);
-    connect(d->mListenner, &UpnpListenner::removedService, this, &UpnpDeviceModel::removedDevice);
-    connect(d->mListenner, &UpnpListenner::searchTimeOut, this, &UpnpDeviceModel::searchTimeOut);
+    connect(d->mListenner, &UpnpSsdpEngine::newService, this, &UpnpDeviceModel::newDevice);
+    connect(d->mListenner, &UpnpSsdpEngine::removedService, this, &UpnpDeviceModel::removedDevice);
+    connect(d->mListenner, &UpnpSsdpEngine::searchTimeOut, this, &UpnpDeviceModel::searchTimeOut);
 }
 
 UpnpDeviceDescription *UpnpDeviceModel::getDeviceDescription(const QString &uuid) const

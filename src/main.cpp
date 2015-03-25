@@ -17,7 +17,7 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#include "upnplistenner.h"
+#include "upnpssdpengine.h"
 #include "upnpdevicedescription.h"
 #include "upnpabstractservicedescription.h"
 #include "upnpdevicemodel.h"
@@ -34,9 +34,9 @@ int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
 
-    UpnpListenner::UpnpInit();
+    UpnpSsdpEngine::UpnpInit();
 
-    qmlRegisterType<UpnpListenner>("org.mgallien.QmlExtension", 1, 0, "UpnpListenner");
+    qmlRegisterType<UpnpSsdpEngine>("org.mgallien.QmlExtension", 1, 0, "UpnpSsdpEngine");
     qmlRegisterType<UpnpDeviceDescription>("org.mgallien.QmlExtension", 1, 0, "UpnpDeviceDescription");
     qmlRegisterType<UpnpAbstractServiceDescription>("org.mgallien.QmlExtension", 1, 0, "UpnpAbstractServiceDescription");
     qmlRegisterType<UpnpDeviceModel>("org.mgallien.QmlExtension", 1, 0, "UpnpDeviceModel");
@@ -49,7 +49,7 @@ int main(int argc, char *argv[])
 
     app.exec();
 
-    UpnpListenner::UpnpDiscoveryFinish();
+    UpnpSsdpEngine::UpnpDiscoveryFinish();
 
     return 0;
 }

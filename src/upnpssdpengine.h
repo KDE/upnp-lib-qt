@@ -17,21 +17,21 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#ifndef UPNPLISTENNER_H
-#define UPNPLISTENNER_H
+#ifndef UPNPSSDPENGINE_H
+#define UPNPSSDPENGINE_H
 
 #include <QObject>
 
 #include "upnp.h"
 
-class UpnpListennerPrivate;
+class UpnpSsdpEnginePrivate;
 
-class UpnpListenner : public QObject
+class UpnpSsdpEngine : public QObject
 {
     Q_OBJECT
 public:
-    explicit UpnpListenner(QObject *parent = 0);
-    ~UpnpListenner();
+    explicit UpnpSsdpEngine(QObject *parent = 0);
+    ~UpnpSsdpEngine();
 
     static bool UpnpInit();
 
@@ -68,9 +68,9 @@ public Q_SLOTS:
 
 private:
 
-    UpnpListennerPrivate *d;
+    UpnpSsdpEnginePrivate *d;
 };
 
 Q_DECLARE_METATYPE(Upnp_Discovery)
 
-#endif // UPNPLISTENNER_H
+#endif

@@ -30,16 +30,16 @@ ApplicationWindow {
     title: 'upnp'
     id: mainWindow
 
-    UpnpListenner {
-        id: myListenner
+    UpnpSsdpEngine {
+        id: mySsdpEngine
     }
 
     UpnpDeviceModel {
         id: deviceModel
-        listenner: myListenner
+        listenner: mySsdpEngine
 
         Component.onCompleted: {
-           myListenner.searchAllUpnpDevice();
+           mySsdpEngine.searchAllUpnpDevice();
         }
     }
 
