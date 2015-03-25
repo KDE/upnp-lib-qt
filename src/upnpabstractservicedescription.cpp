@@ -234,8 +234,6 @@ KDSoapPendingCall UpnpAbstractServiceDescription::callAction(const QString &acti
 
 void UpnpAbstractServiceDescription::subscribeEvents(int duration)
 {
-    qDebug() << "UpnpAbstractServiceDescription::subscribeEvents" << duration;
-
     QString webServerAddess(QStringLiteral("<http://"));
 
     if (!d->mPublicAddress.isNull()) {
@@ -353,6 +351,8 @@ void UpnpAbstractServiceDescription::finishedDownload(QNetworkReply *reply)
             }
 #endif
         }
+    } else if (reply->isFinished()) {
+        qDebug() << "UpnpAbstractServiceDescription::finishedDownload" << "error";
     }
 }
 
