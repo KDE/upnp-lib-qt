@@ -8,6 +8,7 @@ set(upnp-player-qt_SOURCES
     upnpcontrolrenderingcontrol.cpp
     upnpcontrolavtransport.cpp
     upnpcontrolswitchpower.cpp
+    upnpcontroldimming.cpp
     upnpdevicemodel.cpp
     upnpbasictypes.h
     main.qml
