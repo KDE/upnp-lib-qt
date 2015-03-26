@@ -39,7 +39,7 @@ ApplicationWindow {
         listenner: mySsdpEngine
 
         Component.onCompleted: {
-           mySsdpEngine.searchAllUpnpDevice();
+            mySsdpEngine.searchAllUpnpDevice();
         }
     }
 
