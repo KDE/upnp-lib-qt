@@ -21,11 +21,11 @@
 #define UPNPDEVICEMODEL_H
 
 #include <QAbstractListModel>
-#include "upnp.h"
 
 class UpnpDeviceModelPrivate;
 class UpnpSsdpEngine;
 class UpnpDeviceDescription;
+struct UpnpDiscoveryResult;
 
 class UpnpDeviceModel : public QAbstractListModel
 {
@@ -67,11 +67,9 @@ public Q_SLOTS:
 
 private Q_SLOTS:
 
-    void newDevice(const Upnp_Discovery &deviceDiscovery);
+    void newDevice(const UpnpDiscoveryResult &deviceDiscovery);
 
-    void removedDevice(const Upnp_Discovery &deviceDiscovery);
-
-    void searchTimeOut();
+    void removedDevice(const UpnpDiscoveryResult &deviceDiscovery);
 
     void deviceDescriptionChanged(const QString &uuid);
 

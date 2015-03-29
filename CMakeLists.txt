@@ -14,10 +14,6 @@ find_package(Qt5 ${REQUIRED_QT_VERSION} CONFIG REQUIRED Core Network Quick Widge
 
 find_package(KDSoap CONFIG REQUIRED)
 
-find_package(PkgConfig REQUIRED)
-
-pkg_check_modules(LIBUPNP REQUIRED libupnp)
-
 include(FeatureSummary)
 include(ECMSetupVersion)
 

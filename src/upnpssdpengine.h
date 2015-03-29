@@ -22,7 +22,16 @@
 
 #include <QObject>
 
-#include "upnp.h"
+struct UpnpDiscoveryResult
+{
+    QString mST;
+
+    QString mUSN;
+
+    QString mLocation;
+};
+
+Q_DECLARE_METATYPE(UpnpDiscoveryResult)
 
 class UpnpSsdpEnginePrivate;
 
@@ -31,21 +40,14 @@ class UpnpSsdpEngine : public QObject
     Q_OBJECT
 public:
     explicit UpnpSsdpEngine(QObject *parent = 0);
-    ~UpnpSsdpEngine();
 
-    static bool UpnpInit();
-
-    static void UpnpDiscoveryFinish();
-
-    int upnpError() const;
+    virtual ~UpnpSsdpEngine();
 
 Q_SIGNALS:
 
-    void searchTimeOut();
+    void newService(const UpnpDiscoveryResult &serviceDiscovery);
 
-    void newService(const Upnp_Discovery &serviceDiscovery);
-
-    void removedService(const Upnp_Discovery &serviceDiscovery);
+    void removedService(const UpnpDiscoveryResult &serviceDiscovery);
 
 public Q_SLOTS:
 
@@ -54,23 +56,19 @@ public Q_SLOTS:
      */
     bool searchAllUpnpDevice();
 
-    /**
-     * @brief searchUpnpContentDirectory will trigger a search for upnp service of MediaServer (UPNP/DLNA)
-     */
-    bool searchUpnpContentDirectory();
+    void publishDevice(const QString &urlDevice);
 
-    /**
-     * @brief searchUpnpPlayerControl will trigger a search for upnp service of MediaRenderer (UPNP/DLNA)
-     */
-    bool searchUpnpPlayerControl();
+private Q_SLOTS:
 
-    int upnpInternalCallBack(Upnp_EventType EventType, void *Event);
+    void standardReceivedData();
+
+    void queryReceivedData();
 
 private:
 
+    void parseSsdpDatagram(const QByteArray &datagram);
+
     UpnpSsdpEnginePrivate *d;
 };
-
-Q_DECLARE_METATYPE(Upnp_Discovery)
 
 #endif

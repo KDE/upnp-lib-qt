@@ -34,8 +34,6 @@ int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
 
-    UpnpSsdpEngine::UpnpInit();
-
     qmlRegisterType<UpnpSsdpEngine>("org.mgallien.QmlExtension", 1, 0, "UpnpSsdpEngine");
     qmlRegisterType<UpnpDeviceDescription>("org.mgallien.QmlExtension", 1, 0, "UpnpDeviceDescription");
     qmlRegisterType<UpnpAbstractServiceDescription>("org.mgallien.QmlExtension", 1, 0, "UpnpAbstractServiceDescription");
@@ -43,13 +41,11 @@ int main(int argc, char *argv[])
     qmlRegisterType<UpnpControlSwitchPower>("org.mgallien.QmlExtension", 1, 0, "UpnpControlSwitchPower");
 
     qRegisterMetaType<A_ARG_TYPE_InstanceID>();
-    qRegisterMetaType<Upnp_Discovery>();
+    qRegisterMetaType<UpnpDiscoveryResult>();
 
     QQmlApplicationEngine engine(QUrl(QStringLiteral("./main.qml")));
 
     app.exec();
-
-    UpnpSsdpEngine::UpnpDiscoveryFinish();
 
     return 0;
 }

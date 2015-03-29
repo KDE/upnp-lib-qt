@@ -25,34 +25,45 @@
 #include <QtCore/QDebug>
 #include <QtCore/QSet>
 
+#include <QtNetwork/QUdpSocket>
+
+#include <sys/types.h>          /* Consultez NOTES */
+#include <sys/socket.h>
+
 class UpnpSsdpEnginePrivate
 {
 public:
-    int mUpnpLibraryStatus;
 
-    UpnpClient_Handle mClientHandle;
+    QHash<QString, UpnpDiscoveryResult> mDiscoveryResults;
 
-    QHash<QString, Upnp_Discovery> mDiscoveryResults;
+    QUdpSocket mSsdpQuerySocket;
+
+    QUdpSocket mSsdpStandardSocket;
 };
-
-int upnpCallBack(Upnp_EventType EventType,void *Event,void *Cookie)
-{
-    if (Cookie) {
-        return static_cast<UpnpSsdpEngine*>(Cookie)->upnpInternalCallBack(EventType, Event);
-    }
-
-    return -1;
-}
 
 UpnpSsdpEngine::UpnpSsdpEngine(QObject *parent)
     : QObject(parent), d(new UpnpSsdpEnginePrivate)
 {
-    d->mUpnpLibraryStatus = UpnpRegisterClient(&upnpCallBack, this, &d->mClientHandle);
-    if (d->mUpnpLibraryStatus == UPNP_E_SUCCESS) {
-        qDebug() << "success";
-    } else {
-        qDebug() << "fail";
+    connect(&d->mSsdpQuerySocket, &QUdpSocket::readyRead, this, &UpnpSsdpEngine::queryReceivedData);
+    connect(&d->mSsdpStandardSocket, &QUdpSocket::readyRead, this, &UpnpSsdpEngine::standardReceivedData);
+
+    d->mSsdpStandardSocket.bind(QHostAddress(QStringLiteral("239.255.255.250")), 1900, QAbstractSocket::ShareAddress | QAbstractSocket::ReuseAddressHint);
+
+    int reuse = 1;
+    if (setsockopt(d->mSsdpStandardSocket.socketDescriptor(), SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(reuse)) < 0) {
+        qDebug() << "setsockopt() failed" << errno;
     }
+
+    if (setsockopt(d->mSsdpStandardSocket.socketDescriptor(), SOL_SOCKET, SO_REUSEPORT, &reuse, sizeof(reuse)) < 0) {
+        qDebug() << "setsockopt() 2 failed" << errno;
+    }
+
+    int bindResult = d->mSsdpStandardSocket.bind(QHostAddress(QStringLiteral("239.255.255.250")), 1900, QAbstractSocket::ShareAddress | QAbstractSocket::ReuseAddressHint);
+    if (!bindResult) {
+        qDebug() << "bind failed" << QHostAddress(QStringLiteral("239.255.255.250")) << d->mSsdpStandardSocket.error() << d->mSsdpStandardSocket.errorString();
+    }
+
+    d->mSsdpQuerySocket.bind(QHostAddress::Any);
 }
 
 UpnpSsdpEngine::~UpnpSsdpEngine()
@@ -60,102 +71,26 @@ UpnpSsdpEngine::~UpnpSsdpEngine()
     delete d;
 }
 
-bool UpnpSsdpEngine::UpnpInit()
-{
-    int res = UpnpInit2(nullptr, 0);
-    if (res == UPNP_E_SUCCESS) {
-        qDebug() << "success";
-    } else {
-        qDebug() << "fail";
-    }
-
-    return (res == UPNP_E_SUCCESS);
-}
-
-void UpnpSsdpEngine::UpnpDiscoveryFinish()
-{
-    ::UpnpFinish();
-}
-
-int UpnpSsdpEngine::upnpError() const
-{
-    return d->mUpnpLibraryStatus;
-}
-
 bool UpnpSsdpEngine::searchAllUpnpDevice()
 {
-    d->mUpnpLibraryStatus = UpnpSearchAsync(d->mClientHandle, 60, "ssdp:all", this);
+    QByteArray allDiscoveryMessage;
 
-    if (d->mUpnpLibraryStatus == UPNP_E_SUCCESS) {
-        qDebug() << "success";
-    } else {
-        qDebug() << "fail";
-    }
+    allDiscoveryMessage += "M-SEARCH * HTTP/1.1\r\n";
+    allDiscoveryMessage += "HOST: 239.255.255.250:1900\r\n";
+    allDiscoveryMessage += "MAN: \"ssdp:discover\"\r\n";
+    allDiscoveryMessage += "MX: 1\r\n";
+    allDiscoveryMessage += "ST: ssdp:all\r\n\r\n";
 
-    return d->mUpnpLibraryStatus == UPNP_E_SUCCESS;
+    auto result = d->mSsdpQuerySocket.writeDatagram(allDiscoveryMessage, QHostAddress(QStringLiteral("239.255.255.250")), 1900);
+
+    return result != -1;
 }
 
-bool UpnpSsdpEngine::searchUpnpContentDirectory()
+void UpnpSsdpEngine::publishDevice(const QString &urlDevice)
 {
-    d->mUpnpLibraryStatus = UpnpSearchAsync(d->mClientHandle, 60, "urn:schemas-upnp-org:device:MediaServer:1", this);
-
-    if (d->mUpnpLibraryStatus == UPNP_E_SUCCESS) {
-        qDebug() << "success";
-    } else {
-        qDebug() << "fail";
-    }
-
-    if (d->mUpnpLibraryStatus != UPNP_E_SUCCESS) {
-        return (d->mUpnpLibraryStatus == UPNP_E_SUCCESS);
-    }
-
-    d->mUpnpLibraryStatus = UpnpSearchAsync(d->mClientHandle, 60, "urn:schemas-upnp-org:service:ContentDirectory:1", this);
-
-    if (d->mUpnpLibraryStatus == UPNP_E_SUCCESS) {
-        qDebug() << "success";
-    } else {
-        qDebug() << "fail";
-    }
-
-    return (d->mUpnpLibraryStatus == UPNP_E_SUCCESS);
 }
 
-bool UpnpSsdpEngine::searchUpnpPlayerControl()
-{
-    d->mUpnpLibraryStatus = UpnpSearchAsync(d->mClientHandle, 60, "urn:schemas-upnp-org:device:MediaRenderer:1", this);
-
-    if (d->mUpnpLibraryStatus == UPNP_E_SUCCESS) {
-        qDebug() << "success";
-    } else {
-        qDebug() << "fail";
-    }
-
-    if (d->mUpnpLibraryStatus != UPNP_E_SUCCESS) {
-        return (d->mUpnpLibraryStatus == UPNP_E_SUCCESS);
-    }
-
-    d->mUpnpLibraryStatus = UpnpSearchAsync(d->mClientHandle, 60, "urn:schemas-upnp-org:service:AVTransport:1", this);
-
-    if (d->mUpnpLibraryStatus == UPNP_E_SUCCESS) {
-        qDebug() << "success";
-    } else {
-        qDebug() << "fail";
-    }
-
-    if (d->mUpnpLibraryStatus != UPNP_E_SUCCESS) {
-        return (d->mUpnpLibraryStatus == UPNP_E_SUCCESS);
-    }
-
-    d->mUpnpLibraryStatus = UpnpSearchAsync(d->mClientHandle, 60, "urn:schemas-upnp-org:service:RenderingControl:1", this);
-    if (d->mUpnpLibraryStatus == UPNP_E_SUCCESS) {
-        qDebug() << "success";
-    } else {
-        qDebug() << "fail";
-    }
-
-    return (d->mUpnpLibraryStatus == UPNP_E_SUCCESS);
-}
-
+#if 0
 int UpnpSsdpEngine::upnpInternalCallBack(Upnp_EventType EventType, void *Event)
 {
     switch(EventType)
@@ -277,6 +212,133 @@ int UpnpSsdpEngine::upnpInternalCallBack(Upnp_EventType EventType, void *Event)
 
     // return value is ignored according to libupnp documentation
     return 0;
+}
+#endif
+
+void UpnpSsdpEngine::standardReceivedData()
+{
+    qDebug() << "UpnpSsdpEngine::standardReceivedData";
+
+    while (d->mSsdpStandardSocket.hasPendingDatagrams()) {
+        QByteArray datagram;
+        datagram.resize(d->mSsdpStandardSocket.pendingDatagramSize());
+        QHostAddress sender;
+        quint16 senderPort;
+
+        d->mSsdpStandardSocket.readDatagram(datagram.data(), datagram.size(),
+                                &sender, &senderPort);
+
+        parseSsdpDatagram(datagram);
+    }
+}
+
+void UpnpSsdpEngine::queryReceivedData()
+{
+    qDebug() << "UpnpSsdpEngine::queryReceivedData";
+
+    while (d->mSsdpQuerySocket.hasPendingDatagrams()) {
+        QByteArray datagram;
+        datagram.resize(d->mSsdpQuerySocket.pendingDatagramSize());
+        QHostAddress sender;
+        quint16 senderPort;
+
+        d->mSsdpQuerySocket.readDatagram(datagram.data(), datagram.size(),
+                                &sender, &senderPort);
+
+        parseSsdpDatagram(datagram);
+    }
+}
+
+void UpnpSsdpEngine::parseSsdpDatagram(const QByteArray &datagram)
+{
+    const QList<QByteArray> &headers(datagram.split('\n'));
+
+    if (!headers.last().isEmpty()) {
+        return;
+    }
+
+    if (headers[0].startsWith("M-SEARCH * HTTP/1.1")) {
+        qDebug() << "query";
+    }
+    if (headers[0].startsWith("HTTP/1.1 200 OK\r")) {
+        qDebug() << "query answer";
+    }
+    if (headers[0].startsWith("NOTIFY * HTTP/1.1")) {
+        qDebug() << "auto announce";
+    }
+
+    UpnpDiscoveryResult newDiscovery;
+
+    for (QList<QByteArray>::const_iterator itLine = headers.begin(); itLine != headers.end(); ++itLine) {
+        if (itLine->startsWith("LOCATION")) {
+            if ((*itLine)[9] == ' ') {
+                newDiscovery.mLocation = QString::fromLatin1(itLine->mid(10, itLine->length() - 11));
+            } else {
+                newDiscovery.mLocation = QString::fromLatin1(itLine->mid(9, itLine->length() - 10));
+            }
+        }
+        if (itLine->startsWith("Location")) {
+            if ((*itLine)[9] == ' ') {
+                newDiscovery.mLocation = QString::fromLatin1(itLine->mid(10, itLine->length() - 11));
+            } else {
+                newDiscovery.mLocation = QString::fromLatin1(itLine->mid(9, itLine->length() - 10));
+            }
+        }
+        if (itLine->startsWith("USN")) {
+            if ((*itLine)[4] == ' ') {
+                newDiscovery.mUSN = QString::fromLatin1(itLine->mid(5, itLine->length() - 6));
+            } else {
+                newDiscovery.mUSN = QString::fromLatin1(itLine->mid(4, itLine->length() - 5));
+            }
+        }
+        if (itLine->startsWith("ST")) {
+            if ((*itLine)[3] == ' ') {
+                newDiscovery.mST = QString::fromLatin1(itLine->mid(4, itLine->length() - 5));
+            } else {
+                newDiscovery.mST = QString::fromLatin1(itLine->mid(3, itLine->length() - 4));
+            }
+        }
+        if (itLine->startsWith("NT")) {
+            if ((*itLine)[3] == ' ') {
+                newDiscovery.mST = QString::fromLatin1(itLine->mid(4, itLine->length() - 5));
+            } else {
+                newDiscovery.mST = QString::fromLatin1(itLine->mid(3, itLine->length() - 4));
+            }
+        }
+    }
+
+    if (newDiscovery.mLocation.isEmpty() || newDiscovery.mUSN.isEmpty() || newDiscovery.mST.isEmpty()) {
+        qDebug() << datagram;
+        return;
+    }
+
+    if (newDiscovery.mST.startsWith(QStringLiteral("urn:schemas-upnp-org:device:"))) {
+        auto itDiscovery = d->mDiscoveryResults.find(newDiscovery.mUSN);
+        if (itDiscovery == d->mDiscoveryResults.end()) {
+            d->mDiscoveryResults[newDiscovery.mUSN] = newDiscovery;
+
+            qDebug() << "new service";
+            qDebug() << "DeviceId:" << newDiscovery.mUSN;
+            qDebug() << "DeviceType:" << newDiscovery.mST;
+            qDebug() << "Location:" << newDiscovery.mLocation;
+#if 0
+            qDebug() << "new service";
+            qDebug() << "DeviceId:" << searchResult->DeviceId;
+            qDebug() << "DeviceType:" << searchResult->DeviceType;
+            qDebug() << "ServiceType:" << searchResult->ServiceType;
+            qDebug() << "ServiceVer:" << searchResult->ServiceVer;
+            qDebug() << "Os:" << searchResult->Os;
+            qDebug() << "Date:" << searchResult->Date;
+            qDebug() << "Ext:" << searchResult->Ext;
+            qDebug() << "ErrCode:" << searchResult->ErrCode;
+            qDebug() << "Expires:" << searchResult->Expires;
+            qDebug() << "DestAddr:" << QHostAddress(reinterpret_cast<const sockaddr *>(&searchResult->DestAddr));
+#endif
+
+            Q_EMIT newService(newDiscovery);
+        }
+    }
+
 }
 
 #include "moc_upnpssdpengine.cpp"
