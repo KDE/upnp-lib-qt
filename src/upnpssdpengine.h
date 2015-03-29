@@ -22,13 +22,30 @@
 
 #include <QObject>
 
+enum class NotificationSubType
+{
+    Invalid,
+    Alive,
+    ByeBye,
+    Discover,
+};
+
 struct UpnpDiscoveryResult
 {
-    QString mST;
+
+    /**
+     * @brief mNT contains the header ST (i.e. search target) or NT (i.e. notification type) sent in an ssdp message
+     */
+    QString mNT;
 
     QString mUSN;
 
     QString mLocation;
+
+    /**
+     * @brief mNTS contains the header NTS (i.e. notification sub type) sent in an ssdp message
+     */
+    NotificationSubType mNTS;
 };
 
 Q_DECLARE_METATYPE(UpnpDiscoveryResult)

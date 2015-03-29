@@ -30,6 +30,13 @@
 #include <sys/types.h>          /* Consultez NOTES */
 #include <sys/socket.h>
 
+enum class SsdpMessageType
+{
+    query,
+    queryAnswer,
+    announce,
+};
+
 class UpnpSsdpEnginePrivate
 {
 public:
@@ -90,135 +97,8 @@ void UpnpSsdpEngine::publishDevice(const QString &urlDevice)
 {
 }
 
-#if 0
-int UpnpSsdpEngine::upnpInternalCallBack(Upnp_EventType EventType, void *Event)
-{
-    switch(EventType)
-    {
-    case UPNP_CONTROL_ACTION_REQUEST:
-        //qDebug() << "UPNP_CONTROL_ACTION_REQUEST";
-        break;
-    case UPNP_CONTROL_ACTION_COMPLETE:
-        //qDebug() << "UPNP_CONTROL_ACTION_COMPLETE";
-        break;
-    case UPNP_CONTROL_GET_VAR_REQUEST:
-        //qDebug() << "UPNP_CONTROL_GET_VAR_REQUEST";
-        break;
-    case UPNP_CONTROL_GET_VAR_COMPLETE:
-        //qDebug() << "UPNP_CONTROL_GET_VAR_COMPLETE";
-        break;
-    case UPNP_DISCOVERY_ADVERTISEMENT_ALIVE:
-    case UPNP_DISCOVERY_SEARCH_RESULT:
-    {
-        Upnp_Discovery *searchResult = static_cast<Upnp_Discovery*>(Event);
-
-        if (searchResult->DeviceType[0] == 0) {
-            break;
-        }
-
-        qDebug() << "UPNP_DISCOVERY_SEARCH_RESULT" << "UPNP_DISCOVERY_ADVERTISEMENT_ALIVE";
-
-        const QString &deviceIdString(QString::fromLatin1(searchResult->DeviceId));
-
-        auto itDiscovery = d->mDiscoveryResults.find(deviceIdString);
-        if (itDiscovery == d->mDiscoveryResults.end()) {
-            d->mDiscoveryResults[deviceIdString] = *searchResult;
-
-            qDebug() << "new service";
-            qDebug() << "DeviceId:" << searchResult->DeviceId;
-            qDebug() << "DeviceType:" << searchResult->DeviceType;
-            qDebug() << "Expires:" << searchResult->Expires;
-#if 0
-                qDebug() << "new service";
-                qDebug() << "DeviceId:" << searchResult->DeviceId;
-                qDebug() << "DeviceType:" << searchResult->DeviceType;
-                qDebug() << "ServiceType:" << searchResult->ServiceType;
-                qDebug() << "ServiceVer:" << searchResult->ServiceVer;
-                qDebug() << "Location:" << searchResult->Location;
-                qDebug() << "Os:" << searchResult->Os;
-                qDebug() << "Date:" << searchResult->Date;
-                qDebug() << "Ext:" << searchResult->Ext;
-                qDebug() << "ErrCode:" << searchResult->ErrCode;
-                qDebug() << "Expires:" << searchResult->Expires;
-                qDebug() << "DestAddr:" << QHostAddress(reinterpret_cast<const sockaddr *>(&searchResult->DestAddr));
-#endif
-
-                Q_EMIT newService(d->mDiscoveryResults[deviceIdString]);
-        }
-
-        break;
-    }
-    case UPNP_DISCOVERY_ADVERTISEMENT_BYEBYE:
-    {
-        qDebug() << "UPNP_DISCOVERY_ADVERTISEMENT_BYEBYE";
-        Upnp_Discovery *searchResult = static_cast<Upnp_Discovery*>(Event);
-
-        qDebug() << "removed service";
-        qDebug() << "DeviceId:" << searchResult->DeviceId;
-        qDebug() << "DeviceType:" << searchResult->DeviceType;
-        qDebug() << "Expires:" << searchResult->Expires;
-#if 0
-        qDebug() << "ServiceType:" << searchResult->ServiceType;
-        qDebug() << "ServiceVer:" << searchResult->ServiceVer;
-        qDebug() << "Location:" << searchResult->Location;
-        qDebug() << "Os:" << searchResult->Os;
-        qDebug() << "Date:" << searchResult->Date;
-        qDebug() << "Ext:" << searchResult->Ext;
-        qDebug() << "ErrCode:" << searchResult->ErrCode;
-        qDebug() << "Expires:" << searchResult->Expires;
-        qDebug() << "DestAddr:" << QHostAddress(reinterpret_cast<const sockaddr *>(&searchResult->DestAddr));
-#endif
-
-
-        const QString &deviceIdString(QString::fromLatin1(searchResult->DeviceId));
-
-        auto itDiscovery = d->mDiscoveryResults.find(deviceIdString);
-        if (itDiscovery != d->mDiscoveryResults.end()) {
-            Q_EMIT removedService(*itDiscovery);
-
-            qDebug() << "UPNP_DISCOVERY_ADVERTISEMENT_BYEBYE" << searchResult->DeviceId;
-
-            d->mDiscoveryResults.erase(itDiscovery);
-        }
-
-        break;
-    }
-    case UPNP_DISCOVERY_SEARCH_TIMEOUT:
-        qDebug() << "UPNP_DISCOVERY_SEARCH_TIMEOUT";
-        Q_EMIT searchTimeOut();
-        break;
-    case UPNP_EVENT_SUBSCRIPTION_REQUEST:
-        //qDebug() << "UPNP_EVENT_SUBSCRIPTION_REQUEST";
-        break;
-    case UPNP_EVENT_RECEIVED:
-        //qDebug() << "UPNP_EVENT_RECEIVED";
-        break;
-    case UPNP_EVENT_RENEWAL_COMPLETE:
-        //qDebug() << "UPNP_EVENT_RENEWAL_COMPLETE";
-        break;
-    case UPNP_EVENT_SUBSCRIBE_COMPLETE:
-        qDebug() << "UPNP_EVENT_SUBSCRIBE_COMPLETE";
-        break;
-    case UPNP_EVENT_UNSUBSCRIBE_COMPLETE:
-        //qDebug() << "UPNP_EVENT_UNSUBSCRIBE_COMPLETE";
-        break;
-    case UPNP_EVENT_AUTORENEWAL_FAILED:
-        //qDebug() << "UPNP_EVENT_AUTORENEWAL_FAILED";
-        break;
-    case UPNP_EVENT_SUBSCRIPTION_EXPIRED:
-        //qDebug() << "UPNP_EVENT_SUBSCRIPTION_EXPIRED";
-        break;
-    }
-
-    // return value is ignored according to libupnp documentation
-    return 0;
-}
-#endif
-
 void UpnpSsdpEngine::standardReceivedData()
 {
-    qDebug() << "UpnpSsdpEngine::standardReceivedData";
-
     while (d->mSsdpStandardSocket.hasPendingDatagrams()) {
         QByteArray datagram;
         datagram.resize(d->mSsdpStandardSocket.pendingDatagramSize());
@@ -234,8 +114,6 @@ void UpnpSsdpEngine::standardReceivedData()
 
 void UpnpSsdpEngine::queryReceivedData()
 {
-    qDebug() << "UpnpSsdpEngine::queryReceivedData";
-
     while (d->mSsdpQuerySocket.hasPendingDatagrams()) {
         QByteArray datagram;
         datagram.resize(d->mSsdpQuerySocket.pendingDatagramSize());
@@ -257,17 +135,20 @@ void UpnpSsdpEngine::parseSsdpDatagram(const QByteArray &datagram)
         return;
     }
 
+    SsdpMessageType messageType;
+
     if (headers[0].startsWith("M-SEARCH * HTTP/1.1")) {
-        qDebug() << "query";
+        messageType = SsdpMessageType::query;
     }
     if (headers[0].startsWith("HTTP/1.1 200 OK\r")) {
-        qDebug() << "query answer";
+        messageType = SsdpMessageType::queryAnswer;
     }
     if (headers[0].startsWith("NOTIFY * HTTP/1.1")) {
-        qDebug() << "auto announce";
+        messageType = SsdpMessageType::announce;
     }
 
     UpnpDiscoveryResult newDiscovery;
+    newDiscovery.mNTS = NotificationSubType::Invalid;
 
     for (QList<QByteArray>::const_iterator itLine = headers.begin(); itLine != headers.end(); ++itLine) {
         if (itLine->startsWith("LOCATION")) {
@@ -291,54 +172,79 @@ void UpnpSsdpEngine::parseSsdpDatagram(const QByteArray &datagram)
                 newDiscovery.mUSN = QString::fromLatin1(itLine->mid(4, itLine->length() - 5));
             }
         }
-        if (itLine->startsWith("ST")) {
+        if (messageType == SsdpMessageType::queryAnswer && itLine->startsWith("ST")) {
             if ((*itLine)[3] == ' ') {
-                newDiscovery.mST = QString::fromLatin1(itLine->mid(4, itLine->length() - 5));
+                newDiscovery.mNT = QString::fromLatin1(itLine->mid(4, itLine->length() - 5));
             } else {
-                newDiscovery.mST = QString::fromLatin1(itLine->mid(3, itLine->length() - 4));
+                newDiscovery.mNT = QString::fromLatin1(itLine->mid(3, itLine->length() - 4));
             }
         }
-        if (itLine->startsWith("NT")) {
+        if (messageType == SsdpMessageType::announce && itLine->startsWith("NT:")) {
             if ((*itLine)[3] == ' ') {
-                newDiscovery.mST = QString::fromLatin1(itLine->mid(4, itLine->length() - 5));
+                newDiscovery.mNT = QString::fromLatin1(itLine->mid(4, itLine->length() - 5));
             } else {
-                newDiscovery.mST = QString::fromLatin1(itLine->mid(3, itLine->length() - 4));
+                newDiscovery.mNT = QString::fromLatin1(itLine->mid(3, itLine->length() - 4));
+            }
+        }
+        if (messageType == SsdpMessageType::announce && itLine->startsWith("NTS")) {
+            if (itLine->endsWith("ssdp:alive\r")) {
+                newDiscovery.mNTS = NotificationSubType::Alive;
+            }
+            if (itLine->endsWith("ssdp:byebye\r")) {
+                newDiscovery.mNTS = NotificationSubType::ByeBye;
+            }
+            if (itLine->endsWith("ssdp:discover\r")) {
+                newDiscovery.mNTS = NotificationSubType::Discover;
             }
         }
     }
 
-    if (newDiscovery.mLocation.isEmpty() || newDiscovery.mUSN.isEmpty() || newDiscovery.mST.isEmpty()) {
+    if (newDiscovery.mLocation.isEmpty() || newDiscovery.mUSN.isEmpty() ||
+            newDiscovery.mNT.isEmpty() ||
+            (messageType == SsdpMessageType::announce && newDiscovery.mNTS == NotificationSubType::Invalid)) {
         qDebug() << datagram;
         return;
     }
 
-    if (newDiscovery.mST.startsWith(QStringLiteral("urn:schemas-upnp-org:device:"))) {
-        auto itDiscovery = d->mDiscoveryResults.find(newDiscovery.mUSN);
-        if (itDiscovery == d->mDiscoveryResults.end()) {
-            d->mDiscoveryResults[newDiscovery.mUSN] = newDiscovery;
+    if (newDiscovery.mNTS == NotificationSubType::Alive || messageType == SsdpMessageType::queryAnswer) {
+        if (newDiscovery.mNT.startsWith(QStringLiteral("urn:schemas-upnp-org:device:"))) {
+            auto itDiscovery = d->mDiscoveryResults.find(newDiscovery.mUSN);
+            if (itDiscovery == d->mDiscoveryResults.end()) {
+                d->mDiscoveryResults[newDiscovery.mUSN] = newDiscovery;
 
-            qDebug() << "new service";
-            qDebug() << "DeviceId:" << newDiscovery.mUSN;
-            qDebug() << "DeviceType:" << newDiscovery.mST;
-            qDebug() << "Location:" << newDiscovery.mLocation;
-#if 0
-            qDebug() << "new service";
-            qDebug() << "DeviceId:" << searchResult->DeviceId;
-            qDebug() << "DeviceType:" << searchResult->DeviceType;
-            qDebug() << "ServiceType:" << searchResult->ServiceType;
-            qDebug() << "ServiceVer:" << searchResult->ServiceVer;
-            qDebug() << "Os:" << searchResult->Os;
-            qDebug() << "Date:" << searchResult->Date;
-            qDebug() << "Ext:" << searchResult->Ext;
-            qDebug() << "ErrCode:" << searchResult->ErrCode;
-            qDebug() << "Expires:" << searchResult->Expires;
-            qDebug() << "DestAddr:" << QHostAddress(reinterpret_cast<const sockaddr *>(&searchResult->DestAddr));
-#endif
+                qDebug() << "new service";
+                qDebug() << "DeviceId:" << newDiscovery.mUSN;
+                qDebug() << "DeviceType:" << newDiscovery.mNT;
+                qDebug() << "Location:" << newDiscovery.mLocation;
+    #if 0
+                qDebug() << "new service";
+                qDebug() << "DeviceId:" << searchResult->DeviceId;
+                qDebug() << "DeviceType:" << searchResult->DeviceType;
+                qDebug() << "ServiceType:" << searchResult->ServiceType;
+                qDebug() << "ServiceVer:" << searchResult->ServiceVer;
+                qDebug() << "Os:" << searchResult->Os;
+                qDebug() << "Date:" << searchResult->Date;
+                qDebug() << "Ext:" << searchResult->Ext;
+                qDebug() << "ErrCode:" << searchResult->ErrCode;
+                qDebug() << "Expires:" << searchResult->Expires;
+                qDebug() << "DestAddr:" << QHostAddress(reinterpret_cast<const sockaddr *>(&searchResult->DestAddr));
+    #endif
 
-            Q_EMIT newService(newDiscovery);
+                Q_EMIT newService(newDiscovery);
+            }
         }
     }
 
+    if (newDiscovery.mNTS == NotificationSubType::ByeBye) {
+        auto itDiscovery = d->mDiscoveryResults.find(newDiscovery.mUSN);
+        if (itDiscovery != d->mDiscoveryResults.end()) {
+            Q_EMIT removedService(newDiscovery);
+
+            qDebug() << "bye bye" << newDiscovery.mUSN;
+
+            d->mDiscoveryResults.erase(itDiscovery);
+        }
+    }
 }
 
 #include "moc_upnpssdpengine.cpp"
