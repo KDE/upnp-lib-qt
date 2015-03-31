@@ -146,6 +146,8 @@ Q_SIGNALS:
 
     void URLBaseChanged(const QString &uuid);
 
+    void inError();
+
 public Q_SLOTS:
 
     void downloadAndParseDeviceDescription(const QUrl &serviceUrl);

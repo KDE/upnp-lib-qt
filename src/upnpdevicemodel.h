@@ -73,7 +73,11 @@ private Q_SLOTS:
 
     void deviceDescriptionChanged(const QString &uuid);
 
+    void deviceInError();
+
 private:
+
+    void genericRemovedDevice(const QString &usn);
 
     UpnpDeviceModelPrivate *d;
 

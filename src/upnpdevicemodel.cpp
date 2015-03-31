@@ -151,6 +151,7 @@ void UpnpDeviceModel::newDevice(const UpnpDiscoveryResult &deviceDiscovery)
         d->mAllHosts[deviceDiscovery.mUSN] = deviceDiscovery;
         d->mAllHostsDescription[deviceDiscovery.mUSN] = new UpnpDeviceDescription;
         d->mAllHostsDescription[deviceDiscovery.mUSN]->setUUID(deviceDiscovery.mUSN);
+        connect(d->mAllHostsDescription[deviceDiscovery.mUSN].data(), &UpnpDeviceDescription::inError, this, &UpnpDeviceModel::deviceInError);
 
         connect(d->mAllHostsDescription[deviceDiscovery.mUSN].data(), &UpnpDeviceDescription::UDNChanged, this, &UpnpDeviceModel::deviceDescriptionChanged);
         connect(d->mAllHostsDescription[deviceDiscovery.mUSN].data(), &UpnpDeviceDescription::UPCChanged, this, &UpnpDeviceModel::deviceDescriptionChanged);
@@ -173,14 +174,19 @@ void UpnpDeviceModel::newDevice(const UpnpDiscoveryResult &deviceDiscovery)
 
 void UpnpDeviceModel::removedDevice(const UpnpDiscoveryResult &deviceDiscovery)
 {
-    qDebug() << "UpnpDeviceModel::removedDevice" << deviceDiscovery.mUSN;
+    genericRemovedDevice(deviceDiscovery.mUSN);
+}
 
-    auto deviceIndex = d->mAllHostsUUID.indexOf(deviceDiscovery.mUSN);
+void UpnpDeviceModel::genericRemovedDevice(const QString &usn)
+{
+    qDebug() << "UpnpDeviceModel::genericRemovedDevice" << usn;
+
+    auto deviceIndex = d->mAllHostsUUID.indexOf(usn);
     if (deviceIndex != -1) {
         beginRemoveRows(QModelIndex(), deviceIndex, deviceIndex);
         d->mAllHostsUUID.removeAt(deviceIndex);
-        d->mAllHosts.remove(deviceDiscovery.mUSN);
-        d->mAllHostsDescription.remove(deviceDiscovery.mUSN);
+        d->mAllHosts.remove(usn);
+        d->mAllHostsDescription.remove(usn);
         endRemoveRows();
     }
 }
@@ -189,6 +195,16 @@ void UpnpDeviceModel::deviceDescriptionChanged(const QString &uuid)
 {
     int deviceIndex = d->mAllHostsUUID.indexOf(uuid);
     Q_EMIT dataChanged(index(deviceIndex), index(deviceIndex));
+}
+
+void UpnpDeviceModel::deviceInError()
+{
+    if (sender()) {
+        UpnpDeviceDescription *device = qobject_cast<UpnpDeviceDescription*>(sender());
+        if (device) {
+            genericRemovedDevice(device->UUID());
+        }
+    }
 }
 
 #include "moc_upnpdevicemodel.cpp"

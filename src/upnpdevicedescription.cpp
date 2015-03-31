@@ -207,7 +207,6 @@ void UpnpDeviceDescription::finishedDownload(QNetworkReply *reply)
         Q_EMIT deviceTypeChanged(d->mUUID);
 
         d->mFriendlyName = deviceDescription[QStringLiteral("friendlyName")];
-        qDebug() << "friendlyName" << d->mFriendlyName;
         Q_EMIT friendlyNameChanged(d->mUUID);
 
         d->mManufacturer = deviceDescription[QStringLiteral("manufacturer")];
@@ -229,7 +228,6 @@ void UpnpDeviceDescription::finishedDownload(QNetworkReply *reply)
         Q_EMIT modelURLChanged(d->mUUID);
 
         d->mSerialNumber = deviceDescription[QStringLiteral("serialNumber")];
-        qDebug() << "SerialNumber" << d->mSerialNumber;
         Q_EMIT serialNumberChanged(d->mUUID);
 
         if (deviceDescription[QStringLiteral("URLBase")].isValid() && !deviceDescription[QStringLiteral("URLBase")].toString().isEmpty()) {
@@ -292,6 +290,8 @@ void UpnpDeviceDescription::finishedDownload(QNetworkReply *reply)
                 d->mServices[serviceIdNode.toElement().text()] = newService;
             }
         }
+    } else if (reply->isFinished()) {
+        Q_EMIT inError();
     }
 }
 
