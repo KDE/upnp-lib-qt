@@ -46,6 +46,16 @@ struct UpnpDiscoveryResult
      * @brief mNTS contains the header NTS (i.e. notification sub type) sent in an ssdp message
      */
     NotificationSubType mNTS;
+
+    /**
+     * @brief mAnnounceDate contains the date sent in the SSDP message by the other side
+     */
+    QString mAnnounceDate;
+
+    /**
+     * @brief mCacheDuration duration of validity of the announce
+     */
+    int mCacheDuration;
 };
 
 Q_DECLARE_METATYPE(UpnpDiscoveryResult)

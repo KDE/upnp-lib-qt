@@ -197,26 +197,50 @@ void UpnpSsdpEngine::parseSsdpDatagram(const QByteArray &datagram)
                 newDiscovery.mNTS = NotificationSubType::Discover;
             }
         }
+        if (itLine->startsWith("DATE")) {
+            if ((*itLine)[5] == ' ') {
+                newDiscovery.mAnnounceDate = QString::fromLatin1(itLine->mid(6, itLine->length() - 7));
+            } else {
+                newDiscovery.mAnnounceDate = QString::fromLatin1(itLine->mid(5, itLine->length() - 6));
+            }
+        }
+        if (itLine->startsWith("CACHE-CONTROL")) {
+            if ((*itLine)[14] == ' ') {
+                const QList<QByteArray> &splittedLine = itLine->mid(15, itLine->length() - 16).split('=');
+                if (splittedLine.size() == 2) {
+                    newDiscovery.mCacheDuration = splittedLine.last().toInt();
+                }
+            } else {
+                const QList<QByteArray> &splittedLine = itLine->mid(14, itLine->length() - 15).split('=');
+                if (splittedLine.size() == 2) {
+                    newDiscovery.mCacheDuration = splittedLine.last().toInt();
+                }
+            }
+        }
     }
 
     if (newDiscovery.mLocation.isEmpty() || newDiscovery.mUSN.isEmpty() ||
             newDiscovery.mNT.isEmpty() ||
             (messageType == SsdpMessageType::announce && newDiscovery.mNTS == NotificationSubType::Invalid)) {
-        qDebug() << datagram;
+        qDebug() << "not decoded" << datagram;
         return;
     }
 
     if (newDiscovery.mNTS == NotificationSubType::Alive || messageType == SsdpMessageType::queryAnswer) {
-        if (newDiscovery.mNT.startsWith(QStringLiteral("urn:schemas-upnp-org:device:"))) {
+        if (newDiscovery.mNT == QStringLiteral("upnp:rootdevice")) {
             auto itDiscovery = d->mDiscoveryResults.find(newDiscovery.mUSN);
             if (itDiscovery == d->mDiscoveryResults.end()) {
                 d->mDiscoveryResults[newDiscovery.mUSN] = newDiscovery;
 
+                qDebug() << datagram;
+                qDebug() << "AnnounceDate" << newDiscovery.mAnnounceDate;
+                qDebug() << "CacheDuration" << newDiscovery.mCacheDuration;
+
+#if 0
                 qDebug() << "new service";
                 qDebug() << "DeviceId:" << newDiscovery.mUSN;
                 qDebug() << "DeviceType:" << newDiscovery.mNT;
                 qDebug() << "Location:" << newDiscovery.mLocation;
-    #if 0
                 qDebug() << "new service";
                 qDebug() << "DeviceId:" << searchResult->DeviceId;
                 qDebug() << "DeviceType:" << searchResult->DeviceType;
