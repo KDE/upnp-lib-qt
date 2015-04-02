@@ -38,8 +38,6 @@ public:
 
     ~UpnpControlAbstractDevice();
 
-    Q_INVOKABLE UpnpControlAbstractService* serviceById(const QString &serviceId) const;
-
 Q_SIGNALS:
 
     void inError();

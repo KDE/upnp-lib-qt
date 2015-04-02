@@ -225,4 +225,9 @@ const QString &UpnpAbstractDevice::URLBase()
     return d->mURLBase;
 }
 
+void UpnpAbstractDevice::addService(QPointer<UpnpAbstractService> newService)
+{
+    d->mServices.push_back(newService);
+}
+
 #include "moc_upnpabstractdevice.cpp"

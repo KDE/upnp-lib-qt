@@ -213,6 +213,10 @@ Q_SIGNALS:
 
 public Q_SLOTS:
 
+protected:
+
+    void addService(QPointer<UpnpAbstractService> newService);
+
 private:
 
     UpnpAbstractDevicePrivate *d;

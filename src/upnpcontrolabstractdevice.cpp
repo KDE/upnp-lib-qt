@@ -39,15 +39,13 @@ class UpnpControlAbstractDevicePrivate
 public:
 
     UpnpControlAbstractDevicePrivate()
-        : mNetworkAccess(), mDiscoveryResults(), mServices()
+        : mNetworkAccess(), mDiscoveryResults()
     {
     }
 
     QNetworkAccessManager mNetworkAccess;
 
     QList<QVariantMap> mDiscoveryResults;
-
-    QMap<QString, QPointer<UpnpControlAbstractService> > mServices;
 };
 
 UpnpControlAbstractDevice::UpnpControlAbstractDevice(QObject *parent) : UpnpAbstractDevice(parent), d(new UpnpControlAbstractDevicePrivate)
@@ -58,11 +56,6 @@ UpnpControlAbstractDevice::UpnpControlAbstractDevice(QObject *parent) : UpnpAbst
 UpnpControlAbstractDevice::~UpnpControlAbstractDevice()
 {
     delete d;
-}
-
-UpnpControlAbstractService* UpnpControlAbstractDevice::serviceById(const QString &serviceId) const
-{
-    return d->mServices[serviceId].data();
 }
 
 void UpnpControlAbstractDevice::downloadAndParseDeviceDescription(const QUrl &serviceUrl)
@@ -120,7 +113,7 @@ void UpnpControlAbstractDevice::finishedDownload(QNetworkReply *reply)
         for (int serviceIndex = 0; serviceIndex < serviceList.length(); ++serviceIndex) {
             const QDomNode &serviceNode(serviceList.at(serviceIndex));
             if (!serviceNode.isNull()) {
-                QPointer<UpnpControlAbstractService> newService;
+                QPointer<UpnpAbstractService> newService;
 
                 const QDomNode &serviceTypeNode = serviceNode.firstChildElement(QStringLiteral("serviceType"));
                 if (!serviceTypeNode.isNull()) {
@@ -169,8 +162,8 @@ void UpnpControlAbstractDevice::finishedDownload(QNetworkReply *reply)
                 QUrl serviceUrl(URLBase());
                 serviceUrl.setPath(newService->SCPDURL().toString());
 
-                newService->downloadAndParseServiceDescription(serviceUrl);
-                d->mServices[serviceIdNode.toElement().text()] = newService;
+                qobject_cast<UpnpControlAbstractService*>(newService.data())->downloadAndParseServiceDescription(serviceUrl);
+                addService(newService);
             }
         }
     } else if (reply->isFinished()) {
