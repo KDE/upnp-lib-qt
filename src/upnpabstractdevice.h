@@ -24,7 +24,6 @@
 #include <QtCore/QPointer>
 #include <QtCore/QList>
 
-class UpnpSsdpEngine;
 class UpnpAbstractService;
 class UpnpAbstractDevicePrivate;
 

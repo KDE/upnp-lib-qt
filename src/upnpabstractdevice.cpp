@@ -18,17 +18,11 @@
  */
 
 #include "upnpabstractdevice.h"
-#include "upnpssdpengine.h"
-#include "upnpdevicesoapserver.h"
 #include "upnpabstractservice.h"
 
 class UpnpAbstractDevicePrivate
 {
 public:
-
-    UpnpSsdpEngine *mSsdpEngine;
-
-    UpnpDeviceSoapServer *mSoapServer;
 
     QList<QPointer<UpnpAbstractService> > mServices;
 
@@ -72,8 +66,6 @@ public:
 UpnpAbstractDevice::UpnpAbstractDevice(QObject *parent) :
     QObject(parent), d(new UpnpAbstractDevicePrivate)
 {
-    d->mSsdpEngine = nullptr;
-    d->mSoapServer = new UpnpDeviceSoapServer(this);
 }
 
 UpnpAbstractDevice::~UpnpAbstractDevice()
