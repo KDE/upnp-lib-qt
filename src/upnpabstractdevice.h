@@ -92,6 +92,16 @@ class UpnpAbstractDevice : public QObject
                WRITE setURLBase
                NOTIFY URLBaseChanged)
 
+    Q_PROPERTY(int cacheControl
+               READ cacheControl
+               WRITE setCacheControl
+               NOTIFY cacheControlChanged)
+
+    Q_PROPERTY(QUrl locationUrl
+               READ locationUrl
+               WRITE setLocationUrl
+               NOTIFY locationUrlChanged)
+
 public:
 
     explicit UpnpAbstractDevice(QObject *parent = 0);
@@ -185,6 +195,14 @@ public:
 
     const QString& URLBase();
 
+    void setCacheControl(int value);
+
+    int cacheControl() const;
+
+    void setLocationUrl(const QUrl &value);
+
+    const QUrl& locationUrl() const;
+
 Q_SIGNALS:
 
     void UDNChanged(const QString &UDN);
@@ -210,6 +228,10 @@ Q_SIGNALS:
     void serialNumberChanged(const QString &UDN);
 
     void URLBaseChanged(const QString &UDN);
+
+    void cacheControlChanged(const QString &UDN);
+
+    void locationUrlChanged(const QString &UDN);
 
 public Q_SLOTS:
 

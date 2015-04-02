@@ -63,6 +63,10 @@ public:
 
     QString mURLBase;
 
+    int mCacheControl;
+
+    QUrl mLocationUrl;
+
 };
 
 UpnpAbstractDevice::UpnpAbstractDevice(QObject *parent) :
@@ -223,6 +227,28 @@ void UpnpAbstractDevice::setURLBase(const QString &value)
 const QString &UpnpAbstractDevice::URLBase()
 {
     return d->mURLBase;
+}
+
+void UpnpAbstractDevice::setCacheControl(int value)
+{
+    d->mCacheControl = value;
+    Q_EMIT cacheControlChanged(d->mUDN);
+}
+
+int UpnpAbstractDevice::cacheControl() const
+{
+    return d->mCacheControl;
+}
+
+void UpnpAbstractDevice::setLocationUrl(const QUrl &value)
+{
+    d->mLocationUrl = value;
+    Q_EMIT locationUrlChanged(d->mUDN);
+}
+
+const QUrl &UpnpAbstractDevice::locationUrl() const
+{
+    return d->mLocationUrl;
 }
 
 void UpnpAbstractDevice::addService(QPointer<UpnpAbstractService> newService)

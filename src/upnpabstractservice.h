@@ -92,17 +92,17 @@ public:
 
 Q_SIGNALS:
 
-    void serviceTypeChanged();
+    void serviceTypeChanged(const QString &serviceId);
 
-    void serviceIdChanged();
+    void serviceIdChanged(const QString &serviceId);
 
-    void baseURLChanged();
+    void baseURLChanged(const QString &serviceId);
 
-    void SCPDURLChanged();
+    void SCPDURLChanged(const QString &serviceId);
 
-    void controlURLChanged();
+    void controlURLChanged(const QString &serviceId);
 
-    void eventSubURLChanged();
+    void eventSubURLChanged(const QString &serviceId);
 
 public Q_SLOTS:
 

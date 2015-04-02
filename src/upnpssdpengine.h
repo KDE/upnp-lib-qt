@@ -60,6 +60,7 @@ struct UpnpDiscoveryResult
 
 Q_DECLARE_METATYPE(UpnpDiscoveryResult)
 
+class UpnpAbstractDevice;
 class UpnpSsdpEnginePrivate;
 
 class UpnpSsdpEngine : public QObject
@@ -83,7 +84,7 @@ public Q_SLOTS:
      */
     bool searchAllUpnpDevice();
 
-    void publishDevice(const QString &urlDevice);
+    void publishDevice(const QPointer<UpnpAbstractDevice> &device);
 
 private Q_SLOTS:
 

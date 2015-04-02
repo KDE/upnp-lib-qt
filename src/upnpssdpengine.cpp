@@ -93,8 +93,11 @@ bool UpnpSsdpEngine::searchAllUpnpDevice()
     return result != -1;
 }
 
-void UpnpSsdpEngine::publishDevice(const QString &urlDevice)
+void UpnpSsdpEngine::publishDevice(const QPointer<UpnpAbstractDevice> &device)
 {
+    //device.
+
+    //
 }
 
 void UpnpSsdpEngine::standardReceivedData()
