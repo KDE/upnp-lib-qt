@@ -33,7 +33,7 @@ public:
     bool mLoadLevelTarget;
 };
 
-UpnpControlDimming::UpnpControlDimming(QObject *parent) : UpnpAbstractServiceDescription(parent), d(new UpnpControlDimmingPrivate)
+UpnpControlDimming::UpnpControlDimming(QObject *parent) : UpnpControlAbstractService(parent), d(new UpnpControlDimmingPrivate)
 {
     d->mLoadLevelStatus = false;
     d->mLoadLevelTarget = false;

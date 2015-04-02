@@ -17,31 +17,45 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#ifndef UPNPHTTPSERVER_H
-#define UPNPHTTPSERVER_H
+#ifndef UPNPDEVICEDISCOVERY_H
+#define UPNPDEVICEDISCOVERY_H
 
-#include <KDSoapServer/KDSoapServer.h>
+#include "upnpabstractdevice.h"
 
 #include <QtCore/QObject>
 
+class UpnpControlAbstractDevicePrivate;
+class QNetworkReply;
 class UpnpControlAbstractService;
-class UpnpHttpServerPrivate;
 
-class UpnpHttpServer : public KDSoapServer
+class UpnpControlAbstractDevice : public UpnpAbstractDevice
 {
+
     Q_OBJECT
+
 public:
-    UpnpHttpServer(QObject * parent = 0);
+    explicit UpnpControlAbstractDevice(QObject *parent = 0);
 
-    virtual ~UpnpHttpServer();
+    ~UpnpControlAbstractDevice();
 
-    QObject* createServerObject() Q_DECL_OVERRIDE;
+    Q_INVOKABLE UpnpControlAbstractService* serviceById(const QString &serviceId) const;
 
-    void setService(UpnpControlAbstractService *service);
+Q_SIGNALS:
+
+    void inError();
+
+public Q_SLOTS:
+
+    void downloadAndParseDeviceDescription(const QUrl &serviceUrl);
+
+private Q_SLOTS:
+
+    void finishedDownload(QNetworkReply *reply);
 
 private:
 
-    UpnpHttpServerPrivate *d;
+    UpnpControlAbstractDevicePrivate *d;
+
 };
 
-#endif // UPNPHTTPSERVER_H
+#endif // UPNPDEVICEDISCOVERY_H

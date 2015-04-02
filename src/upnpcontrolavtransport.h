@@ -20,10 +20,10 @@
 #ifndef UPNPCONTROLAVTRANSPORT_H
 #define UPNPCONTROLAVTRANSPORT_H
 
-#include "upnpabstractservicedescription.h"
+#include "upnpcontrolabstractservice.h"
 #include "upnpbasictypes.h"
 
-class UpnpControlAVTransport : public UpnpAbstractServiceDescription
+class UpnpControlAVTransport : public UpnpControlAbstractService
 {
     Q_OBJECT
 public:

@@ -20,12 +20,12 @@
 #ifndef UPNPCONTROLDIMMING_H
 #define UPNPCONTROLDIMMING_H
 
-#include "upnpabstractservicedescription.h"
+#include "upnpcontrolabstractservice.h"
 #include "upnpbasictypes.h"
 
 class UpnpControlDimmingPrivate;
 
-class UpnpControlDimming : public UpnpAbstractServiceDescription
+class UpnpControlDimming : public UpnpControlAbstractService
 {
     Q_OBJECT
 

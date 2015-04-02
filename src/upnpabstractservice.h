@@ -17,90 +17,78 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#ifndef UPNPABSTRACTSERVICEDESCRIPTION_H
-#define UPNPABSTRACTSERVICEDESCRIPTION_H
-
-#include <KDSoapClient/KDSoapPendingCall.h>
+#ifndef UPNPABSTRACTSERVICE_H
+#define UPNPABSTRACTSERVICE_H
 
 #include <QtCore/QObject>
 #include <QtCore/QString>
 #include <QtCore/QVariant>
-#include <QtCore/QVariantList>
 #include <QtCore/QUrl>
 
-class UpnpAbstractServiceDescriptionPrivate;
-class QNetworkReply;
-class QHostInfo;
+class UpnpAbstractServicePrivate;
 
-class UpnpAbstractServiceDescription : public QObject
+class UpnpAbstractService : public QObject
 {
     Q_OBJECT
 
-    Q_PROPERTY(QVariant serviceType
+    Q_PROPERTY(QString serviceType
                READ serviceType
                WRITE setServiceType
                NOTIFY serviceTypeChanged)
 
-    Q_PROPERTY(QVariant serviceId
+    Q_PROPERTY(QString serviceId
                READ serviceId
                WRITE setServiceId
                NOTIFY serviceIdChanged)
 
-    Q_PROPERTY(QVariant baseURL
+    Q_PROPERTY(QString baseURL
                READ baseURL
                WRITE setBaseURL
                NOTIFY baseURLChanged)
 
-    Q_PROPERTY(QVariant SCPDURL
+    Q_PROPERTY(QUrl SCPDURL
                READ SCPDURL
                WRITE setSCPDURL
                NOTIFY SCPDURLChanged)
 
-    Q_PROPERTY(QVariant controlURL
+    Q_PROPERTY(QUrl controlURL
                READ controlURL
                WRITE setControlURL
                NOTIFY controlURLChanged)
 
-    Q_PROPERTY(QVariant eventSubURL
+    Q_PROPERTY(QUrl eventSubURL
                READ eventSubURL
                WRITE setEventSubURL
                NOTIFY eventSubURLChanged)
 
 public:
+    explicit UpnpAbstractService(QObject *parent = 0);
 
-    explicit UpnpAbstractServiceDescription(QObject *parent = 0);
+    virtual ~UpnpAbstractService();
 
-    ~UpnpAbstractServiceDescription();
+    void setBaseURL(const QString &newBaseURL);
 
-    void setBaseURL(const QVariant &newBaseURL);
+    const QString& baseURL() const;
 
-    const QVariant& baseURL() const;
+    void setServiceType(const QString &newServiceType);
 
-    void setServiceType(const QVariant &newServiceType);
+    const QString& serviceType() const;
 
-    const QVariant& serviceType() const;
+    void setServiceId(const QString &newServiceId);
 
-    void setServiceId(const QVariant &newServiceId);
+    const QString& serviceId() const;
 
-    const QVariant& serviceId() const;
+    void setSCPDURL(const QUrl &newSCPDURL);
 
-    void setSCPDURL(const QVariant &newSCPDURL);
+    const QUrl& SCPDURL() const;
 
-    const QVariant& SCPDURL() const;
+    void setControlURL(const QUrl &newControlURL);
 
-    void setControlURL(const QVariant &newControlURL);
+    const QUrl& controlURL() const;
 
-    const QVariant& controlURL() const;
+    void setEventSubURL(const QUrl &newEventSubURL);
 
-    void setEventSubURL(const QVariant &newEventSubURL);
-
-    const QVariant& eventSubURL() const;
-
-    Q_INVOKABLE KDSoapPendingCall callAction(const QString &action, const QList<QVariant> &arguments);
-
-    Q_INVOKABLE void subscribeEvents(int duration);
-
-    void handleEventNotification(const QByteArray &requestData, const QMap<QByteArray, QByteArray> &headers);
+    const QUrl& eventSubURL() const;
 
 Q_SIGNALS:
 
@@ -118,21 +106,10 @@ Q_SIGNALS:
 
 public Q_SLOTS:
 
-    void downloadAndParseServiceDescription(const QUrl &serviceUrl);
-
-private Q_SLOTS:
-
-    void finishedDownload(QNetworkReply *reply);
-
-    void eventSubscriptionTimeout();
-
-protected:
-
-    virtual void parseEventNotification(const QString &eventName, const QString &eventValue);
-
 private:
 
-    UpnpAbstractServiceDescriptionPrivate *d;
+    UpnpAbstractServicePrivate *d;
+
 };
 
-#endif // UPNPSERVICECALLER_H
+#endif // UPNPABSTRACTSERVICE_H

@@ -17,7 +17,7 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#include "upnpabstractservicedescription.h"
+#include "upnpcontrolabstractservice.h"
 #include "upnphttpserver.h"
 #include "upnpservereventobject.h"
 
@@ -70,29 +70,12 @@ class UpnpAbstractServiceDescriptionPrivate
 public:
 
     UpnpAbstractServiceDescriptionPrivate()
-        : mNetworkAccess(), mServiceType(), mServiceId(), mBaseURL(), mSCPDURL(), mControlSubURL(),
-          mFullControlSubURL(), mEventSubURL(), mFullEventSubURL(), mActions(), mInterface(nullptr),
-          mEventServer(), mPublicAddress(), mRealEventSubscriptionTimeout(0), mEventSubscriptionTimer(nullptr)
+        : mNetworkAccess(), mActions(), mInterface(nullptr), mEventServer(),
+          mPublicAddress(), mRealEventSubscriptionTimeout(0), mEventSubscriptionTimer(nullptr)
     {
     }
 
     QNetworkAccessManager mNetworkAccess;
-
-    QVariant mServiceType;
-
-    QVariant mServiceId;
-
-    QVariant mBaseURL;
-
-    QVariant mSCPDURL;
-
-    QVariant mControlSubURL;
-
-    QUrl mFullControlSubURL;
-
-    QVariant mEventSubURL;
-
-    QUrl mFullEventSubURL;
 
     QMap<QString, UpnpActionDescription> mActions;
 
@@ -107,10 +90,10 @@ public:
     QPointer<QTimer> mEventSubscriptionTimer;
 };
 
-UpnpAbstractServiceDescription::UpnpAbstractServiceDescription(QObject *parent)
-    : QObject(parent), d(new UpnpAbstractServiceDescriptionPrivate)
+UpnpControlAbstractService::UpnpControlAbstractService(QObject *parent)
+    : UpnpAbstractService(parent), d(new UpnpAbstractServiceDescriptionPrivate)
 {
-    connect(&d->mNetworkAccess, &QNetworkAccessManager::finished, this, &UpnpAbstractServiceDescription::finishedDownload);
+    connect(&d->mNetworkAccess, &QNetworkAccessManager::finished, this, &UpnpControlAbstractService::finishedDownload);
 
     d->mEventServer.setService(this);
 
@@ -127,83 +110,13 @@ UpnpAbstractServiceDescription::UpnpAbstractServiceDescription(QObject *parent)
     }
 }
 
-UpnpAbstractServiceDescription::~UpnpAbstractServiceDescription()
+UpnpControlAbstractService::~UpnpControlAbstractService()
 {
     delete d->mInterface;
     delete d;
 }
 
-void UpnpAbstractServiceDescription::setBaseURL(const QVariant &newBaseURL)
-{
-    d->mBaseURL = newBaseURL;
-    Q_EMIT baseURLChanged();
-}
-
-const QVariant &UpnpAbstractServiceDescription::baseURL() const
-{
-    return d->mBaseURL;
-}
-
-void UpnpAbstractServiceDescription::setServiceType(const QVariant &newServiceType)
-{
-    d->mServiceType = newServiceType;
-    Q_EMIT serviceTypeChanged();
-}
-
-const QVariant &UpnpAbstractServiceDescription::serviceType() const
-{
-    return d->mServiceType;
-}
-
-void UpnpAbstractServiceDescription::setServiceId(const QVariant &newServiceId)
-{
-    d->mServiceId = newServiceId;
-    Q_EMIT serviceIdChanged();
-}
-
-const QVariant &UpnpAbstractServiceDescription::serviceId() const
-{
-    return d->mServiceId;
-}
-
-void UpnpAbstractServiceDescription::setSCPDURL(const QVariant &newSCPDURL)
-{
-    d->mSCPDURL = newSCPDURL;
-    Q_EMIT SCPDURLChanged();
-}
-
-const QVariant &UpnpAbstractServiceDescription::SCPDURL() const
-{
-    return d->mSCPDURL;
-}
-
-void UpnpAbstractServiceDescription::setControlURL(const QVariant &newControlURL)
-{
-    d->mControlSubURL = newControlURL;
-    d->mFullControlSubURL = d->mBaseURL.toUrl();
-    d->mFullControlSubURL.setPath(d->mControlSubURL.toString());
-    Q_EMIT controlURLChanged();
-}
-
-const QVariant &UpnpAbstractServiceDescription::controlURL() const
-{
-    return d->mControlSubURL;
-}
-
-void UpnpAbstractServiceDescription::setEventSubURL(const QVariant &newEventSubURL)
-{
-    d->mEventSubURL = newEventSubURL;
-    d->mFullEventSubURL = d->mBaseURL.toUrl();
-    d->mFullEventSubURL.setPath(d->mEventSubURL.toString());
-    Q_EMIT eventSubURLChanged();
-}
-
-const QVariant &UpnpAbstractServiceDescription::eventSubURL() const
-{
-    return d->mEventSubURL;
-}
-
-KDSoapPendingCall UpnpAbstractServiceDescription::callAction(const QString &action, const QList<QVariant> &arguments)
+KDSoapPendingCall UpnpControlAbstractService::callAction(const QString &action, const QList<QVariant> &arguments)
 {
     KDSoapMessage message;
 
@@ -224,15 +137,15 @@ KDSoapPendingCall UpnpAbstractServiceDescription::callAction(const QString &acti
     }
 
     if (!d->mInterface) {
-        d->mInterface = new KDSoapClientInterface(d->mFullControlSubURL.toString(), d->mServiceType.toString());
+        d->mInterface = new KDSoapClientInterface(controlURL().toString(), serviceType());
         d->mInterface->setSoapVersion(KDSoapClientInterface::SOAP1_1);
         d->mInterface->setStyle(KDSoapClientInterface::RPCStyle);
     }
 
-    return d->mInterface->asyncCall(action, message, d->mServiceType.toString() + QStringLiteral("#") + action);
+    return d->mInterface->asyncCall(action, message, serviceType() + QStringLiteral("#") + action);
 }
 
-void UpnpAbstractServiceDescription::subscribeEvents(int duration)
+void UpnpControlAbstractService::subscribeEvents(int duration)
 {
     QString webServerAddess(QStringLiteral("<http://"));
 
@@ -244,7 +157,7 @@ void UpnpAbstractServiceDescription::subscribeEvents(int duration)
 
     webServerAddess += QStringLiteral(":") + QString::number(d->mEventServer.serverPort()) + QStringLiteral(">");
 
-    QNetworkRequest myRequest(d->mFullEventSubURL);
+    QNetworkRequest myRequest(eventSubURL());
     myRequest.setRawHeader("CALLBACK", webServerAddess.toUtf8());
     myRequest.setRawHeader("NT", "upnp:event");
     QString timeoutDefinition(QStringLiteral("Second-"));
@@ -254,7 +167,7 @@ void UpnpAbstractServiceDescription::subscribeEvents(int duration)
     d->mNetworkAccess.sendCustomRequest(myRequest, "SUBSCRIBE");
 }
 
-void UpnpAbstractServiceDescription::handleEventNotification(const QByteArray &requestData, const QMap<QByteArray, QByteArray> &headers)
+void UpnpControlAbstractService::handleEventNotification(const QByteArray &requestData, const QMap<QByteArray, QByteArray> &headers)
 {
     Q_UNUSED(headers)
 
@@ -277,22 +190,22 @@ void UpnpAbstractServiceDescription::handleEventNotification(const QByteArray &r
     }
 }
 
-void UpnpAbstractServiceDescription::downloadAndParseServiceDescription(const QUrl &serviceUrl)
+void UpnpControlAbstractService::downloadAndParseServiceDescription(const QUrl &serviceUrl)
 {
     d->mNetworkAccess.get(QNetworkRequest(serviceUrl));
 }
 
-void UpnpAbstractServiceDescription::finishedDownload(QNetworkReply *reply)
+void UpnpControlAbstractService::finishedDownload(QNetworkReply *reply)
 {
     if (reply->isFinished() && reply->error() == QNetworkReply::NoError) {
-        if (reply->url() == d->mFullEventSubURL) {
+        if (reply->url() == eventSubURL()) {
             if (reply->hasRawHeader("TIMEOUT")) {
                 if (reply->rawHeader("TIMEOUT").startsWith("Second-")) {
                     d->mRealEventSubscriptionTimeout = reply->rawHeader("TIMEOUT").mid(7).toInt();
 
                     if (!d->mEventSubscriptionTimer) {
                         d->mEventSubscriptionTimer = new QTimer;
-                        connect(d->mEventSubscriptionTimer.data(), &QTimer::timeout, this, &UpnpAbstractServiceDescription::eventSubscriptionTimeout);
+                        connect(d->mEventSubscriptionTimer.data(), &QTimer::timeout, this, &UpnpControlAbstractService::eventSubscriptionTimeout);
                         d->mEventSubscriptionTimer->setInterval(1000 * (d->mRealEventSubscriptionTimeout > 60 ? d->mRealEventSubscriptionTimeout - 60 : d->mRealEventSubscriptionTimeout));
                         d->mEventSubscriptionTimer->start();
                     }
@@ -356,14 +269,14 @@ void UpnpAbstractServiceDescription::finishedDownload(QNetworkReply *reply)
     }
 }
 
-void UpnpAbstractServiceDescription::eventSubscriptionTimeout()
+void UpnpControlAbstractService::eventSubscriptionTimeout()
 {
     subscribeEvents(d->mRealEventSubscriptionTimeout);
 }
 
-void UpnpAbstractServiceDescription::parseEventNotification(const QString &eventName, const QString &eventValue)
+void UpnpControlAbstractService::parseEventNotification(const QString &eventName, const QString &eventValue)
 {
     qDebug() << "one variable" << eventName << eventValue;
 }
 
-#include "moc_upnpabstractservicedescription.cpp"
+#include "moc_upnpcontrolabstractservice.cpp"

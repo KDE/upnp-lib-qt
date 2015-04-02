@@ -1,8 +1,8 @@
 set(upnp-player-qt_SOURCES
     main.cpp
     upnpssdpengine.cpp
-    upnpabstractservicedescription.cpp
-    upnpdevicedescription.cpp
+    upnpcontrolabstractservice.cpp
+    upnpcontrolabstractdevice.cpp
     upnphttpserver.cpp
     upnpservereventobject.cpp
     upnpcontrolrenderingcontrol.cpp
@@ -10,6 +10,9 @@ set(upnp-player-qt_SOURCES
     upnpcontrolswitchpower.cpp
     upnpcontroldimming.cpp
     upnpdevicemodel.cpp
+    upnpabstractdevice.cpp
+    upnpabstractservice.cpp
+    upnpdevicesoapserver.cpp
     upnpbasictypes.h
     main.qml
 )

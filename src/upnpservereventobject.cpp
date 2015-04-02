@@ -19,7 +19,7 @@
 
 #include "upnpservereventobject.h"
 
-#include "upnpabstractservicedescription.h"
+#include "upnpcontrolabstractservice.h"
 
 #include <QtCore/QDebug>
 
@@ -27,7 +27,7 @@ class UpnpServerEventObjectPrivate
 {
 public:
 
-    UpnpAbstractServiceDescription *mService;
+    UpnpControlAbstractService *mService;
 };
 
 UpnpServerEventObject::UpnpServerEventObject(QObject *parent) : QObject(parent), KDSoapServerObjectInterface(), d(new UpnpServerEventObjectPrivate)
@@ -74,7 +74,7 @@ bool UpnpServerEventObject::processCustomVerbRequest(const QByteArray &requestDa
     }
 }
 
-void UpnpServerEventObject::setService(UpnpAbstractServiceDescription *service)
+void UpnpServerEventObject::setService(UpnpControlAbstractService *service)
 {
     d->mService = service;
 }

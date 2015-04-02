@@ -18,8 +18,8 @@
  */
 
 #include "upnpssdpengine.h"
-#include "upnpdevicedescription.h"
-#include "upnpabstractservicedescription.h"
+#include "upnpcontrolabstractdevice.h"
+#include "upnpcontrolabstractservice.h"
 #include "upnpdevicemodel.h"
 #include "upnpbasictypes.h"
 #include "upnpcontrolswitchpower.h"
@@ -35,8 +35,8 @@ int main(int argc, char *argv[])
     QApplication app(argc, argv);
 
     qmlRegisterType<UpnpSsdpEngine>("org.mgallien.QmlExtension", 1, 0, "UpnpSsdpEngine");
-    qmlRegisterType<UpnpDeviceDescription>("org.mgallien.QmlExtension", 1, 0, "UpnpDeviceDescription");
-    qmlRegisterType<UpnpAbstractServiceDescription>("org.mgallien.QmlExtension", 1, 0, "UpnpAbstractServiceDescription");
+    qmlRegisterType<UpnpControlAbstractDevice>("org.mgallien.QmlExtension", 1, 0, "UpnpControlAbstractDevice");
+    qmlRegisterType<UpnpControlAbstractService>("org.mgallien.QmlExtension", 1, 0, "UpnpControlAbstractService");
     qmlRegisterType<UpnpDeviceModel>("org.mgallien.QmlExtension", 1, 0, "UpnpDeviceModel");
     qmlRegisterType<UpnpControlSwitchPower>("org.mgallien.QmlExtension", 1, 0, "UpnpControlSwitchPower");
 

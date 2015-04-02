@@ -20,12 +20,12 @@
 #ifndef UPNPCONTROLSWITCHPOWER_H
 #define UPNPCONTROLSWITCHPOWER_H
 
-#include "upnpabstractservicedescription.h"
+#include "upnpcontrolabstractservice.h"
 #include "upnpbasictypes.h"
 
 class UpnpControlSwitchPowerPrivate;
 
-class UpnpControlSwitchPower : public UpnpAbstractServiceDescription
+class UpnpControlSwitchPower : public UpnpControlAbstractService
 {
     Q_OBJECT
 

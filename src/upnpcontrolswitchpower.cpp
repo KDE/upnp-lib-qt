@@ -33,7 +33,7 @@ public:
     bool mTarget;
 };
 
-UpnpControlSwitchPower::UpnpControlSwitchPower(QObject *parent) : UpnpAbstractServiceDescription(parent), d(new UpnpControlSwitchPowerPrivate)
+UpnpControlSwitchPower::UpnpControlSwitchPower(QObject *parent) : UpnpControlAbstractService(parent), d(new UpnpControlSwitchPowerPrivate)
 {
     d->mStatus = false;
     d->mTarget = false;
