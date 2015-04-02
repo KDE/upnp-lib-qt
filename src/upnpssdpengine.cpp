@@ -19,6 +19,8 @@
 
 #include "upnpssdpengine.h"
 
+#include "upnpabstractdevice.h"
+
 #include <QtNetwork/QHostAddress>
 
 #include <QtCore/QHash>
@@ -95,9 +97,22 @@ bool UpnpSsdpEngine::searchAllUpnpDevice()
 
 void UpnpSsdpEngine::publishDevice(const QPointer<UpnpAbstractDevice> &device)
 {
-    //device.
+    // cache control
+    device->cacheControl();
 
-    //
+    // location
+    device->locationUrl();
+
+    // server
+
+    // UUID
+    device->UDN();
+
+    //device type
+    device->deviceType();
+
+    // services type
+    device->services();
 }
 
 void UpnpSsdpEngine::standardReceivedData()
