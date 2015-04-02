@@ -26,7 +26,7 @@ class BinaryLight : public UpnpAbstractDevice
 {
     Q_OBJECT
 public:
-    explicit BinaryLight(const QUrl &serviceControlUrlValue, const QUrl &serviceEventUrlValue,
+    explicit BinaryLight(int cacheDuration, const QUrl &serviceControlUrlValue, const QUrl &serviceEventUrlValue,
                          const QUrl &serviceSCPDUrlValue, const QUrl &locationUrlValue, QObject *parent = 0);
 
     virtual ~BinaryLight();

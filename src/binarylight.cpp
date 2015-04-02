@@ -23,7 +23,7 @@
 
 #include <QtCore/QUuid>
 
-BinaryLight::BinaryLight(const QUrl &serviceControlUrlValue, const QUrl &serviceEventUrlValue,
+BinaryLight::BinaryLight(int cacheDuration, const QUrl &serviceControlUrlValue, const QUrl &serviceEventUrlValue,
                          const QUrl &serviceSCPDUrlValue, const QUrl &locationUrlValue, QObject *parent) :
     UpnpAbstractDevice(parent)
 {
@@ -40,6 +40,7 @@ BinaryLight::BinaryLight(const QUrl &serviceControlUrlValue, const QUrl &service
     //setUPC();
     //setURLBase();
     setLocationUrl(locationUrlValue);
+    setCacheControl(cacheDuration);
 
     QPointer<UpnpAbstractService> switchPowerService(new UpnpSwitchPower(serviceControlUrlValue, serviceEventUrlValue, serviceSCPDUrlValue));
     addService(switchPowerService);
