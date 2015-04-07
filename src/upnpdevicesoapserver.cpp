@@ -18,15 +18,24 @@
  */
 
 #include "upnpdevicesoapserver.h"
+#include "upnpabstractdevice.h"
+#include "upnpdevicesoapserverobject.h"
+
+#include <QtCore/QMap>
+#include <QtCore/QUrl>
+
+#include <QtNetwork/QNetworkInterface>
 
 class UpnpDeviceSoapServerPrivate
 {
 public:
 
+    QMap<QString, UpnpAbstractDevice*> mDevices;
 };
 
 UpnpDeviceSoapServer::UpnpDeviceSoapServer(QObject *parent) : KDSoapServer(parent), d(new UpnpDeviceSoapServerPrivate)
 {
+    listen();
 }
 
 UpnpDeviceSoapServer::~UpnpDeviceSoapServer()
@@ -34,9 +43,51 @@ UpnpDeviceSoapServer::~UpnpDeviceSoapServer()
 
 }
 
+void UpnpDeviceSoapServer::addDevice(UpnpAbstractDevice *device)
+{
+    if (!d->mDevices.contains(device->UDN())) {
+        d->mDevices[device->UDN()] = device;
+    }
+}
+
+void UpnpDeviceSoapServer::removeDevice(UpnpAbstractDevice *device)
+{
+    if (d->mDevices.contains(device->UDN())) {
+        d->mDevices.remove(device->UDN());
+    }
+}
+
 QObject *UpnpDeviceSoapServer::createServerObject()
 {
-    return nullptr;
+    return new UpnpDeviceSoapServerObject(d->mDevices);
+}
+
+QUrl UpnpDeviceSoapServer::urlPrefix() const
+{
+    QHostAddress publicAddress;
+
+    const QList<QHostAddress> &list = QNetworkInterface::allAddresses();
+    for (auto address = list.begin(); address != list.end(); ++address) {
+        if (!address->isLoopback()) {
+            if (address->protocol() == QAbstractSocket::IPv4Protocol) {
+                publicAddress = *address;
+                break;
+            }
+        }
+    }
+
+    QUrl webServerUrl;
+
+    if (!publicAddress.isNull()) {
+        webServerUrl.setHost(publicAddress.toString());
+    } else {
+        webServerUrl.setHost(QStringLiteral("127.0.0.1"));
+    }
+
+    webServerUrl.setPort(serverPort());
+    webServerUrl.setScheme(QStringLiteral("http"));
+
+    return webServerUrl;
 }
 
 #include "moc_upnpdevicesoapserver.cpp"

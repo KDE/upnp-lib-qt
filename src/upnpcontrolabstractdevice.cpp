@@ -58,9 +58,10 @@ UpnpControlAbstractDevice::~UpnpControlAbstractDevice()
     delete d;
 }
 
-void UpnpControlAbstractDevice::downloadAndParseDeviceDescription(const QUrl &serviceUrl)
+void UpnpControlAbstractDevice::downloadAndParseDeviceDescription(const QUrl &deviceUrl)
 {
-    d->mNetworkAccess.get(QNetworkRequest(serviceUrl));
+    qDebug() << "UpnpControlAbstractDevice::downloadAndParseDeviceDescription" << deviceUrl;
+    d->mNetworkAccess.get(QNetworkRequest(deviceUrl));
 }
 
 void UpnpControlAbstractDevice::finishedDownload(QNetworkReply *reply)

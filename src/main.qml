@@ -43,6 +43,10 @@ ApplicationWindow {
         }
     }
 
+    BinaryLight {
+        id: light1
+    }
+
     Component {
         id: rowDelegate
         Item {
@@ -181,7 +185,7 @@ ApplicationWindow {
         }
     }
 
-    StackView {
+    /*StackView {
         id: stackView
         anchors.fill: parent
 
@@ -232,6 +236,15 @@ ApplicationWindow {
                     movable: false
                 }
             }
+        }
+    }*/
+    Button {
+        id: publishLigth
+        text: "Publish Light"
+        anchors.fill: parent
+
+        onClicked: {
+            mySsdpEngine.publishDevice(light1);
         }
     }
 }

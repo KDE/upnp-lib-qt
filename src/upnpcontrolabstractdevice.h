@@ -44,7 +44,7 @@ Q_SIGNALS:
 
 public Q_SLOTS:
 
-    void downloadAndParseDeviceDescription(const QUrl &serviceUrl);
+    void downloadAndParseDeviceDescription(const QUrl &deviceUrl);
 
 private Q_SLOTS:
 

@@ -17,17 +17,20 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#ifndef BINARYLIGHT_H
-#define BINARYLIGHT_H
+#ifndef UPNPBINARYLIGHT_H
+#define UPNPBINARYLIGHT_H
 
 #include "upnpabstractdevice.h"
+
+#include <QtCore/QUrl>
+
+class BinaryLightPrivate;
 
 class BinaryLight : public UpnpAbstractDevice
 {
     Q_OBJECT
 public:
-    explicit BinaryLight(int cacheDuration, const QUrl &serviceControlUrlValue, const QUrl &serviceEventUrlValue,
-                         const QUrl &serviceSCPDUrlValue, const QUrl &locationUrlValue, QObject *parent = 0);
+    explicit BinaryLight(int cacheDuration = 1800, QObject *parent = 0);
 
     virtual ~BinaryLight();
 
@@ -35,6 +38,10 @@ Q_SIGNALS:
 
 public Q_SLOTS:
 
+private:
+
+    BinaryLightPrivate *d;
+
 };
 
-#endif // BINARYLIGHT_H
+#endif

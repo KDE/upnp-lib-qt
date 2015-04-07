@@ -38,8 +38,7 @@ class UpnpSwitchPower : public UpnpAbstractService
                NOTIFY statusChanged)
 
 public:
-    explicit UpnpSwitchPower(const QUrl &controlUrlValue, const QUrl &eventUrlValue,
-                             const QUrl &SCPDUrlValue, QObject *parent = 0);
+    explicit UpnpSwitchPower(QObject *parent = 0);
 
     virtual ~UpnpSwitchPower();
 

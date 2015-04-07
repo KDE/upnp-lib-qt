@@ -26,6 +26,7 @@
 
 class UpnpAbstractService;
 class UpnpAbstractDevicePrivate;
+class QIODevice;
 
 class UpnpAbstractDevice : public QObject
 {
@@ -135,7 +136,7 @@ public:
      * messages. Must match the prefix of the USN header in all discovery messages. Must
      * begin with uuid: followed by a UUID suffix specified by a UPnP vendor. Single URI.
      */
-    const QString& UDN();
+    const QString& UDN() const;
 
     /**
      * @brief setUPC: Set Universal Product Code
@@ -151,48 +152,48 @@ public:
      * UPC is optional. 12-digit, all-numeric code that identifies the consumer package.
      * Managed by the Uniform Code Council. Specified by UPnP vendor. Single UPC.
      */
-    const QString& UPC();
+    const QString& UPC() const;
 
 
     void setDeviceType(const QString &value);
 
-    const QString& deviceType();
+    const QString& deviceType() const;
 
     void setFriendlyName(const QString &value);
 
-    const QString& friendlyName();
+    const QString& friendlyName() const;
 
     void setManufacturer(const QString &value);
 
-    const QString& manufacturer();
+    const QString& manufacturer() const;
 
     void setManufacturerURL(const QUrl &value);
 
-    const QUrl& manufacturerURL();
+    const QUrl& manufacturerURL() const;
 
     void setModelDescription(const QString &value);
 
-    const QString& modelDescription();
+    const QString& modelDescription() const;
 
     void setModelName(const QString &value);
 
-    const QString& modelName();
+    const QString& modelName() const;
 
     void setModelNumber(const QString &value);
 
-    const QString& modelNumber();
+    const QString& modelNumber() const;
 
     void setModelURL(const QUrl &value);
 
-    const QUrl& modelURL();
+    const QUrl& modelURL() const;
 
     void setSerialNumber(const QString &value);
 
-    const QString& serialNumber();
+    const QString& serialNumber() const;
 
     void setURLBase(const QString &value);
 
-    const QString& URLBase();
+    const QString& URLBase() const;
 
     void setCacheControl(int value);
 
@@ -201,6 +202,8 @@ public:
     void setLocationUrl(const QUrl &value);
 
     const QUrl& locationUrl() const;
+
+    QIODevice* buildAndGetXmlDescription();
 
 Q_SIGNALS:
 

@@ -13,7 +13,8 @@ set(upnp-player-qt_SOURCES
     upnpabstractdevice.cpp
     upnpabstractservice.cpp
     upnpdevicesoapserver.cpp
-    binarylight.cpp
+    upnpdevicesoapserverobject.cpp
+    upnpbinarylight.cpp
     upnpswitchpower.cpp
     upnpbasictypes.h
     main.qml

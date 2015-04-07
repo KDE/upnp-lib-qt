@@ -20,6 +20,13 @@
 #include "upnpabstractdevice.h"
 #include "upnpabstractservice.h"
 
+#include <QtCore/QBuffer>
+#include <QtCore/QIODevice>
+#include <QtCore/QPointer>
+#include <QtCore/QXmlStreamWriter>
+
+#include <QtCore/QDebug>
+
 class UpnpAbstractDevicePrivate
 {
 public:
@@ -61,6 +68,7 @@ public:
 
     QUrl mLocationUrl;
 
+    QPointer<QIODevice> mXmlDescription;
 };
 
 UpnpAbstractDevice::UpnpAbstractDevice(QObject *parent) :
@@ -95,7 +103,7 @@ void UpnpAbstractDevice::setUDN(const QString &value)
     Q_EMIT UDNChanged(d->mUDN);
 }
 
-const QString &UpnpAbstractDevice::UDN()
+const QString &UpnpAbstractDevice::UDN() const
 {
     return d->mUDN;
 }
@@ -106,7 +114,7 @@ void UpnpAbstractDevice::setUPC(const QString &value)
     Q_EMIT UPCChanged(d->mUDN);
 }
 
-const QString &UpnpAbstractDevice::UPC()
+const QString &UpnpAbstractDevice::UPC() const
 {
     return d->mUPC;
 }
@@ -117,7 +125,7 @@ void UpnpAbstractDevice::setDeviceType(const QString &value)
     Q_EMIT deviceTypeChanged(d->mUDN);
 }
 
-const QString &UpnpAbstractDevice::deviceType()
+const QString &UpnpAbstractDevice::deviceType() const
 {
     return d->mDeviceType;
 }
@@ -128,7 +136,7 @@ void UpnpAbstractDevice::setFriendlyName(const QString &value)
     Q_EMIT friendlyNameChanged(d->mUDN);
 }
 
-const QString &UpnpAbstractDevice::friendlyName()
+const QString &UpnpAbstractDevice::friendlyName() const
 {
     return d->mFriendlyName;
 }
@@ -139,7 +147,7 @@ void UpnpAbstractDevice::setManufacturer(const QString &value)
     Q_EMIT manufacturerChanged(d->mUDN);
 }
 
-const QString &UpnpAbstractDevice::manufacturer()
+const QString &UpnpAbstractDevice::manufacturer() const
 {
     return d->mManufacturer;
 }
@@ -150,7 +158,7 @@ void UpnpAbstractDevice::setManufacturerURL(const QUrl &value)
     Q_EMIT manufacturerURLChanged(d->mUDN);
 }
 
-const QUrl &UpnpAbstractDevice::manufacturerURL()
+const QUrl &UpnpAbstractDevice::manufacturerURL() const
 {
     return d->mManufacturerURL;
 }
@@ -161,7 +169,7 @@ void UpnpAbstractDevice::setModelDescription(const QString &value)
     Q_EMIT modelDescriptionChanged(d->mUDN);
 }
 
-const QString &UpnpAbstractDevice::modelDescription()
+const QString &UpnpAbstractDevice::modelDescription() const
 {
     return d->mModelDescription;
 }
@@ -172,7 +180,7 @@ void UpnpAbstractDevice::setModelName(const QString &value)
     Q_EMIT modelNameChanged(d->mUDN);
 }
 
-const QString &UpnpAbstractDevice::modelName()
+const QString &UpnpAbstractDevice::modelName() const
 {
     return d->mModelName;
 }
@@ -183,7 +191,7 @@ void UpnpAbstractDevice::setModelNumber(const QString &value)
     Q_EMIT modelNumberChanged(d->mUDN);
 }
 
-const QString &UpnpAbstractDevice::modelNumber()
+const QString &UpnpAbstractDevice::modelNumber() const
 {
     return d->mModelNumber;
 }
@@ -194,7 +202,7 @@ void UpnpAbstractDevice::setModelURL(const QUrl &value)
     Q_EMIT modelURLChanged(d->mUDN);
 }
 
-const QUrl &UpnpAbstractDevice::modelURL()
+const QUrl &UpnpAbstractDevice::modelURL() const
 {
     return d->mModelURL;
 }
@@ -205,7 +213,7 @@ void UpnpAbstractDevice::setSerialNumber(const QString &value)
     Q_EMIT serialNumberChanged(d->mUDN);
 }
 
-const QString &UpnpAbstractDevice::serialNumber()
+const QString &UpnpAbstractDevice::serialNumber() const
 {
     return d->mSerialNumber;
 }
@@ -216,7 +224,7 @@ void UpnpAbstractDevice::setURLBase(const QString &value)
     Q_EMIT URLBaseChanged(d->mUDN);
 }
 
-const QString &UpnpAbstractDevice::URLBase()
+const QString &UpnpAbstractDevice::URLBase() const
 {
     return d->mURLBase;
 }
@@ -241,6 +249,28 @@ void UpnpAbstractDevice::setLocationUrl(const QUrl &value)
 const QUrl &UpnpAbstractDevice::locationUrl() const
 {
     return d->mLocationUrl;
+}
+
+QIODevice* UpnpAbstractDevice::buildAndGetXmlDescription()
+{
+    qDebug() << "UpnpAbstractDevice::buildAndGetXmlDescription";
+
+    if (!d->mXmlDescription) {
+        QPointer<QBuffer> newDescription(new QBuffer);
+
+        newDescription->open(QIODevice::ReadWrite);
+
+        QXmlStreamWriter insertStream(newDescription.data());
+
+        /*insertStream << "<?xml version=\"1.0\"?>\n";
+        insertStream << "<root xmlns=\"urn:schemas-upnp-org:device-1-0\"><specVersion><major>1</major><minor>0</minor></specVersion></root>";*/
+
+        d->mXmlDescription = newDescription;
+    }
+
+    d->mXmlDescription->seek(0);
+
+    return d->mXmlDescription;
 }
 
 void UpnpAbstractDevice::addService(QPointer<UpnpAbstractService> newService)

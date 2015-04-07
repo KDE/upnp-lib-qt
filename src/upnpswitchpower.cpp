@@ -28,13 +28,10 @@ public:
     bool mStatus;
 };
 
-UpnpSwitchPower::UpnpSwitchPower(const QUrl &controlUrlValue, const QUrl &eventUrlValue, const QUrl &SCPDUrlValue, QObject *parent) :
+UpnpSwitchPower::UpnpSwitchPower(QObject *parent) :
     UpnpAbstractService(parent), d(new UpnpSwitchPowerPrivate)
 {
     //setBaseURL();
-    setControlURL(controlUrlValue);
-    setEventSubURL(eventUrlValue);
-    setSCPDURL(SCPDUrlValue);
     setServiceId(QStringLiteral("urn:upnp-org:serviceId:SwitchPower"));
     setServiceType(QStringLiteral("urn:schemas-upnp-org:service:SwitchPower:1"));
 }

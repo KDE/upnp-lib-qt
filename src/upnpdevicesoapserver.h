@@ -24,7 +24,7 @@
 
 #include <QtCore/QObject>
 
-class UpnpControlAbstractService;
+class UpnpAbstractDevice;
 class UpnpDeviceSoapServerPrivate;
 
 class UpnpDeviceSoapServer : public KDSoapServer
@@ -35,7 +35,13 @@ public:
 
     virtual ~UpnpDeviceSoapServer();
 
+    void addDevice(UpnpAbstractDevice *device);
+
+    void removeDevice(UpnpAbstractDevice *device);
+
     QObject* createServerObject() Q_DECL_OVERRIDE;
+
+    QUrl urlPrefix() const;
 
 private:
 

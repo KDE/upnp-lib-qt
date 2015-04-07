@@ -24,6 +24,7 @@
 #include "upnpdevicemodel.h"
 #include "upnpbasictypes.h"
 #include "upnpcontrolswitchpower.h"
+#include "upnpbinarylight.h"
 
 #include <QtWidgets/QApplication>
 
@@ -36,14 +37,17 @@ int main(int argc, char *argv[])
     QApplication app(argc, argv);
 
     qmlRegisterType<UpnpSsdpEngine>("org.mgallien.QmlExtension", 1, 0, "UpnpSsdpEngine");
+    qmlRegisterType<UpnpAbstractDevice>("org.mgallien.QmlExtension", 1, 0, "UpnpAbstractDevice");
+    qmlRegisterType<UpnpAbstractService>("org.mgallien.QmlExtension", 1, 0, "UpnpAbstractService");
     qmlRegisterType<UpnpControlAbstractDevice>("org.mgallien.QmlExtension", 1, 0, "UpnpControlAbstractDevice");
     qmlRegisterType<UpnpControlAbstractService>("org.mgallien.QmlExtension", 1, 0, "UpnpControlAbstractService");
-    qmlRegisterType<UpnpAbstractService>("org.mgallien.QmlExtension", 1, 0, "UpnpAbstractService");
     qmlRegisterType<UpnpDeviceModel>("org.mgallien.QmlExtension", 1, 0, "UpnpDeviceModel");
     qmlRegisterType<UpnpControlSwitchPower>("org.mgallien.QmlExtension", 1, 0, "UpnpControlSwitchPower");
+    qmlRegisterType<BinaryLight>("org.mgallien.QmlExtension", 1, 0, "BinaryLight");
 
     qRegisterMetaType<A_ARG_TYPE_InstanceID>();
     qRegisterMetaType<UpnpDiscoveryResult>();
+    qRegisterMetaType<QPointer<UpnpAbstractDevice> >();
 
     QQmlApplicationEngine engine(QUrl(QStringLiteral("./main.qml")));
 

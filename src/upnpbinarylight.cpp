@@ -17,15 +17,23 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#include "binarylight.h"
+#include "upnpbinarylight.h"
 
 #include "upnpswitchpower.h"
+#include "upnpdevicesoapserver.h"
 
 #include <QtCore/QUuid>
 
-BinaryLight::BinaryLight(int cacheDuration, const QUrl &serviceControlUrlValue, const QUrl &serviceEventUrlValue,
-                         const QUrl &serviceSCPDUrlValue, const QUrl &locationUrlValue, QObject *parent) :
-    UpnpAbstractDevice(parent)
+class BinaryLightPrivate
+{
+public:
+
+    UpnpDeviceSoapServer mServer;
+
+};
+
+BinaryLight::BinaryLight(int cacheDuration, QObject *parent)
+    : UpnpAbstractDevice(parent), d(new BinaryLightPrivate)
 {
     setDeviceType(QStringLiteral("urn:schemas-upnp-org:device:BinaryLight:1"));
     setFriendlyName(QStringLiteral("Binary Light for Test"));
@@ -36,18 +44,43 @@ BinaryLight::BinaryLight(int cacheDuration, const QUrl &serviceControlUrlValue, 
     //setModelNumber();
     //setModelURL();
     //setSerialNumber();
-    setUDN(QUuid::createUuid().toString());
+
+    const QString &uuidString(QUuid::createUuid().toString());
+    setUDN(uuidString.mid(1, uuidString.length() - 2));
     //setUPC();
     //setURLBase();
-    setLocationUrl(locationUrlValue);
     setCacheControl(cacheDuration);
 
-    QPointer<UpnpAbstractService> switchPowerService(new UpnpSwitchPower(serviceControlUrlValue, serviceEventUrlValue, serviceSCPDUrlValue));
+    QPointer<UpnpAbstractService> switchPowerService(new UpnpSwitchPower);
     addService(switchPowerService);
+
+    d->mServer.addDevice(this);
+
+    QUrl eventUrl = d->mServer.urlPrefix();
+    eventUrl.setPath(QStringLiteral("/event"));
+    eventUrl.setQuery(UDN());
+
+    QUrl controlUrl = d->mServer.urlPrefix();
+    controlUrl.setPath(QStringLiteral("/control"));
+    controlUrl.setQuery(UDN());
+
+    QUrl serviceDescriptionUrl = d->mServer.urlPrefix();
+    serviceDescriptionUrl.setPath(QStringLiteral("/service.xml"));
+    serviceDescriptionUrl.setQuery(UDN());
+
+    switchPowerService->setControlURL(controlUrl);
+    switchPowerService->setEventSubURL(eventUrl);
+    switchPowerService->setSCPDURL(serviceDescriptionUrl);
+
+    QUrl deviceDescriptionUrl = d->mServer.urlPrefix();
+    deviceDescriptionUrl.setPath(QStringLiteral("/device.xml"));
+    deviceDescriptionUrl.setQuery(UDN());
+    setLocationUrl(deviceDescriptionUrl);
 }
 
 BinaryLight::~BinaryLight()
 {
+    delete d;
 }
 
-#include "moc_binarylight.cpp"
+#include "moc_upnpbinarylight.cpp"
