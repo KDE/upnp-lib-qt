@@ -84,7 +84,7 @@ public Q_SLOTS:
      */
     bool searchAllUpnpDevice();
 
-    void publishDevice(const QPointer<UpnpAbstractDevice> &device);
+    void publishDevice(UpnpAbstractDevice *device);
 
 private Q_SLOTS:
 

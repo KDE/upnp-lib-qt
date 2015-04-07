@@ -26,8 +26,10 @@
 #include <QtCore/QHash>
 #include <QtCore/QDebug>
 #include <QtCore/QSet>
+#include <QtCore/QUrl>
 
 #include <QtNetwork/QUdpSocket>
+#include <QtCore/QSysInfo>
 
 #include <sys/types.h>          /* Consultez NOTES */
 #include <sys/socket.h>
@@ -48,6 +50,8 @@ public:
     QUdpSocket mSsdpQuerySocket;
 
     QUdpSocket mSsdpStandardSocket;
+
+    QString mServerInformation;
 };
 
 UpnpSsdpEngine::UpnpSsdpEngine(QObject *parent)
@@ -73,6 +77,8 @@ UpnpSsdpEngine::UpnpSsdpEngine(QObject *parent)
     }
 
     d->mSsdpQuerySocket.bind(QHostAddress::Any);
+
+    d->mServerInformation = QSysInfo::kernelType() + QStringLiteral(" ") + QSysInfo::kernelVersion()  + QStringLiteral(" UPnP/1.0 ");
 }
 
 UpnpSsdpEngine::~UpnpSsdpEngine()
@@ -95,24 +101,34 @@ bool UpnpSsdpEngine::searchAllUpnpDevice()
     return result != -1;
 }
 
-void UpnpSsdpEngine::publishDevice(const QPointer<UpnpAbstractDevice> &device)
+void UpnpSsdpEngine::publishDevice(UpnpAbstractDevice *device)
 {
-    // cache control
-    device->cacheControl();
-
     // location
     device->locationUrl();
 
-    // server
+    QByteArray allDiscoveryMessageCommonContent;
 
-    // UUID
-    device->UDN();
+    allDiscoveryMessageCommonContent += "NOTIFY * HTTP/1.1\r\n";
+    allDiscoveryMessageCommonContent += "HOST: 239.255.255.250:1900\r\n";
+    allDiscoveryMessageCommonContent += "CACHE-CONTROL: max-age=" + QByteArray::number(device->cacheControl()) + "\r\n";
+    allDiscoveryMessageCommonContent += "NTS: ssdp:alive\r\n";
+    allDiscoveryMessageCommonContent += "SERVER: " + d->mServerInformation.toLatin1() + " " + device->modelName().toLatin1() + " " + device->modelNumber().toLatin1() + "\r\n";
 
-    //device type
-    device->deviceType();
+    QByteArray rootDeviceMessage(allDiscoveryMessageCommonContent);
+    rootDeviceMessage += "NT: upnp:rootdevice\r\n";
+    rootDeviceMessage += "USN: uuid:" + device->UDN().toLatin1() + "::upnp:rootdevice\r\n";
+    rootDeviceMessage += "LOCATION: "+ device->locationUrl().toString().toLatin1() + "\r\n";
+    rootDeviceMessage += "\r\n";
 
-    // services type
-    device->services();
+    d->mSsdpQuerySocket.writeDatagram(rootDeviceMessage, QHostAddress(QStringLiteral("239.255.255.250")), 1900);
+
+    /*QByteArray rootDeviceMessage(allDiscoveryMessageCommonContent);
+    rootDeviceMessage += "NT: upnp:rootdevice\r\n";
+    rootDeviceMessage += "USN: uuid:" + device->UDN().toLatin1() + "::upnp:rootdevice\r\n";
+    rootDeviceMessage += "LOCATION: "+ device->locationUrl().toString().toLatin1() + "\r\n";
+    rootDeviceMessage += "\r\n";
+
+    d->mSsdpQuerySocket.writeDatagram(rootDeviceMessage, QHostAddress(QStringLiteral("239.255.255.250")), 1900);*/
 }
 
 void UpnpSsdpEngine::standardReceivedData()
