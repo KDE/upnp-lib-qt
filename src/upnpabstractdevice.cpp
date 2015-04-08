@@ -262,8 +262,43 @@ QIODevice* UpnpAbstractDevice::buildAndGetXmlDescription()
 
         QXmlStreamWriter insertStream(newDescription.data());
 
-        /*insertStream << "<?xml version=\"1.0\"?>\n";
-        insertStream << "<root xmlns=\"urn:schemas-upnp-org:device-1-0\"><specVersion><major>1</major><minor>0</minor></specVersion></root>";*/
+        insertStream.writeNamespace(QStringLiteral("urn:schemas-upnp-org:device-1-0"));
+        insertStream.writeStartDocument();
+        insertStream.writeStartElement(QStringLiteral("root"));
+        insertStream.writeStartElement(QStringLiteral("specVersion"));
+        insertStream.writeTextElement(QStringLiteral("major"), QStringLiteral("1"));
+        insertStream.writeTextElement(QStringLiteral("minor"), QStringLiteral("0"));
+        insertStream.writeEndElement();
+        insertStream.writeStartElement(QStringLiteral("device"));
+        insertStream.writeTextElement(QStringLiteral("deviceType"), deviceType());
+        insertStream.writeTextElement(QStringLiteral("friendlyName"), friendlyName());
+        insertStream.writeTextElement(QStringLiteral("manufacturer"), manufacturer());
+        insertStream.writeTextElement(QStringLiteral("manufacterURL"), manufacturerURL().toString());
+        insertStream.writeTextElement(QStringLiteral("modelDescription"), modelDescription());
+        insertStream.writeTextElement(QStringLiteral("modelName"), modelName());
+        insertStream.writeTextElement(QStringLiteral("modelNumber"), modelNumber());
+        insertStream.writeTextElement(QStringLiteral("modelURL"), modelURL().toString());
+        insertStream.writeTextElement(QStringLiteral("serialNumber"), serialNumber());
+        insertStream.writeTextElement(QStringLiteral("UDN"), UDN());
+        insertStream.writeTextElement(QStringLiteral("UPC"), UPC());
+
+        if (!d->mServices.empty()) {
+            insertStream.writeStartElement(QStringLiteral("serviceList"));
+            for (auto itService = d->mServices.begin(); itService != d->mServices.end(); ++itService) {
+                insertStream.writeStartElement(QStringLiteral("service"));
+                insertStream.writeTextElement(QStringLiteral("serviceType"), (*itService)->serviceType());
+                insertStream.writeTextElement(QStringLiteral("serviceId"), (*itService)->serviceId());
+                insertStream.writeTextElement(QStringLiteral("SCPDURL"), (*itService)->SCPDURL().toString());
+                insertStream.writeTextElement(QStringLiteral("controlURL"), (*itService)->controlURL().toString());
+                insertStream.writeTextElement(QStringLiteral("eventURL"), (*itService)->eventURL().toString());
+                insertStream.writeEndElement();
+            }
+            insertStream.writeEndElement();
+        }
+
+        insertStream.writeEndElement();
+        insertStream.writeEndElement();
+        insertStream.writeEndDocument();
 
         d->mXmlDescription = newDescription;
     }
