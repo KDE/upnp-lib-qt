@@ -56,10 +56,10 @@ class UpnpAbstractService : public QObject
                WRITE setControlURL
                NOTIFY controlURLChanged)
 
-    Q_PROPERTY(QUrl eventSubURL
-               READ eventSubURL
-               WRITE setEventSubURL
-               NOTIFY eventSubURLChanged)
+    Q_PROPERTY(QUrl eventURL
+               READ eventURL
+               WRITE setEventURL
+               NOTIFY eventURLChanged)
 
 public:
     explicit UpnpAbstractService(QObject *parent = 0);
@@ -86,9 +86,9 @@ public:
 
     const QUrl& controlURL() const;
 
-    void setEventSubURL(const QUrl &newEventSubURL);
+    void setEventURL(const QUrl &newEventURL);
 
-    const QUrl& eventSubURL() const;
+    const QUrl& eventURL() const;
 
 Q_SIGNALS:
 
@@ -102,7 +102,7 @@ Q_SIGNALS:
 
     void controlURLChanged(const QString &serviceId);
 
-    void eventSubURLChanged(const QString &serviceId);
+    void eventURLChanged(const QString &serviceId);
 
 public Q_SLOTS:
 

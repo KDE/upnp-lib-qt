@@ -157,7 +157,7 @@ void UpnpControlAbstractService::subscribeEvents(int duration)
 
     webServerAddess += QStringLiteral(":") + QString::number(d->mEventServer.serverPort()) + QStringLiteral(">");
 
-    QNetworkRequest myRequest(eventSubURL());
+    QNetworkRequest myRequest(eventURL());
     myRequest.setRawHeader("CALLBACK", webServerAddess.toUtf8());
     myRequest.setRawHeader("NT", "upnp:event");
     QString timeoutDefinition(QStringLiteral("Second-"));
@@ -198,7 +198,7 @@ void UpnpControlAbstractService::downloadAndParseServiceDescription(const QUrl &
 void UpnpControlAbstractService::finishedDownload(QNetworkReply *reply)
 {
     if (reply->isFinished() && reply->error() == QNetworkReply::NoError) {
-        if (reply->url() == eventSubURL()) {
+        if (reply->url() == eventURL()) {
             if (reply->hasRawHeader("TIMEOUT")) {
                 if (reply->rawHeader("TIMEOUT").startsWith("Second-")) {
                     d->mRealEventSubscriptionTimeout = reply->rawHeader("TIMEOUT").mid(7).toInt();

@@ -33,7 +33,7 @@ public:
 
     QUrl mControlURL;
 
-    QUrl mEventSubURL;
+    QUrl mEventURL;
 
 };
 
@@ -97,14 +97,14 @@ const QUrl &UpnpAbstractService::controlURL() const
     return d->mControlURL;
 }
 
-void UpnpAbstractService::setEventSubURL(const QUrl &newEventSubURL)
+void UpnpAbstractService::setEventURL(const QUrl &newEventURL)
 {
-    d->mEventSubURL = newEventSubURL;
+    d->mEventURL = newEventURL;
 }
 
-const QUrl &UpnpAbstractService::eventSubURL() const
+const QUrl &UpnpAbstractService::eventURL() const
 {
-    return d->mEventSubURL;
+    return d->mEventURL;
 }
 
 #include "moc_upnpabstractservice.cpp"

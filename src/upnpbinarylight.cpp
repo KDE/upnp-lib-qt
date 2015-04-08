@@ -69,7 +69,7 @@ BinaryLight::BinaryLight(int cacheDuration, QObject *parent)
     serviceDescriptionUrl.setQuery(UDN());
 
     switchPowerService->setControlURL(controlUrl);
-    switchPowerService->setEventSubURL(eventUrl);
+    switchPowerService->setEventURL(eventUrl);
     switchPowerService->setSCPDURL(serviceDescriptionUrl);
 
     QUrl deviceDescriptionUrl = d->mServer.urlPrefix();

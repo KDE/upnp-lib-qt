@@ -157,7 +157,7 @@ void UpnpControlAbstractDevice::finishedDownload(QNetworkReply *reply)
                 if (!eventSubURLNode.isNull()) {
                     QUrl eventUrl(URLBase());
                     eventUrl.setPath(eventSubURLNode.toElement().text());
-                    newService->setEventSubURL(eventUrl);
+                    newService->setEventURL(eventUrl);
                 }
 
                 QUrl serviceUrl(URLBase());
