@@ -18,6 +18,7 @@
  */
 
 #include "upnpabstractservice.h"
+#include "upnpbasictypes.h"
 
 #include <QtCore/QPointer>
 #include <QtCore/QBuffer>
@@ -43,6 +44,8 @@ public:
     QUrl mEventURL;
 
     QPointer<QIODevice> mXmlDescription;
+
+    QMap<QString, UpnpActionDescription> mActions;
 
 };
 
@@ -135,8 +138,27 @@ QIODevice* UpnpAbstractService::buildAndGetXmlDescription()
         insertStream.writeTextElement(QStringLiteral("major"), QStringLiteral("1"));
         insertStream.writeTextElement(QStringLiteral("minor"), QStringLiteral("0"));
         insertStream.writeEndElement();
+
         insertStream.writeStartElement(QStringLiteral("actionList"));
+        for (auto itAction = d->mActions.begin(); itAction != d->mActions.end(); ++itAction) {
+            insertStream.writeStartElement(QStringLiteral("action"));
+            insertStream.writeTextElement(QStringLiteral("name"), itAction->mName);
+            insertStream.writeStartElement(QStringLiteral("argumentList"));
+            for (auto itArgument = itAction->mArguments.begin(); itArgument != itAction->mArguments.end(); ++itArgument) {
+                insertStream.writeStartElement(QStringLiteral("argument"));
+                insertStream.writeTextElement(QStringLiteral("name"), itArgument->mName);
+                insertStream.writeTextElement(QStringLiteral("direction"), (itArgument->mDirection == UpnpArgumentDirection::In) ? QStringLiteral("in") : QStringLiteral("out"));
+                if (itArgument->mIsReturnValue) {
+                    insertStream.writeEmptyElement(QStringLiteral("retval"));
+                }
+                insertStream.writeTextElement(QStringLiteral("relatedStateVariable"), itArgument->mRelatedStateVariable);
+                insertStream.writeEndElement();
+            }
+            insertStream.writeEndElement();
+            insertStream.writeEndElement();
+        }
         insertStream.writeEndElement();
+
         insertStream.writeStartElement(QStringLiteral("serviceStateTable"));
         insertStream.writeEndElement();
         insertStream.writeEndElement();
@@ -151,6 +173,16 @@ QIODevice* UpnpAbstractService::buildAndGetXmlDescription()
     d->mXmlDescription->seek(0);
 
     return d->mXmlDescription;
+}
+
+void UpnpAbstractService::addAction(const UpnpActionDescription &newAction)
+{
+    d->mActions[newAction.mName] = newAction;
+}
+
+const UpnpActionDescription &UpnpAbstractService::action(const QString &name) const
+{
+    return d->mActions[name];
 }
 
 #include "moc_upnpabstractservice.cpp"

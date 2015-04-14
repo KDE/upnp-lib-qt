@@ -33,5 +33,33 @@ typedef QString A_ARG_TYPE_SeekMode;
 
 typedef QString A_ARG_TYPE_SeekTarget;
 
+enum class UpnpArgumentDirection
+{
+    In,
+    Out,
+};
+
+class UpnpActionArgumentDescription
+{
+public:
+
+    QString mName;
+
+    UpnpArgumentDirection mDirection;
+
+    bool mIsReturnValue;
+
+    QString mRelatedStateVariable;
+};
+
+class UpnpActionDescription
+{
+public:
+
+    QString mName;
+
+    QList<UpnpActionArgumentDescription> mArguments;
+};
+
 #endif // UPNPBASICTYPES_H
 

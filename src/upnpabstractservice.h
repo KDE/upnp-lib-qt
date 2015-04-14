@@ -26,6 +26,7 @@
 #include <QtCore/QUrl>
 
 class UpnpAbstractServicePrivate;
+class UpnpActionDescription;
 
 class UpnpAbstractService : public QObject
 {
@@ -91,6 +92,12 @@ public:
     const QUrl& eventURL() const;
 
     QIODevice* buildAndGetXmlDescription();
+
+    void addAction(const UpnpActionDescription &newAction);
+
+    void removeAction(const QString &name);
+
+    Q_INVOKABLE const UpnpActionDescription& action(const QString &name) const;
 
 Q_SIGNALS:
 

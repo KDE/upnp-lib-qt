@@ -19,6 +19,8 @@
 
 #include "upnpswitchpower.h"
 
+#include "upnpbasictypes.h"
+
 class UpnpSwitchPowerPrivate
 {
 public:
@@ -34,6 +36,42 @@ UpnpSwitchPower::UpnpSwitchPower(QObject *parent) :
     //setBaseURL();
     setServiceId(QStringLiteral("urn:upnp-org:serviceId:SwitchPower"));
     setServiceType(QStringLiteral("urn:schemas-upnp-org:service:SwitchPower:1"));
+
+    UpnpActionDescription setTargetAction;
+    setTargetAction.mName = QStringLiteral("SetTarget");
+
+    UpnpActionArgumentDescription setTargetNewValue;
+    setTargetNewValue.mName = QStringLiteral("newTargetValue");
+    setTargetNewValue.mIsReturnValue = false;
+    setTargetNewValue.mDirection = UpnpArgumentDirection::In;
+    setTargetNewValue.mRelatedStateVariable = QStringLiteral("Target");
+    setTargetAction.mArguments.push_back(setTargetNewValue);
+
+    addAction(setTargetAction);
+
+    UpnpActionDescription getTargetAction;
+    getTargetAction.mName = QStringLiteral("GetTarget");
+
+    UpnpActionArgumentDescription getTargetRetTargetValue;
+    getTargetRetTargetValue.mName = QStringLiteral("RetTargetValue");
+    getTargetRetTargetValue.mIsReturnValue = false;
+    getTargetRetTargetValue.mDirection = UpnpArgumentDirection::Out;
+    getTargetRetTargetValue.mRelatedStateVariable = QStringLiteral("Target");
+    getTargetAction.mArguments.push_back(getTargetRetTargetValue);
+
+    addAction(getTargetAction);
+
+    UpnpActionDescription getStatusAction;
+    getStatusAction.mName = QStringLiteral("GetStatus");
+
+    UpnpActionArgumentDescription getTargetResultStatus;
+    getTargetResultStatus.mName = QStringLiteral("ResultStatus");
+    getTargetResultStatus.mIsReturnValue = false;
+    getTargetResultStatus.mDirection = UpnpArgumentDirection::Out;
+    getTargetResultStatus.mRelatedStateVariable = QStringLiteral("Status");
+    getStatusAction.mArguments.push_back(getTargetResultStatus);
+
+    addAction(getStatusAction);
 }
 
 UpnpSwitchPower::~UpnpSwitchPower()

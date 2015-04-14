@@ -20,6 +20,7 @@
 #include "upnpcontrolabstractservice.h"
 #include "upnphttpserver.h"
 #include "upnpservereventobject.h"
+#include "upnpbasictypes.h"
 
 #include <KDSoapClient/KDSoapClientInterface.h>
 #include <KDSoapClient/KDSoapMessage.h>
@@ -37,47 +38,17 @@
 #include <QtCore/QBuffer>
 #include <QtCore/QTextStream>
 
-enum class UpnpArgumentDirection
-{
-    In,
-    Out,
-};
-
-class UpnpActionArgumentDescription
-{
-public:
-
-    QString mName;
-
-    UpnpArgumentDirection mDirection;
-
-    bool mIsReturnValue;
-
-    QString mRelatedStateVariable;
-};
-
-class UpnpActionDescription
-{
-public:
-
-    QString mName;
-
-    QList<UpnpActionArgumentDescription> mArguments;
-};
-
 class UpnpAbstractServiceDescriptionPrivate
 {
 public:
 
     UpnpAbstractServiceDescriptionPrivate()
-        : mNetworkAccess(), mActions(), mInterface(nullptr), mEventServer(),
+        : mNetworkAccess(), mInterface(nullptr), mEventServer(),
           mPublicAddress(), mRealEventSubscriptionTimeout(0), mEventSubscriptionTimer(nullptr)
     {
     }
 
     QNetworkAccessManager mNetworkAccess;
-
-    QMap<QString, UpnpActionDescription> mActions;
 
     KDSoapClientInterface *mInterface;
 
@@ -116,23 +87,20 @@ UpnpControlAbstractService::~UpnpControlAbstractService()
     delete d;
 }
 
-KDSoapPendingCall UpnpControlAbstractService::callAction(const QString &action, const QList<QVariant> &arguments)
+KDSoapPendingCall UpnpControlAbstractService::callAction(const QString &actionName, const QList<QVariant> &arguments)
 {
     KDSoapMessage message;
 
-    auto itAction = d->mActions.find(action);
-    if (itAction != d->mActions.end()) {
-        const UpnpActionDescription &actionDescription(itAction.value());
+    const UpnpActionDescription &actionDescription(action(actionName));
 
-        auto itArgumentName = actionDescription.mArguments.begin();
-        auto itArgumentValue = arguments.begin();
-        for (; itArgumentName != actionDescription.mArguments.end() && itArgumentValue != arguments.end(); ++itArgumentName) {
-            message.addArgument(itArgumentName->mName, itArgumentValue->toString());
+    auto itArgumentName = actionDescription.mArguments.begin();
+    auto itArgumentValue = arguments.begin();
+    for (; itArgumentName != actionDescription.mArguments.end() && itArgumentValue != arguments.end(); ++itArgumentName) {
+        message.addArgument(itArgumentName->mName, itArgumentValue->toString());
 
-            ++itArgumentValue;
-            if (itArgumentValue == arguments.end()) {
-                break;
-            }
+        ++itArgumentValue;
+        if (itArgumentValue == arguments.end()) {
+            break;
         }
     }
 
@@ -142,7 +110,7 @@ KDSoapPendingCall UpnpControlAbstractService::callAction(const QString &action, 
         d->mInterface->setStyle(KDSoapClientInterface::RPCStyle);
     }
 
-    return d->mInterface->asyncCall(action, message, serviceType() + QStringLiteral("#") + action);
+    return d->mInterface->asyncCall(actionName, message, serviceType() + QStringLiteral("#") + actionName);
 }
 
 void UpnpControlAbstractService::subscribeEvents(int duration)
@@ -227,7 +195,9 @@ void UpnpControlAbstractService::finishedDownload(QNetworkReply *reply)
                     actionName = nameNode.toElement().text();
                 }
 
-                d->mActions[actionName].mName = actionName;
+                UpnpActionDescription newAction;
+
+                newAction.mName = actionName;
 
                 const QDomNode &argumentListNode = currentChild.firstChildElement(QStringLiteral("argumentList"));
                 QDomNode argumentNode = argumentListNode.firstChild();
@@ -243,7 +213,9 @@ void UpnpControlAbstractService::finishedDownload(QNetworkReply *reply)
                     newArgument.mIsReturnValue = !argumentRetvalNode.isNull();
                     newArgument.mRelatedStateVariable = argumentRelatedStateVariableNode.toElement().text();
 
-                    d->mActions[actionName].mArguments.push_back(newArgument);
+                    newAction.mArguments.push_back(newArgument);
+
+                    addAction(newAction);
 
                     argumentNode = argumentNode.nextSibling();
                 }
