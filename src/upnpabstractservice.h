@@ -90,6 +90,8 @@ public:
 
     const QUrl& eventURL() const;
 
+    QIODevice* buildAndGetXmlDescription();
+
 Q_SIGNALS:
 
     void serviceTypeChanged(const QString &serviceId);

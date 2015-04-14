@@ -50,6 +50,8 @@ private:
 
     QIODevice* downloadDeviceXmlDescription(UpnpAbstractDevice *device, QByteArray &contentType);
 
+    QIODevice* downloadServiceXmlDescription(UpnpAbstractDevice *device, const QString &serviceId, QByteArray &contentType);
+
     UpnpDeviceSoapServerObjectPrivate *d;
 };
 

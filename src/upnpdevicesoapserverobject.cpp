@@ -20,8 +20,10 @@
 #include "upnpdevicesoapserverobject.h"
 
 #include "upnpabstractdevice.h"
+#include "upnpabstractservice.h"
 
 #include <QtCore/QDebug>
+#include <QtCore/QString>
 
 class UpnpDeviceSoapServerObjectPrivate
 {
@@ -61,6 +63,12 @@ QIODevice *UpnpDeviceSoapServerObject::processFileRequest(const QString &path, Q
         if (d->mDevices.contains(deviceUuid)) {
             return downloadDeviceXmlDescription(d->mDevices[deviceUuid], contentType);
         }
+    } else if (path.startsWith(QStringLiteral("/service.xml?"))) {
+        const QString &queryParameters(path.right(path.length() - 13));
+        const QList<QString> &parametersList = queryParameters.split(QStringLiteral("&"));
+        if (d->mDevices.contains(parametersList.first())) {
+            return downloadServiceXmlDescription(d->mDevices[parametersList.first()], parametersList.last(), contentType);
+        }
     }
 
     return nullptr;
@@ -91,6 +99,15 @@ QIODevice *UpnpDeviceSoapServerObject::downloadDeviceXmlDescription(UpnpAbstract
     contentType = "text/xml";
 
     return device->buildAndGetXmlDescription();
+}
+
+QIODevice *UpnpDeviceSoapServerObject::downloadServiceXmlDescription(UpnpAbstractDevice *device, const QString &serviceId, QByteArray &contentType)
+{
+    qDebug() << "UpnpDeviceSoapServerObject::downloadServiceXmlDescription" << device->UDN() << serviceId;
+
+    contentType = "text/xml";
+
+    return device->serviceById(serviceId)->buildAndGetXmlDescription();
 }
 
 #include "moc_upnpdevicesoapserverobject.cpp"

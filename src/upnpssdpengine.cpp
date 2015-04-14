@@ -20,6 +20,7 @@
 #include "upnpssdpengine.h"
 
 #include "upnpabstractdevice.h"
+#include "upnpabstractservice.h"
 
 #include <QtNetwork/QHostAddress>
 
@@ -122,13 +123,32 @@ void UpnpSsdpEngine::publishDevice(UpnpAbstractDevice *device)
 
     d->mSsdpQuerySocket.writeDatagram(rootDeviceMessage, QHostAddress(QStringLiteral("239.255.255.250")), 1900);
 
-    /*QByteArray rootDeviceMessage(allDiscoveryMessageCommonContent);
-    rootDeviceMessage += "NT: upnp:rootdevice\r\n";
-    rootDeviceMessage += "USN: uuid:" + device->UDN().toLatin1() + "::upnp:rootdevice\r\n";
-    rootDeviceMessage += "LOCATION: "+ device->locationUrl().toString().toLatin1() + "\r\n";
-    rootDeviceMessage += "\r\n";
+    QByteArray uuidDeviceMessage(allDiscoveryMessageCommonContent);
+    uuidDeviceMessage += "NT: uuid:" + device->UDN().toLatin1() + "\r\n";
+    uuidDeviceMessage += "USN: uuid:" + device->UDN().toLatin1() + "\r\n";
+    uuidDeviceMessage += "LOCATION: "+ device->locationUrl().toString().toLatin1() + "\r\n";
+    uuidDeviceMessage += "\r\n";
 
-    d->mSsdpQuerySocket.writeDatagram(rootDeviceMessage, QHostAddress(QStringLiteral("239.255.255.250")), 1900);*/
+    d->mSsdpQuerySocket.writeDatagram(uuidDeviceMessage, QHostAddress(QStringLiteral("239.255.255.250")), 1900);
+
+    QByteArray deviceMessage(allDiscoveryMessageCommonContent);
+    deviceMessage += "NT: " + device->deviceType().toLatin1() + "\r\n";
+    deviceMessage += "USN: uuid:" + device->UDN().toLatin1() + "::" + device->deviceType().toLatin1() + "\r\n";
+    deviceMessage += "LOCATION: "+ device->locationUrl().toString().toLatin1() + "\r\n";
+    deviceMessage += "\r\n";
+
+    d->mSsdpQuerySocket.writeDatagram(deviceMessage, QHostAddress(QStringLiteral("239.255.255.250")), 1900);
+
+    const QList<QPointer<UpnpAbstractService> > &servicesList = device->services();
+    for (auto itService = servicesList.begin(); itService != servicesList.end(); ++itService) {
+        QByteArray deviceMessage(allDiscoveryMessageCommonContent);
+        deviceMessage += "NT: " + (*itService)->serviceType().toLatin1() + "\r\n";
+        deviceMessage += "USN: uuid:" + device->UDN().toLatin1() + "::" + (*itService)->serviceType().toLatin1() + "\r\n";
+        deviceMessage += "LOCATION: "+ device->locationUrl().toString().toLatin1() + "\r\n";
+        deviceMessage += "\r\n";
+
+        d->mSsdpQuerySocket.writeDatagram(deviceMessage, QHostAddress(QStringLiteral("239.255.255.250")), 1900);
+    }
 }
 
 void UpnpSsdpEngine::standardReceivedData()

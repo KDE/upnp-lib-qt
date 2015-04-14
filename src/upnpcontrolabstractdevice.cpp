@@ -160,8 +160,11 @@ void UpnpControlAbstractDevice::finishedDownload(QNetworkReply *reply)
                     newService->setEventURL(eventUrl);
                 }
 
-                QUrl serviceUrl(URLBase());
-                serviceUrl.setPath(newService->SCPDURL().toString());
+                QUrl serviceUrl(newService->SCPDURL().toString());
+                if (!serviceUrl.isValid() || serviceUrl.scheme().isEmpty()) {
+                    serviceUrl.setUrl(URLBase());
+                    serviceUrl.setPath(newService->SCPDURL().toString());
+                }
 
                 qobject_cast<UpnpControlAbstractService*>(newService.data())->downloadAndParseServiceDescription(serviceUrl);
                 addService(newService);

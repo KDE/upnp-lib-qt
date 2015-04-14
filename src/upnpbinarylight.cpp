@@ -38,17 +38,16 @@ BinaryLight::BinaryLight(int cacheDuration, QObject *parent)
     setDeviceType(QStringLiteral("urn:schemas-upnp-org:device:BinaryLight:1"));
     setFriendlyName(QStringLiteral("Binary Light for Test"));
     setManufacturer(QStringLiteral("Matthieu Gallien"));
-    //setManufacturerURL();
-    //setModelDescription();
+    setManufacturerURL(QUrl(QStringLiteral("https://gitlab.com/homeautomationqt/upnp-player-qt")));
+    setModelDescription(QStringLiteral("Test Device"));
     setModelName(QStringLiteral("Automatiq Binary Light"));
-    //setModelNumber();
-    //setModelURL();
-    //setSerialNumber();
+    setModelNumber(QStringLiteral("0.1"));
+    setModelURL(QUrl(QStringLiteral("https://gitlab.com/homeautomationqt/upnp-player-qt")));
+    setSerialNumber(QStringLiteral("test-0.1"));
 
     const QString &uuidString(QUuid::createUuid().toString());
     setUDN(uuidString.mid(1, uuidString.length() - 2));
-    //setUPC();
-    //setURLBase();
+    setUPC(QStringLiteral("test"));
     setCacheControl(cacheDuration);
 
     QPointer<UpnpAbstractService> switchPowerService(new UpnpSwitchPower);
@@ -58,21 +57,22 @@ BinaryLight::BinaryLight(int cacheDuration, QObject *parent)
 
     QUrl eventUrl = d->mServer.urlPrefix();
     eventUrl.setPath(QStringLiteral("/event"));
-    eventUrl.setQuery(UDN());
+    eventUrl.setQuery(UDN() + QStringLiteral("&") + switchPowerService->serviceId());
 
     QUrl controlUrl = d->mServer.urlPrefix();
     controlUrl.setPath(QStringLiteral("/control"));
-    controlUrl.setQuery(UDN());
+    controlUrl.setQuery(UDN() + QStringLiteral("&") + switchPowerService->serviceId());
 
     QUrl serviceDescriptionUrl = d->mServer.urlPrefix();
     serviceDescriptionUrl.setPath(QStringLiteral("/service.xml"));
-    serviceDescriptionUrl.setQuery(UDN());
+    serviceDescriptionUrl.setQuery(UDN() + QStringLiteral("&") + switchPowerService->serviceId());
 
     switchPowerService->setControlURL(controlUrl);
     switchPowerService->setEventURL(eventUrl);
     switchPowerService->setSCPDURL(serviceDescriptionUrl);
 
     QUrl deviceDescriptionUrl = d->mServer.urlPrefix();
+    setURLBase(d->mServer.urlPrefix().toString());
     deviceDescriptionUrl.setPath(QStringLiteral("/device.xml"));
     deviceDescriptionUrl.setQuery(UDN());
     setLocationUrl(deviceDescriptionUrl);

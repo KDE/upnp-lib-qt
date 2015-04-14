@@ -19,6 +19,13 @@
 
 #include "upnpabstractservice.h"
 
+#include <QtCore/QPointer>
+#include <QtCore/QBuffer>
+#include <QtCore/QIODevice>
+#include <QtCore/QXmlStreamWriter>
+
+#include <QtCore/QDebug>
+
 class UpnpAbstractServicePrivate
 {
 public:
@@ -34,6 +41,8 @@ public:
     QUrl mControlURL;
 
     QUrl mEventURL;
+
+    QPointer<QIODevice> mXmlDescription;
 
 };
 
@@ -105,6 +114,43 @@ void UpnpAbstractService::setEventURL(const QUrl &newEventURL)
 const QUrl &UpnpAbstractService::eventURL() const
 {
     return d->mEventURL;
+}
+
+QIODevice* UpnpAbstractService::buildAndGetXmlDescription()
+{
+    qDebug() << "UpnpAbstractService::buildAndGetXmlDescription";
+
+    if (!d->mXmlDescription) {
+        QPointer<QBuffer> newDescription(new QBuffer);
+
+        newDescription->open(QIODevice::ReadWrite);
+
+        QXmlStreamWriter insertStream(newDescription.data());
+        insertStream.setAutoFormatting(true);
+
+        insertStream.writeStartDocument();
+        insertStream.writeStartElement(QStringLiteral("scpd"));
+        insertStream.writeAttribute(QStringLiteral("xmlns"), QStringLiteral("urn:schemas-upnp-org:service-1-0"));
+        insertStream.writeStartElement(QStringLiteral("specVersion"));
+        insertStream.writeTextElement(QStringLiteral("major"), QStringLiteral("1"));
+        insertStream.writeTextElement(QStringLiteral("minor"), QStringLiteral("0"));
+        insertStream.writeEndElement();
+        insertStream.writeStartElement(QStringLiteral("actionList"));
+        insertStream.writeEndElement();
+        insertStream.writeStartElement(QStringLiteral("serviceStateTable"));
+        insertStream.writeEndElement();
+        insertStream.writeEndElement();
+
+        d->mXmlDescription = newDescription;
+
+        d->mXmlDescription->seek(0);
+
+        qDebug() << newDescription->data();
+    }
+
+    d->mXmlDescription->seek(0);
+
+    return d->mXmlDescription;
 }
 
 #include "moc_upnpabstractservice.cpp"
