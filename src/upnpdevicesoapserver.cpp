@@ -21,7 +21,7 @@
 #include "upnpabstractdevice.h"
 #include "upnpdevicesoapserverobject.h"
 
-#include <QtCore/QMap>
+#include <QtCore/QList>
 #include <QtCore/QUrl>
 
 #include <QtNetwork/QNetworkInterface>
@@ -30,7 +30,7 @@ class UpnpDeviceSoapServerPrivate
 {
 public:
 
-    QMap<QString, UpnpAbstractDevice*> mDevices;
+    QList<UpnpAbstractDevice*> mDevices;
 };
 
 UpnpDeviceSoapServer::UpnpDeviceSoapServer(QObject *parent) : KDSoapServer(parent), d(new UpnpDeviceSoapServerPrivate)
@@ -43,18 +43,15 @@ UpnpDeviceSoapServer::~UpnpDeviceSoapServer()
 
 }
 
-void UpnpDeviceSoapServer::addDevice(UpnpAbstractDevice *device)
+int UpnpDeviceSoapServer::addDevice(UpnpAbstractDevice *device)
 {
-    if (!d->mDevices.contains(device->UDN())) {
-        d->mDevices[device->UDN()] = device;
-    }
+    d->mDevices.push_back(device);
+    return d->mDevices.count() - 1;
 }
 
-void UpnpDeviceSoapServer::removeDevice(UpnpAbstractDevice *device)
+void UpnpDeviceSoapServer::removeDevice(int index)
 {
-    if (d->mDevices.contains(device->UDN())) {
-        d->mDevices.remove(device->UDN());
-    }
+    d->mDevices.removeAt(index);
 }
 
 QObject *UpnpDeviceSoapServer::createServerObject()

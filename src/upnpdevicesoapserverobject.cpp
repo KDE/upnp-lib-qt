@@ -29,14 +29,14 @@ class UpnpDeviceSoapServerObjectPrivate
 {
 public:
 
-    UpnpDeviceSoapServerObjectPrivate(QMap<QString, UpnpAbstractDevice *> &devices) : mDevices(devices)
+    UpnpDeviceSoapServerObjectPrivate(QList<UpnpAbstractDevice *> &devices) : mDevices(devices)
     {
     }
 
-    QMap<QString, UpnpAbstractDevice *> &mDevices;
+    QList<UpnpAbstractDevice *> &mDevices;
 };
 
-UpnpDeviceSoapServerObject::UpnpDeviceSoapServerObject(QMap<QString, UpnpAbstractDevice *> &devices, QObject *parent)
+UpnpDeviceSoapServerObject::UpnpDeviceSoapServerObject(QList<UpnpAbstractDevice *> &devices, QObject *parent)
     : QObject(parent), KDSoapServerObjectInterface(), d(new UpnpDeviceSoapServerObjectPrivate(devices))
 {
 }
@@ -58,16 +58,17 @@ void UpnpDeviceSoapServerObject::processRequest(const KDSoapMessage &request, KD
 
 QIODevice *UpnpDeviceSoapServerObject::processFileRequest(const QString &path, QByteArray &contentType)
 {
-    if (path.startsWith(QStringLiteral("/device.xml?"))) {
-        const QString &deviceUuid(path.right(path.length() - 12));
-        if (d->mDevices.contains(deviceUuid)) {
-            return downloadDeviceXmlDescription(d->mDevices[deviceUuid], contentType);
+    const QList<QString> &pathParts = path.split(QStringLiteral("/"));
+    if (pathParts.count() == 3 && pathParts.last() == QStringLiteral("device.xml")) {
+        const int deviceIndex = pathParts[1].toInt();
+        if (deviceIndex >= 0 && deviceIndex < d->mDevices.count()) {
+            return downloadDeviceXmlDescription(d->mDevices[deviceIndex], contentType);
         }
-    } else if (path.startsWith(QStringLiteral("/service.xml?"))) {
-        const QString &queryParameters(path.right(path.length() - 13));
-        const QList<QString> &parametersList = queryParameters.split(QStringLiteral("&"));
-        if (d->mDevices.contains(parametersList.first())) {
-            return downloadServiceXmlDescription(d->mDevices[parametersList.first()], parametersList.last(), contentType);
+    } else if (pathParts.count() == 4 && pathParts.last() == QStringLiteral("service.xml")) {
+        const int deviceIndex = pathParts[1].toInt();
+        const int serviceIndex = pathParts[2].toInt();
+        if (deviceIndex >= 0 && deviceIndex < d->mDevices.count()) {
+            return downloadServiceXmlDescription(d->mDevices[deviceIndex], serviceIndex, contentType);
         }
     }
 
@@ -86,8 +87,11 @@ void UpnpDeviceSoapServerObject::processRequestWithPath(const KDSoapMessage &req
 
 bool UpnpDeviceSoapServerObject::processCustomVerbRequest(const QByteArray &requestData, const QMap<QByteArray, QByteArray> &headers)
 {
-    Q_UNUSED(requestData);
-    Q_UNUSED(headers);
+    qDebug() << "UpnpDeviceSoapServerObject::processCustomVerbRequest" << requestData << headers;
+
+    if (headers.value("_requestType") == "SUBSCRIBE") {
+        return true;
+    }
 
     return false;
 }
@@ -101,13 +105,13 @@ QIODevice *UpnpDeviceSoapServerObject::downloadDeviceXmlDescription(UpnpAbstract
     return device->buildAndGetXmlDescription();
 }
 
-QIODevice *UpnpDeviceSoapServerObject::downloadServiceXmlDescription(UpnpAbstractDevice *device, const QString &serviceId, QByteArray &contentType)
+QIODevice *UpnpDeviceSoapServerObject::downloadServiceXmlDescription(UpnpAbstractDevice *device, const int serviceIndex, QByteArray &contentType)
 {
-    qDebug() << "UpnpDeviceSoapServerObject::downloadServiceXmlDescription" << device->UDN() << serviceId;
+    qDebug() << "UpnpDeviceSoapServerObject::downloadServiceXmlDescription" << device->UDN() << serviceIndex;
 
     contentType = "text/xml";
 
-    return device->serviceById(serviceId)->buildAndGetXmlDescription();
+    return device->serviceByIndex(serviceIndex)->buildAndGetXmlDescription();
 }
 
 #include "moc_upnpdevicesoapserverobject.cpp"

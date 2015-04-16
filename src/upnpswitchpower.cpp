@@ -72,6 +72,22 @@ UpnpSwitchPower::UpnpSwitchPower(QObject *parent) :
     getStatusAction.mArguments.push_back(getTargetResultStatus);
 
     addAction(getStatusAction);
+
+    UpnpStateVariableDescription targetStateVariable;
+    targetStateVariable.mName = QStringLiteral("Target");
+    targetStateVariable.mEvented = false;
+    targetStateVariable.mDataType = QStringLiteral("boolean");
+    targetStateVariable.mDefaultValue = QStringLiteral("0");
+
+    addStateVariable(targetStateVariable);
+
+    UpnpStateVariableDescription statusStateVariable;
+    statusStateVariable.mName = QStringLiteral("Status");
+    statusStateVariable.mEvented = true;
+    statusStateVariable.mDataType = QStringLiteral("boolean");
+    statusStateVariable.mDefaultValue = QStringLiteral("0");
+
+    addStateVariable(statusStateVariable);
 }
 
 UpnpSwitchPower::~UpnpSwitchPower()

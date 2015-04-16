@@ -23,6 +23,7 @@
 #include <KDSoapServer/KDSoapServerObjectInterface.h>
 
 #include <QObject>
+#include <QtCore/QList>
 
 class UpnpAbstractDevice;
 class UpnpDeviceSoapServerObjectPrivate;
@@ -34,7 +35,7 @@ class UpnpDeviceSoapServerObject : public QObject, public KDSoapServerObjectInte
     Q_INTERFACES(KDSoapServerObjectInterface)
 
 public:
-    UpnpDeviceSoapServerObject(QMap<QString, UpnpAbstractDevice*> &devices, QObject *parent = 0);
+    UpnpDeviceSoapServerObject(QList<UpnpAbstractDevice *> &devices, QObject *parent = 0);
 
     virtual ~UpnpDeviceSoapServerObject();
 
@@ -50,7 +51,7 @@ private:
 
     QIODevice* downloadDeviceXmlDescription(UpnpAbstractDevice *device, QByteArray &contentType);
 
-    QIODevice* downloadServiceXmlDescription(UpnpAbstractDevice *device, const QString &serviceId, QByteArray &contentType);
+    QIODevice* downloadServiceXmlDescription(UpnpAbstractDevice *device, const int serviceIndex, QByteArray &contentType);
 
     UpnpDeviceSoapServerObjectPrivate *d;
 };

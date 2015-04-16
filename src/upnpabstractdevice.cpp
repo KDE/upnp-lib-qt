@@ -92,6 +92,17 @@ UpnpAbstractService* UpnpAbstractDevice::serviceById(const QString &serviceId) c
     return result;
 }
 
+UpnpAbstractService *UpnpAbstractDevice::serviceByIndex(int serviceIndex) const
+{
+    qDebug() << "UpnpAbstractDevice::serviceByIndex" << serviceIndex;
+    if (serviceIndex < 0 || serviceIndex > d->mServices.size() - 1) {
+        return nullptr;
+    } else {
+        qDebug() << "UpnpAbstractDevice::serviceByIndex" << serviceIndex;
+        return d->mServices[serviceIndex].data();
+    }
+}
+
 QList<QPointer<UpnpAbstractService> > &UpnpAbstractDevice::services() const
 {
     return d->mServices;
@@ -308,9 +319,10 @@ QIODevice* UpnpAbstractDevice::buildAndGetXmlDescription()
     return d->mXmlDescription;
 }
 
-void UpnpAbstractDevice::addService(QPointer<UpnpAbstractService> newService)
+int UpnpAbstractDevice::addService(QPointer<UpnpAbstractService> newService)
 {
     d->mServices.push_back(newService);
+    return d->mServices.count() - 1;
 }
 
 #include "moc_upnpabstractdevice.cpp"

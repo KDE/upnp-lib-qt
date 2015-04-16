@@ -35,9 +35,9 @@ public:
 
     virtual ~UpnpDeviceSoapServer();
 
-    void addDevice(UpnpAbstractDevice *device);
+    int addDevice(UpnpAbstractDevice *device);
 
-    void removeDevice(UpnpAbstractDevice *device);
+    void removeDevice(int index);
 
     QObject* createServerObject() Q_DECL_OVERRIDE;
 

@@ -51,21 +51,18 @@ BinaryLight::BinaryLight(int cacheDuration, QObject *parent)
     setCacheControl(cacheDuration);
 
     QPointer<UpnpAbstractService> switchPowerService(new UpnpSwitchPower);
-    addService(switchPowerService);
+    const int serviceIndex = addService(switchPowerService);
 
-    d->mServer.addDevice(this);
+    const int deviceIndex = d->mServer.addDevice(this);
 
     QUrl eventUrl = d->mServer.urlPrefix();
-    eventUrl.setPath(QStringLiteral("/event"));
-    eventUrl.setQuery(UDN() + QStringLiteral("&") + switchPowerService->serviceId());
+    eventUrl.setPath(QStringLiteral("/") + QString::number(deviceIndex) + QStringLiteral("/") + QString::number(serviceIndex) + QStringLiteral("/event"));
 
     QUrl controlUrl = d->mServer.urlPrefix();
-    controlUrl.setPath(QStringLiteral("/control"));
-    controlUrl.setQuery(UDN() + QStringLiteral("&") + switchPowerService->serviceId());
+    controlUrl.setPath(QStringLiteral("/") + QString::number(deviceIndex) + QStringLiteral("/") + QString::number(serviceIndex) + QStringLiteral("/control"));
 
     QUrl serviceDescriptionUrl = d->mServer.urlPrefix();
-    serviceDescriptionUrl.setPath(QStringLiteral("/service.xml"));
-    serviceDescriptionUrl.setQuery(UDN() + QStringLiteral("&") + switchPowerService->serviceId());
+    serviceDescriptionUrl.setPath(QStringLiteral("/") + QString::number(deviceIndex) + QStringLiteral("/") + QString::number(serviceIndex) + QStringLiteral("/service.xml"));
 
     switchPowerService->setControlURL(controlUrl);
     switchPowerService->setEventURL(eventUrl);
@@ -73,8 +70,7 @@ BinaryLight::BinaryLight(int cacheDuration, QObject *parent)
 
     QUrl deviceDescriptionUrl = d->mServer.urlPrefix();
     setURLBase(d->mServer.urlPrefix().toString());
-    deviceDescriptionUrl.setPath(QStringLiteral("/device.xml"));
-    deviceDescriptionUrl.setQuery(UDN());
+    deviceDescriptionUrl.setPath(QStringLiteral("/") + QString::number(deviceIndex) + QStringLiteral("/device.xml"));
     setLocationUrl(deviceDescriptionUrl);
 }
 
