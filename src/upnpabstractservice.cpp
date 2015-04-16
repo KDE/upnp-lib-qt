@@ -47,6 +47,8 @@ public:
 
     QMap<QString, UpnpActionDescription> mActions;
 
+    QMap<QString, UpnpStateVariableDescription> mStateVariables;
+
 };
 
 UpnpAbstractService::UpnpAbstractService(QObject *parent) :
@@ -160,6 +162,41 @@ QIODevice* UpnpAbstractService::buildAndGetXmlDescription()
         insertStream.writeEndElement();
 
         insertStream.writeStartElement(QStringLiteral("serviceStateTable"));
+        for (auto itStateVariable = d->mStateVariables.begin(); itStateVariable != d->mStateVariables.end(); ++itStateVariable) {
+            insertStream.writeStartElement(QStringLiteral("stateVariable"));
+            if (itStateVariable->mEvented) {
+                insertStream.writeAttribute(QStringLiteral("sendEvents"), QStringLiteral("yes"));
+            } else {
+                insertStream.writeAttribute(QStringLiteral("sendEvents"), QStringLiteral("no"));
+            }
+            insertStream.writeTextElement(QStringLiteral("name"), itStateVariable->mName);
+            insertStream.writeTextElement(QStringLiteral("dataType"), itStateVariable->mDataType);
+            if (itStateVariable->mDefaultValue.isValid()) {
+                insertStream.writeTextElement(QStringLiteral("defaultValue"), itStateVariable->mDefaultValue.toString());
+            }
+            if (itStateVariable->mMinimumValue.isValid() && itStateVariable->mMaximumValue.isValid()
+                && itStateVariable->mStep.isValid()) {
+                insertStream.writeStartElement(QStringLiteral("allowedValueRange"));
+                if (itStateVariable->mMinimumValue.isValid()) {
+                    insertStream.writeTextElement(QStringLiteral("minimum"), itStateVariable->mMinimumValue.toString());
+                }
+                if (itStateVariable->mMaximumValue.isValid()) {
+                    insertStream.writeTextElement(QStringLiteral("maximum"), itStateVariable->mMaximumValue.toString());
+                }
+                if (itStateVariable->mStep.isValid()) {
+                    insertStream.writeTextElement(QStringLiteral("step"), itStateVariable->mStep.toString());
+                }
+                insertStream.writeEndElement();
+            }
+            if (!itStateVariable->mValueList.isEmpty()) {
+                insertStream.writeStartElement(QStringLiteral("allowedValueList"));
+                for (auto itValue = itStateVariable->mValueList.begin(); itValue != itStateVariable->mValueList.end(); ++itValue) {
+                    insertStream.writeTextElement(QStringLiteral("allowedValue"), *itValue);
+                }
+                insertStream.writeEndElement();
+            }
+            insertStream.writeEndElement();
+        }
         insertStream.writeEndElement();
         insertStream.writeEndElement();
 
@@ -183,6 +220,16 @@ void UpnpAbstractService::addAction(const UpnpActionDescription &newAction)
 const UpnpActionDescription &UpnpAbstractService::action(const QString &name) const
 {
     return d->mActions[name];
+}
+
+void UpnpAbstractService::addStateVariable(const UpnpStateVariableDescription &newVariable)
+{
+    d->mStateVariables[newVariable.mName] = newVariable;
+}
+
+const UpnpStateVariableDescription &UpnpAbstractService::stateVariable(const QString &name) const
+{
+    return d->mStateVariables[name];
 }
 
 #include "moc_upnpabstractservice.cpp"

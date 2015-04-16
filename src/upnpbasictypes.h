@@ -22,6 +22,8 @@
 
 #include <QtCore/QtGlobal>
 #include <QtCore/QString>
+#include <QtCore/QList>
+#include <QtCore/QVariant>
 
 typedef quint32 A_ARG_TYPE_InstanceID;
 
@@ -59,6 +61,27 @@ public:
     QString mName;
 
     QList<UpnpActionArgumentDescription> mArguments;
+};
+
+class UpnpStateVariableDescription
+{
+public:
+
+    QString mName;
+
+    bool mEvented;
+
+    QString mDataType;
+
+    QVariant mDefaultValue;
+
+    QVariant mMinimumValue;
+
+    QVariant mMaximumValue;
+
+    QVariant mStep;
+
+    QList<QString> mValueList;
 };
 
 #endif // UPNPBASICTYPES_H

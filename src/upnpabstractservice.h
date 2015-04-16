@@ -27,6 +27,7 @@
 
 class UpnpAbstractServicePrivate;
 class UpnpActionDescription;
+class UpnpStateVariableDescription;
 
 class UpnpAbstractService : public QObject
 {
@@ -98,6 +99,10 @@ public:
     void removeAction(const QString &name);
 
     Q_INVOKABLE const UpnpActionDescription& action(const QString &name) const;
+
+    void addStateVariable(const UpnpStateVariableDescription &newVariable);
+
+    Q_INVOKABLE const UpnpStateVariableDescription& stateVariable(const QString &name) const;
 
 Q_SIGNALS:
 
