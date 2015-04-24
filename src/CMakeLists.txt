@@ -17,6 +17,7 @@ set(upnp-player-qt_SOURCES
     upnpbinarylight.cpp
     upnpswitchpower.cpp
     upnpbasictypes.h
+    upnpeventsubscriber.cpp
     main.qml
 )
 

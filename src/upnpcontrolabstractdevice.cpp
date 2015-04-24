@@ -60,7 +60,6 @@ UpnpControlAbstractDevice::~UpnpControlAbstractDevice()
 
 void UpnpControlAbstractDevice::downloadAndParseDeviceDescription(const QUrl &deviceUrl)
 {
-    qDebug() << "UpnpControlAbstractDevice::downloadAndParseDeviceDescription" << deviceUrl;
     d->mNetworkAccess.get(QNetworkRequest(deviceUrl));
 }
 

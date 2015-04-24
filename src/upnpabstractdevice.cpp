@@ -94,11 +94,9 @@ UpnpAbstractService* UpnpAbstractDevice::serviceById(const QString &serviceId) c
 
 UpnpAbstractService *UpnpAbstractDevice::serviceByIndex(int serviceIndex) const
 {
-    qDebug() << "UpnpAbstractDevice::serviceByIndex" << serviceIndex;
     if (serviceIndex < 0 || serviceIndex > d->mServices.size() - 1) {
         return nullptr;
     } else {
-        qDebug() << "UpnpAbstractDevice::serviceByIndex" << serviceIndex;
         return d->mServices[serviceIndex].data();
     }
 }

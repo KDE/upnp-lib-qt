@@ -248,7 +248,6 @@ void UpnpControlAbstractService::eventSubscriptionTimeout()
 
 void UpnpControlAbstractService::parseEventNotification(const QString &eventName, const QString &eventValue)
 {
-    qDebug() << "one variable" << eventName << eventValue;
 }
 
 #include "moc_upnpcontrolabstractservice.cpp"

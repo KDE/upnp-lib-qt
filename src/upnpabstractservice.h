@@ -24,10 +24,12 @@
 #include <QtCore/QString>
 #include <QtCore/QVariant>
 #include <QtCore/QUrl>
+#include <QtCore/QList>
 
 class UpnpAbstractServicePrivate;
 class UpnpActionDescription;
 class UpnpStateVariableDescription;
+class UpnpEventSubscriber;
 
 class UpnpAbstractService : public QObject
 {
@@ -63,6 +65,11 @@ class UpnpAbstractService : public QObject
                WRITE setEventURL
                NOTIFY eventURLChanged)
 
+    Q_PROPERTY(int maximumSubscriptionDuration
+               READ maximumSubscriptionDuration
+               WRITE setMaximumSubscriptionDuration
+               NOTIFY maximumSubscriptionDurationChanged)
+
 public:
     explicit UpnpAbstractService(QObject *parent = 0);
 
@@ -92,7 +99,13 @@ public:
 
     const QUrl& eventURL() const;
 
+    void setMaximumSubscriptionDuration(int newValue);
+
+    int maximumSubscriptionDuration() const;
+
     QIODevice* buildAndGetXmlDescription();
+
+    QPointer<UpnpEventSubscriber> subscribeToEvents(const QByteArray &requestData, const QMap<QByteArray, QByteArray> &headers);
 
     void addAction(const UpnpActionDescription &newAction);
 
@@ -103,6 +116,8 @@ public:
     void addStateVariable(const UpnpStateVariableDescription &newVariable);
 
     Q_INVOKABLE const UpnpStateVariableDescription& stateVariable(const QString &name) const;
+
+    QList<QString> stateVariables() const;
 
 Q_SIGNALS:
 
@@ -118,9 +133,13 @@ Q_SIGNALS:
 
     void eventURLChanged(const QString &serviceId);
 
+    void maximumSubscriptionDurationChanged(const QString &serviceId);
+
 public Q_SLOTS:
 
 private:
+
+    void sendEventNotification(const QPointer<UpnpEventSubscriber> &currentSubscriber);
 
     UpnpAbstractServicePrivate *d;
 

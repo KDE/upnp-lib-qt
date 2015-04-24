@@ -25,6 +25,10 @@ class UpnpSwitchPowerPrivate
 {
 public:
 
+    UpnpSwitchPowerPrivate() : mTarget(true), mStatus(true)
+    {
+    }
+
     bool mTarget;
 
     bool mStatus;
@@ -74,7 +78,8 @@ UpnpSwitchPower::UpnpSwitchPower(QObject *parent) :
     addAction(getStatusAction);
 
     UpnpStateVariableDescription targetStateVariable;
-    targetStateVariable.mName = QStringLiteral("Target");
+    targetStateVariable.mUpnpName = QStringLiteral("Target");
+    targetStateVariable.mPropertyName = QStringLiteral("target");
     targetStateVariable.mEvented = false;
     targetStateVariable.mDataType = QStringLiteral("boolean");
     targetStateVariable.mDefaultValue = QStringLiteral("0");
@@ -82,7 +87,8 @@ UpnpSwitchPower::UpnpSwitchPower(QObject *parent) :
     addStateVariable(targetStateVariable);
 
     UpnpStateVariableDescription statusStateVariable;
-    statusStateVariable.mName = QStringLiteral("Status");
+    statusStateVariable.mUpnpName = QStringLiteral("Status");
+    statusStateVariable.mPropertyName = QStringLiteral("status");
     statusStateVariable.mEvented = true;
     statusStateVariable.mDataType = QStringLiteral("boolean");
     statusStateVariable.mDefaultValue = QStringLiteral("0");

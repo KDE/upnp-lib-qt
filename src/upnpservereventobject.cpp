@@ -63,10 +63,12 @@ void UpnpServerEventObject::processRequestWithPath(const KDSoapMessage &request,
     Q_UNUSED(path);
 }
 
-bool UpnpServerEventObject::processCustomVerbRequest(const QByteArray &requestData, const QMap<QByteArray, QByteArray> &headers)
+bool UpnpServerEventObject::processCustomVerbRequest(const QByteArray &requestData, const QMap<QByteArray, QByteArray> &headers, QByteArray &customAnswer)
 {
     if (d->mService) {
         d->mService->handleEventNotification(requestData, headers);
+
+        customAnswer = "HTTP/1.1 200 OK\r\n\r\n";
 
         return true;
     } else {

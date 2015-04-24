@@ -67,7 +67,9 @@ class UpnpStateVariableDescription
 {
 public:
 
-    QString mName;
+    QString mUpnpName;
+
+    QString mPropertyName;
 
     bool mEvented;
 

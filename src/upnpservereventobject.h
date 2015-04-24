@@ -44,7 +44,7 @@ public:
 
     void processRequestWithPath(const KDSoapMessage &request, KDSoapMessage &response, const QByteArray &soapAction, const QString &path) Q_DECL_OVERRIDE;
 
-    bool processCustomVerbRequest(const QByteArray &requestData, const QMap<QByteArray, QByteArray> &headers) Q_DECL_OVERRIDE;
+    bool processCustomVerbRequest(const QByteArray &requestData, const QMap<QByteArray, QByteArray> &headers, QByteArray &customAnswer) Q_DECL_OVERRIDE;
 
     void setService(UpnpControlAbstractService *service);
 

@@ -19,17 +19,26 @@
 
 #include "upnpabstractservice.h"
 #include "upnpbasictypes.h"
+#include "upnpeventsubscriber.h"
 
 #include <QtCore/QPointer>
 #include <QtCore/QBuffer>
 #include <QtCore/QIODevice>
 #include <QtCore/QXmlStreamWriter>
+#include <QtCore/QTimer>
 
 #include <QtCore/QDebug>
 
 class UpnpAbstractServicePrivate
 {
 public:
+
+    UpnpAbstractServicePrivate()
+        : mBaseURL(), mServiceType(), mServiceId(), mSCPDURL(), mControlURL(),
+          mEventURL(), mXmlDescription(), mActions(), mStateVariables(),
+          mSubscribers(), mMaximumSubscriptionDuration(3600)
+    {
+    }
 
     QString mBaseURL;
 
@@ -49,6 +58,9 @@ public:
 
     QMap<QString, UpnpStateVariableDescription> mStateVariables;
 
+    QList<QPointer<UpnpEventSubscriber> > mSubscribers;
+
+    int mMaximumSubscriptionDuration;
 };
 
 UpnpAbstractService::UpnpAbstractService(QObject *parent) :
@@ -121,10 +133,19 @@ const QUrl &UpnpAbstractService::eventURL() const
     return d->mEventURL;
 }
 
+void UpnpAbstractService::setMaximumSubscriptionDuration(int newValue)
+{
+    d->mMaximumSubscriptionDuration = newValue;
+    Q_EMIT maximumSubscriptionDurationChanged(d->mServiceId);
+}
+
+int UpnpAbstractService::maximumSubscriptionDuration() const
+{
+    return d->mMaximumSubscriptionDuration;
+}
+
 QIODevice* UpnpAbstractService::buildAndGetXmlDescription()
 {
-    qDebug() << "UpnpAbstractService::buildAndGetXmlDescription";
-
     if (!d->mXmlDescription) {
         QPointer<QBuffer> newDescription(new QBuffer);
 
@@ -169,7 +190,7 @@ QIODevice* UpnpAbstractService::buildAndGetXmlDescription()
             } else {
                 insertStream.writeAttribute(QStringLiteral("sendEvents"), QStringLiteral("no"));
             }
-            insertStream.writeTextElement(QStringLiteral("name"), itStateVariable->mName);
+            insertStream.writeTextElement(QStringLiteral("name"), itStateVariable->mUpnpName);
             insertStream.writeTextElement(QStringLiteral("dataType"), itStateVariable->mDataType);
             if (itStateVariable->mDefaultValue.isValid()) {
                 insertStream.writeTextElement(QStringLiteral("defaultValue"), itStateVariable->mDefaultValue.toString());
@@ -199,17 +220,37 @@ QIODevice* UpnpAbstractService::buildAndGetXmlDescription()
         }
         insertStream.writeEndElement();
         insertStream.writeEndElement();
+        insertStream.writeEndDocument();
 
         d->mXmlDescription = newDescription;
-
-        d->mXmlDescription->seek(0);
-
-        qDebug() << newDescription->data();
     }
 
     d->mXmlDescription->seek(0);
 
     return d->mXmlDescription;
+}
+
+QPointer<UpnpEventSubscriber> UpnpAbstractService::subscribeToEvents(const QByteArray &requestData, const QMap<QByteArray, QByteArray> &headers)
+{
+    QPointer<UpnpEventSubscriber> newSubscriber(new UpnpEventSubscriber);
+
+    const QByteArray &rawCallBackAddress = headers["callback"];
+    newSubscriber->setCallback(QUrl(QString::fromLatin1(rawCallBackAddress.mid(1, rawCallBackAddress.length() - 2))));
+
+    const QByteArray &rawTimeout = headers["timeout"];
+    bool conversionIsOk = false;
+    newSubscriber->setSecondTimeout(rawTimeout.right(rawTimeout.length() - 7).toInt(&conversionIsOk));
+    if (!conversionIsOk || rawTimeout == "Second-infinite") {
+        newSubscriber->setSecondTimeout(d->mMaximumSubscriptionDuration);
+    }
+
+    newSubscriber->setUpnpService(this);
+
+    d->mSubscribers.push_back(newSubscriber);
+
+    sendEventNotification(newSubscriber);
+
+    return newSubscriber;
 }
 
 void UpnpAbstractService::addAction(const UpnpActionDescription &newAction)
@@ -224,12 +265,22 @@ const UpnpActionDescription &UpnpAbstractService::action(const QString &name) co
 
 void UpnpAbstractService::addStateVariable(const UpnpStateVariableDescription &newVariable)
 {
-    d->mStateVariables[newVariable.mName] = newVariable;
+    d->mStateVariables[newVariable.mUpnpName] = newVariable;
 }
 
 const UpnpStateVariableDescription &UpnpAbstractService::stateVariable(const QString &name) const
 {
     return d->mStateVariables[name];
+}
+
+QList<QString> UpnpAbstractService::stateVariables() const
+{
+    return d->mStateVariables.keys();
+}
+
+void UpnpAbstractService::sendEventNotification(const QPointer<UpnpEventSubscriber> &currentSubscriber)
+{
+    QTimer::singleShot(0, currentSubscriber.data(), SLOT(sendEventNotification()));
 }
 
 #include "moc_upnpabstractservice.cpp"

@@ -104,9 +104,6 @@ bool UpnpSsdpEngine::searchAllUpnpDevice()
 
 void UpnpSsdpEngine::publishDevice(UpnpAbstractDevice *device)
 {
-    // location
-    qDebug() << "UpnpSsdpEngine::publishDevice" << device->locationUrl();
-
     QByteArray allDiscoveryMessageCommonContent;
 
     allDiscoveryMessageCommonContent += "NOTIFY * HTTP/1.1\r\n";
