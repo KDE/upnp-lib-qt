@@ -147,15 +147,21 @@ void UpnpControlAbstractDevice::finishedDownload(QNetworkReply *reply)
 
                 const QDomNode &controlURLNode = serviceNode.firstChildElement(QStringLiteral("controlURL"));
                 if (!controlURLNode.isNull()) {
-                    QUrl controlUrl(URLBase());
-                    controlUrl.setPath(controlURLNode.toElement().text());
+                    QUrl controlUrl(controlURLNode.toElement().text());
+                    if (!controlUrl.isValid() || controlUrl.scheme().isEmpty()) {
+                        controlUrl = QUrl(URLBase());
+                        controlUrl.setPath(controlURLNode.toElement().text());
+                    }
                     newService->setControlURL(controlUrl);
                 }
 
                 const QDomNode &eventSubURLNode = serviceNode.firstChildElement(QStringLiteral("eventSubURL"));
                 if (!eventSubURLNode.isNull()) {
-                    QUrl eventUrl(URLBase());
-                    eventUrl.setPath(eventSubURLNode.toElement().text());
+                    QUrl eventUrl(eventSubURLNode.toElement().text());
+                    if (!eventUrl.isValid() || eventUrl.scheme().isEmpty()) {
+                        eventUrl = QUrl(URLBase());
+                        eventUrl.setPath(eventSubURLNode.toElement().text());
+                    }
                     newService->setEventURL(eventUrl);
                 }
 
