@@ -26,6 +26,8 @@
 #include <QtCore/QIODevice>
 #include <QtCore/QXmlStreamWriter>
 #include <QtCore/QTimer>
+#include <QtCore/QMetaObject>
+#include <QtCore/QMetaProperty>
 
 #include <QtCore/QDebug>
 
@@ -232,6 +234,8 @@ QIODevice* UpnpAbstractService::buildAndGetXmlDescription()
 
 QPointer<UpnpEventSubscriber> UpnpAbstractService::subscribeToEvents(const QByteArray &requestData, const QMap<QByteArray, QByteArray> &headers)
 {
+    Q_UNUSED(requestData);
+
     QPointer<UpnpEventSubscriber> newSubscriber(new UpnpEventSubscriber);
 
     const QByteArray &rawCallBackAddress = headers["callback"];
@@ -244,9 +248,23 @@ QPointer<UpnpEventSubscriber> UpnpAbstractService::subscribeToEvents(const QByte
         newSubscriber->setSecondTimeout(d->mMaximumSubscriptionDuration);
     }
 
-    newSubscriber->setUpnpService(this);
+    int signalIndex = -1;
+    for (int i = 0; i < newSubscriber->metaObject()->methodCount(); ++i) {
+        if (newSubscriber->metaObject()->method(i).name() == "notifyPropertyChange") {
+            signalIndex = i;
+            break;
+        }
+    }
 
-    d->mSubscribers.push_back(newSubscriber);
+    if (signalIndex != -1) {
+        newSubscriber->setUpnpService(this);
+        d->mSubscribers.push_back(newSubscriber);
+        for (const UpnpStateVariableDescription &currentStateVariable : d->mStateVariables) {
+            if (currentStateVariable.mEvented) {
+                connect(this, metaObject()->property(currentStateVariable.mPropertyIndex).notifySignal(), newSubscriber, newSubscriber->metaObject()->method(signalIndex));
+            }
+        }
+    }
 
     sendEventNotification(newSubscriber);
 
@@ -263,6 +281,11 @@ const UpnpActionDescription &UpnpAbstractService::action(const QString &name) co
     return d->mActions[name];
 }
 
+QList<QString> UpnpAbstractService::actions() const
+{
+    return d->mActions.keys();
+}
+
 void UpnpAbstractService::addStateVariable(const UpnpStateVariableDescription &newVariable)
 {
     d->mStateVariables[newVariable.mUpnpName] = newVariable;
@@ -276,6 +299,12 @@ const UpnpStateVariableDescription &UpnpAbstractService::stateVariable(const QSt
 QList<QString> UpnpAbstractService::stateVariables() const
 {
     return d->mStateVariables.keys();
+}
+
+void UpnpAbstractService::invokeAction(const QString &actionName, const QList<QVariant> &arguments)
+{
+    Q_UNUSED(actionName);
+    Q_UNUSED(arguments);
 }
 
 void UpnpAbstractService::sendEventNotification(const QPointer<UpnpEventSubscriber> &currentSubscriber)

@@ -124,7 +124,56 @@ void UpnpEventSubscriber::sendEventNotification()
         if (currentStateVariable.mEvented) {
             insertStream.writeStartElement(QStringLiteral("urn:schemas-upnp-org:event-1-0"), QStringLiteral("property"));
 
-            const QVariant &propertyValue(d->mUpnpService->property(currentStateVariable.mPropertyName.toLatin1().constData()));
+            const QVariant &propertyValue(d->mUpnpService->property(currentStateVariable.mPropertyName.constData()));
+            if (propertyValue.canConvert<bool>()) {
+                insertStream.writeTextElement(itVariable, propertyValue.toBool() ? QStringLiteral("1") : QStringLiteral("0"));
+            } else {
+                insertStream.writeTextElement(itVariable, propertyValue.toString());
+            }
+
+            insertStream.writeEndElement();
+        }
+    }
+    insertStream.writeEndElement();
+    insertStream.writeEndDocument();
+    requestBody->seek(0);
+
+    QNetworkReply *replyHandler = d->mNetworkAccess.sendCustomRequest(newRequest, "NOTIFY", requestBody.data());
+    connect(replyHandler, &QNetworkReply::finished, this, &UpnpEventSubscriber::eventingFinished);
+
+    d->mSentBuffer = requestBody;
+}
+
+void UpnpEventSubscriber::notifyPropertyChange(const QString &serviceId, const QByteArray &propertyName)
+{
+    Q_UNUSED(serviceId);
+
+    qDebug() << "UpnpEventSubscriber::notifyPropertyChange";
+
+    QNetworkRequest newRequest(d->mCallback);
+    newRequest.setHeader(QNetworkRequest::ContentTypeHeader, QByteArray("text/xml"));
+    newRequest.setRawHeader("NT", "upnp:event");
+    newRequest.setRawHeader("NTS", "upnp:propchange");
+    QString sidHeader = QStringLiteral("uuid:") + d->mUuid;
+    newRequest.setRawHeader("SID", sidHeader.toLatin1());
+    newRequest.setRawHeader("SEQ", QByteArray::number(d->mSequenceCounter));
+
+    QPointer<QBuffer> requestBody(new QBuffer);
+    requestBody->open(QIODevice::ReadWrite);
+
+    QXmlStreamWriter insertStream(requestBody.data());
+    insertStream.setAutoFormatting(true);
+
+    insertStream.writeStartDocument(QStringLiteral("1.0"));
+    insertStream.writeNamespace(QStringLiteral("urn:schemas-upnp-org:event-1-0"), QStringLiteral("e"));
+    insertStream.writeStartElement(QStringLiteral("urn:schemas-upnp-org:event-1-0"), QStringLiteral("propertyset"));
+    const QList<QString> &allStateVariables(d->mUpnpService->stateVariables());
+    for(const QString &itVariable : allStateVariables) {
+        const UpnpStateVariableDescription &currentStateVariable(d->mUpnpService->stateVariable(itVariable));
+        if (currentStateVariable.mEvented && currentStateVariable.mPropertyName == propertyName) {
+            insertStream.writeStartElement(QStringLiteral("urn:schemas-upnp-org:event-1-0"), QStringLiteral("property"));
+
+            const QVariant &propertyValue(d->mUpnpService->property(currentStateVariable.mPropertyName.constData()));
             if (propertyValue.canConvert<bool>()) {
                 insertStream.writeTextElement(itVariable, propertyValue.toBool() ? QStringLiteral("1") : QStringLiteral("0"));
             } else {

@@ -21,6 +21,10 @@
 
 #include "upnpbasictypes.h"
 
+#include <QtCore/QDebug>
+#include <QtCore/QMetaObject>
+#include <QtCore/QMetaProperty>
+
 class UpnpSwitchPowerPrivate
 {
 public:
@@ -79,7 +83,15 @@ UpnpSwitchPower::UpnpSwitchPower(QObject *parent) :
 
     UpnpStateVariableDescription targetStateVariable;
     targetStateVariable.mUpnpName = QStringLiteral("Target");
-    targetStateVariable.mPropertyName = QStringLiteral("target");
+    targetStateVariable.mPropertyName = "target";
+
+    for (int propertyIndex = 0; propertyIndex < metaObject()->propertyCount(); ++propertyIndex) {
+        if (metaObject()->property(propertyIndex).name() == targetStateVariable.mPropertyName) {
+            targetStateVariable.mPropertyIndex = propertyIndex;
+            break;
+        }
+    }
+
     targetStateVariable.mEvented = false;
     targetStateVariable.mDataType = QStringLiteral("boolean");
     targetStateVariable.mDefaultValue = QStringLiteral("0");
@@ -88,7 +100,15 @@ UpnpSwitchPower::UpnpSwitchPower(QObject *parent) :
 
     UpnpStateVariableDescription statusStateVariable;
     statusStateVariable.mUpnpName = QStringLiteral("Status");
-    statusStateVariable.mPropertyName = QStringLiteral("status");
+    statusStateVariable.mPropertyName = "status";
+
+    for (int propertyIndex = 0; propertyIndex < metaObject()->propertyCount(); ++propertyIndex) {
+        if (metaObject()->property(propertyIndex).name() == statusStateVariable.mPropertyName) {
+            statusStateVariable.mPropertyIndex = propertyIndex;
+            break;
+        }
+    }
+
     statusStateVariable.mEvented = true;
     statusStateVariable.mDataType = QStringLiteral("boolean");
     statusStateVariable.mDefaultValue = QStringLiteral("0");
@@ -114,12 +134,50 @@ bool UpnpSwitchPower::target() const
 void UpnpSwitchPower::setStatus(bool value)
 {
     d->mStatus = value;
-    Q_EMIT statusChanged(serviceId());
+    Q_EMIT statusChanged(serviceId(), "status");
 }
 
 bool UpnpSwitchPower::status() const
 {
     return d->mStatus;
+}
+
+void UpnpSwitchPower::invokeAction(const QString &actionName, const QList<QVariant> &arguments)
+{
+    if (actionName == QStringLiteral("GetStatus")) {
+        getStatusAction();
+    }
+
+    if (actionName == QStringLiteral("SetTarget")) {
+        if (!arguments.first().canConvert<bool>()) {
+            qDebug() << "invalid type for argument";
+        }
+
+        setTargetAction(arguments.first().toBool());
+    }
+
+    if (actionName == QStringLiteral("GetTarget")) {
+        getTargetAction();
+    }
+}
+
+void UpnpSwitchPower::setTargetAction(bool newValue)
+{
+    qDebug() << "call setTargetAction";
+    d->mStatus = newValue;
+    d->mTarget = newValue;
+
+    Q_EMIT statusChanged(serviceId(), "status");
+}
+
+void UpnpSwitchPower::getTargetAction()
+{
+    qDebug() << "call getTargetAction";
+}
+
+void UpnpSwitchPower::getStatusAction()
+{
+    qDebug() << "call getStatusAction";
 }
 
 #include "moc_upnpswitchpower.cpp"

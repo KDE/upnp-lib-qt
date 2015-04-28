@@ -52,11 +52,19 @@ public:
 
     bool status() const;
 
+    void invokeAction(const QString &actionName, const QList<QVariant> &arguments) Q_DECL_OVERRIDE;
+
 Q_SIGNALS:
 
-    void statusChanged(const QString &serviceId);
+    void statusChanged(const QString &serviceId, const QByteArray &propertyName);
 
 public Q_SLOTS:
+
+    void setTargetAction(bool newValue);
+
+    void getTargetAction();
+
+    void getStatusAction();
 
 private:
 

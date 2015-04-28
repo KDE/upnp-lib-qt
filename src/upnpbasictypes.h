@@ -71,7 +71,9 @@ public:
 
     QString mUpnpName;
 
-    QString mPropertyName;
+    QByteArray mPropertyName;
+
+    int mPropertyIndex;
 
     bool mEvented;
 

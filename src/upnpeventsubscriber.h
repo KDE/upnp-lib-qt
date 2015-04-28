@@ -55,6 +55,8 @@ public Q_SLOTS:
 
     void sendEventNotification();
 
+    void notifyPropertyChange(const QString &serviceId, const QByteArray &propertyName);
+
 private Q_SLOTS:
 
     void eventingFinished();
