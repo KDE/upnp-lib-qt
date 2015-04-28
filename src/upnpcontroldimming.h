@@ -20,6 +20,8 @@
 #ifndef UPNPCONTROLDIMMING_H
 #define UPNPCONTROLDIMMING_H
 
+#include "upnpQt_export.h"
+
 #include "upnpcontrolabstractservice.h"
 #include "upnpbasictypes.h"
 

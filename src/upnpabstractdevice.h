@@ -20,6 +20,8 @@
 #ifndef UPNPABSTRACTDEVICE_H
 #define UPNPABSTRACTDEVICE_H
 
+#include "upnpQt_export.h"
+
 #include <QtCore/QObject>
 #include <QtCore/QPointer>
 #include <QtCore/QList>
@@ -28,7 +30,7 @@ class UpnpAbstractService;
 class UpnpAbstractDevicePrivate;
 class QIODevice;
 
-class UpnpAbstractDevice : public QObject
+class UPNPQT_EXPORT UpnpAbstractDevice : public QObject
 {
     Q_OBJECT
 

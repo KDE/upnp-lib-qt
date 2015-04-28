@@ -20,6 +20,8 @@
 #ifndef UPNPABSTRACTSERVICE_H
 #define UPNPABSTRACTSERVICE_H
 
+#include "upnpQt_export.h"
+
 #include <QtCore/QObject>
 #include <QtCore/QString>
 #include <QtCore/QVariant>
@@ -31,7 +33,7 @@ class UpnpActionDescription;
 class UpnpStateVariableDescription;
 class UpnpEventSubscriber;
 
-class UpnpAbstractService : public QObject
+class UPNPQT_EXPORT UpnpAbstractService : public QObject
 {
     Q_OBJECT
 

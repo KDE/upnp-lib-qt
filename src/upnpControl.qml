@@ -43,10 +43,6 @@ ApplicationWindow {
         }
     }
 
-    BinaryLight {
-        id: light1
-    }
-
     Component {
         id: rowDelegate
         Item {
@@ -122,7 +118,7 @@ ApplicationWindow {
                 anchors.right: statusLabel.left
 
                 onClicked: {
-                    if (upnpService == undefined) upnpService = deviceModel.getDeviceDescription(model.uuid).serviceById('urn:upnp-org:serviceId:SwitchPower:1')
+                    if (upnpService == undefined) upnpService = deviceModel.getDeviceDescription(model.uuid).serviceById('urn:upnp-org:serviceId:SwitchPower')
                     if (upnpService != undefined) upnpService.setTarget(statusLabel.text != 'on')
                 }
             }
@@ -134,7 +130,7 @@ ApplicationWindow {
                 anchors.right: setTargetButton.left
 
                 onClicked: {
-                    if (upnpService == undefined) upnpService = deviceModel.getDeviceDescription(model.uuid).serviceById('urn:upnp-org:serviceId:SwitchPower:1')
+                    if (upnpService == undefined) upnpService = deviceModel.getDeviceDescription(model.uuid).serviceById('urn:upnp-org:serviceId:SwitchPower')
                     if (upnpService != undefined) upnpService.getTarget()
                 }
             }
@@ -146,7 +142,7 @@ ApplicationWindow {
                 anchors.right: getTargetButton.left
 
                 onClicked: {
-                    if (upnpService == undefined) upnpService = deviceModel.getDeviceDescription(model.uuid).serviceById('urn:upnp-org:serviceId:SwitchPower:1')
+                    if (upnpService == undefined) upnpService = deviceModel.getDeviceDescription(model.uuid).serviceById('urn:upnp-org:serviceId:SwitchPower')
                     if (upnpService != undefined) upnpService.getStatus()
                 }
             }
@@ -158,7 +154,7 @@ ApplicationWindow {
                 anchors.right: getStatusButton.left
 
                 onClicked: {
-                    if (upnpService == undefined) upnpService = deviceModel.getDeviceDescription(model.uuid).serviceById('urn:upnp-org:serviceId:SwitchPower:1')
+                    if (upnpService == undefined) upnpService = deviceModel.getDeviceDescription(model.uuid).serviceById('urn:upnp-org:serviceId:SwitchPower')
                     if (upnpService != undefined) upnpService.subscribeEvents(600)
                 }
             }
@@ -185,7 +181,7 @@ ApplicationWindow {
         }
     }
 
-    /*StackView {
+    StackView {
         id: stackView
         anchors.fill: parent
 
@@ -236,15 +232,6 @@ ApplicationWindow {
                     movable: false
                 }
             }
-        }
-    }*/
-    Button {
-        id: publishLigth
-        text: "Publish Light"
-        anchors.fill: parent
-
-        onClicked: {
-            mySsdpEngine.publishDevice(light1);
         }
     }
 }

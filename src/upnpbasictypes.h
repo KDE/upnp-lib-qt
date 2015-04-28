@@ -20,6 +20,8 @@
 #ifndef UPNPBASICTYPES_H
 #define UPNPBASICTYPES_H
 
+#include "upnpQt_export.h"
+
 #include <QtCore/QtGlobal>
 #include <QtCore/QString>
 #include <QtCore/QList>

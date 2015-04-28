@@ -20,6 +20,8 @@
 #ifndef UPNPSWITCHPOWER_H
 #define UPNPSWITCHPOWER_H
 
+#include "upnpQt_export.h"
+
 #include "upnpabstractservice.h"
 
 class UpnpSwitchPowerPrivate;

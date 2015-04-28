@@ -20,6 +20,8 @@
 #ifndef UPNPDEVICEMODEL_H
 #define UPNPDEVICEMODEL_H
 
+#include "upnpQt_export.h"
+
 #include <QAbstractListModel>
 
 class UpnpDeviceModelPrivate;
@@ -27,7 +29,7 @@ class UpnpSsdpEngine;
 class UpnpControlAbstractDevice;
 struct UpnpDiscoveryResult;
 
-class UpnpDeviceModel : public QAbstractListModel
+class UPNPQT_EXPORT UpnpDeviceModel : public QAbstractListModel
 {
     Q_OBJECT
 

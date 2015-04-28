@@ -20,12 +20,14 @@
 #ifndef UPNPCONTROLSWITCHPOWER_H
 #define UPNPCONTROLSWITCHPOWER_H
 
+#include "upnpQt_export.h"
+
 #include "upnpcontrolabstractservice.h"
 #include "upnpbasictypes.h"
 
 class UpnpControlSwitchPowerPrivate;
 
-class UpnpControlSwitchPower : public UpnpControlAbstractService
+class UPNPQT_EXPORT UpnpControlSwitchPower : public UpnpControlAbstractService
 {
     Q_OBJECT
 

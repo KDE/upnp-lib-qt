@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Matthieu Gallien <matthieu_gallien@yahoo.fr>
+ * Copyright 2014 Matthieu Gallien <matthieu_gallien@yahoo.fr>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -17,23 +17,34 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#ifndef UPNPCONTROLRENDERINGCONTROL_H
-#define UPNPCONTROLRENDERINGCONTROL_H
+import QtQuick 2.2
+import QtQuick.Window 2.1
+import QtQuick.Controls 1.2
+import QtQuick.Controls.Styles 1.2
+import org.mgallien.QmlExtension 1.0
 
-#include "upnpQt_export.h"
+ApplicationWindow {
+    visible: true
+    minimumWidth: 150
+    minimumHeight: 100
+    title: 'upnp'
+    id: mainWindow
 
-#include <QObject>
+    UpnpSsdpEngine {
+        id: mySsdpEngine
+    }
 
-class UpnpControlRenderingControl : public QObject
-{
-    Q_OBJECT
-public:
-    explicit UpnpControlRenderingControl(QObject *parent = 0);
-    ~UpnpControlRenderingControl();
+    BinaryLight {
+        id: light1
+    }
 
-Q_SIGNALS:
+    Button {
+        id: publishLigth
+        text: "Publish Light"
+        anchors.fill: parent
 
-public Q_SLOTS:
-};
-
-#endif // UPNPCONTROLRENDERINGCONTROL_H
+        onClicked: {
+            mySsdpEngine.publishDevice(light1);
+        }
+    }
+}

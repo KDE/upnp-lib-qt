@@ -20,6 +20,8 @@
 #ifndef UPNPCONTROLAVTRANSPORT_H
 #define UPNPCONTROLAVTRANSPORT_H
 
+#include "upnpQt_export.h"
+
 #include "upnpcontrolabstractservice.h"
 #include "upnpbasictypes.h"
 

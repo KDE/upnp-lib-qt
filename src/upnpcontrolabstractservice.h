@@ -20,6 +20,8 @@
 #ifndef UPNPABSTRACTSERVICEDESCRIPTION_H
 #define UPNPABSTRACTSERVICEDESCRIPTION_H
 
+#include "upnpQt_export.h"
+
 #include <KDSoapClient/KDSoapPendingCall.h>
 
 #include <QtCore/QObject>
@@ -34,7 +36,7 @@ class UpnpAbstractServiceDescriptionPrivate;
 class QNetworkReply;
 class QHostInfo;
 
-class UpnpControlAbstractService : public UpnpAbstractService
+class UPNPQT_EXPORT UpnpControlAbstractService : public UpnpAbstractService
 {
     Q_OBJECT
 

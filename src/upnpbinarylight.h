@@ -20,13 +20,15 @@
 #ifndef UPNPBINARYLIGHT_H
 #define UPNPBINARYLIGHT_H
 
+#include "upnpQt_export.h"
+
 #include "upnpabstractdevice.h"
 
 #include <QtCore/QUrl>
 
 class BinaryLightPrivate;
 
-class BinaryLight : public UpnpAbstractDevice
+class UPNPQT_EXPORT BinaryLight : public UpnpAbstractDevice
 {
     Q_OBJECT
 public:

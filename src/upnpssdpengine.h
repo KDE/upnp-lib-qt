@@ -20,6 +20,8 @@
 #ifndef UPNPSSDPENGINE_H
 #define UPNPSSDPENGINE_H
 
+#include "upnpQt_export.h"
+
 #include <QObject>
 
 enum class NotificationSubType
@@ -63,7 +65,7 @@ Q_DECLARE_METATYPE(UpnpDiscoveryResult)
 class UpnpAbstractDevice;
 class UpnpSsdpEnginePrivate;
 
-class UpnpSsdpEngine : public QObject
+class UPNPQT_EXPORT UpnpSsdpEngine : public QObject
 {
     Q_OBJECT
 public:

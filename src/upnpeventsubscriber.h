@@ -20,6 +20,8 @@
 #ifndef UPNPEVENTSUBSCRIBER_H
 #define UPNPEVENTSUBSCRIBER_H
 
+#include "upnpQt_export.h"
+
 #include <QtCore/QObject>
 #include <QtCore/QUrl>
 #include <QtCore/QString>

@@ -15,7 +15,13 @@ find_package(Qt5 ${REQUIRED_QT_VERSION} CONFIG REQUIRED Core Network Quick Widge
 find_package(KDSoap CONFIG REQUIRED)
 
 include(FeatureSummary)
+include(GenerateExportHeader)
 include(ECMSetupVersion)
+include(ECMGenerateHeaders)
+
+ecm_setup_version(0.1.0 VARIABLE_PREFIX UPNP_QT
+                        VERSION_HEADER "${CMAKE_CURRENT_BINARY_DIR}/upnpQt_version.h"
+                        PACKAGE_VERSION_FILE "${CMAKE_CURRENT_BINARY_DIR}/UpnpQtConfigVersion.cmake")
 
 add_subdirectory(src)
 

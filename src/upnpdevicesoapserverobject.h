@@ -20,6 +20,8 @@
 #ifndef UPNPDEVICESOAPSERVEROBJECT_H
 #define UPNPDEVICESOAPSERVEROBJECT_H
 
+#include "upnpQt_export.h"
+
 #include <KDSoapServer/KDSoapServerObjectInterface.h>
 
 #include <QObject>
