@@ -33,6 +33,7 @@
 #include <QtCore/QString>
 #include <QtCore/QDateTime>
 #include <QtCore/QSysInfo>
+#include <QtCore/QPair>
 
 class UpnpDeviceSoapServerObjectPrivate
 {
@@ -95,6 +96,7 @@ void UpnpDeviceSoapServerObject::processRequestWithPath(const KDSoapMessage &req
     const QList<QString> &pathParts = path.split(QStringLiteral("/"));
     if (pathParts.count() != 4 || pathParts.last() != QStringLiteral("control")) {
         response.setFault(true);
+        return;
     }
 
     const int deviceIndex = pathParts[1].toInt();
@@ -102,51 +104,83 @@ void UpnpDeviceSoapServerObject::processRequestWithPath(const KDSoapMessage &req
 
     if (deviceIndex < 0 || deviceIndex >= d->mDevices.count()) {
         response.setFault(true);
+        return;
     }
     UpnpAbstractDevice *currentDevice = d->mDevices[deviceIndex];
 
     if (serviceIndex < 0 || serviceIndex >= currentDevice->services().count()) {
         response.setFault(true);
+        return;
     }
     UpnpAbstractService *currentService = currentDevice->serviceByIndex(serviceIndex);
 
     const QList<QByteArray> &soapActionParts = soapAction.split('#');
     if (soapActionParts.size() != 2 || soapActionParts.first() != currentService->serviceType().toLatin1()) {
         response.setFault(true);
+        return;
     }
+
     const QByteArray &actionName = soapActionParts.last();
     const QString &actionNameString = QString::fromLatin1(actionName);
 
+    response = KDSoapValue(actionNameString + QStringLiteral("Response"), QVariant(), currentService->serviceType());
+
     const KDSoapValueList &allArguments(request.arguments());
-    qDebug() << "allArguments" << allArguments;
     const UpnpActionDescription &currentAction = currentService->action(actionNameString);
+    qDebug() << "allArguments" << allArguments << "action arguments" << currentAction.mNumberInArgument;
 
     QList<QVariant> checkedArguments;
     bool argumentError = false;
 
-    for (int i = 0; !argumentError; ++i) {
-        if (i < allArguments.size() && i < currentAction.mArguments.size()) {
-            if (allArguments[i].name() == currentAction.mArguments[i].mName) {
-                checkedArguments.push_back(allArguments[i].value());
+    for (int argumentIndexMessage = 0, actionArgumentIndex = 0; !argumentError; ) {
+        if (actionArgumentIndex >= currentAction.mArguments.size()) {
+            break;
+        }
+        if (currentAction.mArguments[actionArgumentIndex].mDirection == UpnpArgumentDirection::Out) {
+            ++actionArgumentIndex;
+            continue;
+        }
+        if (argumentIndexMessage < allArguments.size() && argumentIndexMessage < currentAction.mNumberInArgument) {
+            if (allArguments[argumentIndexMessage].name() == currentAction.mArguments[argumentIndexMessage].mName) {
+                checkedArguments.push_back(allArguments[argumentIndexMessage].value());
             } else {
                 qDebug() << "invalid argument";
                 argumentError = true;
             }
         } else {
-            if (i == currentAction.mArguments.size() && i == allArguments.size()) {
+            if (argumentIndexMessage == currentAction.mNumberInArgument && argumentIndexMessage == allArguments.size()) {
                 break;
             }
 
-            if (i < currentAction.mArguments.size()) {
+            if (argumentIndexMessage < currentAction.mNumberInArgument) {
                 qDebug() << "missing arguments";
             }
             argumentError = true;
         }
+        ++argumentIndexMessage;
+        ++actionArgumentIndex;
     }
+
     if (argumentError) {
         qDebug() << "error about arguments";
+        response.setFault(true);
+        return;
     } else {
-        currentService->invokeAction(actionNameString, checkedArguments);
+        bool actionCallIsInError = false;
+
+        const QList<QPair<QString, QVariant> > &returnedValues(currentService->invokeAction(actionNameString, checkedArguments, actionCallIsInError));
+
+        if (actionCallIsInError) {
+            response.setFault(true);
+            return;
+        } else {
+            response.setFault(false);
+        }
+
+        response.setType(currentService->serviceType(), actionNameString + QStringLiteral("Response"));
+        for (const QPair<QString, QVariant> &oneValue : returnedValues) {
+            response.addArgument(oneValue.first, oneValue.second);
+        }
     }
 }
 

@@ -301,10 +301,13 @@ QList<QString> UpnpAbstractService::stateVariables() const
     return d->mStateVariables.keys();
 }
 
-void UpnpAbstractService::invokeAction(const QString &actionName, const QList<QVariant> &arguments)
+QList<QPair<QString, QVariant> > UpnpAbstractService::invokeAction(const QString &actionName, const QList<QVariant> &arguments, bool &isInError)
 {
     Q_UNUSED(actionName);
     Q_UNUSED(arguments);
+    Q_UNUSED(isInError);
+
+    return {};
 }
 
 void UpnpAbstractService::sendEventNotification(const QPointer<UpnpEventSubscriber> &currentSubscriber)

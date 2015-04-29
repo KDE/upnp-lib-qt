@@ -54,6 +54,8 @@ UpnpSwitchPower::UpnpSwitchPower(QObject *parent) :
     setTargetNewValue.mDirection = UpnpArgumentDirection::In;
     setTargetNewValue.mRelatedStateVariable = QStringLiteral("Target");
     setTargetAction.mArguments.push_back(setTargetNewValue);
+    setTargetAction.mNumberInArgument = 1;
+    setTargetAction.mNumberOutArgument = 0;
 
     addAction(setTargetAction);
 
@@ -66,6 +68,8 @@ UpnpSwitchPower::UpnpSwitchPower(QObject *parent) :
     getTargetRetTargetValue.mDirection = UpnpArgumentDirection::Out;
     getTargetRetTargetValue.mRelatedStateVariable = QStringLiteral("Target");
     getTargetAction.mArguments.push_back(getTargetRetTargetValue);
+    getTargetAction.mNumberInArgument = 0;
+    getTargetAction.mNumberOutArgument = 1;
 
     addAction(getTargetAction);
 
@@ -78,6 +82,8 @@ UpnpSwitchPower::UpnpSwitchPower(QObject *parent) :
     getTargetResultStatus.mDirection = UpnpArgumentDirection::Out;
     getTargetResultStatus.mRelatedStateVariable = QStringLiteral("Status");
     getStatusAction.mArguments.push_back(getTargetResultStatus);
+    getStatusAction.mNumberInArgument = 0;
+    getStatusAction.mNumberOutArgument = 1;
 
     addAction(getStatusAction);
 
@@ -142,10 +148,14 @@ bool UpnpSwitchPower::status() const
     return d->mStatus;
 }
 
-void UpnpSwitchPower::invokeAction(const QString &actionName, const QList<QVariant> &arguments)
+QList<QPair<QString, QVariant> > UpnpSwitchPower::invokeAction(const QString &actionName, const QList<QVariant> &arguments, bool &isInError)
 {
     if (actionName == QStringLiteral("GetStatus")) {
-        getStatusAction();
+        const QList<QPair<QString, QVariant> > &returnValues(getStatusAction());
+
+        isInError = false;
+
+        return returnValues;
     }
 
     if (actionName == QStringLiteral("SetTarget")) {
@@ -153,31 +163,50 @@ void UpnpSwitchPower::invokeAction(const QString &actionName, const QList<QVaria
             qDebug() << "invalid type for argument";
         }
 
-        setTargetAction(arguments.first().toBool());
+        const QList<QPair<QString, QVariant> > &returnValues(setTargetAction(arguments.first().toBool()));
+
+        isInError = false;
+
+        return returnValues;
     }
 
     if (actionName == QStringLiteral("GetTarget")) {
-        getTargetAction();
+        const QList<QPair<QString, QVariant> > &returnValues(getTargetAction());
+
+        isInError = false;
+
+        return returnValues;
     }
+
+    isInError = true;
+    return {};
 }
 
-void UpnpSwitchPower::setTargetAction(bool newValue)
+QList<QPair<QString, QVariant> > UpnpSwitchPower::setTargetAction(bool newValue)
 {
     qDebug() << "call setTargetAction";
     d->mStatus = newValue;
     d->mTarget = newValue;
 
     Q_EMIT statusChanged(serviceId(), "status");
+
+    qDebug() << "call setTargetAction" << d->mStatus;
+
+    return {};
 }
 
-void UpnpSwitchPower::getTargetAction()
+QList<QPair<QString, QVariant> > UpnpSwitchPower::getTargetAction()
 {
     qDebug() << "call getTargetAction";
+
+    return {{QStringLiteral("RetTargetValue"), d->mTarget}};
 }
 
-void UpnpSwitchPower::getStatusAction()
+QList<QPair<QString, QVariant> > UpnpSwitchPower::getStatusAction()
 {
     qDebug() << "call getStatusAction";
+
+    return {{QStringLiteral("ResultStatus"), d->mStatus}};
 }
 
 #include "moc_upnpswitchpower.cpp"

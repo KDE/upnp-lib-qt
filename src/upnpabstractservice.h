@@ -27,6 +27,7 @@
 #include <QtCore/QVariant>
 #include <QtCore/QUrl>
 #include <QtCore/QList>
+#include <QtCore/QPair>
 
 class UpnpAbstractServicePrivate;
 class UpnpActionDescription;
@@ -121,7 +122,7 @@ public:
 
     QList<QString> stateVariables() const;
 
-    virtual void invokeAction(const QString &actionName, const QList<QVariant> &arguments);
+    virtual QList<QPair<QString, QVariant> > invokeAction(const QString &actionName, const QList<QVariant> &arguments, bool &isInError);
 
 Q_SIGNALS:
 

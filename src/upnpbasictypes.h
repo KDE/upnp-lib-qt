@@ -63,6 +63,10 @@ public:
     QString mName;
 
     QList<UpnpActionArgumentDescription> mArguments;
+
+    int mNumberInArgument;
+
+    int mNumberOutArgument;
 };
 
 class UpnpStateVariableDescription

@@ -52,7 +52,7 @@ public:
 
     bool status() const;
 
-    void invokeAction(const QString &actionName, const QList<QVariant> &arguments) Q_DECL_OVERRIDE;
+    QList<QPair<QString, QVariant> > invokeAction(const QString &actionName, const QList<QVariant> &arguments, bool &isInError) Q_DECL_OVERRIDE;
 
 Q_SIGNALS:
 
@@ -60,11 +60,11 @@ Q_SIGNALS:
 
 public Q_SLOTS:
 
-    void setTargetAction(bool newValue);
+    QList<QPair<QString, QVariant> > setTargetAction(bool newValue);
 
-    void getTargetAction();
+    QList<QPair<QString, QVariant> > getTargetAction();
 
-    void getStatusAction();
+    QList<QPair<QString, QVariant> > getStatusAction();
 
 private:
 
