@@ -22,6 +22,8 @@
 
 #include "upnpQt_export.h"
 
+#include <QtNetwork/QNetworkReply>
+
 #include <QtCore/QObject>
 #include <QtCore/QUrl>
 #include <QtCore/QString>
@@ -60,6 +62,8 @@ public Q_SLOTS:
 private Q_SLOTS:
 
     void eventingFinished();
+
+    void eventingInErrorFinished(QNetworkReply::NetworkError code);
 
 private:
 

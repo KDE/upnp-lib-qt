@@ -140,6 +140,7 @@ void UpnpEventSubscriber::sendEventNotification()
 
     QNetworkReply *replyHandler = d->mNetworkAccess.sendCustomRequest(newRequest, "NOTIFY", requestBody.data());
     connect(replyHandler, &QNetworkReply::finished, this, &UpnpEventSubscriber::eventingFinished);
+    connect(replyHandler, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(eventingInErrorFinished(QNetworkReply::NetworkError)));
 
     d->mSentBuffer = requestBody;
 }
@@ -147,8 +148,6 @@ void UpnpEventSubscriber::sendEventNotification()
 void UpnpEventSubscriber::notifyPropertyChange(const QString &serviceId, const QByteArray &propertyName)
 {
     Q_UNUSED(serviceId);
-
-    qDebug() << "UpnpEventSubscriber::notifyPropertyChange";
 
     QNetworkRequest newRequest(d->mCallback);
     newRequest.setHeader(QNetworkRequest::ContentTypeHeader, QByteArray("text/xml"));
@@ -188,12 +187,20 @@ void UpnpEventSubscriber::notifyPropertyChange(const QString &serviceId, const Q
     requestBody->seek(0);
 
     QNetworkReply *replyHandler = d->mNetworkAccess.sendCustomRequest(newRequest, "NOTIFY", requestBody.data());
+
     connect(replyHandler, &QNetworkReply::finished, this, &UpnpEventSubscriber::eventingFinished);
 
     d->mSentBuffer = requestBody;
+    d->mSentBuffer->seek(0);
+    qDebug() << "UpnpEventSubscriber::notifyPropertyChange" << d->mSentBuffer->data();
 }
 
 void UpnpEventSubscriber::eventingFinished()
+{
+    d->mSentBuffer.clear();
+}
+
+void UpnpEventSubscriber::eventingInErrorFinished(QNetworkReply::NetworkError code)
 {
     d->mSentBuffer.clear();
 }

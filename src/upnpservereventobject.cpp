@@ -68,7 +68,7 @@ bool UpnpServerEventObject::processCustomVerbRequest(const QByteArray &requestDa
     if (d->mService) {
         d->mService->handleEventNotification(requestData, headers);
 
-        customAnswer = "HTTP/1.1 200 OK\r\n\r\n";
+        customAnswer = "HTTP/1.1 200 OK\r\nContent-Length: 0\r\nContent-Type: text/html\r\n\r\n";
 
         return true;
     } else {
