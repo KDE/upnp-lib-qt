@@ -182,6 +182,11 @@ QList<QPair<QString, QVariant> > UpnpSwitchPower::invokeAction(const QString &ac
     return {};
 }
 
+void UpnpSwitchPower::switchTarget()
+{
+    setTargetAction(!target());
+}
+
 QList<QPair<QString, QVariant> > UpnpSwitchPower::setTargetAction(bool newValue)
 {
     qDebug() << "call setTargetAction";

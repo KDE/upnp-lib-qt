@@ -60,6 +60,8 @@ Q_SIGNALS:
 
 public Q_SLOTS:
 
+    void switchTarget();
+
     QList<QPair<QString, QVariant> > setTargetAction(bool newValue);
 
     QList<QPair<QString, QVariant> > getTargetAction();

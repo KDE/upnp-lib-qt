@@ -41,10 +41,26 @@ ApplicationWindow {
     Button {
         id: publishLigth
         text: "Publish Light"
-        anchors.fill: parent
+        anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.right: parent.right
+        height: 40
 
         onClicked: {
             mySsdpEngine.publishDevice(light1);
+        }
+    }
+
+    Button {
+        id: switchLigth
+        text: "Switch Light"
+        anchors.top: publishLigth.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        height: 40
+
+        onClicked: {
+            light1.serviceById('urn:upnp-org:serviceId:SwitchPower').switchTarget();
         }
     }
 }
