@@ -19,6 +19,7 @@
 
 #include "upnpabstractdevice.h"
 #include "upnpabstractservice.h"
+#include "upnpssdpengine.h"
 
 #include <QtCore/QBuffer>
 #include <QtCore/QIODevice>
@@ -315,6 +316,26 @@ QIODevice* UpnpAbstractDevice::buildAndGetXmlDescription()
     d->mXmlDescription->seek(0);
 
     return d->mXmlDescription;
+}
+
+void UpnpAbstractDevice::newSearchQuery(UpnpSsdpEngine *engine, const UpnpSearchQuery &searchQuery)
+{
+    qDebug() << "UpnpAbstractDevice::newSearchQuery" << "search for" << searchQuery.mSearchTarget;
+    switch(searchQuery.mSearchTargetType)
+    {
+    case SearchTargetType::All:
+        qDebug() << "UpnpAbstractDevice::newSearchQuery" << "publish";
+        engine->publishDevice(this);
+        break;
+    case SearchTargetType::RootDevice:
+        break;
+    case SearchTargetType::DeviceUUID:
+        break;
+    case SearchTargetType::DeviceType:
+        break;
+    case SearchTargetType::ServiceType:
+        break;
+    }
 }
 
 int UpnpAbstractDevice::addService(QPointer<UpnpAbstractService> newService)

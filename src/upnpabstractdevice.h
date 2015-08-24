@@ -29,6 +29,8 @@
 class UpnpAbstractService;
 class UpnpAbstractDevicePrivate;
 class QIODevice;
+class UpnpSearchQuery;
+class UpnpSsdpEngine;
 
 class UPNPQT_EXPORT UpnpAbstractDevice : public QObject
 {
@@ -240,6 +242,8 @@ Q_SIGNALS:
     void locationUrlChanged(const QString &UDN);
 
 public Q_SLOTS:
+
+    void newSearchQuery(UpnpSsdpEngine *engine, const UpnpSearchQuery &searchQuery);
 
 protected:
 

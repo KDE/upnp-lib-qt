@@ -35,13 +35,6 @@
 #include <sys/types.h>          /* Consultez NOTES */
 #include <sys/socket.h>
 
-enum class SsdpMessageType
-{
-    query,
-    queryAnswer,
-    announce,
-};
-
 class UpnpSsdpEnginePrivate
 {
 public:
@@ -100,6 +93,12 @@ bool UpnpSsdpEngine::searchAllUpnpDevice()
     auto result = d->mSsdpQuerySocket.writeDatagram(allDiscoveryMessage, QHostAddress(QStringLiteral("239.255.255.250")), 1900);
 
     return result != -1;
+}
+
+void UpnpSsdpEngine::subscribeDevice(UpnpAbstractDevice *device)
+{
+    connect(this, &UpnpSsdpEngine::newSearchQuery, device, &UpnpAbstractDevice::newSearchQuery);
+    publishDevice(device);
 }
 
 void UpnpSsdpEngine::publishDevice(UpnpAbstractDevice *device)
@@ -178,26 +177,74 @@ void UpnpSsdpEngine::queryReceivedData()
     }
 }
 
-void UpnpSsdpEngine::parseSsdpDatagram(const QByteArray &datagram)
+void UpnpSsdpEngine::parseSsdpQueryDatagram(const QByteArray &datagram, const QList<QByteArray> &headers)
 {
-    const QList<QByteArray> &headers(datagram.split('\n'));
+    UpnpSearchQuery newSearch;
+    bool hasAddress = false;
+    bool hasAnswerDelay = false;
+    bool hasSearchTarget = false;
 
-    if (!headers.last().isEmpty()) {
-        return;
-    }
+    for (QList<QByteArray>::const_iterator itLine = headers.begin(); itLine != headers.end(); ++itLine) {
+        if (itLine->startsWith("HOST")) {
+            QString hostName;
+            if ((*itLine)[4] == ' ') {
+                hostName = QString::fromLatin1(itLine->mid(7, itLine->length() - 8));
+            } else {
+                hostName = QString::fromLatin1(itLine->mid(6, itLine->length() - 7));
+            }
+            auto addressParts = hostName.split(QStringLiteral(":"));
+            newSearch.mSearchHostAddress.setAddress(addressParts.first());
+            newSearch.mSearchHostPort = addressParts.last().toInt();
+            hasAddress = true;
+        }
+        if (itLine->startsWith("MAN")) {
+            if (!itLine->contains("\"ssdp:discover\"")) {
+                qDebug() << "not valid" << datagram;
+                return;
+            }
+        }
+        if (itLine->startsWith("MX")) {
+            if ((*itLine)[2] == ' ') {
+                newSearch.mAnswerDelay = QString::fromLatin1(itLine->mid(4, itLine->length() - 5)).toInt();
+            } else {
+                newSearch.mAnswerDelay = QString::fromLatin1(itLine->mid(3, itLine->length() - 4)).toInt();
+            }
+            hasAnswerDelay = true;
+        }
+        if (itLine->startsWith("ST")) {
+            if ((*itLine)[2] == ' ') {
+                newSearch.mSearchTarget = QString::fromLatin1(itLine->mid(5, itLine->length() - 6));
+            } else {
+                newSearch.mSearchTarget = QString::fromLatin1(itLine->mid(4, itLine->length() - 5));
+            }
+            if (newSearch.mSearchTarget.startsWith(QStringLiteral("ssdp:all"))) {
+                newSearch.mSearchTargetType = SearchTargetType::All;
+            } else if (newSearch.mSearchTarget.startsWith(QStringLiteral("upnp:rootdevice"))) {
+                newSearch.mSearchTargetType = SearchTargetType::RootDevice;
+            } else if (newSearch.mSearchTarget.startsWith(QStringLiteral("uuid:"))) {
+                newSearch.mSearchTargetType = SearchTargetType::DeviceUUID;
+            } else if (newSearch.mSearchTarget.startsWith(QStringLiteral("urn:"))) {
+                if (newSearch.mSearchTarget.contains(QStringLiteral("device:"))) {
+                    newSearch.mSearchTargetType = SearchTargetType::DeviceType;
+                } else if (newSearch.mSearchTarget.contains(QStringLiteral("service:"))) {
+                    newSearch.mSearchTargetType = SearchTargetType::ServiceType;
+                }
+            }
+            hasSearchTarget = true;
+        }
 
-    SsdpMessageType messageType;
+        if (hasAddress && hasAnswerDelay && hasSearchTarget) {
+            qDebug() << "search host" << newSearch.mSearchHostAddress << newSearch.mSearchHostPort;
+            qDebug() << "answer delay" << newSearch.mAnswerDelay;
+            qDebug() << "search target" << newSearch.mSearchTarget;
 
-    if (headers[0].startsWith("M-SEARCH * HTTP/1.1")) {
-        messageType = SsdpMessageType::query;
+            Q_EMIT newSearchQuery(this, newSearch);
+        }
     }
-    if (headers[0].startsWith("HTTP/1.1 200 OK\r")) {
-        messageType = SsdpMessageType::queryAnswer;
-    }
-    if (headers[0].startsWith("NOTIFY * HTTP/1.1")) {
-        messageType = SsdpMessageType::announce;
-    }
+}
 
+void UpnpSsdpEngine::parseSsdpAnnounceDatagram(const QByteArray &datagram, const QList<QByteArray> &headers, SsdpMessageType messageType)
+{
     UpnpDiscoveryResult newDiscovery;
     newDiscovery.mNTS = NotificationSubType::Invalid;
 
@@ -315,7 +362,7 @@ void UpnpSsdpEngine::parseSsdpDatagram(const QByteArray &datagram)
             qDebug() << "ErrCode:" << searchResult->ErrCode;
             qDebug() << "Expires:" << searchResult->Expires;
             qDebug() << "DestAddr:" << QHostAddress(reinterpret_cast<const sockaddr *>(&searchResult->DestAddr));
-    #endif
+#endif
         }
 
         (*itDiscovery)[newDiscovery.mNT] = newDiscovery;
@@ -334,6 +381,36 @@ void UpnpSsdpEngine::parseSsdpDatagram(const QByteArray &datagram)
 
             d->mDiscoveryResults.erase(itDiscovery);
         }
+    }
+}
+
+void UpnpSsdpEngine::parseSsdpDatagram(const QByteArray &datagram)
+{
+    const QList<QByteArray> &headers(datagram.split('\n'));
+
+    if (!headers.last().isEmpty()) {
+        return;
+    }
+
+    SsdpMessageType messageType;
+
+    if (headers[0].startsWith("M-SEARCH * HTTP/1.1")) {
+        messageType = SsdpMessageType::query;
+    }
+    if (headers[0].startsWith("HTTP/1.1 200 OK\r")) {
+        messageType = SsdpMessageType::queryAnswer;
+    }
+    if (headers[0].startsWith("NOTIFY * HTTP/1.1")) {
+        messageType = SsdpMessageType::announce;
+    }
+
+    if (messageType == SsdpMessageType::query) {
+        parseSsdpQueryDatagram(datagram, headers);
+    } else if (messageType == SsdpMessageType::announce || messageType == SsdpMessageType::queryAnswer) {
+        parseSsdpAnnounceDatagram(datagram, headers, messageType);
+    } else {
+        qDebug() << "not decoded" << datagram;
+        return;
     }
 }
 

@@ -22,7 +22,8 @@
 
 #include "upnpQt_export.h"
 
-#include <QObject>
+#include <QtCore/QObject>
+#include <QtNetwork/QHostAddress>
 
 enum class NotificationSubType
 {
@@ -30,6 +31,50 @@ enum class NotificationSubType
     Alive,
     ByeBye,
     Discover,
+};
+
+enum class SearchTargetType
+{
+    All,
+    RootDevice,
+    DeviceUUID,
+    DeviceType,
+    ServiceType,
+};
+
+enum class SsdpMessageType
+{
+    query,
+    queryAnswer,
+    announce,
+};
+
+struct UpnpSearchQuery
+{
+    /**
+     * @brief mSearchHostAddress is the host address to which we should answer
+     */
+    QHostAddress mSearchHostAddress;
+
+    /**
+     * @brief mSearchHostPort is the host port to which we should answer
+     */
+    quint16 mSearchHostPort;
+
+    /**
+     * @brief mSearchTargetType is the search target type as defined by enum SearchTargetType
+     */
+    SearchTargetType mSearchTargetType;
+
+    /**
+     * @brief mSearchTarget is the search target string that we should use when determining if we should answer
+     */
+    QString mSearchTarget;
+
+    /**
+     * @brief mAnswerDelay is the delay defined by UPnP SSDP that will be interpreted as the maximum delay before sending the answer
+     */
+    int mAnswerDelay;
 };
 
 struct UpnpDiscoveryResult
@@ -75,6 +120,8 @@ public:
 
 Q_SIGNALS:
 
+    void newSearchQuery(UpnpSsdpEngine *engine, const UpnpSearchQuery &searchQuery);
+
     void newService(const UpnpDiscoveryResult &serviceDiscovery);
 
     void removedService(const UpnpDiscoveryResult &serviceDiscovery);
@@ -85,6 +132,8 @@ public Q_SLOTS:
      * @brief searchAllUpnpDevice will trigger a search for all upnp device
      */
     bool searchAllUpnpDevice();
+
+    void subscribeDevice(UpnpAbstractDevice *device);
 
     void publishDevice(UpnpAbstractDevice *device);
 
@@ -97,6 +146,10 @@ private Q_SLOTS:
 private:
 
     void parseSsdpDatagram(const QByteArray &datagram);
+
+    void parseSsdpQueryDatagram(const QByteArray &datagram, const QList<QByteArray> &headers);
+
+    void parseSsdpAnnounceDatagram(const QByteArray &datagram, const QList<QByteArray> &headers, SsdpMessageType messageType);
 
     UpnpSsdpEnginePrivate *d;
 };
