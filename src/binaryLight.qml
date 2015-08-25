@@ -30,12 +30,20 @@ ApplicationWindow {
     title: 'upnp'
     id: mainWindow
 
-    UpnpSsdpEngine {
-        id: mySsdpEngine
-    }
+    Item {
+        id: upnpLight1
 
-    BinaryLight {
-        id: light1
+        UpnpSsdpEngine {
+            id: mySsdpEngine
+        }
+
+        BinaryLight {
+            id: light1
+        }
+
+        Component.onCompleted: {
+            mySsdpEngine.subscribeDevice(light1)
+        }
     }
 
     Button {
