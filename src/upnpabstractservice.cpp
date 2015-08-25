@@ -271,6 +271,11 @@ QPointer<UpnpEventSubscriber> UpnpAbstractService::subscribeToEvents(const QByte
     return newSubscriber;
 }
 
+void UpnpAbstractService::unsubscribeToEvents(const QByteArray &requestData, const QMap<QByteArray, QByteArray> &headers)
+{
+    qDebug() << "UpnpAbstractService::unsubscribeToEvents" << requestData;
+}
+
 void UpnpAbstractService::addAction(const UpnpActionDescription &newAction)
 {
     d->mActions[newAction.mName] = newAction;

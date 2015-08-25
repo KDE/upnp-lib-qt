@@ -110,6 +110,8 @@ public:
 
     QPointer<UpnpEventSubscriber> subscribeToEvents(const QByteArray &requestData, const QMap<QByteArray, QByteArray> &headers);
 
+    void unsubscribeToEvents(const QByteArray &requestData, const QMap<QByteArray, QByteArray> &headers);
+
     void addAction(const UpnpActionDescription &newAction);
 
     Q_INVOKABLE const UpnpActionDescription& action(const QString &name) const;

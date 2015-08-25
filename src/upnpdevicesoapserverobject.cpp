@@ -208,6 +208,28 @@ bool UpnpDeviceSoapServerObject::processCustomVerbRequest(const QByteArray &requ
                 }
             }
         }
+    } else if (headers.value("_requestType") == "UNSUBSCRIBE") {
+        const QString &path = QString::fromLatin1(headers.value("_path"));
+        const QList<QString> &pathParts = path.split(QStringLiteral("/"));
+        if (pathParts.count() == 4 && pathParts.last() == QStringLiteral("event")) {
+            const int deviceIndex = pathParts[1].toInt();
+            const int serviceIndex = pathParts[2].toInt();
+            if (deviceIndex >= 0 && deviceIndex < d->mDevices.count()) {
+                UpnpAbstractDevice *currentDevice = d->mDevices[deviceIndex];
+                if (serviceIndex >= 0 && serviceIndex < currentDevice->services().count()) {
+                    currentDevice->serviceByIndex(serviceIndex)->unsubscribeToEvents(requestData, headers);
+
+                    customAnswer  = "HTTP/1.1 200 OK\r\n";
+                    customAnswer += "DATE: " + QDateTime::currentDateTime().toString(QStringLiteral("ddd, d MMM yyyy HH:mm:ss t")).toLatin1() + "\r\n";
+                    //customAnswer += "SID: uuid:" + newSubscriber->uuid().toLatin1() + "\r\n";
+                    customAnswer += "SERVER: " + QSysInfo::kernelType().toLatin1() + " " + QSysInfo::kernelVersion().toLatin1() + " UPnP/1.0 test/1.0\r\n";
+                    //customAnswer += "TIMEOUT:Second-" + QByteArray::number(newSubscriber->secondTimeout()) + "\r\n";
+                    customAnswer += "\r\n";
+
+                    return true;
+                }
+            }
+        }
     } else {
         qDebug() << "UpnpDeviceSoapServerObject::processCustomVerbRequest" << requestData << headers;
     }
