@@ -102,6 +102,7 @@ target_link_libraries(binaryLight
 set(upnpControl_SOURCES
     upnpControl.cpp
     upnpControl.qml
+    mediaServer.qml
 )
 
 add_executable(upnpControl ${upnpControl_SOURCES})

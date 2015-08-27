@@ -75,7 +75,12 @@ ApplicationWindow {
                 anchors.rightMargin: 2
                 anchors.leftMargin: 2
                 color: styleData.textColor
-                text: {if (model != undefined) model.name ; if (model == undefined) ""}
+                text: {
+                    if (model != undefined)
+                        model.name
+                    else
+                        ""
+                }
                 horizontalAlignment: Text.AlignLeft
                 verticalAlignment: Text.AlignVCenter
                 height: 30
@@ -95,6 +100,10 @@ ApplicationWindow {
                 verticalAlignment: Text.AlignVCenter
                 height: 15
                 visible: styleData.selected
+                onVisibleChanged: {
+                    if (visible)
+                        deviceControlLoader.setSource(model.viewName, { 'aDevice' : deviceModel.getDeviceDescription(model.uuid)})
+                }
             }
             Label {
                 id: statusLabel
@@ -181,57 +190,38 @@ ApplicationWindow {
         }
     }
 
-    StackView {
-        id: stackView
-        anchors.fill: parent
-
-        delegate: StackViewDelegate {
-            function transitionFinished(properties)
-            {
-                properties.exitItem.opacity = 1
-            }
-
-            pushTransition: StackViewTransition {
-                PropertyAnimation {
-                    target: enterItem
-                    property: "opacity"
-                    from: 0
-                    to: 1
-                }
-                PropertyAnimation {
-                    target: exitItem
-                    property: "opacity"
-                    from: 1
-                    to: 0
-                }
-            }
+    TableView {
+        id: peersView
+        model: deviceModel
+        itemDelegate: deviceDelegate
+        rowDelegate: rowDelegate
+        anchors.left: parent.left
+        anchors.top: parent.top
+        anchors.bottom: parent.bottom
+        width: 500
+        headerVisible: false
+        TableViewColumn
+        {
+            width: peersView.width - 4
+            resizable: false
+            movable: false
         }
 
-        // Implements back key navigation
-        focus: true
-        Keys.onReleased: if (event.key === Qt.Key_Back && stackView.depth > 1) {
+        onSelectionChanged:
+        {
 
-                             stackView.pop();
-                             event.accepted = true;
-                         }
+        }
+    }
+    Item {
+        id: deviceControl
+        anchors.left: peersView.right
+        anchors.right: parent.right
+        anchors.top: parent.top
+        anchors.bottom: parent.bottom
 
-        initialItem: Item {
-            width: parent.width
-            height: parent.height
-            TableView {
-                id: peersView
-                model: deviceModel
-                itemDelegate: deviceDelegate
-                rowDelegate: rowDelegate
-                anchors.fill: parent
-                headerVisible: false
-                TableViewColumn
-                {
-                    width: peersView.width - 2
-                    resizable: false
-                    movable: false
-                }
-            }
+        Loader {
+            anchors.fill: parent
+            id: deviceControlLoader
         }
     }
 }
