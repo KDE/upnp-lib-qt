@@ -58,6 +58,11 @@ UpnpControlAbstractDevice::~UpnpControlAbstractDevice()
     delete d;
 }
 
+QString UpnpControlAbstractDevice::viewName() const
+{
+    return QStringLiteral("genericDevice.qml");
+}
+
 void UpnpControlAbstractDevice::downloadAndParseDeviceDescription(const QUrl &deviceUrl)
 {
     d->mNetworkAccess.get(QNetworkRequest(deviceUrl));

@@ -40,6 +40,8 @@ public:
 
     ~UpnpControlAbstractDevice();
 
+    virtual QString viewName() const;
+
 Q_SIGNALS:
 
     void inError();
