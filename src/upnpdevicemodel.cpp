@@ -20,6 +20,7 @@
 #include "upnpdevicemodel.h"
 #include "upnpssdpengine.h"
 #include "upnpcontrolabstractdevice.h"
+#include "upnpcontrolmediaserver.h"
 
 #include <QtCore/QHash>
 #include <QtCore/QString>
@@ -159,7 +160,11 @@ void UpnpDeviceModel::newDevice(const UpnpDiscoveryResult &deviceDiscovery)
 
         d->mAllHostsUUID.push_back(decodedUdn);
         d->mAllHosts[decodedUdn] = deviceDiscovery;
-        d->mAllHostsDescription[decodedUdn] = new UpnpControlAbstractDevice;
+        if (deviceDiscovery.mNT == QStringLiteral("urn:schemas-upnp-org:device:MediaServer:1")) {
+            d->mAllHostsDescription[decodedUdn] = new UpnpControlMediaServer;
+        } else {
+            d->mAllHostsDescription[decodedUdn] = new UpnpControlAbstractDevice;
+        }
         d->mAllHostsDescription[decodedUdn]->setUDN(decodedUdn);
         connect(d->mAllHostsDescription[decodedUdn].data(), &UpnpControlAbstractDevice::inError, this, &UpnpDeviceModel::deviceInError);
 

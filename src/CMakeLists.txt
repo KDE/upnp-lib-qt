@@ -10,6 +10,7 @@ set(upnpQt_SOURCES
     upnpcontrolavtransport.cpp
     upnpcontrolswitchpower.cpp
     upnpcontroldimming.cpp
+    upnpcontrolconnectionmanager.cpp
     upnpdevicemodel.cpp
     upnpabstractdevice.cpp
     upnpabstractservice.cpp
@@ -19,6 +20,7 @@ set(upnpQt_SOURCES
     upnpswitchpower.cpp
     upnpbasictypes.h
     upnpeventsubscriber.cpp
+    upnpcontrolmediaserver.cpp
 )
 
 ecm_generate_headers(
