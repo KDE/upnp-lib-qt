@@ -144,12 +144,11 @@ UpnpControlAbstractDevice *UpnpDeviceModel::getDeviceDescription(const QString &
 
 void UpnpDeviceModel::newDevice(const UpnpDiscoveryResult &deviceDiscovery)
 {
-    if (!d->mAllHostsUUID.contains(deviceDiscovery.mUSN)) {
+    const QString &deviceUuid = deviceDiscovery.mUSN.mid(5, 36);
+    if (!d->mAllHostsUUID.contains(deviceUuid) && deviceDiscovery.mNT.startsWith(QStringLiteral("urn:schemas-upnp-org:device:"))) {
         beginInsertRows(QModelIndex(), d->mAllHostsUUID.size(), d->mAllHostsUUID.size());
 
-        auto usnParts = deviceDiscovery.mUSN.splitRef(QStringLiteral("::"));
-
-        const QString &decodedUdn(usnParts.first().toString());
+        const QString &decodedUdn(deviceUuid);
 
         d->mAllHostsUUID.push_back(decodedUdn);
         d->mAllHosts[decodedUdn] = deviceDiscovery;

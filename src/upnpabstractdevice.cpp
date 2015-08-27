@@ -109,8 +109,9 @@ QList<QPointer<UpnpAbstractService> > &UpnpAbstractDevice::services() const
 
 void UpnpAbstractDevice::setUDN(const QString &value)
 {
+    d->mDeviceUUID = value.mid(5);
     d->mUDN = value;
-    Q_EMIT UDNChanged(d->mUDN);
+    Q_EMIT UDNChanged(d->mDeviceUUID);
 }
 
 const QString &UpnpAbstractDevice::UDN() const
@@ -121,7 +122,7 @@ const QString &UpnpAbstractDevice::UDN() const
 void UpnpAbstractDevice::setUPC(const QString &value)
 {
     d->mUPC = value;
-    Q_EMIT UPCChanged(d->mUDN);
+    Q_EMIT UPCChanged(d->mDeviceUUID);
 }
 
 const QString &UpnpAbstractDevice::UPC() const
@@ -132,7 +133,7 @@ const QString &UpnpAbstractDevice::UPC() const
 void UpnpAbstractDevice::setDeviceType(const QString &value)
 {
     d->mDeviceType = value;
-    Q_EMIT deviceTypeChanged(d->mUDN);
+    Q_EMIT deviceTypeChanged(d->mDeviceUUID);
 }
 
 const QString &UpnpAbstractDevice::deviceType() const
@@ -143,7 +144,7 @@ const QString &UpnpAbstractDevice::deviceType() const
 void UpnpAbstractDevice::setFriendlyName(const QString &value)
 {
     d->mFriendlyName = value;
-    Q_EMIT friendlyNameChanged(d->mUDN);
+    Q_EMIT friendlyNameChanged(d->mDeviceUUID);
 }
 
 const QString &UpnpAbstractDevice::friendlyName() const
@@ -154,7 +155,7 @@ const QString &UpnpAbstractDevice::friendlyName() const
 void UpnpAbstractDevice::setManufacturer(const QString &value)
 {
     d->mManufacturer = value;
-    Q_EMIT manufacturerChanged(d->mUDN);
+    Q_EMIT manufacturerChanged(d->mDeviceUUID);
 }
 
 const QString &UpnpAbstractDevice::manufacturer() const
@@ -165,7 +166,7 @@ const QString &UpnpAbstractDevice::manufacturer() const
 void UpnpAbstractDevice::setManufacturerURL(const QUrl &value)
 {
     d->mManufacturerURL = value;
-    Q_EMIT manufacturerURLChanged(d->mUDN);
+    Q_EMIT manufacturerURLChanged(d->mDeviceUUID);
 }
 
 const QUrl &UpnpAbstractDevice::manufacturerURL() const
@@ -176,7 +177,7 @@ const QUrl &UpnpAbstractDevice::manufacturerURL() const
 void UpnpAbstractDevice::setModelDescription(const QString &value)
 {
     d->mModelDescription = value;
-    Q_EMIT modelDescriptionChanged(d->mUDN);
+    Q_EMIT modelDescriptionChanged(d->mDeviceUUID);
 }
 
 const QString &UpnpAbstractDevice::modelDescription() const
@@ -187,7 +188,7 @@ const QString &UpnpAbstractDevice::modelDescription() const
 void UpnpAbstractDevice::setModelName(const QString &value)
 {
     d->mModelName = value;
-    Q_EMIT modelNameChanged(d->mUDN);
+    Q_EMIT modelNameChanged(d->mDeviceUUID);
 }
 
 const QString &UpnpAbstractDevice::modelName() const
@@ -198,7 +199,7 @@ const QString &UpnpAbstractDevice::modelName() const
 void UpnpAbstractDevice::setModelNumber(const QString &value)
 {
     d->mModelNumber = value;
-    Q_EMIT modelNumberChanged(d->mUDN);
+    Q_EMIT modelNumberChanged(d->mDeviceUUID);
 }
 
 const QString &UpnpAbstractDevice::modelNumber() const
@@ -209,7 +210,7 @@ const QString &UpnpAbstractDevice::modelNumber() const
 void UpnpAbstractDevice::setModelURL(const QUrl &value)
 {
     d->mModelURL = value;
-    Q_EMIT modelURLChanged(d->mUDN);
+    Q_EMIT modelURLChanged(d->mDeviceUUID);
 }
 
 const QUrl &UpnpAbstractDevice::modelURL() const
@@ -220,7 +221,7 @@ const QUrl &UpnpAbstractDevice::modelURL() const
 void UpnpAbstractDevice::setSerialNumber(const QString &value)
 {
     d->mSerialNumber = value;
-    Q_EMIT serialNumberChanged(d->mUDN);
+    Q_EMIT serialNumberChanged(d->mDeviceUUID);
 }
 
 const QString &UpnpAbstractDevice::serialNumber() const
@@ -231,7 +232,7 @@ const QString &UpnpAbstractDevice::serialNumber() const
 void UpnpAbstractDevice::setURLBase(const QString &value)
 {
     d->mURLBase = value;
-    Q_EMIT URLBaseChanged(d->mUDN);
+    Q_EMIT URLBaseChanged(d->mDeviceUUID);
 }
 
 const QString &UpnpAbstractDevice::URLBase() const
@@ -242,7 +243,7 @@ const QString &UpnpAbstractDevice::URLBase() const
 void UpnpAbstractDevice::setCacheControl(int value)
 {
     d->mCacheControl = value;
-    Q_EMIT cacheControlChanged(d->mUDN);
+    Q_EMIT cacheControlChanged(d->mDeviceUUID);
 }
 
 int UpnpAbstractDevice::cacheControl() const
@@ -253,7 +254,7 @@ int UpnpAbstractDevice::cacheControl() const
 void UpnpAbstractDevice::setLocationUrl(const QUrl &value)
 {
     d->mLocationUrl = value;
-    Q_EMIT locationUrlChanged(d->mUDN);
+    Q_EMIT locationUrlChanged(d->mDeviceUUID);
 }
 
 const QUrl &UpnpAbstractDevice::locationUrl() const

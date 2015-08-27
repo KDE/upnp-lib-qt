@@ -325,15 +325,7 @@ void UpnpSsdpEngine::parseSsdpAnnounceDatagram(const QByteArray &datagram, const
     }
 
     if (newDiscovery.mNTS == NotificationSubType::Alive || messageType == SsdpMessageType::queryAnswer) {
-        bool shouldSendSignal = false;
-
         auto itDiscovery = d->mDiscoveryResults.find(newDiscovery.mUSN);
-
-        if (newDiscovery.mNT == QStringLiteral("upnp:rootdevice")) {
-            if (itDiscovery == d->mDiscoveryResults.end()) {
-                shouldSendSignal = true;
-            }
-        }
 
         if (itDiscovery == d->mDiscoveryResults.end()) {
             d->mDiscoveryResults[newDiscovery.mUSN];
@@ -367,9 +359,7 @@ void UpnpSsdpEngine::parseSsdpAnnounceDatagram(const QByteArray &datagram, const
 
         (*itDiscovery)[newDiscovery.mNT] = newDiscovery;
 
-        if (shouldSendSignal) {
-            Q_EMIT newService(newDiscovery);
-        }
+        Q_EMIT newService(newDiscovery);
     }
 
     if (newDiscovery.mNTS == NotificationSubType::ByeBye) {
