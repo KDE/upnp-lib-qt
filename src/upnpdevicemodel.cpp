@@ -194,12 +194,13 @@ void UpnpDeviceModel::removedDevice(const UpnpDiscoveryResult &deviceDiscovery)
 
 void UpnpDeviceModel::genericRemovedDevice(const QString &usn)
 {
-    auto deviceIndex = d->mAllHostsUUID.indexOf(usn);
+    const QString &deviceUuid = usn.mid(5, 36);
+    auto deviceIndex = d->mAllHostsUUID.indexOf(deviceUuid);
     if (deviceIndex != -1) {
         beginRemoveRows(QModelIndex(), deviceIndex, deviceIndex);
         d->mAllHostsUUID.removeAt(deviceIndex);
-        d->mAllHosts.remove(usn);
-        d->mAllHostsDescription.remove(usn);
+        d->mAllHosts.remove(deviceUuid);
+        d->mAllHostsDescription.remove(deviceUuid);
         endRemoveRows();
     }
 }
