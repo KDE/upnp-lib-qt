@@ -263,6 +263,14 @@ void UpnpSsdpEngine::parseSsdpAnnounceDatagram(const QByteArray &datagram, const
                 newDiscovery.mLocation = QString::fromLatin1(itLine->mid(9, itLine->length() - 10));
             }
         }
+        if (itLine->startsWith("HOST") || itLine->startsWith("Host")) {
+            QString hostName;
+            if ((*itLine)[4] == ' ') {
+                newDiscovery.mLocation = QString::fromLatin1(itLine->mid(7, itLine->length() - 8));
+            } else {
+                newDiscovery.mLocation = QString::fromLatin1(itLine->mid(6, itLine->length() - 7));
+            }
+        }
         if (itLine->startsWith("USN")) {
             if ((*itLine)[4] == ' ') {
                 newDiscovery.mUSN = QString::fromLatin1(itLine->mid(5, itLine->length() - 6));
