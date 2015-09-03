@@ -107,6 +107,17 @@ QList<QPointer<UpnpAbstractService> > &UpnpAbstractDevice::services() const
     return d->mServices;
 }
 
+QList<QString> UpnpAbstractDevice::servicesName() const
+{
+    QList<QString> result;
+
+    for (auto itService: d->mServices) {
+        result.push_back(itService->serviceType());
+    }
+
+    return result;
+}
+
 void UpnpAbstractDevice::setUDN(const QString &value)
 {
     d->mDeviceUUID = value.mid(5);

@@ -118,6 +118,8 @@ public:
 
     QList<QPointer<UpnpAbstractService> >& services() const;
 
+    QList<QString> servicesName() const;
+
     /**
      * @brief setUDN will set the UDN (i.e. Unique Device Name) of this device
      *
@@ -159,7 +161,6 @@ public:
      * Managed by the Uniform Code Council. Specified by UPnP vendor. Single UPC.
      */
     const QString& UPC() const;
-
 
     void setDeviceType(const QString &value);
 
