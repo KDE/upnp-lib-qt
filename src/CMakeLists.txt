@@ -21,6 +21,7 @@ set(upnpQt_SOURCES
     upnpbasictypes.h
     upnpeventsubscriber.cpp
     upnpcontrolmediaserver.cpp
+    upnpcontrolcontentdirectory.cpp
 )
 
 ecm_generate_headers(
