@@ -22,13 +22,40 @@
 
 #include <QtCore/QDebug>
 
-UpnpControlMediaServer::UpnpControlMediaServer(QObject *parent) : UpnpControlAbstractDevice(parent)
+class UpnpControlMediaServerPrivate
 {
+public:
+
+    bool mHasAVTransport;
+};
+
+UpnpControlMediaServer::UpnpControlMediaServer(QObject *parent) : UpnpControlAbstractDevice(parent), d(new UpnpControlMediaServerPrivate)
+{
+}
+
+UpnpControlMediaServer::~UpnpControlMediaServer()
+{
+    delete d;
 }
 
 QString UpnpControlMediaServer::viewName() const
 {
     return QStringLiteral("mediaServer.qml");
+}
+
+bool UpnpControlMediaServer::hasAVTransport() const
+{
+    return d->mHasAVTransport;
+}
+
+void UpnpControlMediaServer::parseDeviceDescription(QIODevice *deviceDescriptionContent, const QString &fallBackURLBase)
+{
+    UpnpControlAbstractDevice::parseDeviceDescription(deviceDescriptionContent, fallBackURLBase);
+
+    auto servicesList(servicesName());
+
+    d->mHasAVTransport = servicesList.contains(QStringLiteral("urn:schemas-upnp-org:service:AVTransport:1.0"));
+    Q_EMIT hasAVTransportChanged();
 }
 
 #include "moc_upnpcontrolmediaserver.cpp"

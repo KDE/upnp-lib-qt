@@ -24,15 +24,37 @@
 
 class UpnpControlConnectionManager;
 
+class UpnpControlMediaServerPrivate;
+
 class UPNPQT_EXPORT UpnpControlMediaServer : public UpnpControlAbstractDevice
 {
 
     Q_OBJECT
 
+    Q_PROPERTY(bool hasAVTransport
+               READ hasAVTransport
+               NOTIFY hasAVTransportChanged)
+
 public:
     explicit UpnpControlMediaServer(QObject *parent = 0);
 
+    ~UpnpControlMediaServer();
+
     QString viewName() const override;
+
+    bool hasAVTransport() const;
+
+Q_SIGNALS:
+
+    void hasAVTransportChanged();
+
+protected:
+
+    void parseDeviceDescription(QIODevice *deviceDescriptionContent, const QString &fallBackURLBase) override;
+
+private:
+
+    UpnpControlMediaServerPrivate *d;
 
 };
 
