@@ -183,7 +183,7 @@ void UpnpDeviceModel::newDevice(const UpnpDiscoveryResult &deviceDiscovery)
 
         endInsertRows();
 
-        d->mAllHostsDescription[decodedUdn]->downloadAndParseDeviceDescription(QUrl(deviceDiscovery.mLocation));
+        d->mAllHostsDescription[decodedUdn]->downloadDeviceDescription(QUrl(deviceDiscovery.mLocation));
     }
 }
 

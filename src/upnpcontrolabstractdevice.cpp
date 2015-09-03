@@ -64,7 +64,7 @@ QString UpnpControlAbstractDevice::viewName() const
     return QStringLiteral("genericDevice.qml");
 }
 
-void UpnpControlAbstractDevice::downloadAndParseDeviceDescription(const QUrl &deviceUrl)
+void UpnpControlAbstractDevice::downloadDeviceDescription(const QUrl &deviceUrl)
 {
     d->mNetworkAccess.get(QNetworkRequest(deviceUrl));
 }
@@ -72,119 +72,124 @@ void UpnpControlAbstractDevice::downloadAndParseDeviceDescription(const QUrl &de
 void UpnpControlAbstractDevice::finishedDownload(QNetworkReply *reply)
 {
     if (reply->isFinished() && reply->error() == QNetworkReply::NoError) {
-        QDomDocument deviceDescriptionDocument;
-        deviceDescriptionDocument.setContent(reply);
+        parseDeviceDescription(reply, reply->url().adjusted(QUrl::RemovePath).toString());
+    } else if (reply->isFinished()) {
+        Q_EMIT inError();
+    }
+}
 
-        const QDomElement &documentRoot = deviceDescriptionDocument.documentElement();
+void UpnpControlAbstractDevice::parseDeviceDescription(QIODevice *deviceDescriptionContent, const QString &fallBackURLBase)
+{
+    QDomDocument deviceDescriptionDocument;
+    deviceDescriptionDocument.setContent(deviceDescriptionContent);
 
-        QVariantMap deviceDescription;
+    const QDomElement &documentRoot = deviceDescriptionDocument.documentElement();
 
-        QDomNode currentChild = documentRoot.firstChild();
-        while (!currentChild.isNull()) {
-            if (currentChild.isElement() && !currentChild.firstChild().isNull() && !currentChild.firstChild().hasChildNodes()) {
-                deviceDescription[currentChild.nodeName()] = currentChild.toElement().text();
-            }
-            currentChild = currentChild.nextSibling();
+    QVariantMap deviceDescription;
+
+    QDomNode currentChild = documentRoot.firstChild();
+    while (!currentChild.isNull()) {
+        if (currentChild.isElement() && !currentChild.firstChild().isNull() && !currentChild.firstChild().hasChildNodes()) {
+            deviceDescription[currentChild.nodeName()] = currentChild.toElement().text();
         }
+        currentChild = currentChild.nextSibling();
+    }
 
-        const QDomElement &deviceRoot = documentRoot.firstChildElement(QStringLiteral("device"));
+    const QDomElement &deviceRoot = documentRoot.firstChildElement(QStringLiteral("device"));
 
-        currentChild = deviceRoot.firstChild();
-        while (!currentChild.isNull()) {
-            if (currentChild.isElement() && !currentChild.firstChild().isNull() && !currentChild.firstChild().hasChildNodes()) {
-                deviceDescription[currentChild.nodeName()] = currentChild.toElement().text();
-            }
-            currentChild = currentChild.nextSibling();
+    currentChild = deviceRoot.firstChild();
+    while (!currentChild.isNull()) {
+        if (currentChild.isElement() && !currentChild.firstChild().isNull() && !currentChild.firstChild().hasChildNodes()) {
+            deviceDescription[currentChild.nodeName()] = currentChild.toElement().text();
         }
+        currentChild = currentChild.nextSibling();
+    }
 
-        setUDN(deviceDescription[QStringLiteral("UDN")].toString());
-        setUPC(deviceDescription[QStringLiteral("UPC")].toString());
-        setDeviceType(deviceDescription[QStringLiteral("deviceType")].toString());
-        setFriendlyName(deviceDescription[QStringLiteral("friendlyName")].toString());
-        setManufacturer(deviceDescription[QStringLiteral("manufacturer")].toString());
-        setManufacturerURL(deviceDescription[QStringLiteral("manufacturerURL")].toUrl());
-        setModelDescription(deviceDescription[QStringLiteral("modelDescription")].toString());
-        setModelName(deviceDescription[QStringLiteral("modelName")].toString());
-        setModelNumber(deviceDescription[QStringLiteral("modelNumber")].toString());
-        setModelURL(deviceDescription[QStringLiteral("modelURL")].toUrl());
-        setSerialNumber(deviceDescription[QStringLiteral("serialNumber")].toString());
+    setUDN(deviceDescription[QStringLiteral("UDN")].toString());
+    setUPC(deviceDescription[QStringLiteral("UPC")].toString());
+    setDeviceType(deviceDescription[QStringLiteral("deviceType")].toString());
+    setFriendlyName(deviceDescription[QStringLiteral("friendlyName")].toString());
+    setManufacturer(deviceDescription[QStringLiteral("manufacturer")].toString());
+    setManufacturerURL(deviceDescription[QStringLiteral("manufacturerURL")].toUrl());
+    setModelDescription(deviceDescription[QStringLiteral("modelDescription")].toString());
+    setModelName(deviceDescription[QStringLiteral("modelName")].toString());
+    setModelNumber(deviceDescription[QStringLiteral("modelNumber")].toString());
+    setModelURL(deviceDescription[QStringLiteral("modelURL")].toUrl());
+    setSerialNumber(deviceDescription[QStringLiteral("serialNumber")].toString());
 
-        if (deviceDescription[QStringLiteral("URLBase")].isValid() && !deviceDescription[QStringLiteral("URLBase")].toString().isEmpty()) {
-            setURLBase(deviceDescription[QStringLiteral("URLBase")].toString());
-        } else {
-            setURLBase(reply->url().adjusted(QUrl::RemovePath).toString());
-        }
+    if (deviceDescription[QStringLiteral("URLBase")].isValid() && !deviceDescription[QStringLiteral("URLBase")].toString().isEmpty()) {
+        setURLBase(deviceDescription[QStringLiteral("URLBase")].toString());
+    } else {
+        setURLBase(fallBackURLBase);
+    }
 
-        auto serviceList = deviceDescriptionDocument.elementsByTagName(QStringLiteral("service"));
-        for (int serviceIndex = 0; serviceIndex < serviceList.length(); ++serviceIndex) {
-            const QDomNode &serviceNode(serviceList.at(serviceIndex));
-            if (!serviceNode.isNull()) {
-                QPointer<UpnpAbstractService> newService;
+    auto serviceList = deviceDescriptionDocument.elementsByTagName(QStringLiteral("service"));
+    for (int serviceIndex = 0; serviceIndex < serviceList.length(); ++serviceIndex) {
+        const QDomNode &serviceNode(serviceList.at(serviceIndex));
+        if (!serviceNode.isNull()) {
+            QPointer<UpnpAbstractService> newService;
 
-                const QDomNode &serviceTypeNode = serviceNode.firstChildElement(QStringLiteral("serviceType"));
-                if (!serviceTypeNode.isNull()) {
-                    if (serviceTypeNode.toElement().text() == QStringLiteral("urn:schemas-upnp-org:service:AVTransport:1")) {
-                        newService = new UpnpControlAVTransport;
-                    } else if (serviceTypeNode.toElement().text() == QStringLiteral("urn:schemas-upnp-org:service:RenderingControl:1")) {
-                        newService = new UpnpControlSwitchPower;
-                    } else if (serviceTypeNode.toElement().text() == QStringLiteral("urn:schemas-upnp-org:service:SwitchPower:1")) {
-                        newService = new UpnpControlSwitchPower;
-                    } else if (serviceTypeNode.toElement().text() == QStringLiteral("urn:schemas-upnp-org:service:ConnectionManager:1")) {
-                        newService = new UpnpControlConnectionManager;
-                    } else {
-                        newService = new UpnpControlAbstractService;
-                    }
+            const QDomNode &serviceTypeNode = serviceNode.firstChildElement(QStringLiteral("serviceType"));
+            if (!serviceTypeNode.isNull()) {
+                if (serviceTypeNode.toElement().text() == QStringLiteral("urn:schemas-upnp-org:service:AVTransport:1")) {
+                    newService = new UpnpControlAVTransport;
+                } else if (serviceTypeNode.toElement().text() == QStringLiteral("urn:schemas-upnp-org:service:RenderingControl:1")) {
+                    newService = new UpnpControlSwitchPower;
+                } else if (serviceTypeNode.toElement().text() == QStringLiteral("urn:schemas-upnp-org:service:SwitchPower:1")) {
+                    newService = new UpnpControlSwitchPower;
+                } else if (serviceTypeNode.toElement().text() == QStringLiteral("urn:schemas-upnp-org:service:ConnectionManager:1")) {
+                    newService = new UpnpControlConnectionManager;
                 } else {
                     newService = new UpnpControlAbstractService;
                 }
-
-                newService->setBaseURL(URLBase());
-                if (!serviceTypeNode.isNull()) {
-                    newService->setServiceType(serviceTypeNode.toElement().text());
-                }
-
-                const QDomNode &serviceIdNode = serviceNode.firstChildElement(QStringLiteral("serviceId"));
-                if (!serviceIdNode.isNull()) {
-                    newService->setServiceId(serviceIdNode.toElement().text());
-                }
-
-                const QDomNode &SCPDURLNode = serviceNode.firstChildElement(QStringLiteral("SCPDURL"));
-                if (!SCPDURLNode.isNull()) {
-                    newService->setSCPDURL(QUrl(SCPDURLNode.toElement().text()));
-                }
-
-                const QDomNode &controlURLNode = serviceNode.firstChildElement(QStringLiteral("controlURL"));
-                if (!controlURLNode.isNull()) {
-                    QUrl controlUrl(controlURLNode.toElement().text());
-                    if (!controlUrl.isValid() || controlUrl.scheme().isEmpty()) {
-                        controlUrl = QUrl(URLBase());
-                        controlUrl.setPath(controlURLNode.toElement().text());
-                    }
-                    newService->setControlURL(controlUrl);
-                }
-
-                const QDomNode &eventSubURLNode = serviceNode.firstChildElement(QStringLiteral("eventSubURL"));
-                if (!eventSubURLNode.isNull()) {
-                    QUrl eventUrl(eventSubURLNode.toElement().text());
-                    if (!eventUrl.isValid() || eventUrl.scheme().isEmpty()) {
-                        eventUrl = QUrl(URLBase());
-                        eventUrl.setPath(eventSubURLNode.toElement().text());
-                    }
-                    newService->setEventURL(eventUrl);
-                }
-
-                QUrl serviceUrl(newService->SCPDURL().toString());
-                if (!serviceUrl.isValid() || serviceUrl.scheme().isEmpty()) {
-                    serviceUrl.setUrl(URLBase());
-                    serviceUrl.setPath(newService->SCPDURL().toString());
-                }
-
-                qobject_cast<UpnpControlAbstractService*>(newService.data())->downloadAndParseServiceDescription(serviceUrl);
-                addService(newService);
+            } else {
+                newService = new UpnpControlAbstractService;
             }
+
+            newService->setBaseURL(URLBase());
+            if (!serviceTypeNode.isNull()) {
+                newService->setServiceType(serviceTypeNode.toElement().text());
+            }
+
+            const QDomNode &serviceIdNode = serviceNode.firstChildElement(QStringLiteral("serviceId"));
+            if (!serviceIdNode.isNull()) {
+                newService->setServiceId(serviceIdNode.toElement().text());
+            }
+
+            const QDomNode &SCPDURLNode = serviceNode.firstChildElement(QStringLiteral("SCPDURL"));
+            if (!SCPDURLNode.isNull()) {
+                newService->setSCPDURL(QUrl(SCPDURLNode.toElement().text()));
+            }
+
+            const QDomNode &controlURLNode = serviceNode.firstChildElement(QStringLiteral("controlURL"));
+            if (!controlURLNode.isNull()) {
+                QUrl controlUrl(controlURLNode.toElement().text());
+                if (!controlUrl.isValid() || controlUrl.scheme().isEmpty()) {
+                    controlUrl = QUrl(URLBase());
+                    controlUrl.setPath(controlURLNode.toElement().text());
+                }
+                newService->setControlURL(controlUrl);
+            }
+
+            const QDomNode &eventSubURLNode = serviceNode.firstChildElement(QStringLiteral("eventSubURL"));
+            if (!eventSubURLNode.isNull()) {
+                QUrl eventUrl(eventSubURLNode.toElement().text());
+                if (!eventUrl.isValid() || eventUrl.scheme().isEmpty()) {
+                    eventUrl = QUrl(URLBase());
+                    eventUrl.setPath(eventSubURLNode.toElement().text());
+                }
+                newService->setEventURL(eventUrl);
+            }
+
+            QUrl serviceUrl(newService->SCPDURL().toString());
+            if (!serviceUrl.isValid() || serviceUrl.scheme().isEmpty()) {
+                serviceUrl.setUrl(URLBase());
+                serviceUrl.setPath(newService->SCPDURL().toString());
+            }
+
+            qobject_cast<UpnpControlAbstractService*>(newService.data())->downloadServiceDescription(serviceUrl);
+            addService(newService);
         }
-    } else if (reply->isFinished()) {
-        Q_EMIT inError();
     }
 }
 

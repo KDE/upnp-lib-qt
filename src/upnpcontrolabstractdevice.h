@@ -48,11 +48,15 @@ Q_SIGNALS:
 
 public Q_SLOTS:
 
-    void downloadAndParseDeviceDescription(const QUrl &deviceUrl);
+    void downloadDeviceDescription(const QUrl &deviceUrl);
 
 private Q_SLOTS:
 
     void finishedDownload(QNetworkReply *reply);
+
+protected:
+
+    virtual void parseDeviceDescription(QIODevice *deviceDescriptionContent, const QString &fallBackURLBase);
 
 private:
 
