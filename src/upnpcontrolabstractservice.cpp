@@ -158,7 +158,7 @@ void UpnpControlAbstractService::handleEventNotification(const QByteArray &reque
     }
 }
 
-void UpnpControlAbstractService::downloadAndParseServiceDescription(const QUrl &serviceUrl)
+void UpnpControlAbstractService::downloadServiceDescription(const QUrl &serviceUrl)
 {
     d->mNetworkAccess.get(QNetworkRequest(serviceUrl));
 }
@@ -180,61 +180,7 @@ void UpnpControlAbstractService::finishedDownload(QNetworkReply *reply)
                 }
             }
         } else {
-            QDomDocument serviceDescriptionDocument;
-            serviceDescriptionDocument.setContent(reply);
-
-            const QDomElement &scpdRoot = serviceDescriptionDocument.documentElement();
-
-            const QDomElement &actionListRoot = scpdRoot.firstChildElement(QStringLiteral("actionList"));
-            QDomNode currentChild = actionListRoot.firstChild();
-            while (!currentChild.isNull()) {
-                const QDomNode &nameNode = currentChild.firstChildElement(QStringLiteral("name"));
-
-                QString actionName;
-                if (!nameNode.isNull()) {
-                    actionName = nameNode.toElement().text();
-                }
-
-                UpnpActionDescription newAction;
-
-                newAction.mName = actionName;
-
-                const QDomNode &argumentListNode = currentChild.firstChildElement(QStringLiteral("argumentList"));
-                QDomNode argumentNode = argumentListNode.firstChild();
-                while (!argumentNode.isNull()) {
-                    const QDomNode &argumentNameNode = argumentNode.firstChildElement(QStringLiteral("name"));
-                    const QDomNode &argumentDirectionNode = argumentNode.firstChildElement(QStringLiteral("direction"));
-                    const QDomNode &argumentRetvalNode = argumentNode.firstChildElement(QStringLiteral("retval"));
-                    const QDomNode &argumentRelatedStateVariableNode = argumentNode.firstChildElement(QStringLiteral("relatedStateVariable"));
-
-                    UpnpActionArgumentDescription newArgument;
-                    newArgument.mName = argumentNameNode.toElement().text();
-                    newArgument.mDirection = (argumentDirectionNode.toElement().text() == QStringLiteral("in") ? UpnpArgumentDirection::In : UpnpArgumentDirection::Out);
-                    newArgument.mIsReturnValue = !argumentRetvalNode.isNull();
-                    newArgument.mRelatedStateVariable = argumentRelatedStateVariableNode.toElement().text();
-
-                    newAction.mArguments.push_back(newArgument);
-
-                    addAction(newAction);
-
-                    argumentNode = argumentNode.nextSibling();
-                }
-
-                currentChild = currentChild.nextSibling();
-            }
-
-#if 0
-            const QDomElement &serviceStateTableRoot = scpdRoot.firstChildElement(QStringLiteral("serviceStateTable"));
-            currentChild = serviceStateTableRoot.firstChild();
-            while (!currentChild.isNull()) {
-                const QDomNode &nameNode = currentChild.firstChildElement(QStringLiteral("name"));
-                if (!nameNode.isNull()) {
-                    qDebug() << "state variable name" << nameNode.toElement().text();
-                }
-
-                currentChild = currentChild.nextSibling();
-            }
-#endif
+            parseServiceDescription(reply);
         }
     } else if (reply->isFinished()) {
         qDebug() << "UpnpAbstractServiceDescription::finishedDownload" << "error";
@@ -244,6 +190,65 @@ void UpnpControlAbstractService::finishedDownload(QNetworkReply *reply)
 void UpnpControlAbstractService::eventSubscriptionTimeout()
 {
     subscribeEvents(d->mRealEventSubscriptionTimeout);
+}
+
+void UpnpControlAbstractService::parseServiceDescription(QIODevice *serviceDescriptionContent)
+{
+    QDomDocument serviceDescriptionDocument;
+    serviceDescriptionDocument.setContent(serviceDescriptionContent);
+
+    const QDomElement &scpdRoot = serviceDescriptionDocument.documentElement();
+
+    const QDomElement &actionListRoot = scpdRoot.firstChildElement(QStringLiteral("actionList"));
+    QDomNode currentChild = actionListRoot.firstChild();
+    while (!currentChild.isNull()) {
+        const QDomNode &nameNode = currentChild.firstChildElement(QStringLiteral("name"));
+
+        QString actionName;
+        if (!nameNode.isNull()) {
+            actionName = nameNode.toElement().text();
+        }
+
+        UpnpActionDescription newAction;
+
+        newAction.mName = actionName;
+
+        const QDomNode &argumentListNode = currentChild.firstChildElement(QStringLiteral("argumentList"));
+        QDomNode argumentNode = argumentListNode.firstChild();
+        while (!argumentNode.isNull()) {
+            const QDomNode &argumentNameNode = argumentNode.firstChildElement(QStringLiteral("name"));
+            const QDomNode &argumentDirectionNode = argumentNode.firstChildElement(QStringLiteral("direction"));
+            const QDomNode &argumentRetvalNode = argumentNode.firstChildElement(QStringLiteral("retval"));
+            const QDomNode &argumentRelatedStateVariableNode = argumentNode.firstChildElement(QStringLiteral("relatedStateVariable"));
+
+            UpnpActionArgumentDescription newArgument;
+            newArgument.mName = argumentNameNode.toElement().text();
+            newArgument.mDirection = (argumentDirectionNode.toElement().text() == QStringLiteral("in") ? UpnpArgumentDirection::In : UpnpArgumentDirection::Out);
+            newArgument.mIsReturnValue = !argumentRetvalNode.isNull();
+            newArgument.mRelatedStateVariable = argumentRelatedStateVariableNode.toElement().text();
+
+            newAction.mArguments.push_back(newArgument);
+
+            addAction(newAction);
+
+            argumentNode = argumentNode.nextSibling();
+        }
+
+        currentChild = currentChild.nextSibling();
+    }
+
+#if 0
+    const QDomElement &serviceStateTableRoot = scpdRoot.firstChildElement(QStringLiteral("serviceStateTable"));
+    currentChild = serviceStateTableRoot.firstChild();
+    while (!currentChild.isNull()) {
+        const QDomNode &nameNode = currentChild.firstChildElement(QStringLiteral("name"));
+        if (!nameNode.isNull()) {
+            qDebug() << "state variable name" << nameNode.toElement().text();
+        }
+
+        currentChild = currentChild.nextSibling();
+    }
+#endif
 }
 
 void UpnpControlAbstractService::parseEventNotification(const QString &eventName, const QString &eventValue)

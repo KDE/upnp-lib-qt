@@ -56,7 +56,7 @@ Q_SIGNALS:
 
 public Q_SLOTS:
 
-    void downloadAndParseServiceDescription(const QUrl &serviceUrl);
+    void downloadServiceDescription(const QUrl &serviceUrl);
 
 private Q_SLOTS:
 
@@ -65,6 +65,8 @@ private Q_SLOTS:
     void eventSubscriptionTimeout();
 
 protected:
+
+    virtual void parseServiceDescription(QIODevice *serviceDescriptionContent);
 
     virtual void parseEventNotification(const QString &eventName, const QString &eventValue);
 
