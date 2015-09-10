@@ -13,7 +13,11 @@ Item {
 
     Button {
         id: backButton
-        height: 25
+        height: if (listingView.depth == 1)
+                    25
+                else
+                    0
+        visible: (listingView.depth == 1)
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: parent.right
