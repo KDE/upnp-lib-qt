@@ -85,9 +85,9 @@ UpnpAbstractDevice::~UpnpAbstractDevice()
 UpnpAbstractService* UpnpAbstractDevice::serviceById(const QString &serviceId) const
 {
     UpnpAbstractService *result = nullptr;
-    for (auto it = d->mServices.begin(); it != d->mServices.end(); ++it) {
-        if ((*it)->serviceId() == serviceId) {
-            return it->data();
+    for (auto service : d->mServices) {
+        if (service->serviceId() == serviceId) {
+            return service;
         }
     }
     return result;
