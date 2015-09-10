@@ -22,6 +22,7 @@ set(upnpQt_SOURCES
     upnpeventsubscriber.cpp
     upnpcontrolmediaserver.cpp
     upnpcontrolcontentdirectory.cpp
+    upnpcontentdirectorymodel.cpp
 )
 
 ecm_generate_headers(
@@ -104,6 +105,8 @@ set(upnpControl_SOURCES
     upnpControl.cpp
     upnpControl.qml
     mediaServer.qml
+    mediaServerListing.qml
+    genericDevice.qml
 )
 
 add_executable(upnpControl ${upnpControl_SOURCES})

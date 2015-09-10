@@ -43,26 +43,13 @@ class UPNPQT_EXPORT UpnpControlConnectionManager : public UpnpControlAbstractSer
                READ currentConnectionIDs
                NOTIFY currentConnectionIDsChanged)
 
-    Q_PROPERTY(QString A_ARG_TYPE_ConnectionStatus
-               READ connectionStatus)
+    Q_PROPERTY(bool hasPrepareForConnection
+               READ hasPrepareForConnection
+               NOTIFY hasPrepareForConnectionChanged)
 
-    Q_PROPERTY(QString A_ARG_TYPE_ConnectionManager
-               READ connectionManager)
-
-    Q_PROPERTY(QString A_ARG_TYPE_Direction
-               READ direction)
-
-    Q_PROPERTY(QString A_ARG_TYPE_ProtocolInfo
-               READ protocolInfo)
-
-    Q_PROPERTY(int A_ARG_TYPE_ConnectionID
-               READ connectionID)
-
-    Q_PROPERTY(int A_ARG_TYPE_AVTransportID
-               READ AVTransportID)
-
-    Q_PROPERTY(int A_ARG_TYPE_RcsID
-               READ rcsID)
+    Q_PROPERTY(bool hasConnectionComplete
+               READ hasConnectionComplete
+               NOTIFY hasConnectionCompleteChanged)
 
 public:
 
@@ -76,19 +63,9 @@ public:
 
     const QString& currentConnectionIDs() const;
 
-    const QString &connectionStatus() const;
+    bool hasPrepareForConnection() const;
 
-    const QString &connectionManager() const;
-
-    const QString &direction() const;
-
-    const QString &protocolInfo() const;
-
-    int connectionID() const;
-
-    int AVTransportID() const;
-
-    int rcsID() const;
+    bool hasConnectionComplete() const;
 
 public Q_SLOTS:
 
@@ -110,6 +87,10 @@ Q_SIGNALS:
 
     void currentConnectionIDsChanged(const QString &ids);
 
+    void hasPrepareForConnectionChanged();
+
+    void hasConnectionCompleteChanged();
+
     void getProtocolInfoFinished(bool success);
 
     void prepareForConnectionFinished(bool success);
@@ -118,7 +99,9 @@ Q_SIGNALS:
 
     void getCurrentConnectionIDsFinished(bool success);
 
-    void getCurrentConnectionInfoFinished(bool success);
+    void getCurrentConnectionInfoFinished(int rcsID, int avTransportID, const QString &protocolInfo,
+                                          const QString &connectionManager, int peerConnectionID,
+                                          const QString &direction, const QString &connectionStatus, bool success);
 
 private Q_SLOTS:
 
@@ -133,6 +116,8 @@ private Q_SLOTS:
     void finishedGetCurrentConnectionInfoCall(KDSoapPendingCallWatcher *self);
 
 protected:
+
+    void parseServiceDescription(QIODevice *serviceDescriptionContent) override;
 
     void parseEventNotification(const QString &eventName, const QString &eventValue) Q_DECL_OVERRIDE;
 

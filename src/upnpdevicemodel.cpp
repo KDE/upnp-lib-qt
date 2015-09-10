@@ -150,6 +150,26 @@ UpnpControlAbstractDevice *UpnpDeviceModel::getDeviceDescription(const QString &
     return d->mAllHostsDescription[uuid];
 }
 
+QVariant UpnpDeviceModel::get(int row, const QString &roleName) const
+{
+    int role = Qt::DisplayRole;
+
+    if (roleName == QStringLiteral("name")) {
+        role = ColumnsRoles::NameRole;
+    }
+    if (roleName == QStringLiteral("upnpType")) {
+        role = ColumnsRoles::TypeRole;
+    }
+    if (roleName == QStringLiteral("uuid")) {
+        role = ColumnsRoles::uuidRole;
+    }
+    if (roleName == QStringLiteral("viewName")) {
+        role = ColumnsRoles::ViewName;
+    }
+
+    return data(index(row), role);
+}
+
 void UpnpDeviceModel::newDevice(const UpnpDiscoveryResult &deviceDiscovery)
 {
     const QString &deviceUuid = deviceDiscovery.mUSN.mid(5, 36);

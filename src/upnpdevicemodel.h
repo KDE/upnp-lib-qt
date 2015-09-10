@@ -64,6 +64,8 @@ public:
 
     Q_INVOKABLE UpnpControlAbstractDevice* getDeviceDescription(const QString &uuid)const;
 
+    Q_INVOKABLE QVariant get(int row, const QString &roleName) const;
+
 Q_SIGNALS:
 
 public Q_SLOTS:

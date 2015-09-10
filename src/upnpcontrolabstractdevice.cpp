@@ -23,6 +23,7 @@
 #include "upnpcontrolavtransport.h"
 #include "upnpcontrolswitchpower.h"
 #include "upnpcontrolconnectionmanager.h"
+#include "upnpcontrolcontentdirectory.h"
 
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtNetwork/QNetworkReply>
@@ -139,6 +140,8 @@ void UpnpControlAbstractDevice::parseDeviceDescription(QIODevice *deviceDescript
                     newService = new UpnpControlSwitchPower;
                 } else if (serviceTypeNode.toElement().text() == QStringLiteral("urn:schemas-upnp-org:service:ConnectionManager:1")) {
                     newService = new UpnpControlConnectionManager;
+                } else if (serviceTypeNode.toElement().text() == QStringLiteral("urn:schemas-upnp-org:service:ContentDirectory:1")) {
+                    newService = new UpnpControlContentDirectory;
                 } else {
                     newService = new UpnpControlAbstractService;
                 }

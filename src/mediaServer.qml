@@ -5,44 +5,47 @@ import org.mgallien.QmlExtension 1.0
 
 Item {
     property UpnpControlMediaServer aDevice
+    property StackView stackView
     property UpnpControlConnectionManager connectionManager
 
-    Button {
-        id: getProtocolInfoButton
-        text: 'getProtocolInfo'
-        onClicked: connectionManager.getProtocolInfo()
-    }
+    width: parent.width
+    height: parent.height
 
     Button {
-        id: prepareForConnectionButton
-        anchors.top: getProtocolInfoButton.bottom
-        text: 'prepareForConnection'
-        onClicked: connectionManager.prepareForConnection()
+        id: backButton
+        height: 25
+        anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.right: parent.right
+        onClicked: stackView.pop()
+        text: 'Back'
     }
 
-    Button {
-        id: connectionCompleteButton
-        anchors.top: prepareForConnectionButton.bottom
-        text: 'connectionComplete'
-        onClicked: connectionManager.connectionComplete()
-    }
+    StackView {
+        id: listingView
+        anchors.top: backButton.bottom
+        anchors.bottom: parent.bottom
+        anchors.right: parent.right
+        anchors.left: parent.left
 
-    Button {
-        id: getCurrentConnectionIDsButton
-        anchors.top: connectionCompleteButton.bottom
-        text: 'getCurrentConnectionIDs'
-        onClicked: connectionManager.getCurrentConnectionIDs()
-    }
-
-    Button {
-        id: getCurrentConnectionInfoButton
-        anchors.top: getCurrentConnectionIDsButton.bottom
-        text: 'getCurrentConnectionInfo'
-        onClicked: connectionManager.getCurrentConnectionInfo()
+        // Implements back key navigation
+        focus: true
+        Keys.onReleased: if (event.key === Qt.Key_Back && stackView.depth > 1) {
+                             stackView.pop();
+                             event.accepted = true;
+                         }
     }
 
     Component.onCompleted: {
         connectionManager = aDevice.serviceById('urn:upnp-org:serviceId:ConnectionManager')
+        listingView.push({
+                           item: Qt.resolvedUrl("mediaServerListing.qml"),
+                           properties: {
+                               'contentDirectoryService': aDevice.serviceById('urn:upnp-org:serviceId:ContentDirectory'),
+                               'rootId': '0',
+                               'stackView': listingView
+                           }
+                       })
     }
 }
 

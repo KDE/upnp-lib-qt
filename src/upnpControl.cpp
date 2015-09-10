@@ -26,6 +26,8 @@
 #include "upnpcontrolswitchpower.h"
 #include "upnpcontrolconnectionmanager.h"
 #include "upnpcontrolmediaserver.h"
+#include "upnpcontrolcontentdirectory.h"
+#include "upnpcontentdirectorymodel.h"
 
 #include <QtWidgets/QApplication>
 
@@ -46,11 +48,14 @@ int main(int argc, char *argv[])
     qmlRegisterType<UpnpControlSwitchPower>("org.mgallien.QmlExtension", 1, 0, "UpnpControlSwitchPower");
     qmlRegisterType<UpnpControlConnectionManager>("org.mgallien.QmlExtension", 1, 0, "UpnpControlConnectionManager");
     qmlRegisterType<UpnpControlMediaServer>("org.mgallien.QmlExtension", 1, 0, "UpnpControlMediaServer");
+    qmlRegisterType<UpnpControlContentDirectory>("org.mgallien.QmlExtension", 1, 0, "UpnpControlContentDirectory");
+    qmlRegisterType<UpnpContentDirectoryModel>("org.mgallien.QmlExtension", 1, 0, "UpnpContentDirectoryModel");
 
     qRegisterMetaType<A_ARG_TYPE_InstanceID>();
     qRegisterMetaType<UpnpDiscoveryResult>();
     qRegisterMetaType<QPointer<UpnpAbstractDevice> >();
     qRegisterMetaType<UpnpControlConnectionManager*>();
+    qRegisterMetaType<UpnpContentDirectoryModel*>();
 
     QQmlApplicationEngine engine(QUrl(QStringLiteral("./upnpControl.qml")));
 

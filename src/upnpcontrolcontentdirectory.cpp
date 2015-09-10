@@ -237,7 +237,7 @@ void UpnpControlContentDirectory::finishedBrowseCall(KDSoapPendingCallWatcher *s
         }
     }
 
-    qDebug() << "Result:" << result;
+    //qDebug() << "Result:" << result;
     qDebug() << "NumberReturned:" << numberReturned;
     qDebug() << "TotalMatches:" << totalMatches;
     qDebug() << "UpdateID:" << d->mSystemUpdateID;

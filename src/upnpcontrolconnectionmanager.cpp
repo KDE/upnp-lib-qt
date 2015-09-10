@@ -34,19 +34,9 @@ public:
 
     QString mCurrentConnectionIDs;
 
-    QString mConnectionStatus;
+    bool mHasPrepareForConnection;
 
-    QString mConnectionManager;
-
-    QString mDirection;
-
-    QString mProtocolInfo;
-
-    int mConnectionID;
-
-    int mAVTransportID;
-
-    int mRcsID;
+    bool mHasConnectionComplete;
 
 };
 
@@ -73,39 +63,14 @@ const QString &UpnpControlConnectionManager::currentConnectionIDs() const
     return d->mCurrentConnectionIDs;
 }
 
-const QString &UpnpControlConnectionManager::connectionStatus() const
+bool UpnpControlConnectionManager::hasPrepareForConnection() const
 {
-    return d->mConnectionStatus;
+    return d->mHasPrepareForConnection;
 }
 
-const QString &UpnpControlConnectionManager::connectionManager() const
+bool UpnpControlConnectionManager::hasConnectionComplete() const
 {
-    return d->mConnectionManager;
-}
-
-const QString &UpnpControlConnectionManager::direction() const
-{
-    return d->mDirection;
-}
-
-const QString &UpnpControlConnectionManager::protocolInfo() const
-{
-    return d->mProtocolInfo;
-}
-
-int UpnpControlConnectionManager::connectionID() const
-{
-    return d->mConnectionID;
-}
-
-int UpnpControlConnectionManager::AVTransportID() const
-{
-    return d->mAVTransportID;
-}
-
-int UpnpControlConnectionManager::rcsID() const
-{
-    return d->mRcsID;
+    return d->mHasConnectionComplete;
 }
 
 void UpnpControlConnectionManager::getProtocolInfo()
@@ -164,10 +129,19 @@ void UpnpControlConnectionManager::finishedGetProtocolInfoCall(KDSoapPendingCall
 {
     self->deleteLater();
 
-    qDebug() << self->returnValue();
+    auto answer = self->returnMessage();
+    auto allValues = answer.childValues();
+    for (KDSoapValue oneValue : allValues) {
+        if (oneValue.name() == QStringLiteral("Source")) {
+            d->mSourceProtocolInfo = oneValue.value().toString();
+        }
+        if (oneValue.name() == QStringLiteral("Sink")) {
+            d->mSinkProtocolInfo = oneValue.value().toString();
+        }
+    }
 
-    d->mSourceProtocolInfo = self->returnValue().toString();
-    d->mSinkProtocolInfo;
+    qDebug() << "SourceProtocolInfo:" << d->mSourceProtocolInfo;
+    qDebug() << "SinkProtocolInfo:" << d->mSinkProtocolInfo;
 
     Q_EMIT getProtocolInfoFinished(!self->returnMessage().isFault());
 }
@@ -195,6 +169,8 @@ void UpnpControlConnectionManager::finishedGetCurrentConnectionIDsCall(KDSoapPen
     self->deleteLater();
 
     qDebug() << self->returnValue();
+    d->mCurrentConnectionIDs = self->returnValue().toString();
+    Q_EMIT currentConnectionIDsChanged(d->mCurrentConnectionIDs);
 
     Q_EMIT getCurrentConnectionIDsFinished(!self->returnMessage().isFault());
 }
@@ -203,20 +179,64 @@ void UpnpControlConnectionManager::finishedGetCurrentConnectionInfoCall(KDSoapPe
 {
     self->deleteLater();
 
-    qDebug() << self->returnValue();
+    auto answer = self->returnMessage();
+    auto allValues = answer.childValues();
+    int rcsID;
+    int avTransportID;
+    QString protocolInfo;
+    QString connectionManager;
+    int peerConnectionID;
+    QString direction;
+    QString connectionStatus;
 
-    Q_EMIT getCurrentConnectionInfoFinished(!self->returnMessage().isFault());
+    for (KDSoapValue oneValue : allValues) {
+        if (oneValue.name() == QStringLiteral("RcsID")) {
+            rcsID = oneValue.value().toInt();
+        }
+        if (oneValue.name() == QStringLiteral("AVTransportID")) {
+            avTransportID = oneValue.value().toInt();
+        }
+        if (oneValue.name() == QStringLiteral("protocolInfo")) {
+            protocolInfo = oneValue.value().toInt();
+        }
+        if (oneValue.name() == QStringLiteral("PeerConnectionManager")) {
+            connectionManager = oneValue.value().toInt();
+        }
+        if (oneValue.name() == QStringLiteral("PeerConnectionID")) {
+            peerConnectionID = oneValue.value().toInt();
+        }
+        if (oneValue.name() == QStringLiteral("Direction")) {
+            direction = oneValue.value().toInt();
+        }
+        if (oneValue.name() == QStringLiteral("Status")) {
+            connectionStatus = oneValue.value().toInt();
+        }
+    }
+
+    qDebug() << "RcsID:" << rcsID;
+    qDebug() << "AVTransportID:" << avTransportID;
+    qDebug() << "protocolInfo:" << protocolInfo;
+    qDebug() << "PeerConnectionManager:" << connectionManager;
+    qDebug() << "PeerConnectionID:" << peerConnectionID;
+    qDebug() << "Direction:" << direction;
+    qDebug() << "Status:" << connectionStatus;
+
+    Q_EMIT getCurrentConnectionInfoFinished(rcsID, avTransportID, protocolInfo, connectionManager, peerConnectionID,
+                                            direction, connectionStatus, !self->returnMessage().isFault());
 }
 
-//void UpnpControlConnectionManager::finishedGetStatusCall(KDSoapPendingCallWatcher *self)
-//{
-//    self->deleteLater();
+void UpnpControlConnectionManager::parseServiceDescription(QIODevice *serviceDescriptionContent)
+{
+    UpnpControlAbstractService::parseServiceDescription(serviceDescriptionContent);
 
-//    Q_EMIT getStatusFinished(!self->returnMessage().isFault(), self->returnValue().toBool());
+    const QList<QString> &allActions(actions());
 
-//    d->mStatus = self->returnValue().toBool();
-//    Q_EMIT statusChanged();
-//}
+    d->mHasPrepareForConnection = allActions.contains(QStringLiteral("PrepareForConnection"));
+    Q_EMIT hasPrepareForConnectionChanged();
+
+    d->mHasConnectionComplete = allActions.contains(QStringLiteral("ConnectionComplete"));
+    Q_EMIT hasConnectionCompleteChanged();
+}
 
 void UpnpControlConnectionManager::parseEventNotification(const QString &eventName, const QString &eventValue)
 {

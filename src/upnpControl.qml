@@ -100,10 +100,6 @@ ApplicationWindow {
                 verticalAlignment: Text.AlignVCenter
                 height: 15
                 visible: styleData.selected
-                onVisibleChanged: {
-                    if (visible)
-                        deviceControlLoader.setSource(model.viewName, { 'aDevice' : deviceModel.getDeviceDescription(model.uuid)})
-                }
             }
             Label {
                 id: statusLabel
@@ -190,38 +186,32 @@ ApplicationWindow {
         }
     }
 
-    TableView {
-        id: peersView
-        model: deviceModel
-        itemDelegate: deviceDelegate
-        rowDelegate: rowDelegate
-        anchors.left: parent.left
-        anchors.top: parent.top
-        anchors.bottom: parent.bottom
-        width: 500
-        headerVisible: false
-        TableViewColumn
-        {
-            width: peersView.width - 4
-            resizable: false
-            movable: false
-        }
-
-        onSelectionChanged:
-        {
-
-        }
-    }
-    Item {
-        id: deviceControl
-        anchors.left: peersView.right
-        anchors.right: parent.right
-        anchors.top: parent.top
-        anchors.bottom: parent.bottom
-
-        Loader {
-            anchors.fill: parent
-            id: deviceControlLoader
+    StackView {
+        anchors.fill: parent
+        initialItem: TableView {
+            id: peersView
+            model: deviceModel
+            itemDelegate: deviceDelegate
+            rowDelegate: rowDelegate
+            width: parent.width
+            height: parent.height
+            headerVisible: false
+            TableViewColumn
+            {
+                width: peersView.width - 4
+                resizable: false
+                movable: false
+            }
+            onClicked:
+            {
+                parent.push({
+                                item: Qt.resolvedUrl(model.get(row, 'viewName')),
+                                properties: {
+                                    'stackView' : parent,
+                                    'aDevice' : deviceModel.getDeviceDescription(model.get(row, 'uuid'))
+                                }
+                            })
+            }
         }
     }
 }
