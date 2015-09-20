@@ -101,29 +101,61 @@ target_link_libraries(binaryLight
         Qt5::Widgets
 )
 
-set(upnpControl_SOURCES
-    upnpControl.cpp
-    upnpControl.qml
-    mediaServer.qml
-    mediaServerListing.qml
-    mediaAlbumView.qml
-    genericDevice.qml
+set(upnpControlMobile_SOURCES
+    upnpControlMobile.cpp
+    upnpControlMobile.qml
+    mediaServerMobile.qml
+    mediaServerListingMobile.qml
+    mediaAlbumViewMobile.qml
+    genericDeviceMobile.qml
     RatingStar.qml
-    AudioTrackDelegate.qml
-    MediaPlayerControl.qml
-    MediaServerEntry.qml
+    AudioTrackDelegateMobile.qml
+    MediaPlayerControlMobile.qml
+    MediaServerEntryMobile.qml
 )
 
-qt5_add_resources(upnpControl_SOURCES upnpControl.qrc)
 
-add_executable(upnpControl ${upnpControl_SOURCES})
+qt5_add_resources(upnpControlMobile_SOURCES upnpControlMobile.qrc)
 
-target_include_directories(upnpControl PRIVATE ${KDSoap_INCLUDE_DIRS})
+add_executable(upnpControlMobile ${upnpControlMobile_SOURCES})
 
-target_link_libraries(upnpControl
+target_include_directories(upnpControlMobile PRIVATE ${KDSoap_INCLUDE_DIRS})
+
+target_link_libraries(upnpControlMobile
     LINK_PRIVATE
         upnpQt
         Qt5::Quick
         Qt5::Widgets
-        KF5::Declarative
+        Qt5::Svg
+        Qt5::Multimedia
 )
+
+if (NOT(CMAKE_SYSTEM_NAME STREQUAL Android))
+    set(upnpControl_SOURCES
+        upnpControl.cpp
+        upnpControl.qml
+        mediaServer.qml
+        mediaServerListing.qml
+        mediaAlbumView.qml
+        genericDevice.qml
+        RatingStar.qml
+        AudioTrackDelegate.qml
+        MediaPlayerControl.qml
+        MediaServerEntry.qml
+    )
+
+    qt5_add_resources(upnpControl_SOURCES upnpControl.qrc)
+
+    add_executable(upnpControl ${upnpControl_SOURCES})
+
+    target_include_directories(upnpControl PRIVATE ${KDSoap_INCLUDE_DIRS})
+
+    target_link_libraries(upnpControl
+        LINK_PRIVATE
+            upnpQt
+            Qt5::Quick
+            Qt5::Widgets
+            KF5::Declarative
+    )
+endif()
+

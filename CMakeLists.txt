@@ -10,7 +10,7 @@ include(KDEFrameworkCompilerSettings)
 include(KDECMakeSettings)
 
 set(REQUIRED_QT_VERSION "5.4.0")
-find_package(Qt5 ${REQUIRED_QT_VERSION} CONFIG REQUIRED Core Network Quick Widgets Xml)
+find_package(Qt5 ${REQUIRED_QT_VERSION} CONFIG REQUIRED Core Network Quick Widgets Xml Multimedia Svg)
 
 find_package(KDSoap CONFIG REQUIRED)
 find_package(KF5Declarative CONFIG)
@@ -23,6 +23,14 @@ include(ECMGenerateHeaders)
 ecm_setup_version(0.1.0 VARIABLE_PREFIX UPNP_QT
                         VERSION_HEADER "${CMAKE_CURRENT_BINARY_DIR}/upnpQt_version.h"
                         PACKAGE_VERSION_FILE "${CMAKE_CURRENT_BINARY_DIR}/UpnpQtConfigVersion.cmake")
+
+if (CMAKE_SYSTEM_NAME STREQUAL Android)
+    set(QT_QMAKE_EXECUTABLE "$ENV{Qt5_android}/bin/qmake")
+    # workaround until this fix is in released ECM
+    if(ECM_VERSION VERSION_LESS "5.15.0")
+        add_definitions(-DANDROID)
+    endif()
+endif()
 
 add_subdirectory(src)
 
