@@ -70,6 +70,7 @@ QHash<int, QByteArray> UpnpDeviceModel::roleNames() const
     roles[static_cast<int>(ColumnsRoles::TypeRole)] = "upnpType";
     roles[static_cast<int>(ColumnsRoles::uuidRole)] = "uuid";
     roles[static_cast<int>(ColumnsRoles::ViewNameRole)] = "viewName";
+    roles[static_cast<int>(ColumnsRoles::MobileViewNameRole)] = "mobileViewName";
 
     return roles;
 }
@@ -119,6 +120,8 @@ QVariant UpnpDeviceModel::data(const QModelIndex &index, int role) const
         return d->mAllHostsUUID[index.row()];
     case ColumnsRoles::ViewNameRole:
         return d->mAllHostsDescription[d->mAllHostsUUID[index.row()]]->viewName();
+    case ColumnsRoles::MobileViewNameRole:
+        return d->mAllHostsDescription[d->mAllHostsUUID[index.row()]]->mobileViewName();
     }
 
     return QVariant();
@@ -165,6 +168,9 @@ QVariant UpnpDeviceModel::get(int row, const QString &roleName) const
     }
     if (roleName == QStringLiteral("viewName")) {
         role = ColumnsRoles::ViewNameRole;
+    }
+    if (roleName == QStringLiteral("mobileViewName")) {
+        role = ColumnsRoles::MobileViewNameRole;
     }
 
     return data(index(row), role);

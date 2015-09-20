@@ -38,6 +38,11 @@ UpnpControlMediaServer::~UpnpControlMediaServer()
     delete d;
 }
 
+QString UpnpControlMediaServer::mobileViewName() const
+{
+    return QStringLiteral("mediaServerMobile.qml");
+}
+
 QString UpnpControlMediaServer::viewName() const
 {
     return QStringLiteral("mediaServer.qml");

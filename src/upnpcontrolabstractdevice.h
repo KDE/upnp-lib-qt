@@ -40,6 +40,8 @@ public:
 
     ~UpnpControlAbstractDevice();
 
+    virtual QString mobileViewName() const;
+
     virtual QString viewName() const;
 
 Q_SIGNALS:

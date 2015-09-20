@@ -60,6 +60,11 @@ UpnpControlAbstractDevice::~UpnpControlAbstractDevice()
     delete d;
 }
 
+QString UpnpControlAbstractDevice::mobileViewName() const
+{
+    return QStringLiteral("genericDeviceMobile.qml");
+}
+
 QString UpnpControlAbstractDevice::viewName() const
 {
     return QStringLiteral("genericDevice.qml");

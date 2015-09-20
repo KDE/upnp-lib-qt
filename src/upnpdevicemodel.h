@@ -44,6 +44,7 @@ public:
         TypeRole,
         uuidRole,
         ViewNameRole,
+        MobileViewNameRole,
     };
 
     explicit UpnpDeviceModel(QObject *parent = 0);

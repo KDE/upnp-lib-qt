@@ -40,6 +40,8 @@ public:
 
     ~UpnpControlMediaServer();
 
+    QString mobileViewName() const override;
+
     QString viewName() const override;
 
     bool hasAVTransport() const;
