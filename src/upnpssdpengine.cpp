@@ -54,20 +54,17 @@ UpnpSsdpEngine::UpnpSsdpEngine(QObject *parent)
     connect(&d->mSsdpQuerySocket, &QUdpSocket::readyRead, this, &UpnpSsdpEngine::queryReceivedData);
     connect(&d->mSsdpStandardSocket, &QUdpSocket::readyRead, this, &UpnpSsdpEngine::standardReceivedData);
 
-    d->mSsdpStandardSocket.bind(QHostAddress(QStringLiteral("239.255.255.250")), 1900, QAbstractSocket::ShareAddress | QAbstractSocket::ReuseAddressHint);
+    if (!d->mSsdpStandardSocket.bind(QHostAddress(QStringLiteral("239.255.255.250")), 1900, QAbstractSocket::ShareAddress | QAbstractSocket::ReuseAddressHint)) {
+        qDebug() << "Qt method failed";
+        int reuse = 1;
+        if (setsockopt(d->mSsdpStandardSocket.socketDescriptor(), SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(reuse)) < 0) {
+            qDebug() << "setsockopt() failed";
+        }
 
-    int reuse = 1;
-    if (setsockopt(d->mSsdpStandardSocket.socketDescriptor(), SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(reuse)) < 0) {
-        qDebug() << "setsockopt() failed" << errno;
-    }
-
-    if (setsockopt(d->mSsdpStandardSocket.socketDescriptor(), SOL_SOCKET, SO_REUSEPORT, &reuse, sizeof(reuse)) < 0) {
-        qDebug() << "setsockopt() 2 failed" << errno;
-    }
-
-    int bindResult = d->mSsdpStandardSocket.bind(QHostAddress(QStringLiteral("239.255.255.250")), 1900, QAbstractSocket::ShareAddress | QAbstractSocket::ReuseAddressHint);
-    if (!bindResult) {
-        qDebug() << "bind failed" << QHostAddress(QStringLiteral("239.255.255.250")) << d->mSsdpStandardSocket.error() << d->mSsdpStandardSocket.errorString();
+        int bindResult = d->mSsdpStandardSocket.bind(QHostAddress(QStringLiteral("239.255.255.250")), 1900, QAbstractSocket::ShareAddress | QAbstractSocket::ReuseAddressHint);
+        if (!bindResult) {
+            qDebug() << "bind failed" << QHostAddress(QStringLiteral("239.255.255.250")) << d->mSsdpStandardSocket.error() << d->mSsdpStandardSocket.errorString();
+        }
     }
 
     d->mSsdpQuerySocket.bind(QHostAddress::Any);
