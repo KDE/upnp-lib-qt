@@ -1,0 +1,15 @@
+<RCC>
+    <qresource prefix="/">
+        <file>AudioTrackDelegate.qml</file>
+        <file>binaryLight.qml</file>
+        <file>genericDevice.qml</file>
+        <file>mediaAlbumView.qml</file>
+        <file>MediaPlayerControl.qml</file>
+        <file>MediaServerEntry.qml</file>
+        <file>mediaServerListing.qml</file>
+        <file>mediaServer.qml</file>
+        <file>RatingStar.qml</file>
+        <file>upnpControl.qml</file>
+    </qresource>
+</RCC>
+

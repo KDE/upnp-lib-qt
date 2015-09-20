@@ -8,75 +8,100 @@ Item {
     property string rootId
     property StackView stackView
 
-    width: parent.width
-    height: parent.height
+    Component {
+        id: mediaServerEntry
 
-    Loader {
-        anchors.fill: parent
+        Item {
+            width: contentDirectoryView.cellWidth
+            height: contentDirectoryView.cellHeight
 
-        UpnpContentDirectoryModel {
-            id: contentDirectoryModel
-            browseFlag: 'BrowseDirectChildren'
-            filter: '*'
-            sortCriteria: ''
-            contentDirectory: contentDirectoryService
+            MouseArea {
+                id: clickHandle
 
-            Component.onCompleted: {
-                contentDirectoryModel.forceRefresh(rootId)
-            }
-        }
+                width: parent.width
+                height: parent.height
 
-        Button {
-            id: backButton
-            visible:(rootId != '0')
-            height: if (rootId == '0')
-                        0
+                onClicked: {
+                    if (itemClass == UpnpContentDirectoryModel.AudioTrack)
+                    {
+                        stackView.push({
+                                           item: Qt.resolvedUrl("mediaPlayer.qml"),
+                                           properties: {
+                                               'audioUrl': '',
+                                               'stackView': stackView
+                                           }
+                                       })
+                    }
+                    else if (itemClass == UpnpContentDirectoryModel.Album)
+                    {
+                        stackView.push({
+                                           item: Qt.resolvedUrl("mediaAlbumView.qml"),
+                                           properties: {
+                                               'contentDirectoryService': contentDirectoryService,
+                                               'rootId': contentDirectoryModel.objectIdByRow(index),
+                                               'stackView': stackView
+                                           }
+                                       })
+                    }
                     else
-                        25
-            anchors.top: parent.top
-            anchors.left: parent.left
-            anchors.right: parent.right
-            onClicked: stackView.pop()
-            text: 'Back'
-        }
-
-        TableView {
-            id: contentDirectoryView
-            anchors.top: backButton.bottom
-            anchors.bottom: parent.bottom
-            anchors.left: parent.left
-            anchors.right: parent.right
-            model: contentDirectoryModel
-
-            TableViewColumn {
-                role: "title"
-                title: "Title"
-                width: 100
+                    {
+                        stackView.push({
+                                           item: Qt.resolvedUrl("mediaServerListing.qml"),
+                                           properties: {
+                                               'contentDirectoryService': contentDirectoryService,
+                                               'rootId': contentDirectoryModel.objectIdByRow(index),
+                                               'stackView': stackView
+                                           }
+                                       })
+                    }
+                }
             }
 
-            TableViewColumn {
-                role: "count"
-                title: "Count"
-                width: 50
-            }
+            Column {
+                width: parent.width
+                height: parent.height
 
-            TableViewColumn {
-                role: "class"
-                title: "Class"
-                width: 50
-            }
+                Image {
+                    id: playIcon
+                    source: image
+                    width: parent.height * 0.8
+                    height: parent.height * 0.8
+                    sourceSize.width: width
+                    sourceSize.height: width
+                    fillMode: Image.PreserveAspectFit
+                }
 
-            onClicked:
-            {
-                stackView.push({
-                                   item: Qt.resolvedUrl("mediaServerListing.qml"),
-                                   properties: {
-                                       'contentDirectoryService': contentDirectoryService,
-                                       'rootId': contentDirectoryModel.objectIdByRow(row),
-                                       'stackView': stackView
-                                   }
-                               })
+                Label {
+                    id: mainLabel
+                    text: title
+                    width: parent.width
+                    elide: "ElideRight"
+                }
             }
         }
+    }
+
+    UpnpContentDirectoryModel {
+        id: contentDirectoryModel
+        browseFlag: 'BrowseDirectChildren'
+        filter: '*'
+        sortCriteria: ''
+        contentDirectory: contentDirectoryService
+
+        Component.onCompleted: {
+            contentDirectoryModel.forceRefresh(rootId)
+        }
+    }
+
+    GridView {
+        id: contentDirectoryView
+        anchors.fill: parent
+        model: contentDirectoryModel
+
+        delegate: mediaServerEntry
+
+        focus: true
+        contentWidth: parent.width
+        contentHeight: parent.height
     }
 }

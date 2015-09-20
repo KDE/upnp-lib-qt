@@ -13,15 +13,14 @@ Item {
 
     Button {
         id: backButton
-        height: if (listingView.depth == 1)
-                    25
-                else
-                    0
-        visible: (listingView.depth == 1)
+        height: 25
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: parent.right
-        onClicked: stackView.pop()
+        onClicked: if (listingView.depth > 1)
+                       listingView.pop()
+                   else
+                       stackView.pop()
         text: 'Back'
     }
 

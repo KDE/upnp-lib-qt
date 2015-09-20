@@ -59,12 +59,24 @@ class UPNPQT_EXPORT UpnpContentDirectoryModel : public QAbstractListModel
                WRITE setContentDirectory
                NOTIFY contentDirectoryChanged)
 
+    Q_ENUMS(ItemClass)
+
 public:
+
+    enum ItemClass {
+        Container = 0,
+        Album = 1,
+        AudioTrack = 2,
+    };
 
     enum ColumnsRoles {
         TitleRole = Qt::UserRole + 1,
-        ClassRole = TitleRole + 1,
-        CountRole = ClassRole + 1,
+        DurationRole = TitleRole + 1,
+        ArtistRole = DurationRole + 1,
+        RatingRole = ArtistRole + 1,
+        ImageRole = RatingRole + 1,
+        ItemClassRole = ImageRole + 1,
+        CountRole = ItemClassRole + 1,
     };
 
     explicit UpnpContentDirectoryModel(QObject *parent = 0);
@@ -103,6 +115,8 @@ public:
 
     Q_INVOKABLE QString objectIdByRow(int row) const;
 
+    Q_INVOKABLE QVariant getUrl(int row) const;
+
 Q_SIGNALS:
 
     void rootObjectIDChanged();
@@ -126,6 +140,8 @@ private:
     UpnpContentDirectoryModelPrivate *d;
 
 };
+
+Q_DECLARE_METATYPE(UpnpContentDirectoryModel::ItemClass)
 
 #endif // UPNPCONTENTDIRECTORYMODEL_H
 

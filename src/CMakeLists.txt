@@ -106,8 +106,15 @@ set(upnpControl_SOURCES
     upnpControl.qml
     mediaServer.qml
     mediaServerListing.qml
+    mediaAlbumView.qml
     genericDevice.qml
+    RatingStar.qml
+    AudioTrackDelegate.qml
+    MediaPlayerControl.qml
+    MediaServerEntry.qml
 )
+
+qt5_add_resources(upnpControl_SOURCES upnpControl.qrc)
 
 add_executable(upnpControl ${upnpControl_SOURCES})
 
@@ -118,4 +125,5 @@ target_link_libraries(upnpControl
         upnpQt
         Qt5::Quick
         Qt5::Widgets
+        KF5::Declarative
 )

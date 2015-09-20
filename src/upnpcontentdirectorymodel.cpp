@@ -76,7 +76,11 @@ QHash<int, QByteArray> UpnpContentDirectoryModel::roleNames() const
     QHash<int, QByteArray> roles;
 
     roles[static_cast<int>(ColumnsRoles::TitleRole)] = "title";
-    roles[static_cast<int>(ColumnsRoles::ClassRole)] = "class";
+    roles[static_cast<int>(ColumnsRoles::DurationRole)] = "duration";
+    roles[static_cast<int>(ColumnsRoles::ArtistRole)] = "artist";
+    roles[static_cast<int>(ColumnsRoles::RatingRole)] = "rating";
+    roles[static_cast<int>(ColumnsRoles::ImageRole)] = "image";
+    roles[static_cast<int>(ColumnsRoles::ItemClassRole)] = "itemClass";
     roles[static_cast<int>(ColumnsRoles::CountRole)] = "count";
 
     return roles;
@@ -117,10 +121,34 @@ QVariant UpnpContentDirectoryModel::data(const QModelIndex &index, int role) con
     {
     case ColumnsRoles::TitleRole:
         return d->mData[d->mDataIds[index.row()]][QStringLiteral("title")];
-    case ColumnsRoles::ClassRole:
+    case ColumnsRoles::ItemClassRole:
         return d->mData[d->mDataIds[index.row()]][QStringLiteral("class")];
     case ColumnsRoles::CountRole:
         return d->mData[d->mDataIds[index.row()]][QStringLiteral("count")];
+    case ColumnsRoles::DurationRole:
+        return d->mData[d->mDataIds[index.row()]][QStringLiteral("duration")];
+    case ColumnsRoles::RatingRole:
+        return 0;
+    case ColumnsRoles::ArtistRole:
+        if (!d->mData[d->mDataIds[index.row()]][QStringLiteral("artist")].toString().isEmpty()) {
+            return d->mData[d->mDataIds[index.row()]][QStringLiteral("artist")];
+        } else {
+            return d->mData[d->mDataIds[index.row()]][QStringLiteral("creator")];
+        }
+    case ColumnsRoles::ImageRole:
+        switch (d->mData[d->mDataIds[index.row()]][QStringLiteral("class")].value<int>())
+        {
+        case UpnpContentDirectoryModel::Album:
+            if (!d->mData[d->mDataIds[index.row()]][QStringLiteral("albumArt")].toString().isEmpty()) {
+                return d->mData[d->mDataIds[index.row()]][QStringLiteral("albumArt")].toUrl();
+            } else {
+                return QUrl(QStringLiteral("image://icon/media-optical-audio"));
+            }
+        case UpnpContentDirectoryModel::Container:
+            return QUrl(QStringLiteral("image://icon/folder"));
+        case UpnpContentDirectoryModel::AudioTrack:
+            return QUrl(QStringLiteral("image://icon/audio-x-generic"));
+        }
     }
 
     return QVariant();
@@ -200,6 +228,11 @@ QString UpnpContentDirectoryModel::objectIdByRow(int row) const
     return d->mDataIds.at(row);
 }
 
+QVariant UpnpContentDirectoryModel::getUrl(int row) const
+{
+    return d->mData[d->mDataIds[row]][QStringLiteral("resource")];
+}
+
 void UpnpContentDirectoryModel::browseFinished(const QString &result, int numberReturned, int totalMatches, int systemUpdateID, bool success)
 {
     Q_UNUSED(numberReturned)
@@ -213,7 +246,7 @@ void UpnpContentDirectoryModel::browseFinished(const QString &result, int number
     QDomDocument browseDescription;
     browseDescription.setContent(result);
 
-    const QDomElement &documentRoot = browseDescription.documentElement();
+    browseDescription.documentElement();
 
     QList<QString> newDataIds;
     QHash<QString, QHash<QString, QVariant> > newData;
@@ -242,9 +275,28 @@ void UpnpContentDirectoryModel::browseFinished(const QString &result, int number
                 newData[id][QStringLiteral("title")] = titleNode.toElement().text();
             }
 
+            const QDomNode &authorNode = containerNode.firstChildElement(QStringLiteral("dc:creator"));
+            if (!authorNode.isNull()) {
+                newData[id][QStringLiteral("creator")] = authorNode.toElement().text();
+            }
+
+            const QDomNode &resourceNode = containerNode.firstChildElement(QStringLiteral("res"));
+            if (!resourceNode.isNull()) {
+                newData[id][QStringLiteral("resource")] = resourceNode.toElement().text();
+            }
+
             const QDomNode &classNode = containerNode.firstChildElement(QStringLiteral("upnp:class"));
-            if (!classNode.isNull()) {
-                newData[id][QStringLiteral("class")] = classNode.toElement().text();
+            if (classNode.toElement().text().startsWith(QStringLiteral("object.item.audioItem"))) {
+                newData[id][QStringLiteral("class")] = UpnpContentDirectoryModel::AudioTrack;
+            } else if (classNode.toElement().text().startsWith(QStringLiteral("object.container.album"))) {
+                newData[id][QStringLiteral("class")] = UpnpContentDirectoryModel::Album;
+            } else if (classNode.toElement().text().startsWith(QStringLiteral("object.container"))) {
+                newData[id][QStringLiteral("class")] = UpnpContentDirectoryModel::Container;
+            }
+
+            const QDomNode &albumArtNode = containerNode.firstChildElement(QStringLiteral("upnp:albumArtURI"));
+            if (!albumArtNode.isNull()) {
+                newData[id][QStringLiteral("albumArt")] = albumArtNode.toElement().text();
             }
 
             const QDomNode &storageUsedNode = containerNode.firstChildElement(QStringLiteral("upnp:storageUsed"));
@@ -276,9 +328,41 @@ void UpnpContentDirectoryModel::browseFinished(const QString &result, int number
                 newData[id][QStringLiteral("title")] = titleNode.toElement().text();
             }
 
+            const QDomNode &authorNode = itemNode.firstChildElement(QStringLiteral("dc:creator"));
+            if (!authorNode.isNull()) {
+                newData[id][QStringLiteral("creator")] = authorNode.toElement().text();
+            }
+
+            const QDomNode &resourceNode = itemNode.firstChildElement(QStringLiteral("res"));
+            if (!resourceNode.isNull()) {
+                newData[id][QStringLiteral("resource")] = resourceNode.toElement().text();
+                if (resourceNode.attributes().contains(QStringLiteral("duration"))) {
+                    const QDomNode &durationNode = resourceNode.attributes().namedItem(QStringLiteral("duration"));
+                    QString durationValue = durationNode.nodeValue();
+                    if (durationValue.startsWith(QStringLiteral("0:"))) {
+                        durationValue = durationValue.mid(2);
+                    }
+                    if (durationValue.contains(uint('.'))) {
+                        durationValue = durationValue.split(QStringLiteral(".")).first();
+                    }
+
+                    newData[id][QStringLiteral("duration")] = durationValue;
+                }
+                if (resourceNode.attributes().contains(QStringLiteral("artist"))) {
+                    const QDomNode &artistNode = resourceNode.attributes().namedItem(QStringLiteral("artist"));
+                    newData[id][QStringLiteral("artist")] = artistNode.nodeValue();
+                }
+            }
+
             const QDomNode &classNode = itemNode.firstChildElement(QStringLiteral("upnp:class"));
             if (!classNode.isNull()) {
-                newData[id][QStringLiteral("class")] = classNode.toElement().text();
+                if (classNode.toElement().text().startsWith(QStringLiteral("object.item.audioItem"))) {
+                    newData[id][QStringLiteral("class")] = UpnpContentDirectoryModel::AudioTrack;
+                } else if (classNode.toElement().text().startsWith(QStringLiteral("object.container.album"))) {
+                    newData[id][QStringLiteral("class")] = UpnpContentDirectoryModel::Album;
+                } else if (classNode.toElement().text().startsWith(QStringLiteral("object.container"))) {
+                    newData[id][QStringLiteral("class")] = UpnpContentDirectoryModel::Container;
+                }
             }
 
             const QDomNode &storageUsedNode = itemNode.firstChildElement(QStringLiteral("upnp:storageUsed"));

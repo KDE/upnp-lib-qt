@@ -33,6 +33,7 @@ class UpnpAbstractServicePrivate;
 class UpnpActionDescription;
 class UpnpStateVariableDescription;
 class UpnpEventSubscriber;
+class QIODevice;
 
 class UPNPQT_EXPORT UpnpAbstractService : public QObject
 {

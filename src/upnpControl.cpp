@@ -29,13 +29,15 @@
 #include "upnpcontrolcontentdirectory.h"
 #include "upnpcontentdirectorymodel.h"
 
+#include <KDeclarative/KDeclarative>
+
 #include <QtWidgets/QApplication>
 
 #include <QtQml/QQmlApplicationEngine>
 #include <QtQml/QQmlEngine>
 #include <QtQml>
 
-int main(int argc, char *argv[])
+int __attribute__((visibility("default"))) main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
 
@@ -57,7 +59,11 @@ int main(int argc, char *argv[])
     qRegisterMetaType<UpnpControlConnectionManager*>();
     qRegisterMetaType<UpnpContentDirectoryModel*>();
 
-    QQmlApplicationEngine engine(QUrl(QStringLiteral("./upnpControl.qml")));
+    QQmlApplicationEngine engine(QUrl(QStringLiteral("qrc:/upnpControl.qml")));
+
+    KDeclarative::KDeclarative decl;
+    decl.setDeclarativeEngine(&engine);
+    decl.setupBindings();
 
     app.exec();
 
