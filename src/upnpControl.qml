@@ -21,6 +21,7 @@ import QtQuick 2.2
 import QtQuick.Window 2.1
 import QtQuick.Controls 1.2
 import QtQuick.Controls.Styles 1.2
+import QtQml.Models 2.1
 import org.mgallien.QmlExtension 1.0
 
 ApplicationWindow {
@@ -56,16 +57,31 @@ ApplicationWindow {
         }
     }
 
-    Component {
-        id: deviceDelegate
-        Item {
+    DelegateModel {
+        id: delegateDeviceModel
+        model: deviceModel
+
+        delegate: Item {
             id: serviceItem
-            anchors.rightMargin: 4
-            anchors.leftMargin: 4
-            anchors.left: parent.left
-            anchors.right: parent.right
+            width: peersView.width
+            height: 50
 
             property UpnpControlSwitchPower upnpService
+
+            MouseArea {
+                anchors.fill: parent
+                onClicked: {
+                    serviceItem.DelegateModel.inSelected = !serviceItem.DelegateModel.inSelected
+
+                    globalStackView.push({
+                                    item: Qt.resolvedUrl(deviceModel.get(serviceItem.DelegateModel.itemsIndex, 'viewName')),
+                                    properties: {
+                                        'parentStackView' : globalStackView,
+                                        'aDevice' : deviceModel.getDeviceDescription(deviceModel.get(serviceItem.DelegateModel.itemsIndex, 'uuid'))
+                                    }
+                                })
+                }
+            }
 
             Label {
                 id: nameLabel
@@ -74,7 +90,6 @@ ApplicationWindow {
                 anchors.right: parent.right
                 anchors.rightMargin: 2
                 anchors.leftMargin: 2
-                color: styleData.textColor
                 text: {
                     if (model != undefined)
                         model.name
@@ -94,7 +109,6 @@ ApplicationWindow {
                 anchors.right: nameLabel.right
                 anchors.rightMargin: 8
                 anchors.leftMargin: 2
-                color: styleData.textColor
                 text: {if (model != undefined) model.upnpType ; if (model == undefined) ""}
                 horizontalAlignment: Text.AlignRight
                 verticalAlignment: Text.AlignVCenter
@@ -108,7 +122,6 @@ ApplicationWindow {
                 anchors.right: deviceTypeLabel.left
                 anchors.rightMargin: 8
                 anchors.leftMargin: 2
-                color: styleData.textColor
                 text: ''
                 horizontalAlignment: Text.AlignRight
                 verticalAlignment: Text.AlignVCenter
@@ -187,11 +200,14 @@ ApplicationWindow {
     }
 
     StackView {
+        id: globalStackView
         anchors.fill: parent
+
         initialItem: TableView {
             id: peersView
-            model: deviceModel
-            itemDelegate: deviceDelegate
+
+            model: delegateDeviceModel
+
             rowDelegate: rowDelegate
             width: parent.width
             height: parent.height
@@ -207,8 +223,8 @@ ApplicationWindow {
                 parent.push({
                                 item: Qt.resolvedUrl(model.get(row, 'viewName')),
                                 properties: {
-                                    'stackView' : parent,
-                                    'aDevice' : deviceModel.getDeviceDescription(model.get(row, 'uuid'))
+                                    'parentStackView': globalStackView,
+                                    'aDevice': deviceModel.getDeviceDescription(model.get(row, 'uuid'))
                                 }
                             })
             }

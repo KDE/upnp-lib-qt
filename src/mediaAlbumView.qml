@@ -2,6 +2,7 @@ import QtQuick 2.0
 import QtQuick.Controls 1.2
 import QtQuick.Controls.Styles 1.2
 import QtQuick.Layouts 1.1
+import QtQml.Models 2.1
 import org.mgallien.QmlExtension 1.0
 import QtMultimedia 5.4
 
@@ -9,6 +10,7 @@ Item {
     property UpnpControlContentDirectory contentDirectoryService
     property string rootId
     property StackView stackView
+    property UpnpContentDirectoryModel contentModel
 
     width: stackView.width
     height: stackView.height
@@ -23,19 +25,6 @@ Item {
                 color: "#fff"
                 anchors.fill: parent
             }
-        }
-    }
-
-
-    UpnpContentDirectoryModel {
-        id: contentDirectoryModel
-        browseFlag: 'BrowseDirectChildren'
-        filter: '*'
-        sortCriteria: ''
-        contentDirectory: contentDirectoryService
-
-        Component.onCompleted: {
-            contentDirectoryModel.forceRefresh(rootId)
         }
     }
 
@@ -70,39 +59,44 @@ Item {
         TableView {
             id: contentDirectoryView
 
-            model: contentDirectoryModel
+            model: DelegateModel {
+                model: contentModel
+                rootIndex: contentModel.indexFromId(rootId)
+
+                delegate: AudioTrackDelegate {
+                    height: 80
+                    width: contentDirectoryView.width
+                    title: if (model != undefined && model.title !== undefined)
+                               model.title
+                           else
+                               ''
+                    artist: if (model != undefined && model.artist !== undefined)
+                                model.artist
+                            else
+                                ''
+                    itemDecoration: if (model != undefined && model.image !== undefined)
+                                        model.image
+                                    else
+                                        ''
+                    duration: if (model != undefined && model.duration !== undefined)
+                                  model.duration
+                              else
+                                  ''
+                    trackRating: if (model != undefined && model.rating !== undefined)
+                                     model.rating
+                                 else
+                                     ''
+                    isPlaying: true
+                }
+            }
+
             headerVisible: false
             frameVisible: false
             focus: true
             rowDelegate: rowDelegate
 
-            itemDelegate: AudioTrackDelegate {
-                height: 80
-                title: if (model != undefined)
-                           model.title
-                       else
-                           ''
-                artist: if (model != undefined)
-                            model.artist
-                        else
-                            ''
-                itemDecoration: if (model != undefined)
-                                    model.image
-                                else
-                                    ''
-                duration: if (model != undefined)
-                              model.duration
-                          else
-                              ''
-                trackRating: if (model != undefined)
-                                 model.rating
-                             else
-                                 ''
-                isPlaying: true
-            }
-
             onClicked: {
-                player.source = model.getUrl(row)
+                player.source = contentModel.getUrl(model.modelIndex(row))
             }
 
             TableViewColumn {

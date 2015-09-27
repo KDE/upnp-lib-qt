@@ -17,17 +17,36 @@ Item {
         height: parent.height
         spacing: 0
 
-        Image {
-            id: mainIcon
-            source: itemDecoration
-            Layout.preferredWidth: parent.height * 0.9
-            Layout.preferredHeight: parent.height * 0.9
-            width: parent.height * 0.9
-            height: parent.height * 0.9
-            sourceSize.width: width
-            sourceSize.height: width
-            fillMode: Image.PreserveAspectFit
-            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
+        ColumnLayout {
+            Layout.preferredWidth: parent.height
+            Layout.preferredHeight: parent.height
+            Layout.alignment: Qt.AlignVCenter | Qt.AlignLeft
+            spacing: 0
+
+            Item {
+                Layout.preferredHeight: 1
+                Layout.minimumHeight: 1
+                Layout.maximumHeight: 1
+            }
+
+            Image {
+                id: mainIcon
+                source: itemDecoration
+                Layout.preferredWidth: parent.height - 2
+                Layout.preferredHeight: parent.height - 2
+                width: parent.height - 2
+                //height: parent.height
+                sourceSize.width: width
+                sourceSize.height: width
+                fillMode: Image.PreserveAspectFit
+                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
+            }
+
+            Item {
+                Layout.preferredHeight: 1
+                Layout.minimumHeight: 1
+                Layout.maximumHeight: 1
+            }
         }
 
         ColumnLayout {

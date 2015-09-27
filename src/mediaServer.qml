@@ -5,8 +5,11 @@ import org.mgallien.QmlExtension 1.0
 
 Item {
     property UpnpControlMediaServer aDevice
-    property StackView stackView
+    property StackView parentStackView
     property UpnpControlConnectionManager connectionManager
+    property string globalBrowseFlag: 'BrowseDirectChildren'
+    property string globalFilter: '*'
+    property string globalSortCriteria: ''
 
     width: parent.width
     height: parent.height
@@ -17,10 +20,11 @@ Item {
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: parent.right
-        onClicked: if (listingView.depth > 1)
+        onClicked: if (listingView.depth > 1) {
                        listingView.pop()
-                   else
-                       stackView.pop()
+                   } else {
+                       parentStackView.pop()
+                   }
         text: 'Back'
     }
 
@@ -39,14 +43,23 @@ Item {
                          }
     }
 
+    UpnpContentDirectoryModel {
+        id: contentDirectoryModel
+        browseFlag: globalBrowseFlag
+        filter: globalFilter
+        sortCriteria: globalSortCriteria
+        contentDirectory: aDevice.serviceById('urn:upnp-org:serviceId:ContentDirectory')
+    }
+
     Component.onCompleted: {
         connectionManager = aDevice.serviceById('urn:upnp-org:serviceId:ConnectionManager')
         listingView.push({
                            item: Qt.resolvedUrl("mediaServerListing.qml"),
                            properties: {
-                               'contentDirectoryService': aDevice.serviceById('urn:upnp-org:serviceId:ContentDirectory'),
+                               'contentDirectoryService': contentDirectoryModel.contentDirectory,
                                'rootId': '0',
-                               'stackView': listingView
+                               'stackView': listingView,
+                               'contentModel': contentDirectoryModel
                            }
                        })
     }

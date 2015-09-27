@@ -22,7 +22,7 @@
 
 #include "upnpQt_export.h"
 
-#include <QAbstractListModel>
+#include <QtCore/QAbstractItemModel>
 
 class UpnpContentDirectoryModelPrivate;
 class UpnpSsdpEngine;
@@ -30,14 +30,9 @@ class UpnpControlAbstractDevice;
 class UpnpControlContentDirectory;
 struct UpnpDiscoveryResult;
 
-class UPNPQT_EXPORT UpnpContentDirectoryModel : public QAbstractListModel
+class UPNPQT_EXPORT UpnpContentDirectoryModel : public QAbstractItemModel
 {
     Q_OBJECT
-
-    Q_PROPERTY(QString rootObjectID
-               READ rootObjectID
-               WRITE setRootObjectID
-               NOTIFY rootObjectIDChanged)
 
     Q_PROPERTY(QString browseFlag
                READ browseFlag
@@ -72,28 +67,38 @@ public:
     enum ColumnsRoles {
         TitleRole = Qt::UserRole + 1,
         DurationRole = TitleRole + 1,
-        ArtistRole = DurationRole + 1,
+        CreatorRole = DurationRole + 1,
+        ArtistRole = CreatorRole + 1,
         RatingRole = ArtistRole + 1,
         ImageRole = RatingRole + 1,
-        ItemClassRole = ImageRole + 1,
+        ResourceRole = ImageRole + 1,
+        ItemClassRole = ResourceRole + 1,
         CountRole = ItemClassRole + 1,
+        IdRole = CountRole + 1,
+        ParentIdRole = IdRole + 1,
     };
 
     explicit UpnpContentDirectoryModel(QObject *parent = 0);
 
     virtual ~UpnpContentDirectoryModel();
 
-    int rowCount(const QModelIndex &parent = QModelIndex()) const Q_DECL_OVERRIDE;
+    int rowCount(const QModelIndex &parent = QModelIndex()) const override;
 
-    QHash<int, QByteArray> roleNames() const Q_DECL_OVERRIDE;
+    QHash<int, QByteArray> roleNames() const override;
 
-    Qt::ItemFlags flags(const QModelIndex &index) const Q_DECL_OVERRIDE;
+    Qt::ItemFlags flags(const QModelIndex &index) const override;
 
-    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const Q_DECL_OVERRIDE;
+    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
 
-    const QString& rootObjectID() const;
+    QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const override;
 
-    void setRootObjectID(const QString &value);
+    QModelIndex parent(const QModelIndex &child) const override;
+
+    int columnCount(const QModelIndex &parent = QModelIndex()) const override;
+
+    bool canFetchMore(const QModelIndex &parent) const override;
+
+    void fetchMore(const QModelIndex &parent) override;
 
     const QString& browseFlag() const;
 
@@ -111,15 +116,13 @@ public:
 
     void setContentDirectory(UpnpControlContentDirectory *directory);
 
-    Q_INVOKABLE void forceRefresh(const QString &objectId);
+    Q_INVOKABLE QString objectIdByIndex(const QModelIndex &index) const;
 
-    Q_INVOKABLE QString objectIdByRow(int row) const;
+    Q_INVOKABLE QVariant getUrl(const QModelIndex &index) const;
 
-    Q_INVOKABLE QVariant getUrl(int row) const;
+    Q_INVOKABLE QModelIndex indexFromId(const QString &id) const;
 
 Q_SIGNALS:
-
-    void rootObjectIDChanged();
 
     void browseFlagChanged();
 
@@ -136,6 +139,8 @@ public Q_SLOTS:
 private Q_SLOTS:
 
 private:
+
+    QModelIndex indexFromInternalId(quintptr internalId) const;
 
     UpnpContentDirectoryModelPrivate *d;
 
