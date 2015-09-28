@@ -11,6 +11,8 @@ Item {
     property string rootId
     property StackView stackView
     property UpnpContentDirectoryModel contentModel
+    property Audio player
+    property MediaPlayerControl playControl
 
     width: stackView.width
     height: stackView.height
@@ -28,33 +30,9 @@ Item {
         }
     }
 
-    Audio {
-        id: player
-    }
-
     ColumnLayout {
         anchors.fill: parent
         spacing: 0
-
-        MediaPlayerControl {
-            id: playControl
-
-            volume: player.volume
-            position: player.position
-            duration: player.duration
-            muted: player.muted
-            isPlaying: (player.playbackState == Audio.PlayingState)
-            seekable: player.seekable
-
-            Layout.preferredHeight: 80
-            Layout.fillWidth: true
-
-            onPlay: player.play()
-            onPause: player.pause()
-            onSeek: player.seek(position)
-            onVolumeChanged: player.volume = volume
-            onMutedChanged: player.muted = muted
-        }
 
         TableView {
             id: contentDirectoryView

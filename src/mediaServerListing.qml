@@ -3,12 +3,15 @@ import QtQuick.Controls 1.2
 import QtQuick.Controls.Styles 1.2
 import QtQml.Models 2.1
 import org.mgallien.QmlExtension 1.0
+import QtMultimedia 5.4
 
 Item {
     property UpnpControlContentDirectory contentDirectoryService
     property string rootId
     property StackView stackView
     property UpnpContentDirectoryModel contentModel
+    property Audio player
+    property MediaPlayerControl playControl
 
     GridView {
         id: contentDirectoryView
@@ -43,7 +46,9 @@ Item {
                                                properties: {
                                                    'audioUrl': '',
                                                    'stackView': stackView,
-                                                   'contentModel': contentModel
+                                                   'contentModel': contentModel,
+                                                   'player': player,
+                                                   'playControl': playControl
                                                }
                                            })
                         }
@@ -55,7 +60,9 @@ Item {
                                                    'contentDirectoryService': contentDirectoryService,
                                                    'rootId': contentModel.objectIdByIndex(delegateContentModel.modelIndex(mediaServerEntry.DelegateModel.itemsIndex)),
                                                    'stackView': stackView,
-                                                   'contentModel': contentModel
+                                                   'contentModel': contentModel,
+                                                   'player': player,
+                                                   'playControl': playControl
                                                }
                                            })
                         }
@@ -67,7 +74,9 @@ Item {
                                                    'contentDirectoryService': contentDirectoryService,
                                                    'rootId': contentModel.objectIdByIndex(delegateContentModel.modelIndex(mediaServerEntry.DelegateModel.itemsIndex)),
                                                    'stackView': stackView,
-                                                   'contentModel': contentModel
+                                                   'contentModel': contentModel,
+                                                   'player': player,
+                                                   'playControl': playControl
                                                }
                                            })
                         }

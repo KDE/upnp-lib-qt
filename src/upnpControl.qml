@@ -113,7 +113,7 @@ ApplicationWindow {
                 horizontalAlignment: Text.AlignRight
                 verticalAlignment: Text.AlignVCenter
                 height: 15
-                visible: styleData.selected
+                visible: false
             }
             Label {
                 id: statusLabel
