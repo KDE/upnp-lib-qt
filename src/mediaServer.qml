@@ -18,6 +18,12 @@ Item {
 
     Audio {
         id: audioPlayer
+
+        muted: playControlItem.muted
+        volume: if (muted)
+                    0
+                else
+                    playControlItem.volume
     }
 
     MediaPlayList {
@@ -43,10 +49,10 @@ Item {
         MediaPlayerControl {
             id: playControlItem
 
-            volume: audioPlayer.volume
+            volume: 100
             position: audioPlayer.position
             duration: audioPlayer.duration
-            muted: audioPlayer.muted
+            muted: false
             isPlaying: (audioPlayer.playbackState == Audio.PlayingState)
             seekable: audioPlayer.seekable
 
@@ -58,8 +64,6 @@ Item {
             onPlay: audioPlayer.play()
             onPause: audioPlayer.pause()
             onSeek: audioPlayer.seek(position)
-            onVolumeChanged: audioPlayer.volume = volume
-            onMutedChanged: audioPlayer.muted = muted
         }
 
         RowLayout {

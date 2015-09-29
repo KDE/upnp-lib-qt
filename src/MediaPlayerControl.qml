@@ -152,12 +152,7 @@ Item {
                 id: volumeIcon
                 MouseArea {
                     anchors.fill: parent
-                    onClicked: {
-                        if (musicWidget.muted)
-                            musicWidget.muted = false
-                        else
-                            musicWidget.muted = true
-                    }
+                    onClicked: musicWidget.muted = !musicWidget.muted
                 }
                 source: if (musicWidget.muted)
                             'image://icon/player-volume-muted'
@@ -193,8 +188,14 @@ Item {
                        else
                            musicWidget.volume
                 onValueChanged: {
-                    musicWidget.volume = value
-                    musicWidget.muted = false
+                    if (!musicWidget.muted) {
+                        musicWidget.volume = value
+                    } else {
+                        if (value != 0) {
+                            musicWidget.volume = value
+                            musicWidget.muted = false
+                        }
+                    }
                 }
 
                 Layout.alignment: Qt.AlignVCenter
