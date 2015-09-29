@@ -28,6 +28,7 @@
 #include "upnpcontrolmediaserver.h"
 #include "upnpcontrolcontentdirectory.h"
 #include "upnpcontentdirectorymodel.h"
+#include "mediaplaylist.h"
 
 #include <KDeclarative/KDeclarative>
 
@@ -52,6 +53,7 @@ int __attribute__((visibility("default"))) main(int argc, char *argv[])
     qmlRegisterType<UpnpControlMediaServer>("org.mgallien.QmlExtension", 1, 0, "UpnpControlMediaServer");
     qmlRegisterType<UpnpControlContentDirectory>("org.mgallien.QmlExtension", 1, 0, "UpnpControlContentDirectory");
     qmlRegisterType<UpnpContentDirectoryModel>("org.mgallien.QmlExtension", 1, 0, "UpnpContentDirectoryModel");
+    qmlRegisterType<MediaPlayList>("org.mgallien.QmlExtension", 1, 0, "MediaPlayList");
 
     qRegisterMetaType<A_ARG_TYPE_InstanceID>();
     qRegisterMetaType<UpnpDiscoveryResult>();

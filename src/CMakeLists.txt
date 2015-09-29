@@ -23,6 +23,7 @@ set(upnpQt_SOURCES
     upnpcontrolmediaserver.cpp
     upnpcontrolcontentdirectory.cpp
     upnpcontentdirectorymodel.cpp
+    mediaplaylist.cpp
 )
 
 ecm_generate_headers(

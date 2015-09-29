@@ -6,13 +6,77 @@ import QtQml.Models 2.1
 import org.mgallien.QmlExtension 1.0
 import QtMultimedia 5.4
 
-Rectangle {
+Item {
     property UpnpControlMediaServer mediaServerDevice
     property StackView parentStackView
     property UpnpControlConnectionManager connectionManager
     property Audio player
     property MediaPlayerControl playControl
+    property MediaPlayList playListModel
 
-    color: 'black'
+    Component {
+        id: rowDelegate
+
+        Item {
+            id: rowDelegateContent
+            height: 80
+            Rectangle {
+                color: "#fff"
+                anchors.fill: parent
+            }
+        }
+    }
+
+    ColumnLayout {
+        anchors.fill: parent
+        spacing: 0
+
+        TableView {
+            id: playListView
+
+            model: DelegateModel {
+                model: playListModel
+
+                delegate: AudioTrackDelegate {
+                    height: 80
+                    width: playListView.width
+                    title: if (model != undefined && model.title !== undefined)
+                               model.title
+                           else
+                               ''
+                    artist: if (model != undefined && model.artist !== undefined)
+                                model.artist
+                            else
+                                ''
+                    itemDecoration: if (model != undefined && model.image !== undefined)
+                                        model.image
+                                    else
+                                        ''
+                    duration: if (model != undefined && model.duration !== undefined)
+                                  model.duration
+                              else
+                                  ''
+                    trackRating: if (model != undefined && model.rating !== undefined)
+                                     model.rating
+                                 else
+                                     ''
+                    isPlaying: true
+                }
+            }
+
+            headerVisible: false
+            frameVisible: false
+            focus: true
+            rowDelegate: rowDelegate
+
+            TableViewColumn {
+                role: "title"
+                title: "Title"
+            }
+
+            Layout.fillHeight: true
+            Layout.fillWidth: true
+        }
+    }
 }
 

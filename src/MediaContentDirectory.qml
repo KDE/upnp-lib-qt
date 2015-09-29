@@ -9,8 +9,7 @@ Item {
     property UpnpControlMediaServer mediaServerDevice
     property StackView parentStackView
     property UpnpControlConnectionManager connectionManager
-    property Audio player
-    property MediaPlayerControl playControl
+    property MediaPlayList playListModel
 
     property string globalBrowseFlag: 'BrowseDirectChildren'
     property string globalFilter: '*'
@@ -70,8 +69,7 @@ Item {
                                  'rootId': '0',
                                  'stackView': listingView,
                                  'contentModel': contentDirectoryModel,
-                                 'player': player,
-                                 'playControl': playControl
+                                 'playListModel': playListModel,
                              }
                          })
     }

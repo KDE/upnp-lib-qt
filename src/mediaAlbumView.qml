@@ -11,8 +11,7 @@ Item {
     property string rootId
     property StackView stackView
     property UpnpContentDirectoryModel contentModel
-    property Audio player
-    property MediaPlayerControl playControl
+    property MediaPlayList playListModel
 
     width: stackView.width
     height: stackView.height
@@ -74,7 +73,7 @@ Item {
             rowDelegate: rowDelegate
 
             onClicked: {
-                player.source = contentModel.getUrl(model.modelIndex(row))
+                playListModel.enqueue(model.modelIndex(row))
             }
 
             TableViewColumn {

@@ -10,8 +10,7 @@ Item {
     property string rootId
     property StackView stackView
     property UpnpContentDirectoryModel contentModel
-    property Audio player
-    property MediaPlayerControl playControl
+    property MediaPlayList playListModel
 
     Rectangle {
         color: 'white'
@@ -53,8 +52,7 @@ Item {
                                                        'audioUrl': '',
                                                        'stackView': stackView,
                                                        'contentModel': contentModel,
-                                                       'player': player,
-                                                       'playControl': playControl
+                                                       'playListModel': playListModel
                                                    }
                                                })
                             }
@@ -67,8 +65,7 @@ Item {
                                                        'rootId': contentModel.objectIdByIndex(delegateContentModel.modelIndex(mediaServerEntry.DelegateModel.itemsIndex)),
                                                        'stackView': stackView,
                                                        'contentModel': contentModel,
-                                                       'player': player,
-                                                       'playControl': playControl
+                                                       'playListModel': playListModel
                                                    }
                                                })
                             }
@@ -81,8 +78,7 @@ Item {
                                                        'rootId': contentModel.objectIdByIndex(delegateContentModel.modelIndex(mediaServerEntry.DelegateModel.itemsIndex)),
                                                        'stackView': stackView,
                                                        'contentModel': contentModel,
-                                                       'player': player,
-                                                       'playControl': playControl
+                                                       'playListModel': playListModel
                                                    }
                                                })
                             }

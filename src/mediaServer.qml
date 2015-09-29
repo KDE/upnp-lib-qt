@@ -20,6 +20,10 @@ Item {
         id: audioPlayer
     }
 
+    MediaPlayList {
+        id: playListModelItem
+    }
+
     ListModel {
         id: viewModeModel
 
@@ -125,8 +129,7 @@ Item {
                         mediaServerDevice: aDevice
                         parentStackView: rootElement.parentStackView
                         connectionManager: rootElement.connectionManager
-                        player: audioPlayer
-                        playControl: playControlItem
+                        playListModel: playListModelItem
 
                         width: mainContentView.width
                         height: mainContentView.height
@@ -142,6 +145,7 @@ Item {
                         connectionManager: rootElement.connectionManager
                         player: audioPlayer
                         playControl: playControlItem
+                        playListModel: playListModelItem
 
                         width: mainContentView.width
                         height: mainContentView.height
