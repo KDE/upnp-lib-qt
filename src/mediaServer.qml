@@ -1,7 +1,8 @@
-import QtQuick 2.0
-import QtQuick.Controls 1.2
-import QtQuick.Controls.Styles 1.2
+import QtQuick 2.4
+import QtQuick.Controls 1.3
+import QtQuick.Controls.Styles 1.3
 import QtQuick.Layouts 1.1
+import QtQml.Models 2.1
 import org.mgallien.QmlExtension 1.0
 import QtMultimedia 5.4
 
@@ -9,15 +10,26 @@ Item {
     property UpnpControlMediaServer aDevice
     property StackView parentStackView
     property UpnpControlConnectionManager connectionManager
-    property string globalBrowseFlag: 'BrowseDirectChildren'
-    property string globalFilter: '*'
-    property string globalSortCriteria: ''
+
+    id: rootElement
 
     width: parent.width
     height: parent.height
 
     Audio {
-        id: player
+        id: audioPlayer
+    }
+
+    ListModel {
+        id: viewModeModel
+
+        ListElement {
+            name: "Content"
+        }
+
+        ListElement {
+            name: "PlayList"
+        }
     }
 
     ColumnLayout {
@@ -25,80 +37,118 @@ Item {
         spacing: 0
 
         MediaPlayerControl {
-            id: playControl
+            id: playControlItem
 
-            volume: player.volume
-            position: player.position
-            duration: player.duration
-            muted: player.muted
-            isPlaying: (player.playbackState == Audio.PlayingState)
-            seekable: player.seekable
+            volume: audioPlayer.volume
+            position: audioPlayer.position
+            duration: audioPlayer.duration
+            muted: audioPlayer.muted
+            isPlaying: (audioPlayer.playbackState == Audio.PlayingState)
+            seekable: audioPlayer.seekable
 
             Layout.preferredHeight: 60
             Layout.minimumHeight: Layout.preferredHeight
             Layout.maximumHeight: Layout.preferredHeight
             Layout.fillWidth: true
 
-            onPlay: player.play()
-            onPause: player.pause()
-            onSeek: player.seek(position)
-            onVolumeChanged: player.volume = volume
-            onMutedChanged: player.muted = muted
+            onPlay: audioPlayer.play()
+            onPause: audioPlayer.pause()
+            onSeek: audioPlayer.seek(position)
+            onVolumeChanged: audioPlayer.volume = volume
+            onMutedChanged: audioPlayer.muted = muted
         }
 
-        Button {
-            id: backButton
-
-            height: 25
-            Layout.preferredHeight: height
-            Layout.minimumHeight: height
-            Layout.maximumHeight: height
-            Layout.fillWidth: true
-
-            onClicked: if (listingView.depth > 1) {
-                           listingView.pop()
-                       } else {
-                           parentStackView.pop()
-                       }
-            text: 'Back'
-        }
-
-        StackView {
-            id: listingView
-
+        RowLayout {
             Layout.fillHeight: true
             Layout.fillWidth: true
+            spacing: 0
 
-            // Implements back key navigation
-            focus: true
-            Keys.onReleased: if (event.key === Qt.Key_Back && stackView.depth > 1) {
-                                 stackView.pop();
-                                 event.accepted = true;
-                             }
+            TableView {
+                id: viewModeView
+
+                Layout.fillHeight: true
+                Layout.preferredWidth: 150
+
+                headerVisible: false
+                frameVisible: false
+                focus: true
+                backgroundVisible: false
+
+                rowDelegate: Rectangle {
+                    color: '#EFF0F1'
+
+                    height: 50
+                    width: viewModeView.width
+                }
+
+                model: viewModeModel
+
+                itemDelegate: Rectangle {
+                    height: 50
+                    width: viewModeView.width
+                    color: if (styleData.selected)
+                               '#3DAEE9'
+                           else
+                               '#EFF0F1'
+                    Label {
+                        anchors.fill: parent
+                        width: viewModeView.width
+                        text: model.name
+                    }
+                }
+
+                TableViewColumn {
+                    role: 'name'
+                    width: viewModeView.width
+                }
+
+                Component.onCompleted: {
+                    currentRow = 0
+                    selection.select(0, 0)
+                }
+            }
+
+            TabView {
+                id: mainContentView
+
+                tabsVisible: false
+
+                currentIndex: viewModeView.currentRow
+
+                Layout.fillHeight: true
+                Layout.fillWidth: true
+
+                Tab {
+                    MediaContentDirectory {
+                        id: contentBrowser
+
+                        mediaServerDevice: aDevice
+                        parentStackView: rootElement.parentStackView
+                        connectionManager: rootElement.connectionManager
+                        player: audioPlayer
+                        playControl: playControlItem
+
+                        width: mainContentView.width
+                        height: mainContentView.height
+                    }
+                }
+
+                Tab {
+                    MediaPlayListView {
+                        id: playList
+
+                        mediaServerDevice: aDevice
+                        parentStackView: rootElement.parentStackView
+                        connectionManager: rootElement.connectionManager
+                        player: audioPlayer
+                        playControl: playControlItem
+
+                        width: mainContentView.width
+                        height: mainContentView.height
+                    }
+                }
+            }
         }
-    }
-
-    UpnpContentDirectoryModel {
-        id: contentDirectoryModel
-        browseFlag: globalBrowseFlag
-        filter: globalFilter
-        sortCriteria: globalSortCriteria
-        contentDirectory: aDevice.serviceById('urn:upnp-org:serviceId:ContentDirectory')
-    }
-
-    Component.onCompleted: {
-        connectionManager = aDevice.serviceById('urn:upnp-org:serviceId:ConnectionManager')
-        listingView.push({
-                           item: Qt.resolvedUrl("mediaServerListing.qml"),
-                           properties: {
-                               'contentDirectoryService': contentDirectoryModel.contentDirectory,
-                               'rootId': '0',
-                               'stackView': listingView,
-                               'contentModel': contentDirectoryModel,
-                               'player': player,
-                               'playControl': playControl
-                           }
-                       })
     }
 }
 

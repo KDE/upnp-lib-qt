@@ -142,6 +142,8 @@ if (NOT(CMAKE_SYSTEM_NAME STREQUAL Android))
         AudioTrackDelegate.qml
         MediaPlayerControl.qml
         MediaServerEntry.qml
+        MediaContentDirectory.qml
+        MediaPlayListView.qml
     )
 
     qt5_add_resources(upnpControl_SOURCES upnpControl.qrc)

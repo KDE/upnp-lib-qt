@@ -10,6 +10,7 @@
         <file>mediaServer.qml</file>
         <file>RatingStar.qml</file>
         <file>upnpControl.qml</file>
+        <file>MediaContentDirectory.qml</file>
+        <file>MediaPlayListView.qml</file>
     </qresource>
 </RCC>
-
