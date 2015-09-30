@@ -76,6 +76,7 @@ public:
         CountRole = ItemClassRole + 1,
         IdRole = CountRole + 1,
         ParentIdRole = IdRole + 1,
+        IsPlayingRole = ParentIdRole + 1,
     };
 
     explicit UpnpContentDirectoryModel(QObject *parent = 0);

@@ -101,6 +101,7 @@ QHash<int, QByteArray> UpnpContentDirectoryModel::roleNames() const
     roles[static_cast<int>(ColumnsRoles::ImageRole)] = "image";
     roles[static_cast<int>(ColumnsRoles::ItemClassRole)] = "itemClass";
     roles[static_cast<int>(ColumnsRoles::CountRole)] = "count";
+    roles[static_cast<int>(ColumnsRoles::IsPlayingRole)] = "isPlaying";
 
     return roles;
 }
@@ -169,6 +170,8 @@ QVariant UpnpContentDirectoryModel::data(const QModelIndex &index, int role) con
     case ColumnsRoles::IdRole:
         return d->mData[index.internalId()][convertedRole];
     case ColumnsRoles::ParentIdRole:
+        return d->mData[index.internalId()][convertedRole];
+    case ColumnsRoles::IsPlayingRole:
         return d->mData[index.internalId()][convertedRole];
     }
 

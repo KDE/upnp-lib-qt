@@ -37,6 +37,7 @@ Item {
                 console.log('entering pause state')
                 playListPosition = 0
                 player.pause()
+                playControl.isPlaying = false
             }
 
             SignalTransition {
@@ -58,7 +59,9 @@ Item {
             onEntered: {
                 console.log('entering playing state')
                 player.source = playListModel.model.getUrl(playListModel.modelIndex(playListPosition))
+                playListModel.model.startPlaying(playListModel.modelIndex(playListPosition))
                 player.play()
+                playControl.isPlaying = true
             }
 
             SignalTransition {
@@ -76,13 +79,6 @@ Item {
             SignalTransition {
                 targetState: trackFinished
                 signal: player.stopped
-                guard: modelData.trackCount > 0 && playListPosition < modelData.trackCount - 1
-            }
-
-            SignalTransition {
-                targetState: pause
-                signal: player.stopped
-                guard: playListPosition === modelData.trackCount - 1
             }
         }
 
@@ -91,7 +87,9 @@ Item {
 
             onEntered: {
                 console.log('entering track finished state')
+                playListModel.model.finishedPlaying(playListModel.modelIndex(playListPosition))
                 playListPosition = playListPosition + 1
+                playControl.isPlaying = false
             }
 
             SignalTransition {

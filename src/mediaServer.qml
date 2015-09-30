@@ -65,8 +65,8 @@ Item {
             position: audioPlayer.position
             duration: audioPlayer.duration
             muted: false
-            isPlaying: (audioPlayer.playbackState == Audio.PlayingState)
             seekable: audioPlayer.seekable
+            isPlaying: false
 
             Layout.preferredHeight: 60
             Layout.minimumHeight: Layout.preferredHeight

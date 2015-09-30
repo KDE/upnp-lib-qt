@@ -60,7 +60,7 @@ Item {
                                      model.rating
                                  else
                                      ''
-                    isPlaying: true
+                    isPlaying: model.isPlaying
                 }
             }
 

@@ -59,6 +59,8 @@ public:
 
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
 
+    bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
+
     QHash<int, QByteArray> roleNames() const override;
 
     int trackCount() const;
@@ -66,6 +68,10 @@ public:
     Q_INVOKABLE void enqueue(const QModelIndex &newTrack);
 
     Q_INVOKABLE QVariant getUrl(const QModelIndex &index) const;
+
+    Q_INVOKABLE void startPlaying(const QModelIndex &index);
+
+    Q_INVOKABLE void finishedPlaying(const QModelIndex &index);
 
 Q_SIGNALS:
 

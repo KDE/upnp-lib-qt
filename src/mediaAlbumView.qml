@@ -63,7 +63,10 @@ Item {
                                      model.rating
                                  else
                                      ''
-                    isPlaying: true
+                    isPlaying: if (model != undefined && model.isPlaying !== undefined)
+                                   model.isPlaying
+                               else
+                                   false
                 }
             }
 

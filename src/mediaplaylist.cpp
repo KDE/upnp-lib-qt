@@ -30,6 +30,9 @@ class MediaPlayListPrivate
 public:
 
     QList<QPersistentModelIndex> mData;
+
+    QList<bool> mIsPlaying;
+
 };
 
 MediaPlayList::MediaPlayList(QObject *parent) : QAbstractListModel(parent), d(new MediaPlayListPrivate)
@@ -52,20 +55,56 @@ int MediaPlayList::rowCount(const QModelIndex &parent) const
 
 QVariant MediaPlayList::data(const QModelIndex &index, int role) const
 {
-    qDebug() << "MediaPlayList::data" << index << role;
-
     if (!index.isValid()) {
-        qDebug() << "nothing 1";
         return QVariant();
     }
 
     if (index.row() < 0 || index.row() > d->mData.size()) {
-        qDebug() << "nothing 3";
         return QVariant();
     }
 
-    qDebug() << d->mData[index.row()].data(role);
-    return d->mData[index.row()].data(role);
+    switch(role)
+    {
+    case ColumnsRoles::TitleRole:
+    case ColumnsRoles::DurationRole:
+    case ColumnsRoles::ArtistRole:
+    case ColumnsRoles::RatingRole:
+    case ColumnsRoles::ImageRole:
+    case ColumnsRoles::ItemClassRole:
+    case ColumnsRoles::CountRole:
+        return d->mData[index.row()].data(role);
+    case ColumnsRoles::IsPlayingRole:
+        return d->mIsPlaying[index.row()];
+    }
+
+    return QVariant();
+}
+
+bool MediaPlayList::setData(const QModelIndex &index, const QVariant &value, int role)
+{
+    if (!index.isValid()) {
+        return false;
+    }
+
+    if (index.row() < 0 || index.row() > d->mData.size()) {
+        return false;
+    }
+
+    ColumnsRoles convertedRole = static_cast<ColumnsRoles>(role);
+
+    bool modelModified = false;
+
+    switch(role)
+    {
+    case ColumnsRoles::IsPlayingRole:
+        d->mIsPlaying[index.row()] = value.toBool();
+        Q_EMIT dataChanged(index, index, {role});
+        break;
+    default:
+        modelModified = false;
+    }
+
+    return modelModified;
 }
 
 QHash<int, QByteArray> MediaPlayList::roleNames() const
@@ -93,6 +132,7 @@ void MediaPlayList::enqueue(const QModelIndex &newTrack)
 {
     beginInsertRows(QModelIndex(), d->mData.size(), d->mData.size());
     d->mData.push_back(newTrack);
+    d->mIsPlaying.push_back(false);
     endInsertRows();
 
     Q_EMIT trackCountChanged();
@@ -105,11 +145,20 @@ QVariant MediaPlayList::getUrl(const QModelIndex &index) const
     }
 
     if (index.row() < 0 || index.row() > d->mData.size()) {
-        qDebug() << "nothing 3";
         return QVariant();
     }
 
     return d->mData[index.row()].data(UpnpContentDirectoryModel::ResourceRole);
+}
+
+void MediaPlayList::startPlaying(const QModelIndex &index)
+{
+    setData(index, true, MediaPlayList::IsPlayingRole);
+}
+
+void MediaPlayList::finishedPlaying(const QModelIndex &index)
+{
+    setData(index, false, MediaPlayList::IsPlayingRole);
 }
 
 #include "moc_mediaplaylist.cpp"
