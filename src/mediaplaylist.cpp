@@ -19,6 +19,8 @@
 
 #include "mediaplaylist.h"
 
+#include "upnpcontentdirectorymodel.h"
+
 #include <QtCore/QPersistentModelIndex>
 #include <QtCore/QList>
 #include <QtCore/QDebug>
@@ -82,11 +84,32 @@ QHash<int, QByteArray> MediaPlayList::roleNames() const
     return roles;
 }
 
+int MediaPlayList::trackCount() const
+{
+    return d->mData.size();
+}
+
 void MediaPlayList::enqueue(const QModelIndex &newTrack)
 {
     beginInsertRows(QModelIndex(), d->mData.size(), d->mData.size());
     d->mData.push_back(newTrack);
     endInsertRows();
+
+    Q_EMIT trackCountChanged();
+}
+
+QVariant MediaPlayList::getUrl(const QModelIndex &index) const
+{
+    if (!index.isValid()) {
+        return QVariant();
+    }
+
+    if (index.row() < 0 || index.row() > d->mData.size()) {
+        qDebug() << "nothing 3";
+        return QVariant();
+    }
+
+    return d->mData[index.row()].data(UpnpContentDirectoryModel::ResourceRole);
 }
 
 #include "moc_mediaplaylist.cpp"

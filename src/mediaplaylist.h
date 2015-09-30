@@ -30,6 +30,10 @@ class UPNPQT_EXPORT MediaPlayList : public QAbstractListModel
 {
     Q_OBJECT
 
+    Q_PROPERTY(int trackCount
+               READ trackCount
+               NOTIFY trackCountChanged)
+
 public:
 
     enum ColumnsRoles {
@@ -57,9 +61,15 @@ public:
 
     QHash<int, QByteArray> roleNames() const override;
 
+    int trackCount() const;
+
     Q_INVOKABLE void enqueue(const QModelIndex &newTrack);
 
+    Q_INVOKABLE QVariant getUrl(const QModelIndex &index) const;
+
 Q_SIGNALS:
+
+    void trackCountChanged();
 
 public Q_SLOTS:
 

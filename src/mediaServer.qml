@@ -30,6 +30,18 @@ Item {
         id: playListModelItem
     }
 
+    PlayListControler {
+        id: playListControler
+
+        playListModel: DelegateModel {
+            model: playListModelItem
+        }
+        modelData: playListModelItem
+
+        player: audioPlayer
+        playControl: playControlItem
+    }
+
     ListModel {
         id: viewModeModel
 
@@ -61,8 +73,6 @@ Item {
             Layout.maximumHeight: Layout.preferredHeight
             Layout.fillWidth: true
 
-            onPlay: audioPlayer.play()
-            onPause: audioPlayer.pause()
             onSeek: audioPlayer.seek(position)
         }
 
