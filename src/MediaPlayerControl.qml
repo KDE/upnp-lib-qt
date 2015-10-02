@@ -34,7 +34,9 @@ Item {
                 id: previousButton
                 MouseArea {
                     anchors.fill: parent
-                    onClicked: musicWidget.playPrevious()
+                    onClicked: {
+                        musicWidget.playPrevious()
+                    }
                 }
                 source: 'image://icon/media-skip-backward'
                 Layout.preferredWidth: width
@@ -56,10 +58,11 @@ Item {
                 MouseArea {
                     anchors.fill: parent
                     onClicked: {
-                        if (musicWidget.isPlaying)
+                        if (musicWidget.isPlaying) {
                             musicWidget.pause()
-                        else
+                        } else {
                             musicWidget.play()
+                        }
                     }
                 }
                 source: {
@@ -86,7 +89,9 @@ Item {
                 id: nextButton
                 MouseArea {
                     anchors.fill: parent
-                    onClicked: musicWidget.playNext()
+                    onClicked: {
+                        musicWidget.playNext()
+                    }
                 }
                 source: 'image://icon/media-skip-forward'
                 Layout.preferredWidth: width

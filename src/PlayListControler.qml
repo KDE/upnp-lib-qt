@@ -19,22 +19,17 @@ Item {
         State {
             id: empty
 
-            onEntered: {
-                console.log('entering empty state')
-            }
-
             SignalTransition {
-                targetState: pause
+                targetState: ready
                 signal: modelData.trackCountChanged
                 guard: modelData.trackCount > 0
             }
         }
 
         State {
-            id: pause
+            id: ready
 
             onEntered: {
-                console.log('entering pause state')
                 playListPosition = 0
                 player.pause()
                 playControl.isPlaying = false
@@ -47,9 +42,23 @@ Item {
             }
 
             SignalTransition {
-                targetState: playing
+                targetState: initializePlay
                 signal: playControl.play
                 guard: modelData.trackCount > 0
+            }
+        }
+
+        State {
+            id: initializePlay
+
+            onEntered: {
+                player.source = playListModel.model.getUrl(playListModel.modelIndex(playListPosition))
+                playListModel.model.startPlaying(playListModel.modelIndex(playListPosition))
+            }
+
+            SignalTransition {
+                targetState: playing
+                signal: initializePlay.entered
             }
         }
 
@@ -57,9 +66,6 @@ Item {
             id: playing
 
             onEntered: {
-                console.log('entering playing state')
-                player.source = playListModel.model.getUrl(playListModel.modelIndex(playListPosition))
-                playListModel.model.startPlaying(playListModel.modelIndex(playListPosition))
                 player.play()
                 playControl.isPlaying = true
             }
@@ -80,28 +86,66 @@ Item {
                 targetState: trackFinished
                 signal: player.stopped
             }
+
+            SignalTransition {
+                targetState: nextTrack
+                signal: playControl.playNext
+            }
+        }
+
+        State {
+            id: pause
+
+            onEntered: {
+                player.pause()
+                playControl.isPlaying = false
+            }
+
+            SignalTransition {
+                targetState: empty
+                signal: modelData.trackCountChanged
+                guard: modelData.trackCount === 0 || playListPosition === modelData.trackCount
+            }
+
+            SignalTransition {
+                targetState: playing
+                signal: playControl.play
+                guard: modelData.trackCount > 0
+            }
         }
 
         State {
             id: trackFinished
 
             onEntered: {
-                console.log('entering track finished state')
                 playListModel.model.finishedPlaying(playListModel.modelIndex(playListPosition))
                 playListPosition = playListPosition + 1
                 playControl.isPlaying = false
             }
 
             SignalTransition {
-                targetState: playing
+                targetState: initializePlay
                 signal: trackFinished.entered
                 guard: playListPosition < modelData.trackCount
             }
 
             SignalTransition {
-                targetState: pause
+                targetState: ready
                 signal: trackFinished.entered
                 guard: playListPosition === modelData.trackCount
+            }
+        }
+
+        State {
+            id: nextTrack
+
+            onEntered: {
+                player.stop()
+            }
+
+            SignalTransition {
+                targetState: trackFinished
+                signal: player.stopped
             }
         }
     }
