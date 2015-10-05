@@ -83,13 +83,18 @@ Item {
             }
 
             SignalTransition {
-                targetState: trackFinished
+                targetState: currentTrackFinished
                 signal: player.stopped
             }
 
             SignalTransition {
                 targetState: nextTrack
                 signal: playControl.playNext
+            }
+
+            SignalTransition {
+                targetState: previousTrack
+                signal: playControl.playPrevious
             }
         }
 
@@ -119,7 +124,6 @@ Item {
 
             onEntered: {
                 playListModel.model.finishedPlaying(playListModel.modelIndex(playListPosition))
-                playListPosition = playListPosition + 1
                 playControl.isPlaying = false
             }
 
@@ -132,7 +136,21 @@ Item {
             SignalTransition {
                 targetState: ready
                 signal: trackFinished.entered
-                guard: playListPosition === modelData.trackCount
+                guard: playListPosition === modelData.trackCount && playListPosition === -1
+            }
+        }
+
+        State {
+            id: currentTrackFinished
+
+            onEntered: {
+                playListModel.model.finishedPlaying(playListModel.modelIndex(playListPosition))
+                playListPosition = playListPosition + 1
+            }
+
+            SignalTransition {
+                targetState: trackFinished
+                signal: currentTrackFinished.entered
             }
         }
 
@@ -141,11 +159,42 @@ Item {
 
             onEntered: {
                 player.stop()
+                playListModel.model.finishedPlaying(playListModel.modelIndex(playListPosition))
+                playListPosition = playListPosition + 1
             }
 
             SignalTransition {
                 targetState: trackFinished
                 signal: player.stopped
+                guard: playListPosition !== modelData.trackCount
+            }
+
+            SignalTransition {
+                targetState: ready
+                signal: player.stopped
+                guard: playListPosition === modelData.trackCount
+            }
+        }
+
+        State {
+            id: previousTrack
+
+            onEntered: {
+                player.stop()
+                playListModel.model.finishedPlaying(playListModel.modelIndex(playListPosition))
+                playListPosition = playListPosition - 1
+            }
+
+            SignalTransition {
+                targetState: trackFinished
+                signal: player.stopped
+                guard: playListPosition !== -1
+            }
+
+            SignalTransition {
+                targetState: ready
+                signal: player.stopped
+                guard: playListPosition === -1
             }
         }
     }
