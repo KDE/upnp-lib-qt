@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.3)
 
 project(upnp-player-qt)
 
-find_package(ECM 1.4.0 REQUIRED NO_MODULE)
+find_package(ECM 5.15.0 REQUIRED NO_MODULE)
 set(CMAKE_MODULE_PATH ${ECM_MODULE_PATH} ${ECM_KDE_MODULE_DIR} ${CMAKE_SOURCE_DIR}/cmake/modules) #TODO: remove cmake/modules when extra-cmake-modules is done
 
 include(KDEInstallDirs)
