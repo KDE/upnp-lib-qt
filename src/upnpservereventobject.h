@@ -23,30 +23,34 @@
 #include "upnpQt_export.h"
 
 #include <KDSoapServer/KDSoapServerObjectInterface.h>
+#include <KDSoapServer/KDSoapServerCustomVerbRequestInterface.h>
 
 #include <QObject>
 
 class UpnpControlAbstractService;
 class UpnpServerEventObjectPrivate;
 
-class UpnpServerEventObject : public QObject, public KDSoapServerObjectInterface
+class UpnpServerEventObject : public QObject, public KDSoapServerCustomVerbRequestInterface
 {
     Q_OBJECT
 
-    Q_INTERFACES(KDSoapServerObjectInterface)
+    Q_INTERFACES(KDSoapServerCustomVerbRequestInterface)
 
 public:
     UpnpServerEventObject(QObject *parent = 0);
 
     virtual ~UpnpServerEventObject();
 
-    void processRequest(const KDSoapMessage &request, KDSoapMessage &response, const QByteArray &soapAction) Q_DECL_OVERRIDE;
-
-    QIODevice* processFileRequest(const QString &path, QByteArray &contentType) Q_DECL_OVERRIDE;
-
-    void processRequestWithPath(const KDSoapMessage &request, KDSoapMessage &response, const QByteArray &soapAction, const QString &path) Q_DECL_OVERRIDE;
-
-    bool processCustomVerbRequest(const QByteArray &requestData, const QMap<QByteArray, QByteArray> &headers, QByteArray &customAnswer) Q_DECL_OVERRIDE;
+    /**
+     * Process a request made with a custom HTTP verb
+     * @param requestType HTTP verb other than GET and POST
+     * @param requestData is the content of the request
+     * @param httpHeaders the map of http headers (keys have been lowercased since they are case insensitive)
+     * @param customAnswer allow to send back the answer to the client if the request has been handled
+     * @return true if the request has been handled and if customAnswer is valid and will be sent back to the client.
+     */
+    bool processCustomVerbRequest(const QByteArray &requestType, const QByteArray &requestData,
+                                  const QMap<QByteArray, QByteArray> &httpHeaders, QByteArray &customAnswer) override;
 
     void setService(UpnpControlAbstractService *service);
 

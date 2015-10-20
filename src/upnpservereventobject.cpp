@@ -30,7 +30,7 @@ public:
     UpnpControlAbstractService *mService;
 };
 
-UpnpServerEventObject::UpnpServerEventObject(QObject *parent) : QObject(parent), KDSoapServerObjectInterface(), d(new UpnpServerEventObjectPrivate)
+UpnpServerEventObject::UpnpServerEventObject(QObject *parent) : QObject(parent), KDSoapServerCustomVerbRequestInterface(), d(new UpnpServerEventObjectPrivate)
 {
     d->mService = nullptr;
 }
@@ -40,33 +40,11 @@ UpnpServerEventObject::~UpnpServerEventObject()
     delete d;
 }
 
-void UpnpServerEventObject::processRequest(const KDSoapMessage &request, KDSoapMessage &response, const QByteArray &soapAction)
-{
-    Q_UNUSED(request);
-    Q_UNUSED(response);
-    Q_UNUSED(request);
-    Q_UNUSED(soapAction);
-}
-
-QIODevice *UpnpServerEventObject::processFileRequest(const QString &path, QByteArray &contentType)
-{
-    Q_UNUSED(path);
-    Q_UNUSED(contentType);
-    return nullptr;
-}
-
-void UpnpServerEventObject::processRequestWithPath(const KDSoapMessage &request, KDSoapMessage &response, const QByteArray &soapAction, const QString &path)
-{
-    Q_UNUSED(request);
-    Q_UNUSED(response);
-    Q_UNUSED(soapAction);
-    Q_UNUSED(path);
-}
-
-bool UpnpServerEventObject::processCustomVerbRequest(const QByteArray &requestData, const QMap<QByteArray, QByteArray> &headers, QByteArray &customAnswer)
+bool UpnpServerEventObject::processCustomVerbRequest(const QByteArray &requestType, const QByteArray &requestData,
+                                                     const QMap<QByteArray, QByteArray> &httpHeaders, QByteArray &customAnswer)
 {
     if (d->mService) {
-        d->mService->handleEventNotification(requestData, headers);
+        d->mService->handleEventNotification(requestData, httpHeaders);
 
         customAnswer = "HTTP/1.1 200 OK\r\nContent-Length: 0\r\nContent-Type: text/html\r\n\r\n";
 

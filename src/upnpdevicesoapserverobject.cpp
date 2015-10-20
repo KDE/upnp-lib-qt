@@ -184,10 +184,11 @@ void UpnpDeviceSoapServerObject::processRequestWithPath(const KDSoapMessage &req
     }
 }
 
-bool UpnpDeviceSoapServerObject::processCustomVerbRequest(const QByteArray &requestData, const QMap<QByteArray, QByteArray> &headers, QByteArray &customAnswer)
+bool UpnpDeviceSoapServerObject::processCustomVerbRequest(const QByteArray &requestType, const QByteArray &requestData,
+                                                          const QMap<QByteArray, QByteArray> &httpHeaders, QByteArray &customAnswer)
 {
-    if (headers.value("_requestType") == "SUBSCRIBE") {
-        const QString &path = QString::fromLatin1(headers.value("_path"));
+    if (requestType == "SUBSCRIBE") {
+        const QString &path = QString::fromLatin1(httpHeaders.value("_path"));
         const QList<QString> &pathParts = path.split(QStringLiteral("/"));
         if (pathParts.count() == 4 && pathParts.last() == QStringLiteral("event")) {
             const int deviceIndex = pathParts[1].toInt();
@@ -195,7 +196,7 @@ bool UpnpDeviceSoapServerObject::processCustomVerbRequest(const QByteArray &requ
             if (deviceIndex >= 0 && deviceIndex < d->mDevices.count()) {
                 UpnpAbstractDevice *currentDevice = d->mDevices[deviceIndex];
                 if (serviceIndex >= 0 && serviceIndex < currentDevice->services().count()) {
-                    QPointer<UpnpEventSubscriber> newSubscriber = currentDevice->serviceByIndex(serviceIndex)->subscribeToEvents(requestData, headers);
+                    QPointer<UpnpEventSubscriber> newSubscriber = currentDevice->serviceByIndex(serviceIndex)->subscribeToEvents(requestData, httpHeaders);
 
                     customAnswer  = "HTTP/1.1 200 OK\r\n";
                     customAnswer += "DATE: " + QDateTime::currentDateTime().toString(QStringLiteral("ddd, d MMM yyyy HH:mm:ss t")).toLatin1() + "\r\n";
@@ -208,8 +209,8 @@ bool UpnpDeviceSoapServerObject::processCustomVerbRequest(const QByteArray &requ
                 }
             }
         }
-    } else if (headers.value("_requestType") == "UNSUBSCRIBE") {
-        const QString &path = QString::fromLatin1(headers.value("_path"));
+    } else if (requestType == "UNSUBSCRIBE") {
+        const QString &path = QString::fromLatin1(httpHeaders.value("_path"));
         const QList<QString> &pathParts = path.split(QStringLiteral("/"));
         if (pathParts.count() == 4 && pathParts.last() == QStringLiteral("event")) {
             const int deviceIndex = pathParts[1].toInt();
@@ -217,7 +218,7 @@ bool UpnpDeviceSoapServerObject::processCustomVerbRequest(const QByteArray &requ
             if (deviceIndex >= 0 && deviceIndex < d->mDevices.count()) {
                 UpnpAbstractDevice *currentDevice = d->mDevices[deviceIndex];
                 if (serviceIndex >= 0 && serviceIndex < currentDevice->services().count()) {
-                    currentDevice->serviceByIndex(serviceIndex)->unsubscribeToEvents(requestData, headers);
+                    currentDevice->serviceByIndex(serviceIndex)->unsubscribeToEvents(requestData, httpHeaders);
 
                     customAnswer  = "HTTP/1.1 200 OK\r\n";
                     customAnswer += "DATE: " + QDateTime::currentDateTime().toString(QStringLiteral("ddd, d MMM yyyy HH:mm:ss t")).toLatin1() + "\r\n";
@@ -231,7 +232,7 @@ bool UpnpDeviceSoapServerObject::processCustomVerbRequest(const QByteArray &requ
             }
         }
     } else {
-        qDebug() << "UpnpDeviceSoapServerObject::processCustomVerbRequest" << requestData << headers;
+        qDebug() << "UpnpDeviceSoapServerObject::processCustomVerbRequest" << requestData << httpHeaders;
     }
 
     return false;

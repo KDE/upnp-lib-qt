@@ -22,6 +22,7 @@
 
 #include "upnpQt_export.h"
 
+#include <KDSoapServer/KDSoapServerCustomVerbRequestInterface.h>
 #include <KDSoapServer/KDSoapServerObjectInterface.h>
 
 #include <QObject>
@@ -30,24 +31,33 @@
 class UpnpAbstractDevice;
 class UpnpDeviceSoapServerObjectPrivate;
 
-class UpnpDeviceSoapServerObject : public QObject, public KDSoapServerObjectInterface
+class UpnpDeviceSoapServerObject : public QObject, public KDSoapServerObjectInterface, public KDSoapServerCustomVerbRequestInterface
 {
     Q_OBJECT
 
-    Q_INTERFACES(KDSoapServerObjectInterface)
+    Q_INTERFACES(KDSoapServerObjectInterface KDSoapServerCustomVerbRequestInterface)
 
 public:
     UpnpDeviceSoapServerObject(QList<UpnpAbstractDevice *> &devices, QObject *parent = 0);
 
     virtual ~UpnpDeviceSoapServerObject();
 
-    void processRequest(const KDSoapMessage &request, KDSoapMessage &response, const QByteArray &soapAction) Q_DECL_OVERRIDE;
+    void processRequest(const KDSoapMessage &request, KDSoapMessage &response, const QByteArray &soapAction) override;
 
-    QIODevice* processFileRequest(const QString &path, QByteArray &contentType) Q_DECL_OVERRIDE;
+    QIODevice* processFileRequest(const QString &path, QByteArray &contentType) override;
 
-    void processRequestWithPath(const KDSoapMessage &request, KDSoapMessage &response, const QByteArray &soapAction, const QString &path) Q_DECL_OVERRIDE;
+    void processRequestWithPath(const KDSoapMessage &request, KDSoapMessage &response, const QByteArray &soapAction, const QString &path) override;
 
-    bool processCustomVerbRequest(const QByteArray &requestData, const QMap<QByteArray, QByteArray> &headers, QByteArray &customAnswer) Q_DECL_OVERRIDE;
+    /**
+     * Process a request made with a custom HTTP verb
+     * @param requestType HTTP verb other than GET and POST
+     * @param requestData is the content of the request
+     * @param httpHeaders the map of http headers (keys have been lowercased since they are case insensitive)
+     * @param customAnswer allow to send back the answer to the client if the request has been handled
+     * @return true if the request has been handled and if customAnswer is valid and will be sent back to the client.
+     */
+    bool processCustomVerbRequest(const QByteArray &requestType, const QByteArray &requestData,
+                                  const QMap<QByteArray, QByteArray> &httpHeaders, QByteArray &customAnswer) override;
 
 private:
 
