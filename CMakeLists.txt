@@ -11,7 +11,7 @@ include(KDECMakeSettings)
 
 set(REQUIRED_QT_VERSION "5.4.0")
 find_package(Qt5 ${REQUIRED_QT_VERSION} CONFIG REQUIRED Core Network Xml)
-find_package(Qt5 ${REQUIRED_QT_VERSION} CONFIG OPTIONAL_COMPONENTS Quick Widgets Multimedia Svg)
+find_package(Qt5 ${REQUIRED_QT_VERSION} CONFIG OPTIONAL_COMPONENTS Quick Widgets Multimedia Svg Test)
 
 find_package(KDSoap CONFIG REQUIRED)
 find_package(KF5Declarative CONFIG)
@@ -34,6 +34,7 @@ if (CMAKE_SYSTEM_NAME STREQUAL Android)
 endif()
 
 add_subdirectory(src)
+add_subdirectory(tests)
 
 if ("${CMAKE_BINARY_DIR}" STREQUAL "${CMAKE_CURRENT_BINARY_DIR}")
   feature_summary(WHAT ALL   FATAL_ON_MISSING_REQUIRED_PACKAGES)
