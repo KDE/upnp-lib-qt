@@ -112,11 +112,33 @@ class UpnpSsdpEnginePrivate;
 
 class UPNPQT_EXPORT UpnpSsdpEngine : public QObject
 {
+
     Q_OBJECT
+
+    Q_PROPERTY(quint16 port
+               READ port
+               WRITE setPort
+               NOTIFY portChanged)
+
+    Q_PROPERTY(bool canExportServices
+               READ canExportServices
+               WRITE setCanExportServices
+               NOTIFY canExportServicesChanged)
+
 public:
     explicit UpnpSsdpEngine(QObject *parent = 0);
 
     virtual ~UpnpSsdpEngine();
+
+    quint16 port() const;
+
+    void setPort(quint16 value);
+
+    bool canExportServices() const;
+
+    void setCanExportServices(bool value);
+
+    Q_INVOKABLE void initialize();
 
 Q_SIGNALS:
 
@@ -126,12 +148,16 @@ Q_SIGNALS:
 
     void removedService(const UpnpDiscoveryResult &serviceDiscovery);
 
+    void portChanged();
+
+    void canExportServicesChanged();
+
 public Q_SLOTS:
 
     /**
      * @brief searchAllUpnpDevice will trigger a search for all upnp device
      */
-    bool searchAllUpnpDevice();
+    bool searchAllUpnpDevice(int maxDelay = 1);
 
     void subscribeDevice(UpnpAbstractDevice *device);
 
