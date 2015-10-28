@@ -159,6 +159,26 @@ public Q_SLOTS:
      */
     bool searchAllUpnpDevice(int maxDelay = 1);
 
+    /**
+     * @brief searchAllRootDevice will trigger a search for all upnp root device
+     */
+    bool searchAllRootDevice(int maxDelay = 1);
+
+    /**
+     * @brief searchByDeviceUUID will trigger a search by device UUID
+     */
+    bool searchByDeviceUUID(const QString &uuid, int maxDelay = 1);
+
+    /**
+     * @brief searchByDeviceType will trigger a search by device type
+     */
+    bool searchByDeviceType(const QString &upnpDeviceType, int maxDelay = 1);
+
+    /**
+     * @brief searchByServiceType will trigger a search by service type
+     */
+    bool searchByServiceType(const QString &upnpServiceType, int maxDelay = 1);
+
     void subscribeDevice(UpnpAbstractDevice *device);
 
     void publishDevice(UpnpAbstractDevice *device);

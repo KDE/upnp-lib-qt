@@ -120,6 +120,66 @@ bool UpnpSsdpEngine::searchAllUpnpDevice(int maxDelay)
     return result != -1;
 }
 
+bool UpnpSsdpEngine::searchAllRootDevice(int maxDelay)
+{
+    QByteArray allDiscoveryMessage;
+
+    allDiscoveryMessage += "M-SEARCH * HTTP/1.1\r\n";
+    allDiscoveryMessage += "HOST: 239.255.255.250:" + QByteArray::number(d->mPortNumber) + "\r\n";
+    allDiscoveryMessage += "MAN: \"ssdp:discover\"\r\n";
+    allDiscoveryMessage += "MX: " + QByteArray::number(maxDelay) + "\r\n";
+    allDiscoveryMessage += "ST: upnp:rootdevice\r\n\r\n";
+
+    auto result = d->mSsdpQuerySocket.writeDatagram(allDiscoveryMessage, QHostAddress(QStringLiteral("239.255.255.250")), d->mPortNumber);
+
+    return result != -1;
+}
+
+bool UpnpSsdpEngine::searchByDeviceUUID(const QString &uuid, int maxDelay)
+{
+    QByteArray allDiscoveryMessage;
+
+    allDiscoveryMessage += "M-SEARCH * HTTP/1.1\r\n";
+    allDiscoveryMessage += "HOST: 239.255.255.250:" + QByteArray::number(d->mPortNumber) + "\r\n";
+    allDiscoveryMessage += "MAN: \"ssdp:discover\"\r\n";
+    allDiscoveryMessage += "MX: " + QByteArray::number(maxDelay) + "\r\n";
+    allDiscoveryMessage += "ST: uuid:" + uuid.toLatin1() + "\r\n\r\n";
+
+    auto result = d->mSsdpQuerySocket.writeDatagram(allDiscoveryMessage, QHostAddress(QStringLiteral("239.255.255.250")), d->mPortNumber);
+
+    return result != -1;
+}
+
+bool UpnpSsdpEngine::searchByDeviceType(const QString &upnpDeviceType, int maxDelay)
+{
+    QByteArray allDiscoveryMessage;
+
+    allDiscoveryMessage += "M-SEARCH * HTTP/1.1\r\n";
+    allDiscoveryMessage += "HOST: 239.255.255.250:" + QByteArray::number(d->mPortNumber) + "\r\n";
+    allDiscoveryMessage += "MAN: \"ssdp:discover\"\r\n";
+    allDiscoveryMessage += "MX: " + QByteArray::number(maxDelay) + "\r\n";
+    allDiscoveryMessage += "ST: urn:" + upnpDeviceType.toLatin1() + "\r\n\r\n";
+
+    auto result = d->mSsdpQuerySocket.writeDatagram(allDiscoveryMessage, QHostAddress(QStringLiteral("239.255.255.250")), d->mPortNumber);
+
+    return result != -1;
+}
+
+bool UpnpSsdpEngine::searchByServiceType(const QString &upnpServiceType, int maxDelay)
+{
+    QByteArray allDiscoveryMessage;
+
+    allDiscoveryMessage += "M-SEARCH * HTTP/1.1\r\n";
+    allDiscoveryMessage += "HOST: 239.255.255.250:" + QByteArray::number(d->mPortNumber) + "\r\n";
+    allDiscoveryMessage += "MAN: \"ssdp:discover\"\r\n";
+    allDiscoveryMessage += "MX: " + QByteArray::number(maxDelay) + "\r\n";
+    allDiscoveryMessage += "ST: urn:" + upnpServiceType.toLatin1() + "\r\n\r\n";
+
+    auto result = d->mSsdpQuerySocket.writeDatagram(allDiscoveryMessage, QHostAddress(QStringLiteral("239.255.255.250")), d->mPortNumber);
+
+    return result != -1;
+}
+
 void UpnpSsdpEngine::subscribeDevice(UpnpAbstractDevice *device)
 {
     connect(this, &UpnpSsdpEngine::newSearchQuery, device, &UpnpAbstractDevice::newSearchQuery);
