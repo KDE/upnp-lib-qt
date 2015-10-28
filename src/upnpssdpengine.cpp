@@ -68,18 +68,10 @@ void UpnpSsdpEngine::initialize()
     connect(&d->mSsdpQuerySocket, &QUdpSocket::readyRead, this, &UpnpSsdpEngine::queryReceivedData);
     connect(&d->mSsdpStandardSocket, &QUdpSocket::readyRead, this, &UpnpSsdpEngine::standardReceivedData);
 
-    if (!d->mSsdpStandardSocket.bind(QHostAddress(QStringLiteral("239.255.255.250")), d->mPortNumber, QAbstractSocket::ShareAddress | QAbstractSocket::ReuseAddressHint)) {
-        qDebug() << "Qt method failed";
-        int reuse = 1;
-        if (setsockopt(d->mSsdpStandardSocket.socketDescriptor(), SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(reuse)) < 0) {
-            qDebug() << "setsockopt() failed";
-        }
-
-        int bindResult = d->mSsdpStandardSocket.bind(QHostAddress(QStringLiteral("239.255.255.250")), d->mPortNumber, QAbstractSocket::ShareAddress | QAbstractSocket::ReuseAddressHint);
-        if (!bindResult) {
-            qDebug() << "bind failed" << QHostAddress(QStringLiteral("239.255.255.250")) << d->mSsdpStandardSocket.error() << d->mSsdpStandardSocket.errorString();
-        }
-    }
+    d->mSsdpStandardSocket.bind(QHostAddress::AnyIPv4, d->mPortNumber, QAbstractSocket::ShareAddress | QAbstractSocket::ReuseAddressHint);
+    d->mSsdpStandardSocket.joinMulticastGroup(QHostAddress(QStringLiteral("239.255.255.250")));
+    d->mSsdpStandardSocket.setSocketOption(QAbstractSocket::MulticastLoopbackOption, 1);
+    d->mSsdpStandardSocket.setSocketOption(QAbstractSocket::MulticastTtlOption, 4);
 
     d->mSsdpQuerySocket.bind(QHostAddress::Any);
 
