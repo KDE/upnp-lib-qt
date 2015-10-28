@@ -36,8 +36,8 @@ class MockSsdpClient : public QObject
 
 public:
 
-    explicit MockSsdpClient(const QStringList &aAnswerData, QObject *parent = 0)
-        : QObject(parent), mAnswerData(aAnswerData)
+    explicit MockSsdpClient(const QByteArray &aExpectedQuery, const QStringList &aAnswerData, QObject *parent = 0)
+        : QObject(parent), mAnswerData(aAnswerData), mExpectedQuery(aExpectedQuery)
     {
     }
 
@@ -45,17 +45,10 @@ public:
     {
         connect(&mClientSocket, &QUdpSocket::readyRead, this, &MockSsdpClient::dataReceived);
 
-        if (!mClientSocket.bind(QHostAddress(QStringLiteral("239.255.255.250")), portNumber, QAbstractSocket::ShareAddress | QAbstractSocket::ReuseAddressHint)) {
-            int reuse = 1;
-            if (setsockopt(mClientSocket.socketDescriptor(), SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(reuse)) < 0) {
-                qDebug() << "setsockopt() failed";
-            }
-
-            int bindResult = mClientSocket.bind(QHostAddress(QStringLiteral("239.255.255.250")), portNumber, QAbstractSocket::ShareAddress | QAbstractSocket::ReuseAddressHint);
-            if (!bindResult) {
-                qDebug() << "bind failed" << QHostAddress(QStringLiteral("239.255.255.250")) << mClientSocket.error() << mClientSocket.errorString();
-            }
-        }
+        mClientSocket.bind(QHostAddress::AnyIPv4, portNumber, QAbstractSocket::ShareAddress | QAbstractSocket::ReuseAddressHint);
+        mClientSocket.joinMulticastGroup(QHostAddress(QStringLiteral("239.255.255.250")));
+        mClientSocket.setSocketOption(QAbstractSocket::MulticastLoopbackOption, 1);
+        mClientSocket.setSocketOption(QAbstractSocket::MulticastTtlOption, 4);
     }
 
 public Q_SLOTS:
@@ -71,6 +64,8 @@ public Q_SLOTS:
             mClientSocket.readDatagram(datagram.data(), datagram.size(),
                                        &sender, &senderPort);
 
+            QVERIFY(datagram == mExpectedQuery);
+
             QTest::qSleep(1700);
 
             for (auto &answer : mAnswerData) {
@@ -84,6 +79,8 @@ private:
     QUdpSocket mClientSocket;
 
     QStringList mAnswerData;
+
+    QByteArray mExpectedQuery;
 };
 
 class SsdpTests: public QObject
@@ -146,7 +143,12 @@ private Q_SLOTS:
                                      "Content-Length: 0\r\n\r\n")
                                     });
 
-        QScopedPointer<MockSsdpClient> newClient(new MockSsdpClient(hardCodedAnswer));
+        QScopedPointer<MockSsdpClient> newClient(new MockSsdpClient("M-SEARCH * HTTP/1.1\r\n"
+                                                                    "HOST: 239.255.255.250:11900\r\n"
+                                                                    "MAN: \"ssdp:discover\"\r\n"
+                                                                    "MX: 2\r\n"
+                                                                    "ST: ssdp:all\r\n\r\n",
+                                                                    hardCodedAnswer));
         newClient->listen(11900);
 
         QScopedPointer<UpnpSsdpEngine> newEngine(new UpnpSsdpEngine);
@@ -216,7 +218,12 @@ private Q_SLOTS:
                                      "Content-Length: 0\r\n\r\n")
                                     });
 
-        QScopedPointer<MockSsdpClient> newClient(new MockSsdpClient(hardCodedAnswer));
+        QScopedPointer<MockSsdpClient> newClient(new MockSsdpClient("M-SEARCH * HTTP/1.1\r\n"
+                                                                    "HOST: 239.255.255.250:11900\r\n"
+                                                                    "MAN: \"ssdp:discover\"\r\n"
+                                                                    "MX: 2\r\n"
+                                                                    "ST: upnp:rootdevice\r\n\r\n",
+                                                                    hardCodedAnswer));
         newClient->listen(11900);
 
         QScopedPointer<UpnpSsdpEngine> newEngine(new UpnpSsdpEngine);
@@ -254,7 +261,12 @@ private Q_SLOTS:
                                      "Content-Length: 0\r\n\r\n"),
                                     });
 
-        QScopedPointer<MockSsdpClient> newClient(new MockSsdpClient(hardCodedAnswer));
+        QScopedPointer<MockSsdpClient> newClient(new MockSsdpClient("M-SEARCH * HTTP/1.1\r\n"
+                                                                    "HOST: 239.255.255.250:11900\r\n"
+                                                                    "MAN: \"ssdp:discover\"\r\n"
+                                                                    "MX: 2\r\n"
+                                                                    "ST: uuid:4d696e69-444c-164e-9d41-ecf4bb9c317e\r\n\r\n",
+                                                                    hardCodedAnswer));
         newClient->listen(11900);
 
         QScopedPointer<UpnpSsdpEngine> newEngine(new UpnpSsdpEngine);
@@ -292,7 +304,12 @@ private Q_SLOTS:
                                      "Content-Length: 0\r\n\r\n"),
                                     });
 
-        QScopedPointer<MockSsdpClient> newClient(new MockSsdpClient(hardCodedAnswer));
+        QScopedPointer<MockSsdpClient> newClient(new MockSsdpClient("M-SEARCH * HTTP/1.1\r\n"
+                                                                    "HOST: 239.255.255.250:11900\r\n"
+                                                                    "MAN: \"ssdp:discover\"\r\n"
+                                                                    "MX: 2\r\n"
+                                                                    "ST: urn:schemas-upnp-org:device:MediaServer:1\r\n\r\n",
+                                                                    hardCodedAnswer));
         newClient->listen(11900);
 
         QScopedPointer<UpnpSsdpEngine> newEngine(new UpnpSsdpEngine);
@@ -330,7 +347,12 @@ private Q_SLOTS:
                                      "Content-Length: 0\r\n\r\n")
                                     });
 
-        QScopedPointer<MockSsdpClient> newClient(new MockSsdpClient(hardCodedAnswer));
+        QScopedPointer<MockSsdpClient> newClient(new MockSsdpClient("M-SEARCH * HTTP/1.1\r\n"
+                                                                    "HOST: 239.255.255.250:11900\r\n"
+                                                                    "MAN: \"ssdp:discover\"\r\n"
+                                                                    "MX: 2\r\n"
+                                                                    "ST: urn:schemas-upnp-org:service:ConnectionManager:1\r\n\r\n",
+                                                                    hardCodedAnswer));
         newClient->listen(11900);
 
         QScopedPointer<UpnpSsdpEngine> newEngine(new UpnpSsdpEngine);
