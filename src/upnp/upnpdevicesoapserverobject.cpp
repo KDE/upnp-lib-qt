@@ -24,6 +24,10 @@
 #include "upnpeventsubscriber.h"
 #include "upnpbasictypes.h"
 
+#include "upnpactiondescription.h"
+#include "upnpdevicedescription.h"
+#include "upnpservicedescription.h"
+
 #include "KDSoapClient/KDSoapValue.h"
 #include "KDSoapClient/KDSoapValue.h"
 
@@ -115,7 +119,7 @@ void UpnpDeviceSoapServerObject::processRequestWithPath(const KDSoapMessage &req
     UpnpAbstractService *currentService = currentDevice->serviceByIndex(serviceIndex);
 
     const QList<QByteArray> &soapActionParts = soapAction.split('#');
-    if (soapActionParts.size() != 2 || soapActionParts.first() != currentService->serviceType().toLatin1()) {
+    if (soapActionParts.size() != 2 || soapActionParts.first() != currentService->service()->serviceType().toLatin1()) {
         response.setFault(true);
         return;
     }
@@ -123,7 +127,7 @@ void UpnpDeviceSoapServerObject::processRequestWithPath(const KDSoapMessage &req
     const QByteArray &actionName = soapActionParts.last();
     const QString &actionNameString = QString::fromLatin1(actionName);
 
-    response = KDSoapValue(actionNameString + QStringLiteral("Response"), QVariant(), currentService->serviceType());
+    response = KDSoapValue(actionNameString + QStringLiteral("Response"), QVariant(), currentService->service()->serviceType());
 
     const KDSoapValueList &allArguments(request.arguments());
     const UpnpActionDescription &currentAction = currentService->action(actionNameString);
@@ -177,7 +181,7 @@ void UpnpDeviceSoapServerObject::processRequestWithPath(const KDSoapMessage &req
             response.setFault(false);
         }
 
-        response.setType(currentService->serviceType(), actionNameString + QStringLiteral("Response"));
+        response.setType(currentService->service()->serviceType(), actionNameString + QStringLiteral("Response"));
         for (const QPair<QString, QVariant> &oneValue : returnedValues) {
             response.addArgument(oneValue.first, oneValue.second);
         }
@@ -240,7 +244,7 @@ bool UpnpDeviceSoapServerObject::processCustomVerbRequest(const QByteArray &requ
 
 QIODevice *UpnpDeviceSoapServerObject::downloadDeviceXmlDescription(UpnpAbstractDevice *device, QByteArray &contentType)
 {
-    qDebug() << "UpnpDeviceSoapServerObject::downloadDeviceXmlDescription" << device->UDN();
+    qDebug() << "UpnpDeviceSoapServerObject::downloadDeviceXmlDescription" << device->device()->UDN();
 
     contentType = "text/xml";
 
@@ -249,7 +253,7 @@ QIODevice *UpnpDeviceSoapServerObject::downloadDeviceXmlDescription(UpnpAbstract
 
 QIODevice *UpnpDeviceSoapServerObject::downloadServiceXmlDescription(UpnpAbstractDevice *device, const int serviceIndex, QByteArray &contentType)
 {
-    qDebug() << "UpnpDeviceSoapServerObject::downloadServiceXmlDescription" << device->UDN() << serviceIndex;
+    qDebug() << "UpnpDeviceSoapServerObject::downloadServiceXmlDescription" << device->device()->UDN() << serviceIndex;
 
     contentType = "text/xml";
 

@@ -22,6 +22,9 @@
 #include "upnpservereventobject.h"
 #include "upnpbasictypes.h"
 
+#include "upnpactiondescription.h"
+#include "upnpservicedescription.h"
+
 #include <KDSoapClient/KDSoapClientInterface.h>
 #include <KDSoapClient/KDSoapMessage.h>
 
@@ -105,12 +108,12 @@ KDSoapPendingCall UpnpControlAbstractService::callAction(const QString &actionNa
     }
 
     if (!d->mInterface) {
-        d->mInterface = new KDSoapClientInterface(controlURL().toString(), serviceType());
+        d->mInterface = new KDSoapClientInterface(service()->controlURL().toString(), service()->serviceType());
         d->mInterface->setSoapVersion(KDSoapClientInterface::SOAP1_1);
         d->mInterface->setStyle(KDSoapClientInterface::RPCStyle);
     }
 
-    return d->mInterface->asyncCall(actionName, message, serviceType() + QStringLiteral("#") + actionName);
+    return d->mInterface->asyncCall(actionName, message, service()->serviceType() + QStringLiteral("#") + actionName);
 }
 
 void UpnpControlAbstractService::subscribeEvents(int duration)
@@ -125,7 +128,7 @@ void UpnpControlAbstractService::subscribeEvents(int duration)
 
     webServerAddess += QStringLiteral(":") + QString::number(d->mEventServer.serverPort()) + QStringLiteral(">");
 
-    QNetworkRequest myRequest(eventURL());
+    QNetworkRequest myRequest(service()->eventURL());
     myRequest.setRawHeader("CALLBACK", webServerAddess.toUtf8());
     myRequest.setRawHeader("NT", "upnp:event");
     QString timeoutDefinition(QStringLiteral("Second-"));
@@ -166,7 +169,7 @@ void UpnpControlAbstractService::downloadServiceDescription(const QUrl &serviceU
 void UpnpControlAbstractService::finishedDownload(QNetworkReply *reply)
 {
     if (reply->isFinished() && reply->error() == QNetworkReply::NoError) {
-        if (reply->url() == eventURL()) {
+        if (reply->url() == service()->eventURL()) {
             if (reply->hasRawHeader("TIMEOUT")) {
                 if (reply->rawHeader("TIMEOUT").startsWith("Second-")) {
                     d->mRealEventSubscriptionTimeout = reply->rawHeader("TIMEOUT").mid(7).toInt();

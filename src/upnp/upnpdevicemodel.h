@@ -71,11 +71,11 @@ Q_SIGNALS:
 
 public Q_SLOTS:
 
-private Q_SLOTS:
-
     void newDevice(const UpnpDiscoveryResult &deviceDiscovery);
 
     void removedDevice(const UpnpDiscoveryResult &deviceDiscovery);
+
+private Q_SLOTS:
 
     void deviceDescriptionChanged(const QString &uuid);
 

@@ -21,6 +21,8 @@
 #include "upnpabstractservice.h"
 #include "upnpbasictypes.h"
 
+#include "upnpstatevariabledescription.h"
+
 #include <QtCore/QPointer>
 #include <QtCore/QBuffer>
 #include <QtCore/QXmlStreamWriter>

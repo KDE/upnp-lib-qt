@@ -69,6 +69,7 @@ target_link_libraries(upnpQt
     LINK_PUBLIC
         Qt5::Core
         KDSoap::kdsoap
+        upnpQtBase
 )
 
 target_include_directories(upnpQt PRIVATE ${KDSoap_INCLUDE_DIRS})

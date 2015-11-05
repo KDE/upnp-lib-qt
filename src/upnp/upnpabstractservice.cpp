@@ -21,6 +21,10 @@
 #include "upnpbasictypes.h"
 #include "upnpeventsubscriber.h"
 
+#include "upnpactiondescription.h"
+#include "upnpstatevariabledescription.h"
+#include "upnpservicedescription.h"
+
 #include <QtCore/QPointer>
 #include <QtCore/QBuffer>
 #include <QtCore/QIODevice>
@@ -36,33 +40,16 @@ class UpnpAbstractServicePrivate
 public:
 
     UpnpAbstractServicePrivate()
-        : mBaseURL(), mServiceType(), mServiceId(), mSCPDURL(), mControlURL(),
-          mEventURL(), mXmlDescription(), mActions(), mStateVariables(),
-          mSubscribers(), mMaximumSubscriptionDuration(3600)
+        : mService(new UpnpServiceDescription), mXmlDescription(), mSubscribers()
     {
     }
 
-    QString mBaseURL;
-
-    QString mServiceType;
-
-    QString mServiceId;
-
-    QUrl mSCPDURL;
-
-    QUrl mControlURL;
-
-    QUrl mEventURL;
+    QSharedPointer<UpnpServiceDescription> mService;
 
     QPointer<QIODevice> mXmlDescription;
 
-    QMap<QString, UpnpActionDescription> mActions;
-
-    QMap<QString, UpnpStateVariableDescription> mStateVariables;
-
     QList<QPointer<UpnpEventSubscriber> > mSubscribers;
 
-    int mMaximumSubscriptionDuration;
 };
 
 UpnpAbstractService::UpnpAbstractService(QObject *parent) :
@@ -73,77 +60,6 @@ UpnpAbstractService::UpnpAbstractService(QObject *parent) :
 UpnpAbstractService::~UpnpAbstractService()
 {
     delete d;
-}
-
-void UpnpAbstractService::setBaseURL(const QString &newBaseURL)
-{
-    d->mBaseURL = newBaseURL;
-}
-
-const QString &UpnpAbstractService::baseURL() const
-{
-    return d->mBaseURL;
-}
-
-void UpnpAbstractService::setServiceType(const QString &newServiceType)
-{
-    d->mServiceType = newServiceType;
-}
-
-const QString &UpnpAbstractService::serviceType() const
-{
-    return d->mServiceType;
-}
-
-void UpnpAbstractService::setServiceId(const QString &newServiceId)
-{
-    d->mServiceId = newServiceId;
-}
-
-const QString &UpnpAbstractService::serviceId() const
-{
-    return d->mServiceId;
-}
-
-void UpnpAbstractService::setSCPDURL(const QUrl &newSCPDURL)
-{
-    d->mSCPDURL = newSCPDURL;
-}
-
-const QUrl &UpnpAbstractService::SCPDURL() const
-{
-    return d->mSCPDURL;
-}
-
-void UpnpAbstractService::setControlURL(const QUrl &newControlURL)
-{
-    d->mControlURL = newControlURL;
-}
-
-const QUrl &UpnpAbstractService::controlURL() const
-{
-    return d->mControlURL;
-}
-
-void UpnpAbstractService::setEventURL(const QUrl &newEventURL)
-{
-    d->mEventURL = newEventURL;
-}
-
-const QUrl &UpnpAbstractService::eventURL() const
-{
-    return d->mEventURL;
-}
-
-void UpnpAbstractService::setMaximumSubscriptionDuration(int newValue)
-{
-    d->mMaximumSubscriptionDuration = newValue;
-    Q_EMIT maximumSubscriptionDurationChanged(d->mServiceId);
-}
-
-int UpnpAbstractService::maximumSubscriptionDuration() const
-{
-    return d->mMaximumSubscriptionDuration;
 }
 
 QIODevice* UpnpAbstractService::buildAndGetXmlDescription()
@@ -165,18 +81,18 @@ QIODevice* UpnpAbstractService::buildAndGetXmlDescription()
         insertStream.writeEndElement();
 
         insertStream.writeStartElement(QStringLiteral("actionList"));
-        for (auto itAction = d->mActions.begin(); itAction != d->mActions.end(); ++itAction) {
+        for (const auto &itAction : service()->actions()) {
             insertStream.writeStartElement(QStringLiteral("action"));
-            insertStream.writeTextElement(QStringLiteral("name"), itAction->mName);
+            insertStream.writeTextElement(QStringLiteral("name"), itAction.mName);
             insertStream.writeStartElement(QStringLiteral("argumentList"));
-            for (auto itArgument = itAction->mArguments.begin(); itArgument != itAction->mArguments.end(); ++itArgument) {
+            for (const auto &itArgument : itAction.mArguments) {
                 insertStream.writeStartElement(QStringLiteral("argument"));
-                insertStream.writeTextElement(QStringLiteral("name"), itArgument->mName);
-                insertStream.writeTextElement(QStringLiteral("direction"), (itArgument->mDirection == UpnpArgumentDirection::In) ? QStringLiteral("in") : QStringLiteral("out"));
-                if (itArgument->mIsReturnValue) {
+                insertStream.writeTextElement(QStringLiteral("name"), itArgument.mName);
+                insertStream.writeTextElement(QStringLiteral("direction"), (itArgument.mDirection == UpnpArgumentDirection::In) ? QStringLiteral("in") : QStringLiteral("out"));
+                if (itArgument.mIsReturnValue) {
                     insertStream.writeEmptyElement(QStringLiteral("retval"));
                 }
-                insertStream.writeTextElement(QStringLiteral("relatedStateVariable"), itArgument->mRelatedStateVariable);
+                insertStream.writeTextElement(QStringLiteral("relatedStateVariable"), itArgument.mRelatedStateVariable);
                 insertStream.writeEndElement();
             }
             insertStream.writeEndElement();
@@ -185,36 +101,36 @@ QIODevice* UpnpAbstractService::buildAndGetXmlDescription()
         insertStream.writeEndElement();
 
         insertStream.writeStartElement(QStringLiteral("serviceStateTable"));
-        for (auto itStateVariable = d->mStateVariables.begin(); itStateVariable != d->mStateVariables.end(); ++itStateVariable) {
+        for (const auto &itStateVariable : service()->stateVariables()) {
             insertStream.writeStartElement(QStringLiteral("stateVariable"));
-            if (itStateVariable->mEvented) {
+            if (itStateVariable.mEvented) {
                 insertStream.writeAttribute(QStringLiteral("sendEvents"), QStringLiteral("yes"));
             } else {
                 insertStream.writeAttribute(QStringLiteral("sendEvents"), QStringLiteral("no"));
             }
-            insertStream.writeTextElement(QStringLiteral("name"), itStateVariable->mUpnpName);
-            insertStream.writeTextElement(QStringLiteral("dataType"), itStateVariable->mDataType);
-            if (itStateVariable->mDefaultValue.isValid()) {
-                insertStream.writeTextElement(QStringLiteral("defaultValue"), itStateVariable->mDefaultValue.toString());
+            insertStream.writeTextElement(QStringLiteral("name"), itStateVariable.mUpnpName);
+            insertStream.writeTextElement(QStringLiteral("dataType"), itStateVariable.mDataType);
+            if (itStateVariable.mDefaultValue.isValid()) {
+                insertStream.writeTextElement(QStringLiteral("defaultValue"), itStateVariable.mDefaultValue.toString());
             }
-            if (itStateVariable->mMinimumValue.isValid() && itStateVariable->mMaximumValue.isValid()
-                && itStateVariable->mStep.isValid()) {
+            if (itStateVariable.mMinimumValue.isValid() && itStateVariable.mMaximumValue.isValid()
+                && itStateVariable.mStep.isValid()) {
                 insertStream.writeStartElement(QStringLiteral("allowedValueRange"));
-                if (itStateVariable->mMinimumValue.isValid()) {
-                    insertStream.writeTextElement(QStringLiteral("minimum"), itStateVariable->mMinimumValue.toString());
+                if (itStateVariable.mMinimumValue.isValid()) {
+                    insertStream.writeTextElement(QStringLiteral("minimum"), itStateVariable.mMinimumValue.toString());
                 }
-                if (itStateVariable->mMaximumValue.isValid()) {
-                    insertStream.writeTextElement(QStringLiteral("maximum"), itStateVariable->mMaximumValue.toString());
+                if (itStateVariable.mMaximumValue.isValid()) {
+                    insertStream.writeTextElement(QStringLiteral("maximum"), itStateVariable.mMaximumValue.toString());
                 }
-                if (itStateVariable->mStep.isValid()) {
-                    insertStream.writeTextElement(QStringLiteral("step"), itStateVariable->mStep.toString());
+                if (itStateVariable.mStep.isValid()) {
+                    insertStream.writeTextElement(QStringLiteral("step"), itStateVariable.mStep.toString());
                 }
                 insertStream.writeEndElement();
             }
-            if (!itStateVariable->mValueList.isEmpty()) {
+            if (!itStateVariable.mValueList.isEmpty()) {
                 insertStream.writeStartElement(QStringLiteral("allowedValueList"));
-                for (auto itValue = itStateVariable->mValueList.begin(); itValue != itStateVariable->mValueList.end(); ++itValue) {
-                    insertStream.writeTextElement(QStringLiteral("allowedValue"), *itValue);
+                for (const auto &itValue : itStateVariable.mValueList) {
+                    insertStream.writeTextElement(QStringLiteral("allowedValue"), itValue);
                 }
                 insertStream.writeEndElement();
             }
@@ -245,7 +161,7 @@ QPointer<UpnpEventSubscriber> UpnpAbstractService::subscribeToEvents(const QByte
     bool conversionIsOk = false;
     newSubscriber->setSecondTimeout(rawTimeout.right(rawTimeout.length() - 7).toInt(&conversionIsOk));
     if (!conversionIsOk || rawTimeout == "Second-infinite") {
-        newSubscriber->setSecondTimeout(d->mMaximumSubscriptionDuration);
+        newSubscriber->setSecondTimeout(service()->maximumSubscriptionDuration());
     }
 
     int signalIndex = -1;
@@ -259,7 +175,7 @@ QPointer<UpnpEventSubscriber> UpnpAbstractService::subscribeToEvents(const QByte
     if (signalIndex != -1) {
         newSubscriber->setUpnpService(this);
         d->mSubscribers.push_back(newSubscriber);
-        for (const UpnpStateVariableDescription &currentStateVariable : d->mStateVariables) {
+        for (const UpnpStateVariableDescription &currentStateVariable : service()->stateVariables()) {
             if (currentStateVariable.mEvented) {
                 connect(this, metaObject()->property(currentStateVariable.mPropertyIndex).notifySignal(), newSubscriber, newSubscriber->metaObject()->method(signalIndex));
             }
@@ -278,32 +194,32 @@ void UpnpAbstractService::unsubscribeToEvents(const QByteArray &requestData, con
 
 void UpnpAbstractService::addAction(const UpnpActionDescription &newAction)
 {
-    d->mActions[newAction.mName] = newAction;
+    service()->actions()[newAction.mName] = newAction;
 }
 
 const UpnpActionDescription &UpnpAbstractService::action(const QString &name) const
 {
-    return d->mActions[name];
+    return service()->action(name);
 }
 
 QList<QString> UpnpAbstractService::actions() const
 {
-    return d->mActions.keys();
+    return service()->actions().keys();
 }
 
 void UpnpAbstractService::addStateVariable(const UpnpStateVariableDescription &newVariable)
 {
-    d->mStateVariables[newVariable.mUpnpName] = newVariable;
+    service()->stateVariables()[newVariable.mUpnpName] = newVariable;
 }
 
 const UpnpStateVariableDescription &UpnpAbstractService::stateVariable(const QString &name) const
 {
-    return d->mStateVariables[name];
+    return service()->stateVariable(name);
 }
 
 QList<QString> UpnpAbstractService::stateVariables() const
 {
-    return d->mStateVariables.keys();
+    return service()->stateVariables().keys();
 }
 
 QList<QPair<QString, QVariant> > UpnpAbstractService::invokeAction(const QString &actionName, const QList<QVariant> &arguments, bool &isInError)
@@ -315,6 +231,21 @@ QList<QPair<QString, QVariant> > UpnpAbstractService::invokeAction(const QString
     return {};
 }
 
+void UpnpAbstractService::setService(UpnpServiceDescription *value)
+{
+    d->mService.reset(value);
+    Q_EMIT serviceChanged();
+}
+
+UpnpServiceDescription *UpnpAbstractService::service()
+{
+    return d->mService.data();
+}
+
+const UpnpServiceDescription *UpnpAbstractService::service() const
+{
+    return d->mService.data();
+}
 void UpnpAbstractService::sendEventNotification(const QPointer<UpnpEventSubscriber> &currentSubscriber)
 {
     QTimer::singleShot(0, currentSubscriber.data(), SLOT(sendEventNotification()));

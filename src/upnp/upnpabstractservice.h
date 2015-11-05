@@ -34,78 +34,21 @@ class UpnpActionDescription;
 class UpnpStateVariableDescription;
 class UpnpEventSubscriber;
 class QIODevice;
+class UpnpServiceDescription;
 
 class UPNPQT_EXPORT UpnpAbstractService : public QObject
 {
     Q_OBJECT
 
-    Q_PROPERTY(QString serviceType
-               READ serviceType
-               WRITE setServiceType
-               NOTIFY serviceTypeChanged)
-
-    Q_PROPERTY(QString serviceId
-               READ serviceId
-               WRITE setServiceId
-               NOTIFY serviceIdChanged)
-
-    Q_PROPERTY(QString baseURL
-               READ baseURL
-               WRITE setBaseURL
-               NOTIFY baseURLChanged)
-
-    Q_PROPERTY(QUrl SCPDURL
-               READ SCPDURL
-               WRITE setSCPDURL
-               NOTIFY SCPDURLChanged)
-
-    Q_PROPERTY(QUrl controlURL
-               READ controlURL
-               WRITE setControlURL
-               NOTIFY controlURLChanged)
-
-    Q_PROPERTY(QUrl eventURL
-               READ eventURL
-               WRITE setEventURL
-               NOTIFY eventURLChanged)
-
-    Q_PROPERTY(int maximumSubscriptionDuration
-               READ maximumSubscriptionDuration
-               WRITE setMaximumSubscriptionDuration
-               NOTIFY maximumSubscriptionDurationChanged)
+    Q_PROPERTY(UpnpServiceDescription* service
+               READ service
+               WRITE setService
+               NOTIFY serviceChanged)
 
 public:
     explicit UpnpAbstractService(QObject *parent = 0);
 
     virtual ~UpnpAbstractService();
-
-    void setBaseURL(const QString &newBaseURL);
-
-    const QString& baseURL() const;
-
-    void setServiceType(const QString &newServiceType);
-
-    const QString& serviceType() const;
-
-    void setServiceId(const QString &newServiceId);
-
-    const QString& serviceId() const;
-
-    void setSCPDURL(const QUrl &newSCPDURL);
-
-    const QUrl& SCPDURL() const;
-
-    void setControlURL(const QUrl &newControlURL);
-
-    const QUrl& controlURL() const;
-
-    void setEventURL(const QUrl &newEventURL);
-
-    const QUrl& eventURL() const;
-
-    void setMaximumSubscriptionDuration(int newValue);
-
-    int maximumSubscriptionDuration() const;
 
     QIODevice* buildAndGetXmlDescription();
 
@@ -127,21 +70,15 @@ public:
 
     virtual QList<QPair<QString, QVariant> > invokeAction(const QString &actionName, const QList<QVariant> &arguments, bool &isInError);
 
+    void setService(UpnpServiceDescription *value);
+
+    UpnpServiceDescription* service();
+
+    const UpnpServiceDescription* service() const;
+
 Q_SIGNALS:
 
-    void serviceTypeChanged(const QString &serviceId);
-
-    void serviceIdChanged(const QString &serviceId);
-
-    void baseURLChanged(const QString &serviceId);
-
-    void SCPDURLChanged(const QString &serviceId);
-
-    void controlURLChanged(const QString &serviceId);
-
-    void eventURLChanged(const QString &serviceId);
-
-    void maximumSubscriptionDurationChanged(const QString &serviceId);
+    void serviceChanged();
 
 public Q_SLOTS:
 

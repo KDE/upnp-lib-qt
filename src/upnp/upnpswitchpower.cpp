@@ -21,6 +21,10 @@
 
 #include "upnpbasictypes.h"
 
+#include "upnpactiondescription.h"
+#include "upnpstatevariabledescription.h"
+#include "upnpservicedescription.h"
+
 #include <QtCore/QDebug>
 #include <QtCore/QMetaObject>
 #include <QtCore/QMetaProperty>
@@ -42,8 +46,8 @@ UpnpSwitchPower::UpnpSwitchPower(QObject *parent) :
     UpnpAbstractService(parent), d(new UpnpSwitchPowerPrivate)
 {
     //setBaseURL();
-    setServiceId(QStringLiteral("urn:upnp-org:serviceId:SwitchPower"));
-    setServiceType(QStringLiteral("urn:schemas-upnp-org:service:SwitchPower:1"));
+    service()->setServiceId(QStringLiteral("urn:upnp-org:serviceId:SwitchPower"));
+    service()->setServiceType(QStringLiteral("urn:schemas-upnp-org:service:SwitchPower:1"));
 
     UpnpActionDescription setTargetAction;
     setTargetAction.mName = QStringLiteral("SetTarget");
@@ -140,7 +144,7 @@ bool UpnpSwitchPower::target() const
 void UpnpSwitchPower::setStatus(bool value)
 {
     d->mStatus = value;
-    Q_EMIT statusChanged(serviceId(), "status");
+    Q_EMIT statusChanged(service()->serviceId(), "status");
 }
 
 bool UpnpSwitchPower::status() const
@@ -193,7 +197,7 @@ QList<QPair<QString, QVariant> > UpnpSwitchPower::setTargetAction(bool newValue)
     d->mStatus = newValue;
     d->mTarget = newValue;
 
-    Q_EMIT statusChanged(serviceId(), "status");
+    Q_EMIT statusChanged(service()->serviceId(), "status");
 
     qDebug() << "call setTargetAction" << d->mStatus;
 

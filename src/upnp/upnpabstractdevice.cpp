@@ -21,9 +21,13 @@
 #include "upnpabstractservice.h"
 #include "upnpssdpengine.h"
 
+#include "upnpdevicedescription.h"
+#include "upnpservicedescription.h"
+
 #include <QtCore/QBuffer>
 #include <QtCore/QIODevice>
 #include <QtCore/QPointer>
+#include <QtCore/QSharedPointer>
 #include <QtCore/QXmlStreamWriter>
 
 #include <QtCore/QDebug>
@@ -32,42 +36,13 @@ class UpnpAbstractDevicePrivate
 {
 public:
 
+    UpnpAbstractDevicePrivate() : mServices(), mDevice(new UpnpDeviceDescription), mXmlDescription()
+    {
+    }
+
     QList<QPointer<UpnpAbstractService> > mServices;
 
-    QString mDeviceUUID;
-
-    QString mUDN;
-
-    /**
-     * @brief mUPC: Universal Product Code
-     * mUPC is optional. 12-digit, all-numeric code that identifies the consumer package.
-     * Managed by the Uniform Code Council. Specified by UPnP vendor. Single UPC.
-     */
-    QString mUPC;
-
-    QString mDeviceType;
-
-    QString mFriendlyName;
-
-    QString mManufacturer;
-
-    QUrl mManufacturerURL;
-
-    QString mModelDescription;
-
-    QString mModelName;
-
-    QString mModelNumber;
-
-    QUrl mModelURL;
-
-    QString mSerialNumber;
-
-    QString mURLBase;
-
-    int mCacheControl;
-
-    QUrl mLocationUrl;
+    QSharedPointer<UpnpDeviceDescription> mDevice;
 
     QPointer<QIODevice> mXmlDescription;
 };
@@ -86,7 +61,7 @@ UpnpAbstractService* UpnpAbstractDevice::serviceById(const QString &serviceId) c
 {
     UpnpAbstractService *result = nullptr;
     for (auto service : d->mServices) {
-        if (service->serviceId() == serviceId) {
+        if (service->service()->serviceId() == serviceId) {
             return service;
         }
     }
@@ -112,165 +87,26 @@ QList<QString> UpnpAbstractDevice::servicesName() const
     QList<QString> result;
 
     for (auto itService: d->mServices) {
-        result.push_back(itService->serviceType());
+        result.push_back(itService->service()->serviceType());
     }
 
     return result;
 }
 
-void UpnpAbstractDevice::setUDN(const QString &value)
+void UpnpAbstractDevice::setDevice(UpnpDeviceDescription *value)
 {
-    d->mDeviceUUID = value.mid(5);
-    d->mUDN = value;
-    Q_EMIT UDNChanged(d->mDeviceUUID);
+    d->mDevice.reset(value);
+    Q_EMIT deviceChanged();
 }
 
-const QString &UpnpAbstractDevice::UDN() const
+UpnpDeviceDescription *UpnpAbstractDevice::device()
 {
-    return d->mUDN;
+    return d->mDevice.data();
 }
 
-void UpnpAbstractDevice::setUPC(const QString &value)
+const UpnpDeviceDescription *UpnpAbstractDevice::device() const
 {
-    d->mUPC = value;
-    Q_EMIT UPCChanged(d->mDeviceUUID);
-}
-
-const QString &UpnpAbstractDevice::UPC() const
-{
-    return d->mUPC;
-}
-
-void UpnpAbstractDevice::setDeviceType(const QString &value)
-{
-    d->mDeviceType = value;
-    Q_EMIT deviceTypeChanged(d->mDeviceUUID);
-}
-
-const QString &UpnpAbstractDevice::deviceType() const
-{
-    return d->mDeviceType;
-}
-
-void UpnpAbstractDevice::setFriendlyName(const QString &value)
-{
-    d->mFriendlyName = value;
-    Q_EMIT friendlyNameChanged(d->mDeviceUUID);
-}
-
-const QString &UpnpAbstractDevice::friendlyName() const
-{
-    return d->mFriendlyName;
-}
-
-void UpnpAbstractDevice::setManufacturer(const QString &value)
-{
-    d->mManufacturer = value;
-    Q_EMIT manufacturerChanged(d->mDeviceUUID);
-}
-
-const QString &UpnpAbstractDevice::manufacturer() const
-{
-    return d->mManufacturer;
-}
-
-void UpnpAbstractDevice::setManufacturerURL(const QUrl &value)
-{
-    d->mManufacturerURL = value;
-    Q_EMIT manufacturerURLChanged(d->mDeviceUUID);
-}
-
-const QUrl &UpnpAbstractDevice::manufacturerURL() const
-{
-    return d->mManufacturerURL;
-}
-
-void UpnpAbstractDevice::setModelDescription(const QString &value)
-{
-    d->mModelDescription = value;
-    Q_EMIT modelDescriptionChanged(d->mDeviceUUID);
-}
-
-const QString &UpnpAbstractDevice::modelDescription() const
-{
-    return d->mModelDescription;
-}
-
-void UpnpAbstractDevice::setModelName(const QString &value)
-{
-    d->mModelName = value;
-    Q_EMIT modelNameChanged(d->mDeviceUUID);
-}
-
-const QString &UpnpAbstractDevice::modelName() const
-{
-    return d->mModelName;
-}
-
-void UpnpAbstractDevice::setModelNumber(const QString &value)
-{
-    d->mModelNumber = value;
-    Q_EMIT modelNumberChanged(d->mDeviceUUID);
-}
-
-const QString &UpnpAbstractDevice::modelNumber() const
-{
-    return d->mModelNumber;
-}
-
-void UpnpAbstractDevice::setModelURL(const QUrl &value)
-{
-    d->mModelURL = value;
-    Q_EMIT modelURLChanged(d->mDeviceUUID);
-}
-
-const QUrl &UpnpAbstractDevice::modelURL() const
-{
-    return d->mModelURL;
-}
-
-void UpnpAbstractDevice::setSerialNumber(const QString &value)
-{
-    d->mSerialNumber = value;
-    Q_EMIT serialNumberChanged(d->mDeviceUUID);
-}
-
-const QString &UpnpAbstractDevice::serialNumber() const
-{
-    return d->mSerialNumber;
-}
-
-void UpnpAbstractDevice::setURLBase(const QString &value)
-{
-    d->mURLBase = value;
-    Q_EMIT URLBaseChanged(d->mDeviceUUID);
-}
-
-const QString &UpnpAbstractDevice::URLBase() const
-{
-    return d->mURLBase;
-}
-
-void UpnpAbstractDevice::setCacheControl(int value)
-{
-    d->mCacheControl = value;
-    Q_EMIT cacheControlChanged(d->mDeviceUUID);
-}
-
-int UpnpAbstractDevice::cacheControl() const
-{
-    return d->mCacheControl;
-}
-
-void UpnpAbstractDevice::setLocationUrl(const QUrl &value)
-{
-    d->mLocationUrl = value;
-    Q_EMIT locationUrlChanged(d->mDeviceUUID);
-}
-
-const QUrl &UpnpAbstractDevice::locationUrl() const
-{
-    return d->mLocationUrl;
+    return d->mDevice.data();
 }
 
 QIODevice* UpnpAbstractDevice::buildAndGetXmlDescription()
@@ -290,29 +126,29 @@ QIODevice* UpnpAbstractDevice::buildAndGetXmlDescription()
         insertStream.writeTextElement(QStringLiteral("major"), QStringLiteral("1"));
         insertStream.writeTextElement(QStringLiteral("minor"), QStringLiteral("0"));
         insertStream.writeEndElement();
-        insertStream.writeTextElement(QStringLiteral("URLBase"), URLBase());
+        insertStream.writeTextElement(QStringLiteral("URLBase"), device()->URLBase());
         insertStream.writeStartElement(QStringLiteral("device"));
-        insertStream.writeTextElement(QStringLiteral("deviceType"), deviceType());
-        insertStream.writeTextElement(QStringLiteral("friendlyName"), friendlyName());
-        insertStream.writeTextElement(QStringLiteral("manufacturer"), manufacturer());
-        insertStream.writeTextElement(QStringLiteral("manufacterURL"), manufacturerURL().toString());
-        insertStream.writeTextElement(QStringLiteral("modelDescription"), modelDescription());
-        insertStream.writeTextElement(QStringLiteral("modelName"), modelName());
-        insertStream.writeTextElement(QStringLiteral("modelNumber"), modelNumber());
-        insertStream.writeTextElement(QStringLiteral("modelURL"), modelURL().toString());
-        insertStream.writeTextElement(QStringLiteral("serialNumber"), serialNumber());
-        insertStream.writeTextElement(QStringLiteral("UDN"), QStringLiteral("uuid:") + UDN());
-        insertStream.writeTextElement(QStringLiteral("UPC"), UPC());
+        insertStream.writeTextElement(QStringLiteral("deviceType"), device()->deviceType());
+        insertStream.writeTextElement(QStringLiteral("friendlyName"), device()->friendlyName());
+        insertStream.writeTextElement(QStringLiteral("manufacturer"), device()->manufacturer());
+        insertStream.writeTextElement(QStringLiteral("manufacterURL"), device()->manufacturerURL().toString());
+        insertStream.writeTextElement(QStringLiteral("modelDescription"), device()->modelDescription());
+        insertStream.writeTextElement(QStringLiteral("modelName"), device()->modelName());
+        insertStream.writeTextElement(QStringLiteral("modelNumber"), device()->modelNumber());
+        insertStream.writeTextElement(QStringLiteral("modelURL"), device()->modelURL().toString());
+        insertStream.writeTextElement(QStringLiteral("serialNumber"), device()->serialNumber());
+        insertStream.writeTextElement(QStringLiteral("UDN"), QStringLiteral("uuid:") + device()->UDN());
+        insertStream.writeTextElement(QStringLiteral("UPC"), device()->UPC());
 
         if (!d->mServices.empty()) {
             insertStream.writeStartElement(QStringLiteral("serviceList"));
-            for (auto itService = d->mServices.begin(); itService != d->mServices.end(); ++itService) {
+            for (const auto &itService : d->mServices) {
                 insertStream.writeStartElement(QStringLiteral("service"));
-                insertStream.writeTextElement(QStringLiteral("serviceType"), (*itService)->serviceType());
-                insertStream.writeTextElement(QStringLiteral("serviceId"), (*itService)->serviceId());
-                insertStream.writeTextElement(QStringLiteral("SCPDURL"), (*itService)->SCPDURL().toString());
-                insertStream.writeTextElement(QStringLiteral("controlURL"), (*itService)->controlURL().toString());
-                insertStream.writeTextElement(QStringLiteral("eventSubURL"), (*itService)->eventURL().toString());
+                insertStream.writeTextElement(QStringLiteral("serviceType"), itService->service()->serviceType());
+                insertStream.writeTextElement(QStringLiteral("serviceId"), itService->service()->serviceId());
+                insertStream.writeTextElement(QStringLiteral("SCPDURL"), itService->service()->SCPDURL().toString());
+                insertStream.writeTextElement(QStringLiteral("controlURL"), itService->service()->controlURL().toString());
+                insertStream.writeTextElement(QStringLiteral("eventSubURL"), itService->service()->eventURL().toString());
                 insertStream.writeEndElement();
             }
             insertStream.writeEndElement();
