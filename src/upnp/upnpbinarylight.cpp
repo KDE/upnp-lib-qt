@@ -54,7 +54,7 @@ BinaryLight::BinaryLight(int cacheDuration, QObject *parent)
     device()->setCacheControl(cacheDuration);
 
     QPointer<UpnpAbstractService> switchPowerService(new UpnpSwitchPower);
-    const int serviceIndex = addService(switchPowerService);
+    const int serviceIndex = 0/*addService(switchPowerService)*/;
 
     const int deviceIndex = d->mServer.addDevice(this);
 

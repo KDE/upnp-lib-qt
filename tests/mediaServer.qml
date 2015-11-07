@@ -16,6 +16,12 @@ Item {
     width: parent.width
     height: parent.height
 
+    UpnpControlMediaServer {
+        id: upnpDevice
+
+        description: aDevice
+    }
+
     Audio {
         id: audioPlayer
 
@@ -140,7 +146,7 @@ Item {
                     MediaContentDirectory {
                         id: contentBrowser
 
-                        mediaServerDevice: aDevice
+                        mediaServerDevice: upnpDevice
                         parentStackView: rootElement.parentStackView
                         connectionManager: rootElement.connectionManager
                         playListModel: playListModelItem
@@ -154,7 +160,7 @@ Item {
                     MediaPlayListView {
                         id: playList
 
-                        mediaServerDevice: aDevice
+                        mediaServerDevice: upnpDevice
                         parentStackView: rootElement.parentStackView
                         connectionManager: rootElement.connectionManager
                         player: audioPlayer

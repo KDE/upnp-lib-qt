@@ -32,6 +32,7 @@ class QIODevice;
 class UpnpSearchQuery;
 class UpnpSsdpEngine;
 class UpnpDeviceDescription;
+class UpnpServiceDescription;
 
 class UPNPQT_EXPORT UpnpAbstractDevice : public QObject
 {
@@ -48,11 +49,11 @@ public:
 
     virtual ~UpnpAbstractDevice();
 
-    Q_INVOKABLE UpnpAbstractService* serviceById(const QString &serviceId) const;
+    Q_INVOKABLE UpnpServiceDescription* serviceById(const QString &serviceId) const;
 
-    Q_INVOKABLE UpnpAbstractService* serviceByIndex(int serviceIndex) const;
+    Q_INVOKABLE UpnpServiceDescription* serviceByIndex(int serviceIndex) const;
 
-    QList<QPointer<UpnpAbstractService> >& services() const;
+    const QList<QSharedPointer<UpnpServiceDescription> > &services() const;
 
     QList<QString> servicesName() const;
 
@@ -76,7 +77,7 @@ public Q_SLOTS:
 
 protected:
 
-    int addService(QPointer<UpnpAbstractService> newService);
+    int addService(QSharedPointer<UpnpServiceDescription> newService);
 
 private:
 

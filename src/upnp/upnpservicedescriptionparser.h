@@ -17,54 +17,50 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#ifndef UPNPDEVICEDISCOVERY_H
-#define UPNPDEVICEDISCOVERY_H
-
-#include "upnpQt_export.h"
-
-#include "upnpabstractdevice.h"
+#ifndef UPNPSERVICEDESCRIPTIONPARSER_H
+#define UPNPSERVICEDESCRIPTIONPARSER_H
 
 #include <QtCore/QObject>
+#include <QtCore/QUrl>
+#include <QtCore/QString>
+#include <QtCore/QSharedPointer>
 
-class UpnpControlAbstractDevicePrivate;
 class QNetworkReply;
-class UpnpControlAbstractService;
+class QIODevice;
+class QNetworkAccessManager;
 
-class UPNPQT_EXPORT UpnpControlAbstractDevice : public UpnpAbstractDevice
+class UpnpServiceDescription;
+
+class UpnpServiceDescriptionParserPrivate;
+
+class UpnpServiceDescriptionParser : public QObject
 {
-
     Q_OBJECT
 
-    Q_PROPERTY(UpnpDeviceDescription* description
-               READ description
-               WRITE setDescription
-               NOTIFY descriptionChanged)
-
 public:
-    explicit UpnpControlAbstractDevice(QObject *parent = 0);
 
-    ~UpnpControlAbstractDevice();
+    explicit UpnpServiceDescriptionParser(QNetworkAccessManager *aNetworkAccess, QSharedPointer<UpnpServiceDescription> serviceDescription, QObject *parent = 0);
 
-    UpnpDeviceDescription* description() const;
-
-    void setDescription(UpnpDeviceDescription *newDescription);
+    ~UpnpServiceDescriptionParser();
 
 Q_SIGNALS:
 
-    void inError();
+    void descriptionParsed(const QString &upnpServiceId);
 
-    void descriptionChanged();
+    void ServiceDescriptionInError(const QString &upnpServiceId);
 
 public Q_SLOTS:
 
-private Q_SLOTS:
+    void finishedDownload(QNetworkReply *reply);
 
-protected:
+    void downloadServiceDescription(const QUrl &serviceUrl);
 
 private:
 
-    UpnpControlAbstractDevicePrivate *d;
+    void parseServiceDescription(QIODevice *serviceDescriptionContent);
+
+    UpnpServiceDescriptionParserPrivate *d;
 
 };
 
-#endif // UPNPDEVICEDISCOVERY_H
+#endif // UPNPSERVICEDESCRIPTIONPARSER_H

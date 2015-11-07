@@ -39,11 +39,11 @@ class UpnpControlAbstractDevicePrivate
 public:
 
     UpnpControlAbstractDevicePrivate()
-        : mDiscoveryResults()
+        : mDescription(nullptr)
     {
     }
 
-    QList<QVariantMap> mDiscoveryResults;
+    UpnpDeviceDescription *mDescription;
 };
 
 UpnpControlAbstractDevice::UpnpControlAbstractDevice(QObject *parent) : UpnpAbstractDevice(parent), d(new UpnpControlAbstractDevicePrivate)
@@ -53,6 +53,17 @@ UpnpControlAbstractDevice::UpnpControlAbstractDevice(QObject *parent) : UpnpAbst
 UpnpControlAbstractDevice::~UpnpControlAbstractDevice()
 {
     delete d;
+}
+
+UpnpDeviceDescription* UpnpControlAbstractDevice::description() const
+{
+    return d->mDescription;
+}
+
+void UpnpControlAbstractDevice::setDescription(UpnpDeviceDescription *newDescription)
+{
+    d->mDescription = newDescription;
+    Q_EMIT descriptionChanged();
 }
 
 #include "moc_upnpcontrolabstractdevice.cpp"

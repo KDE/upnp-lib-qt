@@ -22,6 +22,8 @@
 #include "upnpdevicedescription.h"
 #include "upnpservicedescription.h"
 
+#include "upnpservicedescriptionparser.h"
+
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtNetwork/QNetworkRequest>
 #include <QtNetwork/QNetworkReply>
@@ -33,13 +35,17 @@ class UpnpDeviceDescriptionParserPrivate
 public:
 
     UpnpDeviceDescriptionParserPrivate(QNetworkAccessManager *aNetworkAccess, QSharedPointer<UpnpDeviceDescription> deviceDescription)
-        : mNetworkAccess(aNetworkAccess), mDeviceDescription(deviceDescription)
+        : mNetworkAccess(aNetworkAccess), mDeviceDescription(deviceDescription), mDeviceURL()
     {
     }
 
     QNetworkAccessManager *mNetworkAccess;
 
     QSharedPointer<UpnpDeviceDescription> mDeviceDescription;
+
+    QMap<QString, QSharedPointer<UpnpServiceDescriptionParser> > mServiceDescriptionParsers;
+
+    QUrl mDeviceURL;
 };
 
 UpnpDeviceDescriptionParser::UpnpDeviceDescriptionParser(QNetworkAccessManager *aNetworkAccess, QSharedPointer<UpnpDeviceDescription> deviceDescription, QObject *parent)
@@ -54,15 +60,27 @@ UpnpDeviceDescriptionParser::~UpnpDeviceDescriptionParser()
 
 void UpnpDeviceDescriptionParser::downloadDeviceDescription(const QUrl &deviceUrl)
 {
+    d->mDeviceURL = deviceUrl;
     d->mNetworkAccess->get(QNetworkRequest(deviceUrl));
+}
+
+void UpnpDeviceDescriptionParser::serviceDescriptionParsed(const QString &upnpServiceId)
+{
+    d->mServiceDescriptionParsers.remove(upnpServiceId);
+
+    if (d->mServiceDescriptionParsers.isEmpty()) {
+        Q_EMIT descriptionParsed(d->mDeviceDescription->UDN());
+    }
 }
 
 void UpnpDeviceDescriptionParser::finishedDownload(QNetworkReply *reply)
 {
-    if (reply->isFinished() && reply->error() == QNetworkReply::NoError) {
-        parseDeviceDescription(reply, reply->url().adjusted(QUrl::RemovePath).toString());
-    } else if (reply->isFinished()) {
-        Q_EMIT deviceDescriptionInError(d->mDeviceDescription->UDN());
+    if (reply->url() == d->mDeviceURL) {
+        if (reply->isFinished() && reply->error() == QNetworkReply::NoError) {
+            parseDeviceDescription(reply, reply->url().adjusted(QUrl::RemovePath).toString());
+        } else if (reply->isFinished()) {
+            Q_EMIT deviceDescriptionInError(d->mDeviceDescription->UDN());
+        }
     }
 }
 
@@ -179,12 +197,18 @@ void UpnpDeviceDescriptionParser::parseDeviceDescription(QIODevice *deviceDescri
                 serviceUrl.setPath(newService->SCPDURL().toString());
             }
 
-            //qobject_cast<UpnpControlAbstractService*>(newService.data())->downloadServiceDescription(serviceUrl);
             d->mDeviceDescription->addService(newService);
+
+            d->mServiceDescriptionParsers[newService->serviceId()].reset(new UpnpServiceDescriptionParser(d->mNetworkAccess, d->mDeviceDescription->serviceByIndex(serviceIndex)));
+
+            connect(d->mServiceDescriptionParsers[newService->serviceId()].data(), &UpnpServiceDescriptionParser::descriptionParsed,
+                    this, &UpnpDeviceDescriptionParser::serviceDescriptionParsed);
+            connect(d->mNetworkAccess, &QNetworkAccessManager::finished,
+                    d->mServiceDescriptionParsers[newService->serviceId()].data(), &UpnpServiceDescriptionParser::finishedDownload);
+
+            d->mServiceDescriptionParsers[newService->serviceId()]->downloadServiceDescription(serviceUrl);
         }
     }
-
-    Q_EMIT descriptionParsed(d->mDeviceDescription->UDN());
 }
 
 

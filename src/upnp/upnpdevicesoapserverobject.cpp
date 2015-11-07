@@ -116,10 +116,10 @@ void UpnpDeviceSoapServerObject::processRequestWithPath(const KDSoapMessage &req
         response.setFault(true);
         return;
     }
-    UpnpAbstractService *currentService = currentDevice->serviceByIndex(serviceIndex);
+    UpnpServiceDescription *currentService = currentDevice->serviceByIndex(serviceIndex);
 
     const QList<QByteArray> &soapActionParts = soapAction.split('#');
-    if (soapActionParts.size() != 2 || soapActionParts.first() != currentService->service()->serviceType().toLatin1()) {
+    if (soapActionParts.size() != 2 || soapActionParts.first() != currentService->serviceType().toLatin1()) {
         response.setFault(true);
         return;
     }
@@ -127,7 +127,7 @@ void UpnpDeviceSoapServerObject::processRequestWithPath(const KDSoapMessage &req
     const QByteArray &actionName = soapActionParts.last();
     const QString &actionNameString = QString::fromLatin1(actionName);
 
-    response = KDSoapValue(actionNameString + QStringLiteral("Response"), QVariant(), currentService->service()->serviceType());
+    response = KDSoapValue(actionNameString + QStringLiteral("Response"), QVariant(), currentService->serviceType());
 
     const KDSoapValueList &allArguments(request.arguments());
     const UpnpActionDescription &currentAction = currentService->action(actionNameString);
@@ -172,7 +172,7 @@ void UpnpDeviceSoapServerObject::processRequestWithPath(const KDSoapMessage &req
     } else {
         bool actionCallIsInError = false;
 
-        const QList<QPair<QString, QVariant> > &returnedValues(currentService->invokeAction(actionNameString, checkedArguments, actionCallIsInError));
+        //const QList<QPair<QString, QVariant> > &returnedValues(currentService->invokeAction(actionNameString, checkedArguments, actionCallIsInError));
 
         if (actionCallIsInError) {
             response.setFault(true);
@@ -181,10 +181,10 @@ void UpnpDeviceSoapServerObject::processRequestWithPath(const KDSoapMessage &req
             response.setFault(false);
         }
 
-        response.setType(currentService->service()->serviceType(), actionNameString + QStringLiteral("Response"));
-        for (const QPair<QString, QVariant> &oneValue : returnedValues) {
+        response.setType(currentService->serviceType(), actionNameString + QStringLiteral("Response"));
+        /*for (const QPair<QString, QVariant> &oneValue : returnedValues) {
             response.addArgument(oneValue.first, oneValue.second);
-        }
+        }*/
     }
 }
 
@@ -200,13 +200,13 @@ bool UpnpDeviceSoapServerObject::processCustomVerbRequest(const QByteArray &requ
             if (deviceIndex >= 0 && deviceIndex < d->mDevices.count()) {
                 UpnpAbstractDevice *currentDevice = d->mDevices[deviceIndex];
                 if (serviceIndex >= 0 && serviceIndex < currentDevice->services().count()) {
-                    QPointer<UpnpEventSubscriber> newSubscriber = currentDevice->serviceByIndex(serviceIndex)->subscribeToEvents(requestData, httpHeaders);
+                    //QPointer<UpnpEventSubscriber> newSubscriber = currentDevice->serviceByIndex(serviceIndex)->subscribeToEvents(requestData, httpHeaders);
 
                     customAnswer  = "HTTP/1.1 200 OK\r\n";
                     customAnswer += "DATE: " + QDateTime::currentDateTime().toString(QStringLiteral("ddd, d MMM yyyy HH:mm:ss t")).toLatin1() + "\r\n";
-                    customAnswer += "SID: uuid:" + newSubscriber->uuid().toLatin1() + "\r\n";
+                    //customAnswer += "SID: uuid:" + newSubscriber->uuid().toLatin1() + "\r\n";
                     customAnswer += "SERVER: " + QSysInfo::kernelType().toLatin1() + " " + QSysInfo::kernelVersion().toLatin1() + " UPnP/1.0 test/1.0\r\n";
-                    customAnswer += "TIMEOUT:Second-" + QByteArray::number(newSubscriber->secondTimeout()) + "\r\n";
+                    //customAnswer += "TIMEOUT:Second-" + QByteArray::number(newSubscriber->secondTimeout()) + "\r\n";
                     customAnswer += "\r\n";
 
                     return true;
@@ -222,7 +222,7 @@ bool UpnpDeviceSoapServerObject::processCustomVerbRequest(const QByteArray &requ
             if (deviceIndex >= 0 && deviceIndex < d->mDevices.count()) {
                 UpnpAbstractDevice *currentDevice = d->mDevices[deviceIndex];
                 if (serviceIndex >= 0 && serviceIndex < currentDevice->services().count()) {
-                    currentDevice->serviceByIndex(serviceIndex)->unsubscribeToEvents(requestData, httpHeaders);
+                    //currentDevice->serviceByIndex(serviceIndex)->unsubscribeToEvents(requestData, httpHeaders);
 
                     customAnswer  = "HTTP/1.1 200 OK\r\n";
                     customAnswer += "DATE: " + QDateTime::currentDateTime().toString(QStringLiteral("ddd, d MMM yyyy HH:mm:ss t")).toLatin1() + "\r\n";
@@ -257,7 +257,7 @@ QIODevice *UpnpDeviceSoapServerObject::downloadServiceXmlDescription(UpnpAbstrac
 
     contentType = "text/xml";
 
-    return device->serviceByIndex(serviceIndex)->buildAndGetXmlDescription();
+    return nullptr /*device->serviceByIndex(serviceIndex)->buildAndGetXmlDescription()*/;
 }
 
 #include "moc_upnpdevicesoapserverobject.cpp"

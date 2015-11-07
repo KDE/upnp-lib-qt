@@ -115,6 +115,8 @@ public:
 
     const QList<QSharedPointer<UpnpServiceDescription> >& services() const;
 
+    QList<QSharedPointer<UpnpServiceDescription> >& services();
+
     QList<QString> servicesName() const;
 
     /**

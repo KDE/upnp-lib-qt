@@ -88,6 +88,11 @@ const QList<QSharedPointer<UpnpServiceDescription> >& UpnpDeviceDescription::ser
     return d->mServices;
 }
 
+QList<QSharedPointer<UpnpServiceDescription> >& UpnpDeviceDescription::services()
+{
+    return d->mServices;
+}
+
 QList<QString> UpnpDeviceDescription::servicesName() const
 {
     QList<QString> result;

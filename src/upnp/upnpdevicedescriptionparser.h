@@ -55,6 +55,10 @@ public Q_SLOTS:
 
     void downloadDeviceDescription(const QUrl &deviceUrl);
 
+private Q_SLOTS:
+
+    void serviceDescriptionParsed(const QString &upnpServiceId);
+
 private:
 
     void parseDeviceDescription(QIODevice *deviceDescriptionContent, const QString &fallBackURLBase);
