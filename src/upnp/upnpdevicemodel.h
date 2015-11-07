@@ -45,8 +45,6 @@ public:
         NameRole = Qt::UserRole + 1,
         TypeRole,
         uuidRole,
-        ViewNameRole,
-        MobileViewNameRole,
     };
 
     explicit UpnpDeviceModel(QObject *parent = 0);

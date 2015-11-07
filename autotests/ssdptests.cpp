@@ -488,14 +488,10 @@ private Q_SLOTS:
         auto deviceName = newModel->data(newRowIndex, UpnpDeviceModel::NameRole).toString();
         auto deviceType = newModel->data(newRowIndex, UpnpDeviceModel::TypeRole).toString();
         auto deviceUUID = newModel->data(newRowIndex, UpnpDeviceModel::uuidRole).toString();
-        auto deviceViewName = newModel->data(newRowIndex, UpnpDeviceModel::ViewNameRole).toString();
-        auto deviceMobileViewName = newModel->data(newRowIndex, UpnpDeviceModel::MobileViewNameRole).toString();
 
         QVERIFY(deviceName == QStringLiteral(""));
         QVERIFY(deviceType == QStringLiteral(""));
         QVERIFY(deviceUUID == QStringLiteral("4d696e69-444c-164e-9d41-ecf4bb9c317e"));
-        QVERIFY(deviceViewName == QStringLiteral("mediaServer.qml"));
-        QVERIFY(deviceMobileViewName == QStringLiteral("mediaServerMobile.qml"));
 
         newDeviceDataChangedSignal.wait();
 
@@ -506,14 +502,10 @@ private Q_SLOTS:
         deviceName = newModel->data(newRowIndex, UpnpDeviceModel::NameRole).toString();
         deviceType = newModel->data(newRowIndex, UpnpDeviceModel::TypeRole).toString();
         deviceUUID = newModel->data(newRowIndex, UpnpDeviceModel::uuidRole).toString();
-        deviceViewName = newModel->data(newRowIndex, UpnpDeviceModel::ViewNameRole).toString();
-        deviceMobileViewName = newModel->data(newRowIndex, UpnpDeviceModel::MobileViewNameRole).toString();
 
         QVERIFY(deviceName == QStringLiteral("moulinette: minidlna"));
         QVERIFY(deviceType == QStringLiteral("urn:schemas-upnp-org:device:MediaServer:1"));
         QVERIFY(deviceUUID == QStringLiteral("4d696e69-444c-164e-9d41-ecf4bb9c317e"));
-        QVERIFY(deviceViewName == QStringLiteral("mediaServer.qml"));
-        QVERIFY(deviceMobileViewName == QStringLiteral("mediaServerMobile.qml"));
     }
 };
 

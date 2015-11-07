@@ -74,8 +74,15 @@ ApplicationWindow {
                 onClicked: {
                     serviceItem.DelegateModel.inSelected = !serviceItem.DelegateModel.inSelected
 
+                    var deviceType = deviceModel.get(serviceItem.DelegateModel.itemsIndex, 'upnpType')
+                    var viewName = 'genericDevice.qml'
+
+                    if (deviceType === 'urn:schemas-upnp-org:device:MediaServer:1') {
+                        viewName = 'mediaServer.qml';
+                    }
+
                     globalStackView.push({
-                                    item: Qt.resolvedUrl(deviceModel.get(serviceItem.DelegateModel.itemsIndex, 'viewName')),
+                                    item: Qt.resolvedUrl(viewName),
                                     properties: {
                                         'parentStackView' : globalStackView,
                                         'aDevice' : deviceModel.getDeviceDescription(deviceModel.get(serviceItem.DelegateModel.itemsIndex, 'uuid'))
