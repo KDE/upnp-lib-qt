@@ -17,43 +17,50 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#ifndef UPNPDEVICEDISCOVERY_H
-#define UPNPDEVICEDISCOVERY_H
-
-#include "upnpQt_export.h"
-
-#include "upnpabstractdevice.h"
+#ifndef UPNPDEVICEDESCRIPTIONPARSER_H
+#define UPNPDEVICEDESCRIPTIONPARSER_H
 
 #include <QtCore/QObject>
+#include <QtCore/QUrl>
+#include <QtCore/QString>
+#include <QtCore/QSharedPointer>
 
-class UpnpControlAbstractDevicePrivate;
 class QNetworkReply;
-class UpnpControlAbstractService;
+class QIODevice;
+class QNetworkAccessManager;
 
-class UPNPQT_EXPORT UpnpControlAbstractDevice : public UpnpAbstractDevice
+class UpnpDeviceDescription;
+
+class UpnpDeviceDescriptionParserPrivate;
+
+class UpnpDeviceDescriptionParser : public QObject
 {
-
     Q_OBJECT
 
 public:
-    explicit UpnpControlAbstractDevice(QObject *parent = 0);
 
-    ~UpnpControlAbstractDevice();
+    explicit UpnpDeviceDescriptionParser(QNetworkAccessManager *aNetworkAccess, QSharedPointer<UpnpDeviceDescription> deviceDescription, QObject *parent = 0);
+
+    ~UpnpDeviceDescriptionParser();
 
 Q_SIGNALS:
 
-    void inError();
+    void descriptionParsed(const QString &UDN);
+
+    void deviceDescriptionInError(const QString &UDN);
 
 public Q_SLOTS:
 
-private Q_SLOTS:
+    void finishedDownload(QNetworkReply *reply);
 
-protected:
+    void downloadDeviceDescription(const QUrl &deviceUrl);
 
 private:
 
-    UpnpControlAbstractDevicePrivate *d;
+    void parseDeviceDescription(QIODevice *deviceDescriptionContent, const QString &fallBackURLBase);
+
+    UpnpDeviceDescriptionParserPrivate *d;
 
 };
 
-#endif // UPNPDEVICEDISCOVERY_H
+#endif // UPNPDEVICEDESCRIPTIONPARSER_H

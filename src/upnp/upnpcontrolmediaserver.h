@@ -40,10 +40,6 @@ public:
 
     ~UpnpControlMediaServer();
 
-    QString mobileViewName() const override;
-
-    QString viewName() const override;
-
     bool hasAVTransport() const;
 
 Q_SIGNALS:
@@ -52,7 +48,7 @@ Q_SIGNALS:
 
 protected:
 
-    void parseDeviceDescription(QIODevice *deviceDescriptionContent, const QString &fallBackURLBase) override;
+    //void parseDeviceDescription(QIODevice *deviceDescriptionContent, const QString &fallBackURLBase) override;
 
 private:
 

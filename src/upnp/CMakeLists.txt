@@ -24,6 +24,7 @@ set(upnpQt_SOURCES
     upnpcontrolcontentdirectory.cpp
     upnpcontentdirectorymodel.cpp
     mediaplaylist.cpp
+    upnpdevicedescriptionparser.cpp
 )
 
 ecm_generate_headers(

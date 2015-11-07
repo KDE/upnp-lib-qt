@@ -26,8 +26,10 @@
 
 class UpnpDeviceModelPrivate;
 class UpnpSsdpEngine;
-class UpnpControlAbstractDevice;
+class UpnpDeviceDescription;
 struct UpnpDiscoveryResult;
+class QIODevice;
+class QNetworkReply;
 
 class UPNPQT_EXPORT UpnpDeviceModel : public QAbstractListModel
 {
@@ -63,7 +65,7 @@ public:
 
     void setListenner(UpnpSsdpEngine *listenner);
 
-    Q_INVOKABLE UpnpControlAbstractDevice* getDeviceDescription(const QString &uuid)const;
+    Q_INVOKABLE UpnpDeviceDescription* getDeviceDescription(const QString &uuid) const;
 
     Q_INVOKABLE QVariant get(int row, const QString &roleName) const;
 
@@ -80,6 +82,8 @@ private Q_SLOTS:
     void deviceDescriptionChanged(const QString &uuid);
 
     void deviceInError();
+
+    void descriptionParsed(const QString &UDN);
 
 private:
 

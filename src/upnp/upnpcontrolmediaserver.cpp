@@ -31,6 +31,7 @@ public:
 
 UpnpControlMediaServer::UpnpControlMediaServer(QObject *parent) : UpnpControlAbstractDevice(parent), d(new UpnpControlMediaServerPrivate)
 {
+    d->mHasAVTransport = false;
 }
 
 UpnpControlMediaServer::~UpnpControlMediaServer()
@@ -38,22 +39,12 @@ UpnpControlMediaServer::~UpnpControlMediaServer()
     delete d;
 }
 
-QString UpnpControlMediaServer::mobileViewName() const
-{
-    return QStringLiteral("mediaServerMobile.qml");
-}
-
-QString UpnpControlMediaServer::viewName() const
-{
-    return QStringLiteral("mediaServer.qml");
-}
-
 bool UpnpControlMediaServer::hasAVTransport() const
 {
     return d->mHasAVTransport;
 }
 
-void UpnpControlMediaServer::parseDeviceDescription(QIODevice *deviceDescriptionContent, const QString &fallBackURLBase)
+/*void UpnpControlMediaServer::parseDeviceDescription(QIODevice *deviceDescriptionContent, const QString &fallBackURLBase)
 {
     UpnpControlAbstractDevice::parseDeviceDescription(deviceDescriptionContent, fallBackURLBase);
 
@@ -61,6 +52,6 @@ void UpnpControlMediaServer::parseDeviceDescription(QIODevice *deviceDescription
 
     d->mHasAVTransport = servicesList.contains(QStringLiteral("urn:schemas-upnp-org:service:AVTransport:1.0"));
     Q_EMIT hasAVTransportChanged();
-}
+}*/
 
 #include "moc_upnpcontrolmediaserver.cpp"

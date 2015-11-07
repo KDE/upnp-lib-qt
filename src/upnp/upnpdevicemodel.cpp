@@ -19,10 +19,15 @@
 
 #include "upnpdevicemodel.h"
 #include "upnpssdpengine.h"
-#include "upnpcontrolabstractdevice.h"
-#include "upnpcontrolmediaserver.h"
+#include "upnpdevicedescriptionparser.h"
 
 #include "upnpdevicedescription.h"
+#include "upnpservicedescription.h"
+
+#include <QtNetwork/QNetworkAccessManager>
+#include <QtNetwork/QNetworkReply>
+
+#include <QtXml/QDomDocument>
 
 #include <QtCore/QHash>
 #include <QtCore/QString>
@@ -30,6 +35,7 @@
 #include <QtCore/QDebug>
 #include <QtCore/QPointer>
 #include <QtCore/QUrl>
+#include <QtCore/QIODevice>
 
 class UpnpDeviceModelPrivate
 {
@@ -37,11 +43,16 @@ public:
 
     QHash<QString, UpnpDiscoveryResult> mAllHosts;
 
-    QHash<QString, QPointer<UpnpControlAbstractDevice> > mAllHostsDescription;
+    QHash<QString, QSharedPointer<UpnpDeviceDescription> > mAllHostsDescription;
+
+    QHash<QString, QSharedPointer<UpnpDeviceDescriptionParser> > mDeviceDescriptionParsers;
 
     QList<QString> mAllHostsUUID;
 
     UpnpSsdpEngine *mListenner;
+
+    QNetworkAccessManager mNetworkAccess;
+
 };
 
 UpnpDeviceModel::UpnpDeviceModel(QObject *parent)
@@ -115,15 +126,19 @@ QVariant UpnpDeviceModel::data(const QModelIndex &index, int role) const
     switch(role)
     {
     case ColumnsRoles::NameRole:
-        return d->mAllHostsDescription[d->mAllHostsUUID[index.row()]]->device()->friendlyName();
+        return d->mAllHostsDescription[d->mAllHostsUUID[index.row()]]->friendlyName();
     case ColumnsRoles::TypeRole:
-        return d->mAllHostsDescription[d->mAllHostsUUID[index.row()]]->device()->deviceType();
+        return d->mAllHostsDescription[d->mAllHostsUUID[index.row()]]->deviceType();
     case ColumnsRoles::uuidRole:
         return d->mAllHostsUUID[index.row()];
     case ColumnsRoles::ViewNameRole:
-        return d->mAllHostsDescription[d->mAllHostsUUID[index.row()]]->viewName();
+        if (d->mAllHostsDescription[d->mAllHostsUUID[index.row()]]->deviceType() == QStringLiteral("urn:schemas-upnp-org:device:MediaServer:1")) {
+            return QStringLiteral("mediaServer.qml");
+        } else {
+            return QStringLiteral("genericDevice.qml");
+        }
     case ColumnsRoles::MobileViewNameRole:
-        return d->mAllHostsDescription[d->mAllHostsUUID[index.row()]]->mobileViewName();
+        return QVariant();//d->mAllHostsDescription[d->mAllHostsUUID[index.row()]]->mobileViewName();
     }
 
     return QVariant();
@@ -144,7 +159,7 @@ void UpnpDeviceModel::setListenner(UpnpSsdpEngine *listenner)
     connect(d->mListenner, &UpnpSsdpEngine::removedService, this, &UpnpDeviceModel::removedDevice);
 }
 
-UpnpControlAbstractDevice *UpnpDeviceModel::getDeviceDescription(const QString &uuid) const
+UpnpDeviceDescription *UpnpDeviceModel::getDeviceDescription(const QString &uuid) const
 {
     int deviceIndex = d->mAllHostsUUID.indexOf(uuid);
 
@@ -152,7 +167,7 @@ UpnpControlAbstractDevice *UpnpDeviceModel::getDeviceDescription(const QString &
         return nullptr;
     }
 
-    return d->mAllHostsDescription[uuid];
+    return d->mAllHostsDescription[uuid].data();
 }
 
 QVariant UpnpDeviceModel::get(int row, const QString &roleName) const
@@ -188,30 +203,30 @@ void UpnpDeviceModel::newDevice(const UpnpDiscoveryResult &deviceDiscovery)
 
         d->mAllHostsUUID.push_back(decodedUdn);
         d->mAllHosts[decodedUdn] = deviceDiscovery;
-        if (deviceDiscovery.mNT == QStringLiteral("urn:schemas-upnp-org:device:MediaServer:1")) {
-            d->mAllHostsDescription[decodedUdn] = new UpnpControlMediaServer;
-        } else {
-            d->mAllHostsDescription[decodedUdn] = new UpnpControlAbstractDevice;
-        }
-        d->mAllHostsDescription[decodedUdn]->device()->setUDN(decodedUdn);
-        connect(d->mAllHostsDescription[decodedUdn].data(), &UpnpControlAbstractDevice::inError, this, &UpnpDeviceModel::deviceInError);
+        d->mAllHostsDescription[decodedUdn].reset(new UpnpDeviceDescription);
+        d->mAllHostsDescription[decodedUdn]->setUDN(decodedUdn);
 
-        connect(d->mAllHostsDescription[decodedUdn]->device(), &UpnpDeviceDescription::UDNChanged, this, &UpnpDeviceModel::deviceDescriptionChanged);
-        connect(d->mAllHostsDescription[decodedUdn]->device(), &UpnpDeviceDescription::UPCChanged, this, &UpnpDeviceModel::deviceDescriptionChanged);
-        connect(d->mAllHostsDescription[decodedUdn]->device(), &UpnpDeviceDescription::deviceTypeChanged, this, &UpnpDeviceModel::deviceDescriptionChanged);
-        connect(d->mAllHostsDescription[decodedUdn]->device(), &UpnpDeviceDescription::friendlyNameChanged, this, &UpnpDeviceModel::deviceDescriptionChanged);
-        connect(d->mAllHostsDescription[decodedUdn]->device(), &UpnpDeviceDescription::manufacturerChanged, this, &UpnpDeviceModel::deviceDescriptionChanged);
-        connect(d->mAllHostsDescription[decodedUdn]->device(), &UpnpDeviceDescription::manufacturerURLChanged, this, &UpnpDeviceModel::deviceDescriptionChanged);
-        connect(d->mAllHostsDescription[decodedUdn]->device(), &UpnpDeviceDescription::modelDescriptionChanged, this, &UpnpDeviceModel::deviceDescriptionChanged);
-        connect(d->mAllHostsDescription[decodedUdn]->device(), &UpnpDeviceDescription::modelNameChanged, this, &UpnpDeviceModel::deviceDescriptionChanged);
-        connect(d->mAllHostsDescription[decodedUdn]->device(), &UpnpDeviceDescription::modelNumberChanged, this, &UpnpDeviceModel::deviceDescriptionChanged);
-        connect(d->mAllHostsDescription[decodedUdn]->device(), &UpnpDeviceDescription::modelURLChanged, this, &UpnpDeviceModel::deviceDescriptionChanged);
-        connect(d->mAllHostsDescription[decodedUdn]->device(), &UpnpDeviceDescription::serialNumberChanged, this, &UpnpDeviceModel::deviceDescriptionChanged);
-        connect(d->mAllHostsDescription[decodedUdn]->device(), &UpnpDeviceDescription::URLBaseChanged, this, &UpnpDeviceModel::deviceDescriptionChanged);
+        connect(d->mAllHostsDescription[decodedUdn].data(), &UpnpDeviceDescription::UDNChanged, this, &UpnpDeviceModel::deviceDescriptionChanged);
+        connect(d->mAllHostsDescription[decodedUdn].data(), &UpnpDeviceDescription::UPCChanged, this, &UpnpDeviceModel::deviceDescriptionChanged);
+        connect(d->mAllHostsDescription[decodedUdn].data(), &UpnpDeviceDescription::deviceTypeChanged, this, &UpnpDeviceModel::deviceDescriptionChanged);
+        connect(d->mAllHostsDescription[decodedUdn].data(), &UpnpDeviceDescription::friendlyNameChanged, this, &UpnpDeviceModel::deviceDescriptionChanged);
+        connect(d->mAllHostsDescription[decodedUdn].data(), &UpnpDeviceDescription::manufacturerChanged, this, &UpnpDeviceModel::deviceDescriptionChanged);
+        connect(d->mAllHostsDescription[decodedUdn].data(), &UpnpDeviceDescription::manufacturerURLChanged, this, &UpnpDeviceModel::deviceDescriptionChanged);
+        connect(d->mAllHostsDescription[decodedUdn].data(), &UpnpDeviceDescription::modelDescriptionChanged, this, &UpnpDeviceModel::deviceDescriptionChanged);
+        connect(d->mAllHostsDescription[decodedUdn].data(), &UpnpDeviceDescription::modelNameChanged, this, &UpnpDeviceModel::deviceDescriptionChanged);
+        connect(d->mAllHostsDescription[decodedUdn].data(), &UpnpDeviceDescription::modelNumberChanged, this, &UpnpDeviceModel::deviceDescriptionChanged);
+        connect(d->mAllHostsDescription[decodedUdn].data(), &UpnpDeviceDescription::modelURLChanged, this, &UpnpDeviceModel::deviceDescriptionChanged);
+        connect(d->mAllHostsDescription[decodedUdn].data(), &UpnpDeviceDescription::serialNumberChanged, this, &UpnpDeviceModel::deviceDescriptionChanged);
+        connect(d->mAllHostsDescription[decodedUdn].data(), &UpnpDeviceDescription::URLBaseChanged, this, &UpnpDeviceModel::deviceDescriptionChanged);
 
         endInsertRows();
 
-        d->mAllHostsDescription[decodedUdn]->downloadDeviceDescription(QUrl(deviceDiscovery.mLocation));
+        d->mDeviceDescriptionParsers[decodedUdn].reset(new UpnpDeviceDescriptionParser(&d->mNetworkAccess, d->mAllHostsDescription[decodedUdn]));
+
+        connect(&d->mNetworkAccess, &QNetworkAccessManager::finished, d->mDeviceDescriptionParsers[decodedUdn].data(), &UpnpDeviceDescriptionParser::finishedDownload);
+        connect(d->mDeviceDescriptionParsers[decodedUdn].data(), &UpnpDeviceDescriptionParser::descriptionParsed, this, &UpnpDeviceModel::descriptionParsed);
+
+        d->mDeviceDescriptionParsers[decodedUdn]->downloadDeviceDescription(QUrl(deviceDiscovery.mLocation));
     }
 }
 
@@ -244,12 +259,19 @@ void UpnpDeviceModel::deviceDescriptionChanged(const QString &uuid)
 
 void UpnpDeviceModel::deviceInError()
 {
+#if 0
     if (sender()) {
         UpnpControlAbstractDevice *device = qobject_cast<UpnpControlAbstractDevice*>(sender());
         if (device) {
-            genericRemovedDevice(device->device()->UDN());
+            genericRemovedDevice(device->UDN());
         }
     }
+#endif
+}
+
+void UpnpDeviceModel::descriptionParsed(const QString &UDN)
+{
+    d->mDeviceDescriptionParsers.remove(UDN.mid(5));
 }
 
 #include "moc_upnpdevicemodel.cpp"
