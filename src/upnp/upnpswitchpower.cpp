@@ -46,8 +46,8 @@ UpnpSwitchPower::UpnpSwitchPower(QObject *parent) :
     UpnpAbstractService(parent), d(new UpnpSwitchPowerPrivate)
 {
     //setBaseURL();
-    service()->setServiceId(QStringLiteral("urn:upnp-org:serviceId:SwitchPower"));
-    service()->setServiceType(QStringLiteral("urn:schemas-upnp-org:service:SwitchPower:1"));
+    description()->setServiceId(QStringLiteral("urn:upnp-org:serviceId:SwitchPower"));
+    description()->setServiceType(QStringLiteral("urn:schemas-upnp-org:service:SwitchPower:1"));
 
     UpnpActionDescription setTargetAction;
     setTargetAction.mName = QStringLiteral("SetTarget");
@@ -144,7 +144,7 @@ bool UpnpSwitchPower::target() const
 void UpnpSwitchPower::setStatus(bool value)
 {
     d->mStatus = value;
-    Q_EMIT statusChanged(service()->serviceId(), "status");
+    Q_EMIT statusChanged(description()->serviceId(), "status");
 }
 
 bool UpnpSwitchPower::status() const
@@ -197,7 +197,7 @@ QList<QPair<QString, QVariant> > UpnpSwitchPower::setTargetAction(bool newValue)
     d->mStatus = newValue;
     d->mTarget = newValue;
 
-    Q_EMIT statusChanged(service()->serviceId(), "status");
+    Q_EMIT statusChanged(description()->serviceId(), "status");
 
     qDebug() << "call setTargetAction" << d->mStatus;
 

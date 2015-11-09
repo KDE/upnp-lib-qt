@@ -38,20 +38,20 @@ public:
 BinaryLight::BinaryLight(int cacheDuration, QObject *parent)
     : UpnpAbstractDevice(parent), d(new BinaryLightPrivate)
 {
-    device()->setDeviceType(QStringLiteral("urn:schemas-upnp-org:device:BinaryLight:1"));
-    device()->setFriendlyName(QStringLiteral("Binary Light for Test"));
-    device()->setManufacturer(QStringLiteral("Matthieu Gallien"));
-    device()->setManufacturerURL(QUrl(QStringLiteral("https://gitlab.com/homeautomationqt/upnp-player-qt")));
-    device()->setModelDescription(QStringLiteral("Test Device"));
-    device()->setModelName(QStringLiteral("Automatiq Binary Light"));
-    device()->setModelNumber(QStringLiteral("0.1"));
-    device()->setModelURL(QUrl(QStringLiteral("https://gitlab.com/homeautomationqt/upnp-player-qt")));
-    device()->setSerialNumber(QStringLiteral("test-0.1"));
+    description()->setDeviceType(QStringLiteral("urn:schemas-upnp-org:device:BinaryLight:1"));
+    description()->setFriendlyName(QStringLiteral("Binary Light for Test"));
+    description()->setManufacturer(QStringLiteral("Matthieu Gallien"));
+    description()->setManufacturerURL(QUrl(QStringLiteral("https://gitlab.com/homeautomationqt/upnp-player-qt")));
+    description()->setModelDescription(QStringLiteral("Test Device"));
+    description()->setModelName(QStringLiteral("Automatiq Binary Light"));
+    description()->setModelNumber(QStringLiteral("0.1"));
+    description()->setModelURL(QUrl(QStringLiteral("https://gitlab.com/homeautomationqt/upnp-player-qt")));
+    description()->setSerialNumber(QStringLiteral("test-0.1"));
 
     const QString &uuidString(QUuid::createUuid().toString());
-    device()->setUDN(uuidString.mid(1, uuidString.length() - 2));
-    device()->setUPC(QStringLiteral("test"));
-    device()->setCacheControl(cacheDuration);
+    description()->setUDN(uuidString.mid(1, uuidString.length() - 2));
+    description()->setUPC(QStringLiteral("test"));
+    description()->setCacheControl(cacheDuration);
 
     QPointer<UpnpAbstractService> switchPowerService(new UpnpSwitchPower);
     const int serviceIndex = 0/*addService(switchPowerService)*/;
@@ -67,14 +67,14 @@ BinaryLight::BinaryLight(int cacheDuration, QObject *parent)
     QUrl serviceDescriptionUrl = d->mServer.urlPrefix();
     serviceDescriptionUrl.setPath(QStringLiteral("/") + QString::number(deviceIndex) + QStringLiteral("/") + QString::number(serviceIndex) + QStringLiteral("/service.xml"));
 
-    switchPowerService->service()->setControlURL(controlUrl);
-    switchPowerService->service()->setEventURL(eventUrl);
-    switchPowerService->service()->setSCPDURL(serviceDescriptionUrl);
+    switchPowerService->description()->setControlURL(controlUrl);
+    switchPowerService->description()->setEventURL(eventUrl);
+    switchPowerService->description()->setSCPDURL(serviceDescriptionUrl);
 
     QUrl deviceDescriptionUrl = d->mServer.urlPrefix();
-    device()->setURLBase(d->mServer.urlPrefix().toString());
+    description()->setURLBase(d->mServer.urlPrefix().toString());
     deviceDescriptionUrl.setPath(QStringLiteral("/") + QString::number(deviceIndex) + QStringLiteral("/device.xml"));
-    device()->setLocationUrl(deviceDescriptionUrl);
+    description()->setLocationUrl(deviceDescriptionUrl);
 }
 
 BinaryLight::~BinaryLight()

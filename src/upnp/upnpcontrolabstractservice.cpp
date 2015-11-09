@@ -108,12 +108,12 @@ KDSoapPendingCall UpnpControlAbstractService::callAction(const QString &actionNa
     }
 
     if (!d->mInterface) {
-        d->mInterface = new KDSoapClientInterface(service()->controlURL().toString(), service()->serviceType());
+        d->mInterface = new KDSoapClientInterface(description()->controlURL().toString(), description()->serviceType());
         d->mInterface->setSoapVersion(KDSoapClientInterface::SOAP1_1);
         d->mInterface->setStyle(KDSoapClientInterface::RPCStyle);
     }
 
-    return d->mInterface->asyncCall(actionName, message, service()->serviceType() + QStringLiteral("#") + actionName);
+    return d->mInterface->asyncCall(actionName, message, description()->serviceType() + QStringLiteral("#") + actionName);
 }
 
 void UpnpControlAbstractService::subscribeEvents(int duration)
@@ -128,7 +128,7 @@ void UpnpControlAbstractService::subscribeEvents(int duration)
 
     webServerAddess += QStringLiteral(":") + QString::number(d->mEventServer.serverPort()) + QStringLiteral(">");
 
-    QNetworkRequest myRequest(service()->eventURL());
+    QNetworkRequest myRequest(description()->eventURL());
     myRequest.setRawHeader("CALLBACK", webServerAddess.toUtf8());
     myRequest.setRawHeader("NT", "upnp:event");
     QString timeoutDefinition(QStringLiteral("Second-"));
@@ -169,7 +169,7 @@ void UpnpControlAbstractService::downloadServiceDescription(const QUrl &serviceU
 void UpnpControlAbstractService::finishedDownload(QNetworkReply *reply)
 {
     if (reply->isFinished() && reply->error() == QNetworkReply::NoError) {
-        if (reply->url() == service()->eventURL()) {
+        if (reply->url() == description()->eventURL()) {
             if (reply->hasRawHeader("TIMEOUT")) {
                 if (reply->rawHeader("TIMEOUT").startsWith("Second-")) {
                     d->mRealEventSubscriptionTimeout = reply->rawHeader("TIMEOUT").mid(7).toInt();

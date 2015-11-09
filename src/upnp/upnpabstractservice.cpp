@@ -81,7 +81,7 @@ QIODevice* UpnpAbstractService::buildAndGetXmlDescription()
         insertStream.writeEndElement();
 
         insertStream.writeStartElement(QStringLiteral("actionList"));
-        for (const auto &itAction : service()->actions()) {
+        for (const auto &itAction : description()->actions()) {
             insertStream.writeStartElement(QStringLiteral("action"));
             insertStream.writeTextElement(QStringLiteral("name"), itAction.mName);
             insertStream.writeStartElement(QStringLiteral("argumentList"));
@@ -101,7 +101,7 @@ QIODevice* UpnpAbstractService::buildAndGetXmlDescription()
         insertStream.writeEndElement();
 
         insertStream.writeStartElement(QStringLiteral("serviceStateTable"));
-        for (const auto &itStateVariable : service()->stateVariables()) {
+        for (const auto &itStateVariable : description()->stateVariables()) {
             insertStream.writeStartElement(QStringLiteral("stateVariable"));
             if (itStateVariable.mEvented) {
                 insertStream.writeAttribute(QStringLiteral("sendEvents"), QStringLiteral("yes"));
@@ -161,7 +161,7 @@ QPointer<UpnpEventSubscriber> UpnpAbstractService::subscribeToEvents(const QByte
     bool conversionIsOk = false;
     newSubscriber->setSecondTimeout(rawTimeout.right(rawTimeout.length() - 7).toInt(&conversionIsOk));
     if (!conversionIsOk || rawTimeout == "Second-infinite") {
-        newSubscriber->setSecondTimeout(service()->maximumSubscriptionDuration());
+        newSubscriber->setSecondTimeout(description()->maximumSubscriptionDuration());
     }
 
     int signalIndex = -1;
@@ -175,7 +175,7 @@ QPointer<UpnpEventSubscriber> UpnpAbstractService::subscribeToEvents(const QByte
     if (signalIndex != -1) {
         newSubscriber->setUpnpService(this);
         d->mSubscribers.push_back(newSubscriber);
-        for (const UpnpStateVariableDescription &currentStateVariable : service()->stateVariables()) {
+        for (const UpnpStateVariableDescription &currentStateVariable : description()->stateVariables()) {
             if (currentStateVariable.mEvented) {
                 connect(this, metaObject()->property(currentStateVariable.mPropertyIndex).notifySignal(), newSubscriber, newSubscriber->metaObject()->method(signalIndex));
             }
@@ -194,32 +194,32 @@ void UpnpAbstractService::unsubscribeToEvents(const QByteArray &requestData, con
 
 void UpnpAbstractService::addAction(const UpnpActionDescription &newAction)
 {
-    service()->actions()[newAction.mName] = newAction;
+    description()->actions()[newAction.mName] = newAction;
 }
 
 const UpnpActionDescription &UpnpAbstractService::action(const QString &name) const
 {
-    return service()->action(name);
+    return description()->action(name);
 }
 
 QList<QString> UpnpAbstractService::actions() const
 {
-    return service()->actions().keys();
+    return description()->actions().keys();
 }
 
 void UpnpAbstractService::addStateVariable(const UpnpStateVariableDescription &newVariable)
 {
-    service()->stateVariables()[newVariable.mUpnpName] = newVariable;
+    description()->stateVariables()[newVariable.mUpnpName] = newVariable;
 }
 
 const UpnpStateVariableDescription &UpnpAbstractService::stateVariable(const QString &name) const
 {
-    return service()->stateVariable(name);
+    return description()->stateVariable(name);
 }
 
 QList<QString> UpnpAbstractService::stateVariables() const
 {
-    return service()->stateVariables().keys();
+    return description()->stateVariables().keys();
 }
 
 QList<QPair<QString, QVariant> > UpnpAbstractService::invokeAction(const QString &actionName, const QList<QVariant> &arguments, bool &isInError)
@@ -231,18 +231,18 @@ QList<QPair<QString, QVariant> > UpnpAbstractService::invokeAction(const QString
     return {};
 }
 
-void UpnpAbstractService::setService(UpnpServiceDescription *value)
+void UpnpAbstractService::setDescription(UpnpServiceDescription *value)
 {
     d->mService.reset(value);
-    Q_EMIT serviceChanged();
+    Q_EMIT descriptionChanged();
 }
 
-UpnpServiceDescription *UpnpAbstractService::service()
+UpnpServiceDescription *UpnpAbstractService::description()
 {
     return d->mService.data();
 }
 
-const UpnpServiceDescription *UpnpAbstractService::service() const
+const UpnpServiceDescription *UpnpAbstractService::description() const
 {
     return d->mService.data();
 }

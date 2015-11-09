@@ -38,10 +38,10 @@ class UPNPQT_EXPORT UpnpAbstractDevice : public QObject
 {
     Q_OBJECT
 
-    Q_PROPERTY(UpnpDeviceDescription* device
-               READ device
-               WRITE setDevice
-               NOTIFY deviceChanged)
+    Q_PROPERTY(UpnpDeviceDescription* description
+               READ description
+               WRITE setDescription
+               NOTIFY descriptionChanged)
 
 public:
 
@@ -49,19 +49,19 @@ public:
 
     virtual ~UpnpAbstractDevice();
 
-    Q_INVOKABLE UpnpServiceDescription* serviceById(const QString &serviceId) const;
+    Q_INVOKABLE UpnpServiceDescription* serviceDescriptionById(const QString &serviceId) const;
 
-    Q_INVOKABLE UpnpServiceDescription* serviceByIndex(int serviceIndex) const;
+    Q_INVOKABLE UpnpServiceDescription* serviceDescriptionByIndex(int serviceIndex) const;
 
     const QList<QSharedPointer<UpnpServiceDescription> > &services() const;
 
     QList<QString> servicesName() const;
 
-    void setDevice(UpnpDeviceDescription *value);
+    void setDescription(UpnpDeviceDescription *value);
 
-    UpnpDeviceDescription* device();
+    UpnpDeviceDescription* description();
 
-    const UpnpDeviceDescription* device() const;
+    const UpnpDeviceDescription* description() const;
 
     int cacheControl() const;
 
@@ -69,7 +69,7 @@ public:
 
 Q_SIGNALS:
 
-    void deviceChanged();
+    void descriptionChanged();
 
 public Q_SLOTS:
 

@@ -35,31 +35,26 @@ class UPNPQT_EXPORT UpnpControlAbstractDevice : public UpnpAbstractDevice
 
     Q_OBJECT
 
-    Q_PROPERTY(UpnpDeviceDescription* description
-               READ description
-               WRITE setDescription
-               NOTIFY descriptionChanged)
-
 public:
     explicit UpnpControlAbstractDevice(QObject *parent = 0);
 
     ~UpnpControlAbstractDevice();
 
-    UpnpDeviceDescription* description() const;
+    Q_INVOKABLE UpnpControlAbstractService* serviceById(const QString &serviceId) const;
 
-    void setDescription(UpnpDeviceDescription *newDescription);
+    Q_INVOKABLE UpnpControlAbstractService* serviceByIndex(int serviceIndex) const;
 
 Q_SIGNALS:
 
     void inError();
-
-    void descriptionChanged();
 
 public Q_SLOTS:
 
 private Q_SLOTS:
 
 protected:
+
+    UpnpControlAbstractService* serviceFromDescription(UpnpServiceDescription *description) const;
 
 private:
 

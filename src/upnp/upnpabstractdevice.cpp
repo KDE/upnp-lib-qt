@@ -55,7 +55,7 @@ UpnpAbstractDevice::~UpnpAbstractDevice()
     delete d;
 }
 
-UpnpServiceDescription* UpnpAbstractDevice::serviceById(const QString &serviceId) const
+UpnpServiceDescription* UpnpAbstractDevice::serviceDescriptionById(const QString &serviceId) const
 {
     UpnpServiceDescription *result = nullptr;
     for (auto service : d->mDevice->services()) {
@@ -66,7 +66,7 @@ UpnpServiceDescription* UpnpAbstractDevice::serviceById(const QString &serviceId
     return result;
 }
 
-UpnpServiceDescription *UpnpAbstractDevice::serviceByIndex(int serviceIndex) const
+UpnpServiceDescription *UpnpAbstractDevice::serviceDescriptionByIndex(int serviceIndex) const
 {
     if (serviceIndex < 0 || serviceIndex > d->mDevice->services().size() - 1) {
         return nullptr;
@@ -91,18 +91,18 @@ QList<QString> UpnpAbstractDevice::servicesName() const
     return result;
 }
 
-void UpnpAbstractDevice::setDevice(UpnpDeviceDescription *value)
+void UpnpAbstractDevice::setDescription(UpnpDeviceDescription *value)
 {
     d->mDevice.reset(value);
-    Q_EMIT deviceChanged();
+    Q_EMIT descriptionChanged();
 }
 
-UpnpDeviceDescription *UpnpAbstractDevice::device()
+UpnpDeviceDescription *UpnpAbstractDevice::description()
 {
     return d->mDevice.data();
 }
 
-const UpnpDeviceDescription *UpnpAbstractDevice::device() const
+const UpnpDeviceDescription *UpnpAbstractDevice::description() const
 {
     return d->mDevice.data();
 }
@@ -124,19 +124,19 @@ QIODevice* UpnpAbstractDevice::buildAndGetXmlDescription()
         insertStream.writeTextElement(QStringLiteral("major"), QStringLiteral("1"));
         insertStream.writeTextElement(QStringLiteral("minor"), QStringLiteral("0"));
         insertStream.writeEndElement();
-        insertStream.writeTextElement(QStringLiteral("URLBase"), device()->URLBase());
+        insertStream.writeTextElement(QStringLiteral("URLBase"), description()->URLBase());
         insertStream.writeStartElement(QStringLiteral("device"));
-        insertStream.writeTextElement(QStringLiteral("deviceType"), device()->deviceType());
-        insertStream.writeTextElement(QStringLiteral("friendlyName"), device()->friendlyName());
-        insertStream.writeTextElement(QStringLiteral("manufacturer"), device()->manufacturer());
-        insertStream.writeTextElement(QStringLiteral("manufacterURL"), device()->manufacturerURL().toString());
-        insertStream.writeTextElement(QStringLiteral("modelDescription"), device()->modelDescription());
-        insertStream.writeTextElement(QStringLiteral("modelName"), device()->modelName());
-        insertStream.writeTextElement(QStringLiteral("modelNumber"), device()->modelNumber());
-        insertStream.writeTextElement(QStringLiteral("modelURL"), device()->modelURL().toString());
-        insertStream.writeTextElement(QStringLiteral("serialNumber"), device()->serialNumber());
-        insertStream.writeTextElement(QStringLiteral("UDN"), QStringLiteral("uuid:") + device()->UDN());
-        insertStream.writeTextElement(QStringLiteral("UPC"), device()->UPC());
+        insertStream.writeTextElement(QStringLiteral("deviceType"), description()->deviceType());
+        insertStream.writeTextElement(QStringLiteral("friendlyName"), description()->friendlyName());
+        insertStream.writeTextElement(QStringLiteral("manufacturer"), description()->manufacturer());
+        insertStream.writeTextElement(QStringLiteral("manufacterURL"), description()->manufacturerURL().toString());
+        insertStream.writeTextElement(QStringLiteral("modelDescription"), description()->modelDescription());
+        insertStream.writeTextElement(QStringLiteral("modelName"), description()->modelName());
+        insertStream.writeTextElement(QStringLiteral("modelNumber"), description()->modelNumber());
+        insertStream.writeTextElement(QStringLiteral("modelURL"), description()->modelURL().toString());
+        insertStream.writeTextElement(QStringLiteral("serialNumber"), description()->serialNumber());
+        insertStream.writeTextElement(QStringLiteral("UDN"), QStringLiteral("uuid:") + description()->UDN());
+        insertStream.writeTextElement(QStringLiteral("UPC"), description()->UPC());
 
         if (!d->mDevice->services().empty()) {
             insertStream.writeStartElement(QStringLiteral("serviceList"));

@@ -40,10 +40,10 @@ class UPNPQT_EXPORT UpnpAbstractService : public QObject
 {
     Q_OBJECT
 
-    Q_PROPERTY(UpnpServiceDescription* service
-               READ service
-               WRITE setService
-               NOTIFY serviceChanged)
+    Q_PROPERTY(UpnpServiceDescription* description
+               READ description
+               WRITE setDescription
+               NOTIFY descriptionChanged)
 
 public:
     explicit UpnpAbstractService(QObject *parent = 0);
@@ -70,15 +70,15 @@ public:
 
     virtual QList<QPair<QString, QVariant> > invokeAction(const QString &actionName, const QList<QVariant> &arguments, bool &isInError);
 
-    void setService(UpnpServiceDescription *value);
+    void setDescription(UpnpServiceDescription *value);
 
-    UpnpServiceDescription* service();
+    UpnpServiceDescription* description();
 
-    const UpnpServiceDescription* service() const;
+    const UpnpServiceDescription* description() const;
 
 Q_SIGNALS:
 
-    void serviceChanged();
+    void descriptionChanged();
 
 public Q_SLOTS:
 

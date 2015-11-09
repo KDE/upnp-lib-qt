@@ -116,7 +116,7 @@ void UpnpDeviceSoapServerObject::processRequestWithPath(const KDSoapMessage &req
         response.setFault(true);
         return;
     }
-    UpnpServiceDescription *currentService = currentDevice->serviceByIndex(serviceIndex);
+    UpnpServiceDescription *currentService = currentDevice->serviceDescriptionByIndex(serviceIndex);
 
     const QList<QByteArray> &soapActionParts = soapAction.split('#');
     if (soapActionParts.size() != 2 || soapActionParts.first() != currentService->serviceType().toLatin1()) {
@@ -244,7 +244,7 @@ bool UpnpDeviceSoapServerObject::processCustomVerbRequest(const QByteArray &requ
 
 QIODevice *UpnpDeviceSoapServerObject::downloadDeviceXmlDescription(UpnpAbstractDevice *device, QByteArray &contentType)
 {
-    qDebug() << "UpnpDeviceSoapServerObject::downloadDeviceXmlDescription" << device->device()->UDN();
+    qDebug() << "UpnpDeviceSoapServerObject::downloadDeviceXmlDescription" << device->description()->UDN();
 
     contentType = "text/xml";
 
@@ -253,7 +253,7 @@ QIODevice *UpnpDeviceSoapServerObject::downloadDeviceXmlDescription(UpnpAbstract
 
 QIODevice *UpnpDeviceSoapServerObject::downloadServiceXmlDescription(UpnpAbstractDevice *device, const int serviceIndex, QByteArray &contentType)
 {
-    qDebug() << "UpnpDeviceSoapServerObject::downloadServiceXmlDescription" << device->device()->UDN() << serviceIndex;
+    qDebug() << "UpnpDeviceSoapServerObject::downloadServiceXmlDescription" << device->description()->UDN() << serviceIndex;
 
     contentType = "text/xml";
 
