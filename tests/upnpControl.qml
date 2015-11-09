@@ -145,16 +145,6 @@ ApplicationWindow {
                 resizable: false
                 movable: false
             }
-            onClicked:
-            {
-                parent.push({
-                                item: Qt.resolvedUrl(model.get(row, 'viewName')),
-                                properties: {
-                                    'parentStackView': globalStackView,
-                                    'aDevice': deviceModel.getDeviceDescription(model.get(row, 'uuid'))
-                                }
-                            })
-            }
         }
     }
 }
