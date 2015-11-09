@@ -33,11 +33,12 @@
 
 class MockSsdpClient : public QObject
 {
+
     Q_OBJECT
 
 public:
 
-    explicit MockSsdpClient(const QByteArray &aExpectedQuery, const QStringList &aAnswerData, QObject *parent = 0)
+    explicit MockSsdpClient(const QByteArray &aExpectedQuery, const QStringList &aAnswerData, QObject *parent = nullptr)
         : QObject(parent), mClientSocket(), mAnswerData(aAnswerData), mExpectedQuery(aExpectedQuery), mHttpClientSocket()
     {
     }
