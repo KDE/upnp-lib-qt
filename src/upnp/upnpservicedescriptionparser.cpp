@@ -58,8 +58,6 @@ UpnpServiceDescriptionParser::~UpnpServiceDescriptionParser()
 
 void UpnpServiceDescriptionParser::downloadServiceDescription(const QUrl &serviceUrl)
 {
-    qDebug() << "UpnpServiceDescriptionParser::downloadServiceDescription" << serviceUrl;
-
     d->mServiceURL = serviceUrl;
     d->mNetworkAccess->get(QNetworkRequest(serviceUrl));
 }
@@ -132,8 +130,6 @@ void UpnpServiceDescriptionParser::parseServiceDescription(QIODevice *serviceDes
         currentChild = currentChild.nextSibling();
     }
 #endif
-
-    qDebug() << "UpnpServiceDescriptionParser::parseServiceDescription" << d->mServiceDescription->serviceId();
 
     Q_EMIT descriptionParsed(d->mServiceDescription->serviceId());
 }
