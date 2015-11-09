@@ -7,7 +7,7 @@ import org.mgallien.QmlExtension 1.0
 import QtMultimedia 5.4
 
 Item {
-    property UpnpControlMediaServer aDevice
+    property UpnpDeviceDescription aDevice
     property StackView parentStackView
     property UpnpControlConnectionManager connectionManager
 
