@@ -17,104 +17,101 @@ Item {
         width: parent.width
         height: parent.height
 
-        GridView {
-            id: contentDirectoryView
+        ScrollView {
             anchors.fill: parent
-            snapMode: GridView.SnapToRow
-            cacheBuffer: 0
-            displayMarginBeginning: 0
-            displayMarginEnd: 0
+            GridView {
+                id: contentDirectoryView
+                snapMode: GridView.SnapToRow
 
-            model: DelegateModel {
-                id: delegateContentModel
-                model: contentModel
-                rootIndex: contentModel.indexFromId(rootId)
+                model: DelegateModel {
+                    id: delegateContentModel
+                    model: contentModel
+                    rootIndex: contentModel.indexFromId(rootId)
 
-                delegate: Rectangle {
-                    id: mediaServerEntry
+                    delegate: Rectangle {
+                        id: mediaServerEntry
 
-                    color: 'white'
-                    width: contentDirectoryView.cellWidth
-                    height: contentDirectoryView.cellHeight
+                        color: 'white'
+                        width: contentDirectoryView.cellWidth
+                        height: contentDirectoryView.cellHeight
 
-                    MouseArea {
-                        id: clickHandle
+                        MouseArea {
+                            id: clickHandle
 
-                        width: parent.width
-                        height: parent.height
-
-                        onClicked: {
-                            if (itemClass == UpnpContentDirectoryModel.AudioTrack)
-                            {
-                                stackView.push({
-                                                   item: Qt.resolvedUrl("mediaPlayer.qml"),
-                                                   properties: {
-                                                       'audioUrl': '',
-                                                       'stackView': stackView,
-                                                       'contentModel': contentModel,
-                                                       'playListModel': playListModel
-                                                   }
-                                               })
-                            }
-                            else if (itemClass == UpnpContentDirectoryModel.Album)
-                            {
-                                stackView.push({
-                                                   item: Qt.resolvedUrl("mediaAlbumView.qml"),
-                                                   properties: {
-                                                       'contentDirectoryService': contentDirectoryService,
-                                                       'rootId': contentModel.objectIdByIndex(delegateContentModel.modelIndex(mediaServerEntry.DelegateModel.itemsIndex)),
-                                                       'stackView': stackView,
-                                                       'contentModel': contentModel,
-                                                       'playListModel': playListModel
-                                                   }
-                                               })
-                            }
-                            else
-                            {
-                                stackView.push({
-                                                   item: Qt.resolvedUrl("mediaServerListing.qml"),
-                                                   properties: {
-                                                       'contentDirectoryService': contentDirectoryService,
-                                                       'rootId': contentModel.objectIdByIndex(delegateContentModel.modelIndex(mediaServerEntry.DelegateModel.itemsIndex)),
-                                                       'stackView': stackView,
-                                                       'contentModel': contentModel,
-                                                       'playListModel': playListModel
-                                                   }
-                                               })
-                            }
-                        }
-                    }
-
-                    Column {
-                        width: parent.width
-                        height: parent.height
-
-                        Image {
-                            id: playIcon
-                            source: image
-                            width: parent.height * 0.8
-                            height: parent.height * 0.8
-                            sourceSize.width: width
-                            sourceSize.height: width
-                            fillMode: Image.PreserveAspectFit
-                        }
-
-                        Label {
-                            id: mainLabel
-                            text: if (title != undefined)
-                                      title
-                                  else
-                                      ''
                             width: parent.width
-                            elide: "ElideRight"
+                            height: parent.height
+
+                            onClicked: {
+                                if (itemClass == UpnpContentDirectoryModel.AudioTrack)
+                                {
+                                    stackView.push({
+                                                       item: Qt.resolvedUrl("mediaPlayer.qml"),
+                                                       properties: {
+                                                           'audioUrl': '',
+                                                           'stackView': stackView,
+                                                           'contentModel': contentModel,
+                                                           'playListModel': playListModel
+                                                       }
+                                                   })
+                                }
+                                else if (itemClass == UpnpContentDirectoryModel.Album)
+                                {
+                                    stackView.push({
+                                                       item: Qt.resolvedUrl("mediaAlbumView.qml"),
+                                                       properties: {
+                                                           'contentDirectoryService': contentDirectoryService,
+                                                           'rootId': contentModel.objectIdByIndex(delegateContentModel.modelIndex(mediaServerEntry.DelegateModel.itemsIndex)),
+                                                           'stackView': stackView,
+                                                           'contentModel': contentModel,
+                                                           'playListModel': playListModel
+                                                       }
+                                                   })
+                                }
+                                else
+                                {
+                                    stackView.push({
+                                                       item: Qt.resolvedUrl("mediaServerListing.qml"),
+                                                       properties: {
+                                                           'contentDirectoryService': contentDirectoryService,
+                                                           'rootId': contentModel.objectIdByIndex(delegateContentModel.modelIndex(mediaServerEntry.DelegateModel.itemsIndex)),
+                                                           'stackView': stackView,
+                                                           'contentModel': contentModel,
+                                                           'playListModel': playListModel
+                                                       }
+                                                   })
+                                }
+                            }
+                        }
+
+                        Column {
+                            width: parent.width
+                            height: parent.height
+
+                            Image {
+                                id: playIcon
+                                source: image
+                                width: parent.height * 0.8
+                                height: parent.height * 0.8
+                                sourceSize.width: width
+                                sourceSize.height: width
+                                fillMode: Image.PreserveAspectFit
+                            }
+
+                            Label {
+                                id: mainLabel
+                                text: if (title != undefined)
+                                          title
+                                      else
+                                          ''
+                                width: parent.width
+                                elide: "ElideRight"
+                            }
                         }
                     }
                 }
-            }
 
-            focus: true
-            contentWidth: parent.width
-            contentHeight: parent.height
+                focus: true
+            }
         }
     }
 }
