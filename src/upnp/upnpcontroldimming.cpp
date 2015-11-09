@@ -57,7 +57,7 @@ void UpnpControlDimming::setLoadLevelTarget(bool newTargetValue)
 {
     const KDSoapPendingCall &pendingAnswer(callAction(QStringLiteral("SetLoadLevelTarget"), {newTargetValue}));
 
-    KDSoapPendingCallWatcher *replyHandler = new KDSoapPendingCallWatcher(pendingAnswer, this);
+    auto replyHandler = new KDSoapPendingCallWatcher(pendingAnswer, this);
 
     connect(replyHandler, &KDSoapPendingCallWatcher::finished, this, &UpnpControlDimming::finishedSetLoadLevelTargetCall);
 }
@@ -66,7 +66,7 @@ void UpnpControlDimming::getLoadLevelTarget()
 {
     const KDSoapPendingCall &pendingAnswer(callAction(QStringLiteral("GetLoadLevelTarget"), {}));
 
-    KDSoapPendingCallWatcher *replyHandler = new KDSoapPendingCallWatcher(pendingAnswer, this);
+    auto replyHandler = new KDSoapPendingCallWatcher(pendingAnswer, this);
 
     connect(replyHandler, &KDSoapPendingCallWatcher::finished, this, &UpnpControlDimming::finishedGetLoadLevelTargetCall);
 }
@@ -75,7 +75,7 @@ void UpnpControlDimming::getLoadLevelStatus()
 {
     const KDSoapPendingCall &pendingAnswer(callAction(QStringLiteral("GetLoadLevelStatus"), {}));
 
-    KDSoapPendingCallWatcher *replyHandler = new KDSoapPendingCallWatcher(pendingAnswer, this);
+    auto replyHandler = new KDSoapPendingCallWatcher(pendingAnswer, this);
 
     connect(replyHandler, &KDSoapPendingCallWatcher::finished, this, &UpnpControlDimming::finishedGetLoadLevelStatusCall);
 }

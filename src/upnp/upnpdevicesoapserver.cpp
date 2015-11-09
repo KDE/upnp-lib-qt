@@ -63,11 +63,11 @@ QUrl UpnpDeviceSoapServer::urlPrefix() const
 {
     QHostAddress publicAddress;
 
-    const QList<QHostAddress> &list = QNetworkInterface::allAddresses();
-    for (auto address = list.begin(); address != list.end(); ++address) {
-        if (!address->isLoopback()) {
-            if (address->protocol() == QAbstractSocket::IPv4Protocol) {
-                publicAddress = *address;
+    const auto &list = QNetworkInterface::allAddresses();
+    for (const auto &address : list) {
+        if (!address.isLoopback()) {
+            if (address.protocol() == QAbstractSocket::IPv4Protocol) {
+                publicAddress = address;
                 break;
             }
         }

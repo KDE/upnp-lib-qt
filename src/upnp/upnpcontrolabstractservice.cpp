@@ -74,10 +74,10 @@ UpnpControlAbstractService::UpnpControlAbstractService(QObject *parent)
     d->mEventServer.listen(QHostAddress::Any);
 
     const QList<QHostAddress> &list = QNetworkInterface::allAddresses();
-    for (auto address = list.begin(); address != list.end(); ++address) {
-        if (!address->isLoopback()) {
-            if (address->protocol() == QAbstractSocket::IPv4Protocol) {
-                d->mPublicAddress = *address;
+    for (const auto &address : list) {
+        if (!address.isLoopback()) {
+            if (address.protocol() == QAbstractSocket::IPv4Protocol) {
+                d->mPublicAddress = address;
                 break;
             }
         }

@@ -35,7 +35,7 @@ class UpnpServiceDescriptionParserPrivate
 public:
 
     UpnpServiceDescriptionParserPrivate(QNetworkAccessManager *aNetworkAccess, QSharedPointer<UpnpServiceDescription> deviceDescription)
-        : mNetworkAccess(aNetworkAccess), mServiceDescription(deviceDescription), mServiceURL()
+        : mNetworkAccess(aNetworkAccess), mServiceDescription(std::move(deviceDescription)), mServiceURL()
     {
     }
 

@@ -78,7 +78,7 @@ void UpnpControlContentDirectory::getSearchCapabilities()
 {
     const KDSoapPendingCall &pendingAnswer(callAction(QStringLiteral("GetSearchCapabilities"), {}));
 
-    KDSoapPendingCallWatcher *replyHandler = new KDSoapPendingCallWatcher(pendingAnswer, this);
+    auto replyHandler = new KDSoapPendingCallWatcher(pendingAnswer, this);
 
     connect(replyHandler, &KDSoapPendingCallWatcher::finished, this, &UpnpControlContentDirectory::finishedGetSearchCapabilitiesCall);
 }
@@ -87,7 +87,7 @@ void UpnpControlContentDirectory::getSortCapabilities()
 {
     const KDSoapPendingCall &pendingAnswer(callAction(QStringLiteral("GetSortCapabilities"), {}));
 
-    KDSoapPendingCallWatcher *replyHandler = new KDSoapPendingCallWatcher(pendingAnswer, this);
+    auto replyHandler = new KDSoapPendingCallWatcher(pendingAnswer, this);
 
     connect(replyHandler, &KDSoapPendingCallWatcher::finished, this, &UpnpControlContentDirectory::finishedGetSortCapabilitiesCall);
 }
@@ -96,7 +96,7 @@ void UpnpControlContentDirectory::getSystemUpdateID()
 {
     const KDSoapPendingCall &pendingAnswer(callAction(QStringLiteral("GetSystemUpdateID"), {}));
 
-    KDSoapPendingCallWatcher *replyHandler = new KDSoapPendingCallWatcher(pendingAnswer, this);
+    auto replyHandler = new KDSoapPendingCallWatcher(pendingAnswer, this);
 
     connect(replyHandler, &KDSoapPendingCallWatcher::finished, this, &UpnpControlContentDirectory::finishedGetSystemUpdateIDCall);
 }
@@ -107,7 +107,7 @@ void UpnpControlContentDirectory::search(const QString &objectID, const QString 
 {
     const KDSoapPendingCall &pendingAnswer(callAction(QStringLiteral("Search"), {objectID, searchCriteria, filter, startingIndex, requestedCount, sortCriteria}));
 
-    KDSoapPendingCallWatcher *replyHandler = new KDSoapPendingCallWatcher(pendingAnswer, this);
+    auto replyHandler = new KDSoapPendingCallWatcher(pendingAnswer, this);
 
     connect(replyHandler, &KDSoapPendingCallWatcher::finished, this, &UpnpControlContentDirectory::finishedSearchCall);
 }
@@ -118,7 +118,7 @@ void UpnpControlContentDirectory::browse(const QString &objectID, const QString 
 {
     const KDSoapPendingCall &pendingAnswer(callAction(QStringLiteral("Browse"), {objectID, browseFlag, filter, startingIndex, requestedCount, sortCriteria}));
 
-    KDSoapPendingCallWatcher *replyHandler = new KDSoapPendingCallWatcher(pendingAnswer, this);
+    auto replyHandler = new KDSoapPendingCallWatcher(pendingAnswer, this);
 
     connect(replyHandler, &KDSoapPendingCallWatcher::finished, this, &UpnpControlContentDirectory::finishedBrowseCall);
 }

@@ -57,7 +57,7 @@ void UpnpControlSwitchPower::setTarget(bool newTargetValue)
 {
     const KDSoapPendingCall &pendingAnswer(callAction(QStringLiteral("SetTarget"), {newTargetValue}));
 
-    KDSoapPendingCallWatcher *replyHandler = new KDSoapPendingCallWatcher(pendingAnswer, this);
+    auto replyHandler = new KDSoapPendingCallWatcher(pendingAnswer, this);
 
     connect(replyHandler, &KDSoapPendingCallWatcher::finished, this, &UpnpControlSwitchPower::finishedSetTargetCall);
 }
@@ -66,7 +66,7 @@ void UpnpControlSwitchPower::getTarget()
 {
     const KDSoapPendingCall &pendingAnswer(callAction(QStringLiteral("GetTarget"), {}));
 
-    KDSoapPendingCallWatcher *replyHandler = new KDSoapPendingCallWatcher(pendingAnswer, this);
+    auto replyHandler = new KDSoapPendingCallWatcher(pendingAnswer, this);
 
     connect(replyHandler, &KDSoapPendingCallWatcher::finished, this, &UpnpControlSwitchPower::finishedGetTargetCall);
 }
@@ -75,7 +75,7 @@ void UpnpControlSwitchPower::getStatus()
 {
     const KDSoapPendingCall &pendingAnswer(callAction(QStringLiteral("GetStatus"), {}));
 
-    KDSoapPendingCallWatcher *replyHandler = new KDSoapPendingCallWatcher(pendingAnswer, this);
+    auto replyHandler = new KDSoapPendingCallWatcher(pendingAnswer, this);
 
     connect(replyHandler, &KDSoapPendingCallWatcher::finished, this, &UpnpControlSwitchPower::finishedGetStatusCall);
 }

@@ -224,10 +224,10 @@ void UpnpSsdpEngine::publishDevice(UpnpAbstractDevice *device)
     d->mSsdpQuerySocket.writeDatagram(deviceMessage, QHostAddress(QStringLiteral("239.255.255.250")), d->mPortNumber);
 
     const QList<QSharedPointer<UpnpServiceDescription> > &servicesList = device->description()->services();
-    for (auto itService = servicesList.begin(); itService != servicesList.end(); ++itService) {
+    for (const auto &oneService : servicesList) {
         QByteArray deviceMessage(allDiscoveryMessageCommonContent);
-        deviceMessage += "NT: " + (*itService)->serviceType().toLatin1() + "\r\n";
-        deviceMessage += "USN: uuid:" + device->description()->UDN().toLatin1() + "::" + (*itService)->serviceType().toLatin1() + "\r\n";
+        deviceMessage += "NT: " + (oneService)->serviceType().toLatin1() + "\r\n";
+        deviceMessage += "USN: uuid:" + device->description()->UDN().toLatin1() + "::" + (oneService)->serviceType().toLatin1() + "\r\n";
         deviceMessage += "LOCATION: "+ device->description()->locationUrl().toString().toLatin1() + "\r\n";
         deviceMessage += "\r\n";
 
@@ -272,38 +272,38 @@ void UpnpSsdpEngine::parseSsdpQueryDatagram(const QByteArray &datagram, const QL
     bool hasAnswerDelay = false;
     bool hasSearchTarget = false;
 
-    for (auto itLine = headers.begin(); itLine != headers.end(); ++itLine) {
-        if (itLine->startsWith("HOST")) {
+    for (const auto & header : headers) {
+        if (header.startsWith("HOST")) {
             QString hostName;
-            if ((*itLine)[4] == ' ') {
-                hostName = QString::fromLatin1(itLine->mid(7, itLine->length() - 8));
+            if ((header)[4] == ' ') {
+                hostName = QString::fromLatin1(header.mid(7, header.length() - 8));
             } else {
-                hostName = QString::fromLatin1(itLine->mid(6, itLine->length() - 7));
+                hostName = QString::fromLatin1(header.mid(6, header.length() - 7));
             }
             auto addressParts = hostName.split(QStringLiteral(":"));
             newSearch.mSearchHostAddress.setAddress(addressParts.first());
             newSearch.mSearchHostPort = addressParts.last().toInt();
             hasAddress = true;
         }
-        if (itLine->startsWith("MAN")) {
-            if (!itLine->contains("\"ssdp:discover\"")) {
+        if (header.startsWith("MAN")) {
+            if (!header.contains("\"ssdp:discover\"")) {
                 qDebug() << "not valid" << datagram;
                 return;
             }
         }
-        if (itLine->startsWith("MX")) {
-            if ((*itLine)[2] == ' ') {
-                newSearch.mAnswerDelay = QString::fromLatin1(itLine->mid(4, itLine->length() - 5)).toInt();
+        if (header.startsWith("MX")) {
+            if ((header)[2] == ' ') {
+                newSearch.mAnswerDelay = QString::fromLatin1(header.mid(4, header.length() - 5)).toInt();
             } else {
-                newSearch.mAnswerDelay = QString::fromLatin1(itLine->mid(3, itLine->length() - 4)).toInt();
+                newSearch.mAnswerDelay = QString::fromLatin1(header.mid(3, header.length() - 4)).toInt();
             }
             hasAnswerDelay = true;
         }
-        if (itLine->startsWith("ST")) {
-            if ((*itLine)[2] == ' ') {
-                newSearch.mSearchTarget = QString::fromLatin1(itLine->mid(5, itLine->length() - 6));
+        if (header.startsWith("ST")) {
+            if ((header)[2] == ' ') {
+                newSearch.mSearchTarget = QString::fromLatin1(header.mid(5, header.length() - 6));
             } else {
-                newSearch.mSearchTarget = QString::fromLatin1(itLine->mid(4, itLine->length() - 5));
+                newSearch.mSearchTarget = QString::fromLatin1(header.mid(4, header.length() - 5));
             }
             if (newSearch.mSearchTarget.startsWith(QStringLiteral("ssdp:all"))) {
                 newSearch.mSearchTargetType = SearchTargetType::All;
@@ -332,76 +332,76 @@ void UpnpSsdpEngine::parseSsdpAnnounceDatagram(const QByteArray &datagram, const
     UpnpDiscoveryResult newDiscovery;
     newDiscovery.mNTS = NotificationSubType::Invalid;
 
-    for (QList<QByteArray>::const_iterator itLine = headers.begin(); itLine != headers.end(); ++itLine) {
-        if (itLine->startsWith("LOCATION")) {
-            if ((*itLine)[9] == ' ') {
-                newDiscovery.mLocation = QString::fromLatin1(itLine->mid(10, itLine->length() - 11));
+    for (const auto & header : headers) {
+        if (header.startsWith("LOCATION")) {
+            if ((header)[9] == ' ') {
+                newDiscovery.mLocation = QString::fromLatin1(header.mid(10, header.length() - 11));
             } else {
-                newDiscovery.mLocation = QString::fromLatin1(itLine->mid(9, itLine->length() - 10));
+                newDiscovery.mLocation = QString::fromLatin1(header.mid(9, header.length() - 10));
             }
         }
-        if (itLine->startsWith("Location")) {
-            if ((*itLine)[9] == ' ') {
-                newDiscovery.mLocation = QString::fromLatin1(itLine->mid(10, itLine->length() - 11));
+        if (header.startsWith("Location")) {
+            if ((header)[9] == ' ') {
+                newDiscovery.mLocation = QString::fromLatin1(header.mid(10, header.length() - 11));
             } else {
-                newDiscovery.mLocation = QString::fromLatin1(itLine->mid(9, itLine->length() - 10));
+                newDiscovery.mLocation = QString::fromLatin1(header.mid(9, header.length() - 10));
             }
         }
-        if (itLine->startsWith("HOST") || itLine->startsWith("Host")) {
+        if (header.startsWith("HOST") || header.startsWith("Host")) {
             QString hostName;
-            if ((*itLine)[4] == ' ') {
-                newDiscovery.mLocation = QString::fromLatin1(itLine->mid(7, itLine->length() - 8));
+            if ((header)[4] == ' ') {
+                newDiscovery.mLocation = QString::fromLatin1(header.mid(7, header.length() - 8));
             } else {
-                newDiscovery.mLocation = QString::fromLatin1(itLine->mid(6, itLine->length() - 7));
+                newDiscovery.mLocation = QString::fromLatin1(header.mid(6, header.length() - 7));
             }
         }
-        if (itLine->startsWith("USN")) {
-            if ((*itLine)[4] == ' ') {
-                newDiscovery.mUSN = QString::fromLatin1(itLine->mid(5, itLine->length() - 6));
+        if (header.startsWith("USN")) {
+            if ((header)[4] == ' ') {
+                newDiscovery.mUSN = QString::fromLatin1(header.mid(5, header.length() - 6));
             } else {
-                newDiscovery.mUSN = QString::fromLatin1(itLine->mid(4, itLine->length() - 5));
+                newDiscovery.mUSN = QString::fromLatin1(header.mid(4, header.length() - 5));
             }
         }
-        if (messageType == SsdpMessageType::queryAnswer && itLine->startsWith("ST")) {
-            if ((*itLine)[3] == ' ') {
-                newDiscovery.mNT = QString::fromLatin1(itLine->mid(4, itLine->length() - 5));
+        if (messageType == SsdpMessageType::queryAnswer && header.startsWith("ST")) {
+            if ((header)[3] == ' ') {
+                newDiscovery.mNT = QString::fromLatin1(header.mid(4, header.length() - 5));
             } else {
-                newDiscovery.mNT = QString::fromLatin1(itLine->mid(3, itLine->length() - 4));
+                newDiscovery.mNT = QString::fromLatin1(header.mid(3, header.length() - 4));
             }
         }
-        if (messageType == SsdpMessageType::announce && itLine->startsWith("NT:")) {
-            if ((*itLine)[3] == ' ') {
-                newDiscovery.mNT = QString::fromLatin1(itLine->mid(4, itLine->length() - 5));
+        if (messageType == SsdpMessageType::announce && header.startsWith("NT:")) {
+            if ((header)[3] == ' ') {
+                newDiscovery.mNT = QString::fromLatin1(header.mid(4, header.length() - 5));
             } else {
-                newDiscovery.mNT = QString::fromLatin1(itLine->mid(3, itLine->length() - 4));
+                newDiscovery.mNT = QString::fromLatin1(header.mid(3, header.length() - 4));
             }
         }
-        if (messageType == SsdpMessageType::announce && itLine->startsWith("NTS")) {
-            if (itLine->endsWith("ssdp:alive\r")) {
+        if (messageType == SsdpMessageType::announce && header.startsWith("NTS")) {
+            if (header.endsWith("ssdp:alive\r")) {
                 newDiscovery.mNTS = NotificationSubType::Alive;
             }
-            if (itLine->endsWith("ssdp:byebye\r")) {
+            if (header.endsWith("ssdp:byebye\r")) {
                 newDiscovery.mNTS = NotificationSubType::ByeBye;
             }
-            if (itLine->endsWith("ssdp:discover\r")) {
+            if (header.endsWith("ssdp:discover\r")) {
                 newDiscovery.mNTS = NotificationSubType::Discover;
             }
         }
-        if (itLine->startsWith("DATE")) {
-            if ((*itLine)[5] == ' ') {
-                newDiscovery.mAnnounceDate = QString::fromLatin1(itLine->mid(6, itLine->length() - 7));
+        if (header.startsWith("DATE")) {
+            if ((header)[5] == ' ') {
+                newDiscovery.mAnnounceDate = QString::fromLatin1(header.mid(6, header.length() - 7));
             } else {
-                newDiscovery.mAnnounceDate = QString::fromLatin1(itLine->mid(5, itLine->length() - 6));
+                newDiscovery.mAnnounceDate = QString::fromLatin1(header.mid(5, header.length() - 6));
             }
         }
-        if (itLine->startsWith("CACHE-CONTROL")) {
-            if ((*itLine)[14] == ' ') {
-                const QList<QByteArray> &splittedLine = itLine->mid(15, itLine->length() - 16).split('=');
+        if (header.startsWith("CACHE-CONTROL")) {
+            if ((header)[14] == ' ') {
+                const QList<QByteArray> &splittedLine = header.mid(15, header.length() - 16).split('=');
                 if (splittedLine.size() == 2) {
                     newDiscovery.mCacheDuration = splittedLine.last().toInt();
                 }
             } else {
-                const QList<QByteArray> &splittedLine = itLine->mid(14, itLine->length() - 15).split('=');
+                const QList<QByteArray> &splittedLine = header.mid(14, header.length() - 15).split('=');
                 if (splittedLine.size() == 2) {
                     newDiscovery.mCacheDuration = splittedLine.last().toInt();
                 }

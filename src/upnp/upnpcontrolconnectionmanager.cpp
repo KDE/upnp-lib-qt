@@ -77,7 +77,7 @@ void UpnpControlConnectionManager::getProtocolInfo()
 {
     const KDSoapPendingCall &pendingAnswer(callAction(QStringLiteral("GetProtocolInfo"), {}));
 
-    KDSoapPendingCallWatcher *replyHandler = new KDSoapPendingCallWatcher(pendingAnswer, this);
+    auto replyHandler = new KDSoapPendingCallWatcher(pendingAnswer, this);
 
     connect(replyHandler, &KDSoapPendingCallWatcher::finished, this, &UpnpControlConnectionManager::finishedGetProtocolInfoCall);
 }
@@ -93,7 +93,7 @@ void UpnpControlConnectionManager::prepareForConnection(const QString &remotePro
     const KDSoapPendingCall &pendingAnswer(callAction(QStringLiteral("PrepareForConnection"),
                                                       {remoteProtocolInfo, remoteConnectionManager, remotePeerConnectionID, connectionDirection}));
 
-    KDSoapPendingCallWatcher *replyHandler = new KDSoapPendingCallWatcher(pendingAnswer, this);
+    auto replyHandler = new KDSoapPendingCallWatcher(pendingAnswer, this);
 
     connect(replyHandler, &KDSoapPendingCallWatcher::finished, this, &UpnpControlConnectionManager::finishedPrepareForConnectionCall);
 }
@@ -102,7 +102,7 @@ void UpnpControlConnectionManager::connectionComplete(int currentConnectionID)
 {
     const KDSoapPendingCall &pendingAnswer(callAction(QStringLiteral("ConnectionComplete"), {currentConnectionID}));
 
-    KDSoapPendingCallWatcher *replyHandler = new KDSoapPendingCallWatcher(pendingAnswer, this);
+    auto replyHandler = new KDSoapPendingCallWatcher(pendingAnswer, this);
 
     connect(replyHandler, &KDSoapPendingCallWatcher::finished, this, &UpnpControlConnectionManager::finishedConnectionCompleteCall);
 }
@@ -111,7 +111,7 @@ void UpnpControlConnectionManager::getCurrentConnectionIDs()
 {
     const KDSoapPendingCall &pendingAnswer(callAction(QStringLiteral("GetCurrentConnectionIDs"), {}));
 
-    KDSoapPendingCallWatcher *replyHandler = new KDSoapPendingCallWatcher(pendingAnswer, this);
+    auto replyHandler = new KDSoapPendingCallWatcher(pendingAnswer, this);
 
     connect(replyHandler, &KDSoapPendingCallWatcher::finished, this, &UpnpControlConnectionManager::finishedGetCurrentConnectionIDsCall);
 }
@@ -120,7 +120,7 @@ void UpnpControlConnectionManager::getCurrentConnectionInfo(int currentConnectio
 {
     const KDSoapPendingCall &pendingAnswer(callAction(QStringLiteral("GetCurrentConnectionInfo"), {currentConnectionID}));
 
-    KDSoapPendingCallWatcher *replyHandler = new KDSoapPendingCallWatcher(pendingAnswer, this);
+    auto replyHandler = new KDSoapPendingCallWatcher(pendingAnswer, this);
 
     connect(replyHandler, &KDSoapPendingCallWatcher::finished, this, &UpnpControlConnectionManager::finishedGetCurrentConnectionInfoCall);
 }

@@ -40,7 +40,7 @@ UpnpHttpServer::~UpnpHttpServer()
 
 QObject *UpnpHttpServer::createServerObject()
 {
-    UpnpServerEventObject *newObject = new UpnpServerEventObject;
+    auto newObject = new UpnpServerEventObject;
     newObject->setService(d->mService);
     return newObject;
 }
