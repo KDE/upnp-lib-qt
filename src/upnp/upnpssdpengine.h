@@ -79,6 +79,16 @@ struct UpnpSearchQuery
 
 struct UpnpDiscoveryResult
 {
+    UpnpDiscoveryResult()
+        : mNT(), mUSN(), mLocation(), mNTS(), mAnnounceDate(), mCacheDuration()
+    {
+    }
+
+    UpnpDiscoveryResult(const QString &aNT, const QString &aUSN, const QString &aLocation,
+                        NotificationSubType aNTS, const QString &aAnnounceDate, int aCacheDuration)
+        : mNT(aNT), mUSN(aUSN), mLocation(aLocation), mNTS(aNTS), mAnnounceDate(aAnnounceDate), mCacheDuration(aCacheDuration)
+    {
+    }
 
     /**
      * @brief mNT contains the header ST (i.e. search target) or NT (i.e. notification type) sent in an ssdp message
@@ -126,6 +136,18 @@ class UPNPQT_EXPORT UpnpSsdpEngine : public QObject
                NOTIFY canExportServicesChanged)
 
 public:
+
+    enum SEARCH_TYPE
+    {
+        AllDevices,
+        RootDevices,
+        DeviceByUUID,
+        DeviceByType,
+        ServiceByType,
+    };
+
+    Q_ENUM(SEARCH_TYPE)
+
     explicit UpnpSsdpEngine(QObject *parent = 0);
 
     virtual ~UpnpSsdpEngine();
@@ -153,6 +175,11 @@ Q_SIGNALS:
     void canExportServicesChanged();
 
 public Q_SLOTS:
+
+    /**
+     * @brief searchUpnpDevice will trigger a search for upnp device depending on the parameters
+     */
+    bool searchUpnp(SEARCH_TYPE searchType, const QString &searchCriteria, int maxDelay = 1);
 
     /**
      * @brief searchAllUpnpDevice will trigger a search for all upnp device

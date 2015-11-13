@@ -108,6 +108,25 @@ void UpnpSsdpEngine::setCanExportServices(bool value)
     Q_EMIT canExportServicesChanged();
 }
 
+bool UpnpSsdpEngine::searchUpnp(SEARCH_TYPE searchType, const QString &searchCriteria, int maxDelay)
+{
+    switch (searchType)
+    {
+    case AllDevices:
+        return searchAllUpnpDevice(maxDelay);
+    case RootDevices:
+        return searchAllRootDevice(maxDelay);
+    case DeviceByUUID:
+        return searchByDeviceUUID(searchCriteria, maxDelay);
+    case DeviceByType:
+        return searchByDeviceType(searchCriteria, maxDelay);
+    case ServiceByType:
+        return searchByServiceType(searchCriteria, maxDelay);
+    }
+
+    return false;
+}
+
 bool UpnpSsdpEngine::searchAllUpnpDevice(int maxDelay)
 {
     QByteArray allDiscoveryMessage;
