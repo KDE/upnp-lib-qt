@@ -59,7 +59,6 @@ int __attribute__((visibility("default"))) main(int argc, char *argv[])
     qmlRegisterType<UpnpDeviceDescription>("org.mgallien.QmlExtension", 1, 0, "UpnpDeviceDescription");
 
     qRegisterMetaType<A_ARG_TYPE_InstanceID>();
-    qRegisterMetaType<UpnpDiscoveryResult>();
     qRegisterMetaType<QPointer<UpnpAbstractDevice> >();
     qRegisterMetaType<UpnpControlConnectionManager*>();
     qRegisterMetaType<UpnpContentDirectoryModel*>();

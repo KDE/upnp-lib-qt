@@ -71,9 +71,9 @@ Q_SIGNALS:
 
 public Q_SLOTS:
 
-    void newDevice(const UpnpDiscoveryResult &deviceDiscovery);
+    void newDevice(QSharedPointer<UpnpDiscoveryResult> deviceDiscovery);
 
-    void removedDevice(const UpnpDiscoveryResult &deviceDiscovery);
+    void removedDevice(QSharedPointer<UpnpDiscoveryResult> deviceDiscovery);
 
 private Q_SLOTS:
 

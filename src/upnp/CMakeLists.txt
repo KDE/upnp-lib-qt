@@ -26,6 +26,7 @@ set(upnpQt_SOURCES
     mediaplaylist.cpp
     upnpdevicedescriptionparser.cpp
     upnpservicedescriptionparser.cpp
+    upnpdiscoveryresult.cpp
 )
 
 ecm_generate_headers(
@@ -49,6 +50,7 @@ ecm_generate_headers(
     UpnpSwitchPower
     UpnpBasicTypes
     UpnpEventSubscriber
+    UpnpDiscoveryResult
 
   PREFIX upnpQt
   REQUIRED_HEADERS upnpQt_HEADERS

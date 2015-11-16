@@ -41,7 +41,7 @@ class UpnpDeviceModelPrivate
 {
 public:
 
-    QHash<QString, UpnpDiscoveryResult> mAllHosts;
+    QHash<QString, QSharedPointer<UpnpDiscoveryResult> > mAllHosts;
 
     QHash<QString, QSharedPointer<UpnpDeviceDescription> > mAllHostsDescription;
 
@@ -177,10 +177,10 @@ QVariant UpnpDeviceModel::get(int row, const QString &roleName) const
     return data(index(row), role);
 }
 
-void UpnpDeviceModel::newDevice(const UpnpDiscoveryResult &deviceDiscovery)
+void UpnpDeviceModel::newDevice(QSharedPointer<UpnpDiscoveryResult> deviceDiscovery)
 {
-    const QString &deviceUuid = deviceDiscovery.mUSN.mid(5, 36);
-    if (!d->mAllHostsUUID.contains(deviceUuid) && deviceDiscovery.mNT.startsWith(QStringLiteral("urn:schemas-upnp-org:device:"))) {
+    const QString &deviceUuid = deviceDiscovery->mUSN.mid(5, 36);
+    if (!d->mAllHostsUUID.contains(deviceUuid) && deviceDiscovery->mNT.startsWith(QStringLiteral("urn:schemas-upnp-org:device:"))) {
         beginInsertRows(QModelIndex(), d->mAllHostsUUID.size(), d->mAllHostsUUID.size());
 
         const QString &decodedUdn(deviceUuid);
@@ -210,13 +210,13 @@ void UpnpDeviceModel::newDevice(const UpnpDiscoveryResult &deviceDiscovery)
         connect(&d->mNetworkAccess, &QNetworkAccessManager::finished, d->mDeviceDescriptionParsers[decodedUdn].data(), &UpnpDeviceDescriptionParser::finishedDownload);
         connect(d->mDeviceDescriptionParsers[decodedUdn].data(), &UpnpDeviceDescriptionParser::descriptionParsed, this, &UpnpDeviceModel::descriptionParsed);
 
-        d->mDeviceDescriptionParsers[decodedUdn]->downloadDeviceDescription(QUrl(deviceDiscovery.mLocation));
+        d->mDeviceDescriptionParsers[decodedUdn]->downloadDeviceDescription(QUrl(deviceDiscovery->mLocation));
     }
 }
 
-void UpnpDeviceModel::removedDevice(const UpnpDiscoveryResult &deviceDiscovery)
+void UpnpDeviceModel::removedDevice(QSharedPointer<UpnpDiscoveryResult> deviceDiscovery)
 {
-    genericRemovedDevice(deviceDiscovery.mUSN);
+    genericRemovedDevice(deviceDiscovery->mUSN);
 }
 
 void UpnpDeviceModel::genericRemovedDevice(const QString &usn)

@@ -22,16 +22,10 @@
 
 #include "upnpQt_export.h"
 
+#include "upnpdiscoveryresult.h"
+
 #include <QtCore/QObject>
 #include <QtNetwork/QHostAddress>
-
-enum class NotificationSubType
-{
-    Invalid,
-    Alive,
-    ByeBye,
-    Discover,
-};
 
 enum class SearchTargetType
 {
@@ -76,46 +70,6 @@ struct UpnpSearchQuery
      */
     int mAnswerDelay;
 };
-
-struct UpnpDiscoveryResult
-{
-    UpnpDiscoveryResult()
-        : mNT(), mUSN(), mLocation(), mNTS(), mAnnounceDate(), mCacheDuration()
-    {
-    }
-
-    UpnpDiscoveryResult(const QString &aNT, const QString &aUSN, const QString &aLocation,
-                        NotificationSubType aNTS, const QString &aAnnounceDate, int aCacheDuration)
-        : mNT(aNT), mUSN(aUSN), mLocation(aLocation), mNTS(aNTS), mAnnounceDate(aAnnounceDate), mCacheDuration(aCacheDuration)
-    {
-    }
-
-    /**
-     * @brief mNT contains the header ST (i.e. search target) or NT (i.e. notification type) sent in an ssdp message
-     */
-    QString mNT;
-
-    QString mUSN;
-
-    QString mLocation;
-
-    /**
-     * @brief mNTS contains the header NTS (i.e. notification sub type) sent in an ssdp message
-     */
-    NotificationSubType mNTS;
-
-    /**
-     * @brief mAnnounceDate contains the date sent in the SSDP message by the other side
-     */
-    QString mAnnounceDate;
-
-    /**
-     * @brief mCacheDuration duration of validity of the announce
-     */
-    int mCacheDuration;
-};
-
-Q_DECLARE_METATYPE(UpnpDiscoveryResult)
 
 class UpnpAbstractDevice;
 class UpnpSsdpEnginePrivate;
@@ -166,9 +120,9 @@ Q_SIGNALS:
 
     void newSearchQuery(UpnpSsdpEngine *engine, const UpnpSearchQuery &searchQuery);
 
-    void newService(const UpnpDiscoveryResult &serviceDiscovery);
+    void newService(QSharedPointer<UpnpDiscoveryResult> serviceDiscovery);
 
-    void removedService(const UpnpDiscoveryResult &serviceDiscovery);
+    void removedService(QSharedPointer<UpnpDiscoveryResult> serviceDiscovery);
 
     void portChanged();
 
