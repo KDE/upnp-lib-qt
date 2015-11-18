@@ -339,10 +339,84 @@ private Q_SLOTS:
             QVERIFY(firstService->mAnnounceDate == results[i]->mAnnounceDate);
             QVERIFY(firstService->mCacheDuration == results[i]->mCacheDuration);
             QVERIFY(firstService->mLocation == results[i]->mLocation);
-            QVERIFY(firstService->mNT == results[i]->mNT);
+            QVERIFY(firstService->nt() == results[i]->nt());
             QVERIFY(firstService->mNTS == results[i]->mNTS);
             QVERIFY(firstService->mUSN == results[i]->mUSN);
         }
+    }
+
+
+    void searchDeviceWaitTimeout_data()
+    {
+        QTest::addColumn<UpnpSsdpEngine::SEARCH_TYPE>("searchType");
+        QTest::addColumn<QString>("searchCriteria");
+        QTest::addColumn<QByteArray>("ssdpRequest");
+        QTest::addColumn<QStringList>("ssdpAnswers");
+        QTest::addColumn<QList<QPointer<UpnpDiscoveryResult> > >("results");
+
+        QTest::newRow("root device") << UpnpSsdpEngine::RootDevices
+                                     << QString()
+                                     << QByteArray("M-SEARCH * HTTP/1.1\r\n"
+                                                   "HOST: 239.255.255.250:11900\r\n"
+                                                   "MAN: \"ssdp:discover\"\r\n"
+                                                   "MX: 2\r\n"
+                                                   "ST: upnp:rootdevice\r\n\r\n")
+                                     << QStringList({QStringLiteral("HTTP/1.1 200 OK\r\n"
+                                                     "CACHE-CONTROL: max-age=1800\r\n"
+                                                     "DATE: mar., 27 oct. 2015 21:03:35 G\x7F\r\n"
+                                                     "ST: upnp:rootdevice\r\n"
+                                                     "USN: uuid:4d696e69-444c-164e-9d41-ecf4bb9c317e::upnp:rootdevice\r\n"
+                                                     "EXT:\r\n"
+                                                     "SERVER: Debian DLNADOC/1.50 UPnP/1.0 MiniDLNA/1.1.4\r\n"
+                                                     "LOCATION: http://127.0.0.1:8200/rootDesc.xml\r\n"
+                                                     "Content-Length: 0\r\n\r\n")
+                                                    })
+                                     << QList<QPointer<UpnpDiscoveryResult> >({new UpnpDiscoveryResult(QStringLiteral("upnp:rootdevice"),
+                                                                    QStringLiteral("uuid:4d696e69-444c-164e-9d41-ecf4bb9c317e::upnp:rootdevice"),
+                                                                    QStringLiteral("http://127.0.0.1:8200/rootDesc.xml"),
+                                                                    NotificationSubType::Invalid,
+                                                                    QStringLiteral("mar., 27 oct. 2015 21:03:35 G\x7F"),
+                                                                    3)});
+    }
+
+    void searchDeviceWaitTimeout()
+    {
+        QFETCH(UpnpSsdpEngine::SEARCH_TYPE, searchType);
+        QFETCH(QString, searchCriteria);
+        QFETCH(QByteArray, ssdpRequest);
+        QFETCH(QStringList, ssdpAnswers);
+        QFETCH(QList<QPointer<UpnpDiscoveryResult> >, results);
+
+        QScopedPointer<MockSsdpClient> newClient(new MockSsdpClient(ssdpRequest, ssdpAnswers));
+        newClient->listen(11900);
+
+        QScopedPointer<UpnpSsdpEngine> newEngine(new UpnpSsdpEngine);
+        newEngine->setPort(11900);
+        newEngine->initialize();
+
+        QSignalSpy newServiceSignal(newEngine.data(), &UpnpSsdpEngine::newService);
+        QSignalSpy removedServiceSignal(newEngine.data(), &UpnpSsdpEngine::removedService);
+
+        newEngine->searchUpnp(searchType, searchCriteria, 2);
+
+        QTest::qSleep(2000);
+        newServiceSignal.wait();
+
+        QVERIFY(newServiceSignal.size() == results.size());
+
+        for (int i = 0; i < results.size(); ++i) {
+            auto firstService = newServiceSignal[i][0].value<QSharedPointer<UpnpDiscoveryResult> >();
+            QVERIFY(firstService->mAnnounceDate == results[i]->mAnnounceDate);
+            QVERIFY(firstService->mCacheDuration == results[i]->mCacheDuration);
+            QVERIFY(firstService->mLocation == results[i]->mLocation);
+            QVERIFY(firstService->nt() == results[i]->nt());
+            QVERIFY(firstService->mNTS == results[i]->mNTS);
+            QVERIFY(firstService->mUSN == results[i]->mUSN);
+        }
+
+        removedServiceSignal.wait();
+
+        QVERIFY(removedServiceSignal.count() > 0);
     }
 };
 
