@@ -179,7 +179,7 @@ QVariant UpnpDeviceModel::get(int row, const QString &roleName) const
 
 void UpnpDeviceModel::newDevice(QSharedPointer<UpnpDiscoveryResult> deviceDiscovery)
 {
-    const QString &deviceUuid = deviceDiscovery->mUSN.mid(5, 36);
+    const QString &deviceUuid = deviceDiscovery->usn().mid(5, 36);
     if (!d->mAllHostsUUID.contains(deviceUuid) && deviceDiscovery->nt().startsWith(QStringLiteral("urn:schemas-upnp-org:device:"))) {
         beginInsertRows(QModelIndex(), d->mAllHostsUUID.size(), d->mAllHostsUUID.size());
 
@@ -210,13 +210,13 @@ void UpnpDeviceModel::newDevice(QSharedPointer<UpnpDiscoveryResult> deviceDiscov
         connect(&d->mNetworkAccess, &QNetworkAccessManager::finished, d->mDeviceDescriptionParsers[decodedUdn].data(), &UpnpDeviceDescriptionParser::finishedDownload);
         connect(d->mDeviceDescriptionParsers[decodedUdn].data(), &UpnpDeviceDescriptionParser::descriptionParsed, this, &UpnpDeviceModel::descriptionParsed);
 
-        d->mDeviceDescriptionParsers[decodedUdn]->downloadDeviceDescription(QUrl(deviceDiscovery->mLocation));
+        d->mDeviceDescriptionParsers[decodedUdn]->downloadDeviceDescription(QUrl(deviceDiscovery->location()));
     }
 }
 
 void UpnpDeviceModel::removedDevice(QSharedPointer<UpnpDiscoveryResult> deviceDiscovery)
 {
-    genericRemovedDevice(deviceDiscovery->mUSN);
+    genericRemovedDevice(deviceDiscovery->usn());
 }
 
 void UpnpDeviceModel::genericRemovedDevice(const QString &usn)

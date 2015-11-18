@@ -336,12 +336,12 @@ private Q_SLOTS:
 
         for (int i = 0; i < results.size(); ++i) {
             auto firstService = newServiceSignal[i][0].value<QSharedPointer<UpnpDiscoveryResult> >();
-            QVERIFY(firstService->mAnnounceDate == results[i]->mAnnounceDate);
-            QVERIFY(firstService->mCacheDuration == results[i]->mCacheDuration);
-            QVERIFY(firstService->mLocation == results[i]->mLocation);
+            QVERIFY(firstService->announceDate() == results[i]->announceDate());
+            QVERIFY(firstService->cacheDuration() == results[i]->cacheDuration());
+            QVERIFY(firstService->location() == results[i]->location());
             QVERIFY(firstService->nt() == results[i]->nt());
-            QVERIFY(firstService->mNTS == results[i]->mNTS);
-            QVERIFY(firstService->mUSN == results[i]->mUSN);
+            QVERIFY(firstService->nts() == results[i]->nts());
+            QVERIFY(firstService->usn() == results[i]->usn());
         }
     }
 
@@ -406,12 +406,12 @@ private Q_SLOTS:
 
         for (int i = 0; i < results.size(); ++i) {
             auto firstService = newServiceSignal[i][0].value<QSharedPointer<UpnpDiscoveryResult> >();
-            QVERIFY(firstService->mAnnounceDate == results[i]->mAnnounceDate);
-            QVERIFY(firstService->mCacheDuration == results[i]->mCacheDuration);
-            QVERIFY(firstService->mLocation == results[i]->mLocation);
+            QVERIFY(firstService->announceDate() == results[i]->announceDate());
+            QVERIFY(firstService->cacheDuration() == results[i]->cacheDuration());
+            QVERIFY(firstService->location() == results[i]->location());
             QVERIFY(firstService->nt() == results[i]->nt());
-            QVERIFY(firstService->mNTS == results[i]->mNTS);
-            QVERIFY(firstService->mUSN == results[i]->mUSN);
+            QVERIFY(firstService->nts() == results[i]->nts());
+            QVERIFY(firstService->usn() == results[i]->usn());
         }
 
         removedServiceSignal.wait();

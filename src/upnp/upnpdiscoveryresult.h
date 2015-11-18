@@ -43,6 +43,31 @@ class UPNPQT_EXPORT UpnpDiscoveryResult : public QObject
                WRITE setNT
                NOTIFY ntChanged)
 
+    Q_PROPERTY(QString usn
+               READ usn
+               WRITE setUSN
+               NOTIFY usnChanged)
+
+    Q_PROPERTY(QString location
+               READ location
+               WRITE setLocation
+               NOTIFY locationChanged)
+
+    Q_PROPERTY(NotificationSubType nts
+               READ nts
+               WRITE setNTS
+               NOTIFY ntsChanged)
+
+    Q_PROPERTY(QString announceDate
+               READ announceDate
+               WRITE setAnnounceDate
+               NOTIFY announceDateChanged)
+
+    Q_PROPERTY(int cacheDuration
+               READ cacheDuration
+               WRITE setCacheDuration
+               NOTIFY cacheDurationChanged)
+
 public:
 
     explicit UpnpDiscoveryResult(QObject *parent = 0);
@@ -56,11 +81,41 @@ public:
 
     const QString &nt() const;
 
+    void setUSN(const QString &value);
+
+    const QString &usn() const;
+
+    void setLocation(const QString &value);
+
+    const QString &location() const;
+
+    void setNTS(NotificationSubType value);
+
+    NotificationSubType nts() const;
+
+    void setAnnounceDate(const QString &value);
+
+    const QString &announceDate() const;
+
+    void setCacheDuration(int value);
+
+    int cacheDuration() const;
+
 Q_SIGNALS:
 
         void timeout(const QString &usn);
 
         void ntChanged();
+
+        void usnChanged();
+
+        void locationChanged();
+
+        void ntsChanged();
+
+        void announceDateChanged();
+
+        void cacheDurationChanged();
 
 public Q_SLOTS:
 
@@ -69,12 +124,13 @@ public Q_SLOTS:
 private:
 
     /**
-     * @brief mNT contains the header ST (i.e. search target) or NT (i.e. notification type) sent in an ssdp message
+     * @brief mNT contains the header ST (i.e. search target) or NT (i.e. notification type) sent in an ssdp message. This is usefull to know the type of the discovered service.
      */
     QString mNT;
 
-public:
-
+    /**
+     * @brief mUSN contains the header USN (i.e. unique service name) sent in an ssdp message. This uniquely identify the discovered service.
+     */
     QString mUSN;
 
     QString mLocation;

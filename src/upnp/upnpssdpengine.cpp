@@ -361,36 +361,36 @@ void UpnpSsdpEngine::parseSsdpQueryDatagram(const QByteArray &datagram, const QL
 void UpnpSsdpEngine::parseSsdpAnnounceDatagram(const QByteArray &datagram, const QList<QByteArray> &headers, SsdpMessageType messageType)
 {
     QSharedPointer<UpnpDiscoveryResult> newDiscovery(new UpnpDiscoveryResult);
-    newDiscovery->mNTS = NotificationSubType::Invalid;
+    newDiscovery->setNTS(NotificationSubType::Invalid);
 
     for (const auto & header : headers) {
         if (header.startsWith("LOCATION")) {
             if ((header)[9] == ' ') {
-                newDiscovery->mLocation = QString::fromLatin1(header.mid(10, header.length() - 11));
+                newDiscovery->setLocation(QString::fromLatin1(header.mid(10, header.length() - 11)));
             } else {
-                newDiscovery->mLocation = QString::fromLatin1(header.mid(9, header.length() - 10));
+                newDiscovery->setLocation(QString::fromLatin1(header.mid(9, header.length() - 10)));
             }
         }
         if (header.startsWith("Location")) {
             if ((header)[9] == ' ') {
-                newDiscovery->mLocation = QString::fromLatin1(header.mid(10, header.length() - 11));
+                newDiscovery->setLocation(QString::fromLatin1(header.mid(10, header.length() - 11)));
             } else {
-                newDiscovery->mLocation = QString::fromLatin1(header.mid(9, header.length() - 10));
+                newDiscovery->setLocation(QString::fromLatin1(header.mid(9, header.length() - 10)));
             }
         }
         if (header.startsWith("HOST") || header.startsWith("Host")) {
             QString hostName;
             if ((header)[4] == ' ') {
-                newDiscovery->mLocation = QString::fromLatin1(header.mid(7, header.length() - 8));
+                newDiscovery->setLocation(QString::fromLatin1(header.mid(7, header.length() - 8)));
             } else {
-                newDiscovery->mLocation = QString::fromLatin1(header.mid(6, header.length() - 7));
+                newDiscovery->setLocation(QString::fromLatin1(header.mid(6, header.length() - 7)));
             }
         }
         if (header.startsWith("USN")) {
             if ((header)[4] == ' ') {
-                newDiscovery->mUSN = QString::fromLatin1(header.mid(5, header.length() - 6));
+                newDiscovery->setUSN(QString::fromLatin1(header.mid(5, header.length() - 6)));
             } else {
-                newDiscovery->mUSN = QString::fromLatin1(header.mid(4, header.length() - 5));
+                newDiscovery->setUSN(QString::fromLatin1(header.mid(4, header.length() - 5)));
             }
         }
         if (messageType == SsdpMessageType::queryAnswer && header.startsWith("ST")) {
@@ -409,50 +409,50 @@ void UpnpSsdpEngine::parseSsdpAnnounceDatagram(const QByteArray &datagram, const
         }
         if (messageType == SsdpMessageType::announce && header.startsWith("NTS")) {
             if (header.endsWith("ssdp:alive\r")) {
-                newDiscovery->mNTS = NotificationSubType::Alive;
+                newDiscovery->setNTS(NotificationSubType::Alive);
             }
             if (header.endsWith("ssdp:byebye\r")) {
-                newDiscovery->mNTS = NotificationSubType::ByeBye;
+                newDiscovery->setNTS(NotificationSubType::ByeBye);
             }
             if (header.endsWith("ssdp:discover\r")) {
-                newDiscovery->mNTS = NotificationSubType::Discover;
+                newDiscovery->setNTS(NotificationSubType::Discover);
             }
         }
         if (header.startsWith("DATE")) {
             if ((header)[5] == ' ') {
-                newDiscovery->mAnnounceDate = QString::fromLatin1(header.mid(6, header.length() - 7));
+                newDiscovery->setAnnounceDate(QString::fromLatin1(header.mid(6, header.length() - 7)));
             } else {
-                newDiscovery->mAnnounceDate = QString::fromLatin1(header.mid(5, header.length() - 6));
+                newDiscovery->setAnnounceDate(QString::fromLatin1(header.mid(5, header.length() - 6)));
             }
         }
         if (header.startsWith("CACHE-CONTROL")) {
             if ((header)[14] == ' ') {
                 const QList<QByteArray> &splittedLine = header.mid(15, header.length() - 16).split('=');
                 if (splittedLine.size() == 2) {
-                    newDiscovery->mCacheDuration = splittedLine.last().toInt();
+                    newDiscovery->setCacheDuration(splittedLine.last().toInt());
                 }
             } else {
                 const QList<QByteArray> &splittedLine = header.mid(14, header.length() - 15).split('=');
                 if (splittedLine.size() == 2) {
-                    newDiscovery->mCacheDuration = splittedLine.last().toInt();
+                    newDiscovery->setCacheDuration(splittedLine.last().toInt());
                 }
             }
         }
     }
 
-    if (newDiscovery->mLocation.isEmpty() || newDiscovery->mUSN.isEmpty() ||
+    if (newDiscovery->location().isEmpty() || newDiscovery->usn().isEmpty() ||
             newDiscovery->nt().isEmpty() ||
-            (messageType == SsdpMessageType::announce && newDiscovery->mNTS == NotificationSubType::Invalid)) {
+            (messageType == SsdpMessageType::announce && newDiscovery->nts() == NotificationSubType::Invalid)) {
         qDebug() << "not decoded" << datagram;
         return;
     }
 
-    if (newDiscovery->mNTS == NotificationSubType::Alive || messageType == SsdpMessageType::queryAnswer) {
-        auto itDiscovery = d->mDiscoveryResults.find(newDiscovery->mUSN);
+    if (newDiscovery->nts() == NotificationSubType::Alive || messageType == SsdpMessageType::queryAnswer) {
+        auto itDiscovery = d->mDiscoveryResults.find(newDiscovery->usn());
 
         if (itDiscovery == d->mDiscoveryResults.end()) {
-            d->mDiscoveryResults[newDiscovery->mUSN];
-            itDiscovery = d->mDiscoveryResults.find(newDiscovery->mUSN);
+            d->mDiscoveryResults[newDiscovery->usn()];
+            itDiscovery = d->mDiscoveryResults.find(newDiscovery->usn());
         }
 
 #if 0
@@ -482,12 +482,12 @@ void UpnpSsdpEngine::parseSsdpAnnounceDatagram(const QByteArray &datagram, const
         Q_EMIT newService(newDiscovery);
     }
 
-    if (newDiscovery->mNTS == NotificationSubType::ByeBye) {
-        auto itDiscovery = d->mDiscoveryResults.find(newDiscovery->mUSN);
+    if (newDiscovery->nts() == NotificationSubType::ByeBye) {
+        auto itDiscovery = d->mDiscoveryResults.find(newDiscovery->usn());
         if (itDiscovery != d->mDiscoveryResults.end()) {
             Q_EMIT removedService(newDiscovery);
 
-            qDebug() << "bye bye" << newDiscovery->mUSN;
+            qDebug() << "bye bye" << newDiscovery->usn();
 
             d->mDiscoveryResults.erase(itDiscovery);
         }
