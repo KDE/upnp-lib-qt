@@ -493,7 +493,7 @@ void UpnpSsdpEngine::parseSsdpDatagram(const QByteArray &datagram)
         return;
     }
 
-    SsdpMessageType messageType;
+    SsdpMessageType messageType = SsdpMessageType::invalid;
 
     if (headers[0].startsWith("M-SEARCH * HTTP/1.1")) {
         messageType = SsdpMessageType::query;

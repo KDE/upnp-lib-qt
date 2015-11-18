@@ -70,9 +70,9 @@ UpnpServiceDescription *UpnpAbstractDevice::serviceDescriptionByIndex(int servic
 {
     if (serviceIndex < 0 || serviceIndex > d->mDevice->services().size() - 1) {
         return nullptr;
-    } else {
-        return d->mDevice->services()[serviceIndex].data();
     }
+
+    return d->mDevice->services()[serviceIndex].data();
 }
 
 const QList<QSharedPointer<UpnpServiceDescription> >& UpnpAbstractDevice::services() const

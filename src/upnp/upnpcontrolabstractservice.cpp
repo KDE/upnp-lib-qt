@@ -256,6 +256,8 @@ void UpnpControlAbstractService::parseServiceDescription(QIODevice *serviceDescr
 
 void UpnpControlAbstractService::parseEventNotification(const QString &eventName, const QString &eventValue)
 {
+    Q_UNUSED(eventName);
+    Q_UNUSED(eventValue);
 }
 
 #include "moc_upnpcontrolabstractservice.cpp"

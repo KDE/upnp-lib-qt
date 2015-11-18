@@ -189,6 +189,8 @@ QPointer<UpnpEventSubscriber> UpnpAbstractService::subscribeToEvents(const QByte
 
 void UpnpAbstractService::unsubscribeToEvents(const QByteArray &requestData, const QMap<QByteArray, QByteArray> &headers)
 {
+    Q_UNUSED(headers);
+
     qDebug() << "UpnpAbstractService::unsubscribeToEvents" << requestData;
 }
 

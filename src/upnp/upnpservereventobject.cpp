@@ -43,15 +43,17 @@ UpnpServerEventObject::~UpnpServerEventObject()
 bool UpnpServerEventObject::processCustomVerbRequest(const QByteArray &requestType, const QByteArray &requestData,
                                                      const QMap<QByteArray, QByteArray> &httpHeaders, QByteArray &customAnswer)
 {
-    if (d->mService) {
-        d->mService->handleEventNotification(requestData, httpHeaders);
+    Q_UNUSED(requestType);
 
-        customAnswer = "HTTP/1.1 200 OK\r\nContent-Length: 0\r\nContent-Type: text/html\r\n\r\n";
-
-        return true;
-    } else {
+    if (!d->mService) {
         return false;
     }
+
+    d->mService->handleEventNotification(requestData, httpHeaders);
+
+    customAnswer = "HTTP/1.1 200 OK\r\nContent-Length: 0\r\nContent-Type: text/html\r\n\r\n";
+
+    return true;
 }
 
 void UpnpServerEventObject::setService(UpnpControlAbstractService *service)

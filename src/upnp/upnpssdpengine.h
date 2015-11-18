@@ -41,6 +41,7 @@ enum class SsdpMessageType
     query,
     queryAnswer,
     announce,
+    invalid,
 };
 
 struct UpnpSearchQuery

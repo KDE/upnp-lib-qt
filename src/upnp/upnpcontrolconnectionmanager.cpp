@@ -181,11 +181,11 @@ void UpnpControlConnectionManager::finishedGetCurrentConnectionInfoCall(KDSoapPe
 
     auto answer = self->returnMessage();
     auto allValues = answer.childValues();
-    int rcsID;
-    int avTransportID;
+    int rcsID = -1;
+    int avTransportID = -1;
     QString protocolInfo;
     QString connectionManager;
-    int peerConnectionID;
+    int peerConnectionID = -1;
     QString direction;
     QString connectionStatus;
 

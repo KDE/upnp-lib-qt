@@ -43,7 +43,7 @@ class UpnpDeviceSoapServerObjectPrivate
 {
 public:
 
-    UpnpDeviceSoapServerObjectPrivate(QList<UpnpAbstractDevice *> &devices) : mDevices(devices)
+    explicit UpnpDeviceSoapServerObjectPrivate(QList<UpnpAbstractDevice *> &devices) : mDevices(devices)
     {
     }
 

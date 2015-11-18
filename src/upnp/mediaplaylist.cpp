@@ -94,7 +94,7 @@ bool MediaPlayList::setData(const QModelIndex &index, const QVariant &value, int
 
     bool modelModified = false;
 
-    switch(role)
+    switch(convertedRole)
     {
     case ColumnsRoles::IsPlayingRole:
         d->mIsPlaying[index.row()] = value.toBool();

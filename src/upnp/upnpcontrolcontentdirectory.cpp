@@ -186,8 +186,8 @@ void UpnpControlContentDirectory::finishedSearchCall(KDSoapPendingCallWatcher *s
     auto answer = self->returnMessage();
     auto allValues = answer.childValues();
     QString result;
-    int numberReturned;
-    int totalMatches;
+    int numberReturned = 0;
+    int totalMatches = 0;
 
     for (KDSoapValue oneValue : allValues) {
         if (oneValue.name() == QStringLiteral("Result")) {
@@ -219,8 +219,8 @@ void UpnpControlContentDirectory::finishedBrowseCall(KDSoapPendingCallWatcher *s
     auto answer = self->returnMessage();
     auto allValues = answer.childValues();
     QString result;
-    int numberReturned;
-    int totalMatches;
+    int numberReturned = 0;
+    int totalMatches = 0;
 
     for (KDSoapValue oneValue : allValues) {
         if (oneValue.name() == QStringLiteral("Result")) {
@@ -254,7 +254,7 @@ void UpnpControlContentDirectory::parseServiceDescription(QIODevice *serviceDesc
     d->mHasTransferIDs = allVariables.contains(QStringLiteral("TransferIDs"));
     Q_EMIT hasTransferIDsChanged();
 
-    const QList<QString> &allActions(actions());
+    //const QList<QString> &allActions(actions());
 }
 
 void UpnpControlContentDirectory::parseEventNotification(const QString &eventName, const QString &eventValue)

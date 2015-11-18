@@ -65,7 +65,7 @@ public:
     int mMaximumSubscriptionDuration;
 };
 
-UpnpServiceDescription::UpnpServiceDescription(QObject *parent) : d(new UpnpServiceDescriptionPrivate)
+UpnpServiceDescription::UpnpServiceDescription(QObject *parent) : QObject(parent), d(new UpnpServiceDescriptionPrivate)
 {
 }
 

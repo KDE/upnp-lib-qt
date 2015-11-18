@@ -204,6 +204,8 @@ void UpnpEventSubscriber::eventingFinished()
 
 void UpnpEventSubscriber::eventingInErrorFinished(QNetworkReply::NetworkError code)
 {
+    Q_UNUSED(code);
+
     d->mSentBuffer.clear();
 }
 
