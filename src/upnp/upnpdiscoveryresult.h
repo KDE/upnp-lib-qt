@@ -24,6 +24,7 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QString>
+#include <QtCore/QTimer>
 
 enum class NotificationSubType
 {
@@ -37,6 +38,11 @@ class UPNPQT_EXPORT UpnpDiscoveryResult : public QObject
 {
     Q_OBJECT
 
+    Q_PROPERTY(QString nt
+               READ nt
+               WRITE setNT
+               NOTIFY ntChanged)
+
 public:
 
     explicit UpnpDiscoveryResult(QObject *parent = 0);
@@ -46,10 +52,28 @@ public:
 
     virtual ~UpnpDiscoveryResult();
 
+    void setNT(const QString &value);
+
+    const QString &nt() const;
+
+Q_SIGNALS:
+
+        void timeout(const QString &usn);
+
+        void ntChanged();
+
+public Q_SLOTS:
+
+    void validityTimeout();
+
+private:
+
     /**
      * @brief mNT contains the header ST (i.e. search target) or NT (i.e. notification type) sent in an ssdp message
      */
     QString mNT;
+
+public:
 
     QString mUSN;
 
@@ -69,6 +93,8 @@ public:
      * @brief mCacheDuration duration of validity of the announce
      */
     int mCacheDuration;
+
+    QTimer mValidityTimer;
 };
 
 #endif // UPNPDISCOVERYRESULT_H

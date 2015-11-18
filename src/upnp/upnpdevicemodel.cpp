@@ -180,7 +180,7 @@ QVariant UpnpDeviceModel::get(int row, const QString &roleName) const
 void UpnpDeviceModel::newDevice(QSharedPointer<UpnpDiscoveryResult> deviceDiscovery)
 {
     const QString &deviceUuid = deviceDiscovery->mUSN.mid(5, 36);
-    if (!d->mAllHostsUUID.contains(deviceUuid) && deviceDiscovery->mNT.startsWith(QStringLiteral("urn:schemas-upnp-org:device:"))) {
+    if (!d->mAllHostsUUID.contains(deviceUuid) && deviceDiscovery->nt().startsWith(QStringLiteral("urn:schemas-upnp-org:device:"))) {
         beginInsertRows(QModelIndex(), d->mAllHostsUUID.size(), d->mAllHostsUUID.size());
 
         const QString &decodedUdn(deviceUuid);

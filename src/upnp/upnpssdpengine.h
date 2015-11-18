@@ -171,6 +171,8 @@ private Q_SLOTS:
 
     void queryReceivedData();
 
+    void discoveryResultTimeout(const QString &usn);
+
 private:
 
     void parseSsdpDatagram(const QByteArray &datagram);
