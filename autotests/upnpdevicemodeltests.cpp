@@ -267,8 +267,6 @@ private Q_SLOTS:
 
         newDeviceDataChangedSignal.wait();
 
-        qDebug() << newDeviceDataChangedSignal.size();
-
         QVERIFY(newDeviceDataChangedSignal.size() > 1);
 
         deviceName = newModel->data(newRowIndex, UpnpDeviceModel::NameRole).toString();
