@@ -362,7 +362,7 @@ private Q_SLOTS:
                                                    "MX: 2\r\n"
                                                    "ST: upnp:rootdevice\r\n\r\n")
                                      << QStringList({QStringLiteral("HTTP/1.1 200 OK\r\n"
-                                                     "CACHE-CONTROL: max-age=1800\r\n"
+                                                     "CACHE-CONTROL: max-age=3\r\n"
                                                      "DATE: mar., 27 oct. 2015 21:03:35 G\x7F\r\n"
                                                      "ST: upnp:rootdevice\r\n"
                                                      "USN: uuid:4d696e69-444c-164e-9d41-ecf4bb9c317e::upnp:rootdevice\r\n"

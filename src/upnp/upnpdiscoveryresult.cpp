@@ -77,6 +77,9 @@ void UpnpDiscoveryResult::setCacheDuration(int value)
 {
     mCacheDuration = value;
     Q_EMIT cacheDurationChanged();
+
+    mValidityTimer.setSingleShot(false);
+    mValidityTimer.start(mCacheDuration * 1000);
 }
 
 int UpnpDiscoveryResult::cacheDuration() const
