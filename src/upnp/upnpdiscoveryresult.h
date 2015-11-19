@@ -103,19 +103,19 @@ public:
 
 Q_SIGNALS:
 
-        void timeout(const QString &usn);
+    void timeout(const QString &usn);
 
-        void ntChanged();
+    void ntChanged();
 
-        void usnChanged();
+    void usnChanged();
 
-        void locationChanged();
+    void locationChanged();
 
-        void ntsChanged();
+    void ntsChanged();
 
-        void announceDateChanged();
+    void announceDateChanged();
 
-        void cacheDurationChanged();
+    void cacheDurationChanged();
 
 public Q_SLOTS:
 
