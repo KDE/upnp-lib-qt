@@ -25,7 +25,7 @@
 #include <QtCore/QString>
 #include <QtCore/QList>
 
-enum class UPNPQTBASE_EXPORT UpnpArgumentDirection
+enum class UpnpArgumentDirection
 {
     In,
     Out,
