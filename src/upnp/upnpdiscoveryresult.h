@@ -101,6 +101,8 @@ public:
 
     int cacheDuration() const;
 
+    void discoveryIsAlive();
+
 Q_SIGNALS:
 
     void timeout(const QString &usn);

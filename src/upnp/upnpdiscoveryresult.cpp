@@ -106,6 +106,12 @@ int UpnpDiscoveryResult::cacheDuration() const
     return mCacheDuration;
 }
 
+void UpnpDiscoveryResult::discoveryIsAlive()
+{
+
+    mValidityTimer.start(mCacheDuration * 1000);
+}
+
 void UpnpDiscoveryResult::validityTimeout()
 {
     Q_EMIT timeout(mUSN);

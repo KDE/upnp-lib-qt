@@ -451,8 +451,14 @@ void UpnpSsdpEngine::parseSsdpAnnounceDatagram(const QByteArray &datagram, const
         auto itDiscovery = d->mDiscoveryResults.find(newDiscovery->usn());
 
         if (itDiscovery == d->mDiscoveryResults.end()) {
-            d->mDiscoveryResults[newDiscovery->usn()];
+            d->mDiscoveryResults[newDiscovery->usn()] = newDiscovery;
             itDiscovery = d->mDiscoveryResults.find(newDiscovery->usn());
+
+            connect(newDiscovery.data(), &UpnpDiscoveryResult::timeout, this, &UpnpSsdpEngine::discoveryResultTimeout);
+
+            Q_EMIT newService(newDiscovery);
+        } else {
+            (*itDiscovery)->discoveryIsAlive();
         }
 
 #if 0
@@ -477,9 +483,6 @@ void UpnpSsdpEngine::parseSsdpAnnounceDatagram(const QByteArray &datagram, const
         qDebug() << "DestAddr:" << QHostAddress(reinterpret_cast<const sockaddr *>(&searchResult->DestAddr));
 #endif
 
-        connect(newDiscovery.data(), &UpnpDiscoveryResult::timeout, this, &UpnpSsdpEngine::discoveryResultTimeout);
-
-        Q_EMIT newService(newDiscovery);
     }
 
     if (newDiscovery->nts() == NotificationSubType::ByeBye) {
