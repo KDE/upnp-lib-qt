@@ -290,8 +290,6 @@ void UpnpSsdpEngine::discoveryResultTimeout(const QString &usn)
     if (itDiscovery != d->mDiscoveryResults.end()) {
         Q_EMIT removedService(*itDiscovery);
 
-        qDebug() << "bye bye" << usn;
-
         d->mDiscoveryResults.erase(itDiscovery);
     }
 }
@@ -489,8 +487,6 @@ void UpnpSsdpEngine::parseSsdpAnnounceDatagram(const QByteArray &datagram, const
         auto itDiscovery = d->mDiscoveryResults.find(newDiscovery->usn());
         if (itDiscovery != d->mDiscoveryResults.end()) {
             Q_EMIT removedService(newDiscovery);
-
-            qDebug() << "bye bye" << newDiscovery->usn();
 
             d->mDiscoveryResults.erase(itDiscovery);
         }
