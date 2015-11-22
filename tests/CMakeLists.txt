@@ -30,3 +30,31 @@ if (KF5Declarative_FOUND)
             KF5::Declarative
     )
 endif()
+
+set(upnpControlMobile_SOURCES
+    upnpControlMobile.cpp
+    mediaplaylist.cpp
+    AudioTrackDelegateMobile.qml
+    genericDeviceMobile.qml
+    upnpControlMobile.qml
+    mediaServerMobile.qml
+    mediaServerListingMobile.qml
+    mediaAlbumViewMobile.qml
+    MediaPlayerControlMobile.qml
+    MediaServerEntryMobile.qml
+    MediaContentDirectoryMobile.qml
+    PlayListControler.qml
+)
+
+qt5_add_resources(upnpControlMobile_SOURCES upnpControlMobile.qrc)
+
+add_executable(upnpControlMobile ${upnpControlMobile_SOURCES})
+
+target_include_directories(upnpControlMobile PRIVATE ${KDSoap_INCLUDE_DIRS})
+
+target_link_libraries(upnpControlMobile
+    LINK_PRIVATE
+        upnpQt
+        Qt5::Quick
+        Qt5::Widgets
+)

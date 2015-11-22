@@ -19,5 +19,7 @@
         <file>audio-x-generic.svg</file>
         <file>folder.svg</file>
         <file>media-optical-audio.svg</file>
+        <file>MediaContentDirectoryMobile.qml</file>
+        <file>PlayListControler.qml</file>
     </qresource>
 </RCC>

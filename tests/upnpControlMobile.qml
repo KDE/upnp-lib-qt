@@ -37,6 +37,7 @@ ApplicationWindow {
         listenner: mySsdpEngine
 
         Component.onCompleted: {
+            mySsdpEngine.initialize();
             mySsdpEngine.searchAllUpnpDevice();
         }
     }
@@ -114,7 +115,9 @@ ApplicationWindow {
     }
 
     StackView {
+        id: globalStackView
         anchors.fill: parent
+
         initialItem: TableView {
             id: peersView
             model: deviceModel
@@ -131,11 +134,18 @@ ApplicationWindow {
             }
             onClicked:
             {
+                var deviceType = deviceModel.get(row, 'upnpType')
+                var viewName = 'genericDeviceMobile.qml'
+
+                if (deviceType === 'urn:schemas-upnp-org:device:MediaServer:1') {
+                    viewName = 'mediaServerMobile.qml';
+                }
+
                 parent.push({
-                                item: Qt.resolvedUrl(model.get(row, 'mobileViewName')),
+                                item: Qt.resolvedUrl(viewName),
                                 properties: {
-                                    'stackView' : parent,
-                                    'aDevice' : deviceModel.getDeviceDescription(model.get(row, 'uuid'))
+                                    'parentStackView' : globalStackView,
+                                    'aDevice' : deviceModel.getDeviceDescription(deviceModel.get(row, 'uuid'))
                                 }
                             })
             }

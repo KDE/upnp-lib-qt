@@ -28,6 +28,9 @@
 #include "upnpcontrolmediaserver.h"
 #include "upnpcontrolcontentdirectory.h"
 #include "upnpcontentdirectorymodel.h"
+#include "mediaplaylist.h"
+
+#include "upnpdevicedescription.h"
 
 #include <QtWidgets/QApplication>
 
@@ -50,12 +53,14 @@ int __attribute__((visibility("default"))) main(int argc, char *argv[])
     qmlRegisterType<UpnpControlMediaServer>("org.mgallien.QmlExtension", 1, 0, "UpnpControlMediaServer");
     qmlRegisterType<UpnpControlContentDirectory>("org.mgallien.QmlExtension", 1, 0, "UpnpControlContentDirectory");
     qmlRegisterType<UpnpContentDirectoryModel>("org.mgallien.QmlExtension", 1, 0, "UpnpContentDirectoryModel");
+    qmlRegisterType<MediaPlayList>("org.mgallien.QmlExtension", 1, 0, "MediaPlayList");
+    qmlRegisterType<UpnpDeviceDescription>("org.mgallien.QmlExtension", 1, 0, "UpnpDeviceDescription");
 
     qRegisterMetaType<A_ARG_TYPE_InstanceID>();
-    qRegisterMetaType<UpnpDiscoveryResult>();
     qRegisterMetaType<QPointer<UpnpAbstractDevice> >();
     qRegisterMetaType<UpnpControlConnectionManager*>();
     qRegisterMetaType<UpnpContentDirectoryModel*>();
+    qRegisterMetaType<UpnpDeviceDescription*>();
 
     QQmlApplicationEngine engine(QUrl(QStringLiteral("qrc:/upnpControlMobile.qml")));
 

@@ -54,6 +54,11 @@ class UPNPQT_EXPORT UpnpContentDirectoryModel : public QAbstractItemModel
                WRITE setContentDirectory
                NOTIFY contentDirectoryChanged)
 
+    Q_PROPERTY(bool useLocalIcons
+               READ useLocalIcons
+               WRITE setUseLocalIcons
+               NOTIFY useLocalIconsChanged)
+
     Q_ENUMS(ItemClass)
 
 public:
@@ -117,6 +122,10 @@ public:
 
     void setContentDirectory(UpnpControlContentDirectory *directory);
 
+    bool useLocalIcons() const;
+
+    void setUseLocalIcons(bool value);
+
     Q_INVOKABLE QString objectIdByIndex(const QModelIndex &index) const;
 
     Q_INVOKABLE QVariant getUrl(const QModelIndex &index) const;
@@ -132,6 +141,8 @@ Q_SIGNALS:
     void sortCriteriaChanged();
 
     void contentDirectoryChanged();
+
+    void useLocalIconsChanged();
 
 public Q_SLOTS:
 

@@ -53,6 +53,8 @@ public:
 
     int mCurrentUpdateId;
 
+    bool mUseLocalIcons = false;
+
 };
 
 UpnpContentDirectoryModel::UpnpContentDirectoryModel(QObject *parent)
@@ -154,10 +156,18 @@ QVariant UpnpContentDirectoryModel::data(const QModelIndex &index, int role) con
             if (!d->mData[index.internalId()][ColumnsRoles::ImageRole].toString().isEmpty()) {
                 return d->mData[index.internalId()][ColumnsRoles::ImageRole].toUrl();
             } else {
-                return QUrl(QStringLiteral("image://icon/media-optical-audio"));
+                if (d->mUseLocalIcons) {
+                    return QUrl(QStringLiteral("qrc:/media-optical-audio.svg"));
+                } else {
+                    return QUrl(QStringLiteral("image://icon/media-optical-audio"));
+                }
             }
         case UpnpContentDirectoryModel::Container:
-            return QUrl(QStringLiteral("image://icon/folder"));
+            if (d->mUseLocalIcons) {
+                return QUrl(QStringLiteral("qrc:/folder.svg"));
+            } else {
+                return QUrl(QStringLiteral("image://icon/folder"));
+            }
         case UpnpContentDirectoryModel::AudioTrack:
             return data(index.parent(), role);
         }
@@ -361,6 +371,17 @@ void UpnpContentDirectoryModel::setContentDirectory(UpnpControlContentDirectory 
     Q_EMIT contentDirectoryChanged();
 
     connect(d->mContentDirectory, &UpnpControlContentDirectory::browseFinished, this, &UpnpContentDirectoryModel::browseFinished);
+}
+
+bool UpnpContentDirectoryModel::useLocalIcons() const
+{
+    return d->mUseLocalIcons;
+}
+
+void UpnpContentDirectoryModel::setUseLocalIcons(bool value)
+{
+    d->mUseLocalIcons = value;
+    Q_EMIT useLocalIconsChanged();
 }
 
 QString UpnpContentDirectoryModel::objectIdByIndex(const QModelIndex &index) const

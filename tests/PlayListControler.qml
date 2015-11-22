@@ -7,9 +7,9 @@ import org.mgallien.QmlExtension 1.0
 Item {
     property int playListPosition
     property DelegateModel playListModel
-    property MediaPlayList modelData
+    property var modelData
     property Audio player
-    property MediaPlayerControl playControl
+    property var playControl
 
     StateMachine {
         id: controlerState
