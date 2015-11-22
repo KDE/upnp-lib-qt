@@ -23,7 +23,6 @@ set(upnpQt_SOURCES
     upnpcontrolmediaserver.cpp
     upnpcontrolcontentdirectory.cpp
     upnpcontentdirectorymodel.cpp
-    mediaplaylist.cpp
     upnpdevicedescriptionparser.cpp
     upnpservicedescriptionparser.cpp
     upnpdiscoveryresult.cpp

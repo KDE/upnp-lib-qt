@@ -1,6 +1,7 @@
 if (KF5Declarative_FOUND)
     set(upnpControl_SOURCES
         upnpControl.cpp
+        mediaplaylist.cpp
         upnpControl.qml
         mediaServer.qml
         mediaServerListing.qml

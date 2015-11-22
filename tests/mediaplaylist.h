@@ -20,13 +20,11 @@
 #ifndef MEDIAPLAYLIST_H
 #define MEDIAPLAYLIST_H
 
-#include "upnpQt_export.h"
-
 #include <QtCore/QAbstractListModel>
 
 class MediaPlayListPrivate;
 
-class UPNPQT_EXPORT MediaPlayList : public QAbstractListModel
+class MediaPlayList : public QAbstractListModel
 {
     Q_OBJECT
 
