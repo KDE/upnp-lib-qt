@@ -48,6 +48,7 @@ public:
         ParentIdRole = IdRole + 1,
         IsPlayingRole = ParentIdRole + 1,
     };
+    Q_ENUM(ColumnsRoles)
 
     MediaPlayList(QObject *parent = 0);
 

@@ -63,7 +63,13 @@ QVariant MediaPlayList::data(const QModelIndex &index, int role) const
         return QVariant();
     }
 
-    switch(role)
+    if (role < ColumnsRoles::TitleRole || role > ColumnsRoles::IsPlayingRole) {
+        return QVariant();
+    }
+
+    ColumnsRoles convertedRole = static_cast<ColumnsRoles>(role);
+
+    switch(convertedRole)
     {
     case ColumnsRoles::TitleRole:
     case ColumnsRoles::DurationRole:
@@ -72,6 +78,10 @@ QVariant MediaPlayList::data(const QModelIndex &index, int role) const
     case ColumnsRoles::ImageRole:
     case ColumnsRoles::ItemClassRole:
     case ColumnsRoles::CountRole:
+    case ColumnsRoles::CreatorRole:
+    case ColumnsRoles::ResourceRole:
+    case ColumnsRoles::IdRole:
+    case ColumnsRoles::ParentIdRole:
         return d->mData[index.row()].data(role);
     case ColumnsRoles::IsPlayingRole:
         return d->mIsPlaying[index.row()];
