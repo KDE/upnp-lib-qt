@@ -12,6 +12,5 @@
         <file>upnpControl.qml</file>
         <file>MediaContentDirectory.qml</file>
         <file>MediaPlayListView.qml</file>
-        <file>PlayListControler.qml</file>
     </qresource>
 </RCC>

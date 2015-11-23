@@ -13,6 +13,9 @@ Item {
     property bool muted
     property bool isPlaying
     property bool seekable
+    property bool playEnabled
+    property bool skipForwardEnabled
+    property bool skipBackwardEnabled
 
     signal play()
     signal pause()
@@ -50,6 +53,8 @@ Item {
                 height: width
                 width: Screen.pixelDensity * 6
                 fillMode: Image.PreserveAspectFit
+                enabled: skipBackwardEnabled
+                opacity: enabled ? 1.0 : 0.6
             }
 
             Image {
@@ -81,6 +86,8 @@ Item {
                 height: width
                 width: Screen.pixelDensity * 8
                 fillMode: Image.PreserveAspectFit
+                enabled: playEnabled
+                opacity: enabled ? 1.0 : 0.6
             }
 
             Image {
@@ -102,6 +109,8 @@ Item {
                 height: width
                 width: Screen.pixelDensity * 6
                 fillMode: Image.PreserveAspectFit
+                enabled: skipForwardEnabled
+                opacity: enabled ? 1.0 : 0.6
             }
 
             Item {
@@ -134,7 +143,7 @@ Item {
                 value: musicWidget.position
                 Layout.alignment: Qt.AlignVCenter
                 Layout.fillWidth: true
-                enabled: musicWidget.seekable
+                enabled: musicWidget.seekable && musicWidget.playEnabled
                 onPressedChanged: {
                     if (!pressed) {
                         musicWidget.seek(value)

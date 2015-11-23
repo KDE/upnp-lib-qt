@@ -30,6 +30,12 @@ Item {
                     0
                 else
                     playControlItem.volume
+
+        source: playListControler.playerSource
+
+        onPlaying: playListControler.playerPlaying()
+        onPaused: playListControler.playerPaused()
+        onStopped: playListControler.playerStopped()
     }
 
     MediaPlayList {
@@ -39,13 +45,11 @@ Item {
     PlayListControler {
         id: playListControler
 
-        playListModel: DelegateModel {
-            model: playListModelItem
-        }
-        modelData: playListModelItem
+        playListModel: playListModelItem
+        urlRole: MediaPlayList.ResourceRole
 
-        player: audioPlayer
-        playControl: playControlItem
+        onPlayMusic: audioPlayer.play()
+        onPauseMusic: audioPlayer.pause()
     }
 
     ListModel {
@@ -72,7 +76,10 @@ Item {
             duration: audioPlayer.duration
             muted: false
             seekable: audioPlayer.seekable
-            isPlaying: false
+            skipBackwardEnabled: false
+            skipForwardEnabled: false
+            playEnabled: playListControler.playControlEnabled
+            isPlaying: playListControler.musicPlaying
 
             Layout.preferredHeight: 60
             Layout.minimumHeight: Layout.preferredHeight
@@ -80,6 +87,10 @@ Item {
             Layout.fillWidth: true
 
             onSeek: audioPlayer.seek(position)
+            onPlay: playListControler.playPause()
+            onPause: playListControler.playPause()
+            onPlayPrevious: playListControler.skipPreviousTrack()
+            onPlayNext: playListControler.skipNextTrack()
         }
 
         RowLayout {

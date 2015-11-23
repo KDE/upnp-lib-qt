@@ -2,6 +2,7 @@ if (KF5Declarative_FOUND)
     set(upnpControl_SOURCES
         upnpControl.cpp
         mediaplaylist.cpp
+        playlistcontroler.cpp
         upnpControl.qml
         mediaServer.qml
         mediaServerListing.qml
@@ -13,7 +14,6 @@ if (KF5Declarative_FOUND)
         MediaServerEntry.qml
         MediaContentDirectory.qml
         MediaPlayListView.qml
-        PlayListControler.qml
     )
 
     qt5_add_resources(upnpControl_SOURCES upnpControl.qrc)
@@ -34,6 +34,7 @@ endif()
 set(upnpControlMobile_SOURCES
     upnpControlMobile.cpp
     mediaplaylist.cpp
+    playlistcontroler.cpp
     AudioTrackDelegateMobile.qml
     genericDeviceMobile.qml
     upnpControlMobile.qml
@@ -43,7 +44,6 @@ set(upnpControlMobile_SOURCES
     MediaPlayerControlMobile.qml
     MediaServerEntryMobile.qml
     MediaContentDirectoryMobile.qml
-    PlayListControler.qml
 )
 
 qt5_add_resources(upnpControlMobile_SOURCES upnpControlMobile.qrc)
