@@ -25,17 +25,16 @@ Item {
     Audio {
         id: audioPlayer
 
-        muted: playControlItem.muted
-        volume: if (muted)
-                    0
-                else
-                    playControlItem.volume
+        muted: audioPlayer.muted
 
+        volume: playListControler.audioVolume
         source: playListControler.playerSource
 
         onPlaying: playListControler.playerPlaying()
         onPaused: playListControler.playerPaused()
         onStopped: playListControler.playerStopped()
+        onPositionChanged: playListControler.audioPlayerPositionChanged(position)
+        onStatusChanged: playListControler.audioPlayerFinished(status == Audio.EndOfMedia)
     }
 
     MediaPlayList {
@@ -46,10 +45,14 @@ Item {
         id: playListControler
 
         playListModel: playListModelItem
+
         urlRole: MediaPlayList.ResourceRole
+        isPlayingRole: MediaPlayList.IsPlayingRole
+        audioDuration: audioPlayer.duration
 
         onPlayMusic: audioPlayer.play()
         onPauseMusic: audioPlayer.pause()
+        onStopMusic: audioPlayer.stop()
     }
 
     ListModel {
@@ -71,13 +74,13 @@ Item {
         MediaPlayerControl {
             id: playControlItem
 
-            volume: 100
-            position: audioPlayer.position
             duration: audioPlayer.duration
-            muted: false
             seekable: audioPlayer.seekable
-            skipBackwardEnabled: false
-            skipForwardEnabled: false
+
+            volume: playListControler.audioVolume
+            position: playListControler.audioPosition
+            skipBackwardEnabled: playListControler.skipBackwardControlEnabled
+            skipForwardEnabled: playListControler.skipForwardControlEnabled
             playEnabled: playListControler.playControlEnabled
             isPlaying: playListControler.musicPlaying
 
@@ -86,7 +89,7 @@ Item {
             Layout.maximumHeight: Layout.preferredHeight
             Layout.fillWidth: true
 
-            onSeek: audioPlayer.seek(position)
+            onSeek: playListControler.playerSeek(position)
             onPlay: playListControler.playPause()
             onPause: playListControler.playPause()
             onPlayPrevious: playListControler.skipPreviousTrack()
@@ -174,7 +177,6 @@ Item {
                         mediaServerDevice: upnpDevice
                         parentStackView: rootElement.parentStackView
                         connectionManager: rootElement.connectionManager
-                        player: audioPlayer
                         playControl: playControlItem
                         playListModel: playListModelItem
 

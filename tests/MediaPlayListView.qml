@@ -10,7 +10,6 @@ Item {
     property UpnpControlMediaServer mediaServerDevice
     property StackView parentStackView
     property UpnpControlConnectionManager connectionManager
-    property Audio player
     property MediaPlayerControl playControl
     property MediaPlayList playListModel
 

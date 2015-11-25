@@ -66,12 +66,6 @@ public:
 
     Q_INVOKABLE void enqueue(const QModelIndex &newTrack);
 
-    Q_INVOKABLE QVariant getUrl(const QModelIndex &index) const;
-
-    Q_INVOKABLE void startPlaying(const QModelIndex &index);
-
-    Q_INVOKABLE void finishedPlaying(const QModelIndex &index);
-
 Q_SIGNALS:
 
     void trackCountChanged();

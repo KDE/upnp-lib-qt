@@ -102,10 +102,6 @@ Item {
                 isPlaying: true
             }
 
-            onClicked: {
-                player.source = model.getUrl(row)
-            }
-
             TableViewColumn {
                 role: "title"
                 title: "Title"

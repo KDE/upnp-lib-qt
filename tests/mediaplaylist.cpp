@@ -148,27 +148,4 @@ void MediaPlayList::enqueue(const QModelIndex &newTrack)
     Q_EMIT trackCountChanged();
 }
 
-QVariant MediaPlayList::getUrl(const QModelIndex &index) const
-{
-    if (!index.isValid()) {
-        return QVariant();
-    }
-
-    if (index.row() < 0 || index.row() > d->mData.size()) {
-        return QVariant();
-    }
-
-    return d->mData[index.row()].data(UpnpContentDirectoryModel::ResourceRole);
-}
-
-void MediaPlayList::startPlaying(const QModelIndex &index)
-{
-    setData(index, true, MediaPlayList::IsPlayingRole);
-}
-
-void MediaPlayList::finishedPlaying(const QModelIndex &index)
-{
-    setData(index, false, MediaPlayList::IsPlayingRole);
-}
-
 #include "moc_mediaplaylist.cpp"

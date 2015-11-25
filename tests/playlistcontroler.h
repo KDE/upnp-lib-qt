@@ -39,6 +39,14 @@ class PlayListControler : public QObject
                READ playControlEnabled
                NOTIFY playControlEnabledChanged)
 
+    Q_PROPERTY(bool skipBackwardControlEnabled
+               READ skipBackwardControlEnabled
+               NOTIFY skipBackwardControlEnabledChanged)
+
+    Q_PROPERTY(bool skipForwardControlEnabled
+               READ skipForwardControlEnabled
+               NOTIFY skipForwardControlEnabledChanged)
+
     Q_PROPERTY(bool musicPlaying
                READ musicPlaying
                NOTIFY musicPlayingChanged)
@@ -52,6 +60,36 @@ class PlayListControler : public QObject
                READ urlRole
                WRITE setUrlRole
                NOTIFY urlRoleChanged)
+
+    Q_PROPERTY(int isPlayingRole
+               READ isPlayingRole
+               WRITE setIsPlayingRole
+               NOTIFY isPlayingRoleChanged)
+
+    Q_PROPERTY(double audioVolume
+               READ audioVolume
+               WRITE setAudioVolume
+               NOTIFY audioVolumeChanged)
+
+    Q_PROPERTY(int audioPosition
+               READ audioPosition
+               WRITE setAudioPosition
+               NOTIFY audioPositionChanged)
+
+    Q_PROPERTY(int audioDuration
+               READ audioDuration
+               WRITE setAudioDuration
+               NOTIFY audioDurationChanged)
+
+    Q_PROPERTY(double playControlVolume
+               READ playControlVolume
+               WRITE setPlayControlVolume
+               NOTIFY playControlVolumeChanged)
+
+    Q_PROPERTY(int playControlPosition
+               READ playControlPosition
+               WRITE setPlayControlPosition
+               NOTIFY playControlPositionChanged)
 
 public:
 
@@ -70,6 +108,10 @@ public:
 
     bool playControlEnabled() const;
 
+    bool skipBackwardControlEnabled() const;
+
+    bool skipForwardControlEnabled() const;
+
     bool musicPlaying() const;
 
     void setPlayListModel(QAbstractItemModel* aPlayListModel);
@@ -80,21 +122,63 @@ public:
 
     int urlRole() const;
 
+    void setIsPlayingRole(int value);
+
+    int isPlayingRole() const;
+
+    void setAudioVolume(double value);
+
+    double audioVolume() const;
+
+    void setAudioPosition(int value);
+
+    int audioPosition() const;
+
+    void setAudioDuration(int value);
+
+    int audioDuration() const;
+
+    void setPlayControlVolume(double value);
+
+    double playControlVolume() const;
+
+    void setPlayControlPosition(int value);
+
+    int playControlPosition() const;
+
 Q_SIGNALS:
 
     void playMusic();
 
     void pauseMusic();
 
+    void stopMusic();
+
     void playerSourceChanged();
 
     void playControlEnabledChanged();
+
+    void skipBackwardControlEnabledChanged();
+
+    void skipForwardControlEnabledChanged();
 
     void musicPlayingChanged();
 
     void playListModelChanged();
 
     void urlRoleChanged();
+
+    void isPlayingRoleChanged();
+
+    void audioVolumeChanged();
+
+    void audioPositionChanged();
+
+    void audioDurationChanged();
+
+    void playControlVolumeChanged();
+
+    void playControlPositionChanged();
 
 public Q_SLOTS:
 
@@ -121,6 +205,12 @@ public Q_SLOTS:
 
     void playPause();
 
+    void playerSeek(int position);
+
+    void audioPlayerPositionChanged(int position);
+
+    void audioPlayerFinished(bool finished);
+
 private:
 
     void startPlayer();
@@ -129,7 +219,7 @@ private:
 
     void stopPlayer();
 
-    void currentTrackChanged();
+    void gotoNextTrack();
 
     QAbstractItemModel *mPlayListModel;
 
@@ -137,7 +227,21 @@ private:
 
     int mUrlRole;
 
+    int mIsPlayingRole;
+
     PlayerState mPlayerState;
+
+    double mAudioVolume;
+
+    int mAudioPosition;
+
+    int mAudioDuration;
+
+    int mRealAudioPosition;
+
+    double mPlayControlVolume;
+
+    int mPlayControlPosition;
 
 };
 
