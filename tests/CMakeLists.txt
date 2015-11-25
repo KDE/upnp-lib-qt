@@ -1,40 +1,20 @@
-if (KF5Declarative_FOUND)
-    set(upnpControl_SOURCES
-        upnpControl.cpp
-        mediaplaylist.cpp
-        playlistcontroler.cpp
-        upnpControl.qml
-        mediaServer.qml
-        mediaServerListing.qml
-        mediaAlbumView.qml
-        genericDevice.qml
-        RatingStar.qml
-        AudioTrackDelegate.qml
-        MediaPlayerControl.qml
-        MediaServerEntry.qml
-        MediaContentDirectory.qml
-        MediaPlayListView.qml
-    )
+include_directories(${upnp-qt_BINARY_DIR})
 
-    qt5_add_resources(upnpControl_SOURCES upnpControl.qrc)
-
-    add_executable(upnpControl ${upnpControl_SOURCES})
-
-    target_include_directories(upnpControl PRIVATE ${KDSoap_INCLUDE_DIRS})
-
-    target_link_libraries(upnpControl
-        LINK_PRIVATE
-            upnpQt
-            Qt5::Quick
-            Qt5::Widgets
-            KF5::Declarative
-    )
-endif()
-
-set(upnpControlMobile_SOURCES
-    upnpControlMobile.cpp
+set(upnpControl_SOURCES
+    upnpControl.cpp
     mediaplaylist.cpp
     playlistcontroler.cpp
+    upnpControl.qml
+    mediaServer.qml
+    mediaServerListing.qml
+    mediaAlbumView.qml
+    genericDevice.qml
+    RatingStar.qml
+    AudioTrackDelegate.qml
+    MediaPlayerControl.qml
+    MediaServerEntry.qml
+    MediaContentDirectory.qml
+    MediaPlayListView.qml
     AudioTrackDelegateMobile.qml
     genericDeviceMobile.qml
     upnpControlMobile.qml
@@ -46,15 +26,16 @@ set(upnpControlMobile_SOURCES
     MediaContentDirectoryMobile.qml
 )
 
-qt5_add_resources(upnpControlMobile_SOURCES upnpControlMobile.qrc)
+qt5_add_resources(upnpControl_SOURCES upnpControl.qrc)
 
-add_executable(upnpControlMobile ${upnpControlMobile_SOURCES})
+add_executable(upnpControl ${upnpControl_SOURCES})
 
-target_include_directories(upnpControlMobile PRIVATE ${KDSoap_INCLUDE_DIRS})
+target_include_directories(upnpControl PRIVATE ${KDSoap_INCLUDE_DIRS})
 
-target_link_libraries(upnpControlMobile
+target_link_libraries(upnpControl
     LINK_PRIVATE
         upnpQt
         Qt5::Quick
         Qt5::Widgets
+        KF5::Declarative
 )

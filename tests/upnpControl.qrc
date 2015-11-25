@@ -13,4 +13,15 @@
         <file>MediaContentDirectory.qml</file>
         <file>MediaPlayListView.qml</file>
     </qresource>
+    <qresource prefix="/+android">
+        <file>AudioTrackDelegateMobile.qml</file>
+        <file>genericDeviceMobile.qml</file>
+        <file>mediaAlbumViewMobile.qml</file>
+        <file>MediaContentDirectoryMobile.qml</file>
+        <file>MediaPlayerControlMobile.qml</file>
+        <file>MediaServerEntryMobile.qml</file>
+        <file>mediaServerListingMobile.qml</file>
+        <file>mediaServerMobile.qml</file>
+        <file>upnpControlMobile.qml</file>
+    </qresource>
 </RCC>

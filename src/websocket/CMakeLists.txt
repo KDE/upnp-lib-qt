@@ -47,4 +47,6 @@ set_target_properties(upnpQtWebSocket PROPERTIES VERSION ${UPNP_QT_VERSION_STRIN
                                                LINK_FLAGS "-Wl,--no-undefined")
 
 
+install(TARGETS upnpQtWebSocket EXPORT UPNPQTTargets ${KF5_INSTALL_TARGETS_DEFAULT_ARGS})
 install(TARGETS upnpQtWebSocket ${INSTALL_TARGETS_DEFAULT_ARGS})
+

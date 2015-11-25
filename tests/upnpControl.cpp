@@ -17,6 +17,8 @@
  * Boston, MA 02110-1301, USA.
  */
 
+#include "config-upnp-qt.h"
+
 #include "upnpssdpengine.h"
 #include "upnpabstractservice.h"
 #include "upnpcontrolabstractdevice.h"
@@ -33,12 +35,15 @@
 
 #include "upnpdevicedescription.h"
 
+#if KF5Declarative_FOUND
 #include <KDeclarative/KDeclarative>
+#endif
 
 #include <QtWidgets/QApplication>
 
 #include <QtQml/QQmlApplicationEngine>
 #include <QtQml/QQmlEngine>
+#include <QtQml/QQmlFileSelector>
 #include <QtQml>
 
 int __attribute__((visibility("default"))) main(int argc, char *argv[])
@@ -67,10 +72,13 @@ int __attribute__((visibility("default"))) main(int argc, char *argv[])
     qRegisterMetaType<UpnpDeviceDescription*>();
 
     QQmlApplicationEngine engine(QUrl(QStringLiteral("qrc:/upnpControl.qml")));
+    QQmlFileSelector selector(&engine);
 
+#if KF5Declarative_FOUND
     KDeclarative::KDeclarative decl;
     decl.setDeclarativeEngine(&engine);
     decl.setupBindings();
+#endif
 
     app.exec();
 

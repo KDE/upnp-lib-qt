@@ -88,4 +88,5 @@ set_target_properties(upnpQt PROPERTIES VERSION ${UPNP_QT_VERSION_STRING}
                                                LINK_FLAGS "-Wl,--no-undefined")
 
 
+install(TARGETS upnpQt EXPORT UPNPQTTargets ${KF5_INSTALL_TARGETS_DEFAULT_ARGS})
 install(TARGETS upnpQt ${INSTALL_TARGETS_DEFAULT_ARGS})
