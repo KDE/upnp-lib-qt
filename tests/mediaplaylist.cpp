@@ -100,6 +100,10 @@ bool MediaPlayList::setData(const QModelIndex &index, const QVariant &value, int
         return false;
     }
 
+    if (role < ColumnsRoles::TitleRole || role > ColumnsRoles::IsPlayingRole) {
+        return false;
+    }
+
     ColumnsRoles convertedRole = static_cast<ColumnsRoles>(role);
 
     bool modelModified = false;
