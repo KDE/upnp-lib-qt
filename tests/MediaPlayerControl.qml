@@ -2,6 +2,7 @@ import QtQuick 2.0
 import QtQuick.Controls 1.2
 import QtQuick.Controls.Styles 1.2
 import QtQuick.Layouts 1.1
+import QtQuick.Window 2.2
 import org.mgallien.QmlExtension 1.0
 
 
@@ -52,7 +53,7 @@ Item {
                 sourceSize.width: width
                 sourceSize.height: width
                 height: width
-                width: 30
+                width: Screen.pixelDensity * 8.
                 fillMode: Image.PreserveAspectFit
                 enabled: skipBackwardEnabled
                 opacity: enabled ? 1.0 : 0.6
@@ -86,7 +87,7 @@ Item {
                 sourceSize.width: width
                 sourceSize.height: width
                 height: width
-                width: 40
+                width: Screen.pixelDensity * 11.
                 fillMode: Image.PreserveAspectFit
                 enabled: playEnabled
                 opacity: enabled ? 1.0 : 0.6
@@ -111,7 +112,7 @@ Item {
                 sourceSize.width: width
                 sourceSize.height: width
                 height: width
-                width: 30
+                width: Screen.pixelDensity * 8.
                 fillMode: Image.PreserveAspectFit
                 enabled: skipForwardEnabled
                 opacity: enabled ? 1.0 : 0.6
@@ -121,7 +122,7 @@ Item {
                 Layout.preferredWidth: width
                 Layout.maximumWidth: width
                 Layout.minimumWidth: width
-                width: 30
+                width: Screen.pixelDensity * 8.
             }
 
             Label {
@@ -137,7 +138,7 @@ Item {
                 Layout.preferredWidth: width
                 Layout.maximumWidth: width
                 Layout.minimumWidth: width
-                width: 10
+                width: Screen.pixelDensity * 3.
             }
 
             Slider {
@@ -159,7 +160,7 @@ Item {
                 Layout.preferredWidth: width
                 Layout.maximumWidth: width
                 Layout.minimumWidth: width
-                width: 30
+                width: Screen.pixelDensity * 8.
             }
 
             Image {
@@ -182,7 +183,7 @@ Item {
                 sourceSize.width: width
                 sourceSize.height: width
                 height: width
-                width: 30
+                width: Screen.pixelDensity * 8.
                 fillMode: Image.PreserveAspectFit
             }
 
@@ -190,7 +191,7 @@ Item {
                 Layout.preferredWidth: width
                 Layout.maximumWidth: width
                 Layout.minimumWidth: width
-                width: 10
+                width: Screen.pixelDensity * 3.
             }
 
             Slider {
@@ -218,14 +219,14 @@ Item {
                 Layout.preferredWidth: width
                 Layout.maximumWidth: width
                 Layout.minimumWidth: width
-                width: 100
+                width: Screen.pixelDensity * 35.
             }
 
             Item {
                 Layout.preferredWidth: width
                 Layout.maximumWidth: width
                 Layout.minimumWidth: width
-                width: 30
+                width: Screen.pixelDensity * 8.
             }
         }
     }

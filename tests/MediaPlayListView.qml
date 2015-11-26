@@ -2,6 +2,7 @@ import QtQuick 2.4
 import QtQuick.Controls 1.3
 import QtQuick.Controls.Styles 1.3
 import QtQuick.Layouts 1.1
+import QtQuick.Window 2.2
 import QtQml.Models 2.1
 import org.mgallien.QmlExtension 1.0
 import QtMultimedia 5.4
@@ -18,7 +19,7 @@ Item {
 
         Item {
             id: rowDelegateContent
-            height: 80
+            height: Screen.pixelDensity * 20.
             Rectangle {
                 color: "#fff"
                 anchors.fill: parent
@@ -37,7 +38,7 @@ Item {
                 model: playListModel
 
                 delegate: AudioTrackDelegate {
-                    height: 80
+                    height: Screen.pixelDensity * 20.
                     width: playListView.width
                     title: if (model != undefined && model.title !== undefined)
                                model.title

@@ -2,6 +2,7 @@ import QtQuick 2.4
 import QtQuick.Controls 1.3
 import QtQuick.Controls.Styles 1.3
 import QtQuick.Layouts 1.1
+import QtQuick.Window 2.2
 import QtQml.Models 2.1
 import org.mgallien.QmlExtension 1.0
 import QtMultimedia 5.4
@@ -84,7 +85,7 @@ Item {
             playEnabled: playListControler.playControlEnabled
             isPlaying: playListControler.musicPlaying
 
-            Layout.preferredHeight: 60
+            Layout.preferredHeight: Screen.pixelDensity * 16.
             Layout.minimumHeight: Layout.preferredHeight
             Layout.maximumHeight: Layout.preferredHeight
             Layout.fillWidth: true
@@ -105,7 +106,7 @@ Item {
                 id: viewModeView
 
                 Layout.fillHeight: true
-                Layout.preferredWidth: 150
+                Layout.preferredWidth: Screen.pixelDensity * 50.
 
                 headerVisible: false
                 frameVisible: false
@@ -115,14 +116,14 @@ Item {
                 rowDelegate: Rectangle {
                     color: '#EFF0F1'
 
-                    height: 50
+                    height: Screen.pixelDensity * 12.
                     width: viewModeView.width
                 }
 
                 model: viewModeModel
 
                 itemDelegate: Rectangle {
-                    height: 50
+                    height: Screen.pixelDensity * 12.
                     width: viewModeView.width
                     color: if (styleData.selected)
                                '#3DAEE9'

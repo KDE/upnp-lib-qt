@@ -2,6 +2,7 @@ import QtQuick 2.4
 import QtQuick.Controls 1.2
 import QtQuick.Controls.Styles 1.2
 import QtQuick.Layouts 1.1
+import QtQuick.Window 2.2
 import org.mgallien.QmlExtension 1.0
 import QtMultimedia 5.4
 
@@ -30,7 +31,7 @@ Item {
         Button {
             id: backButton
 
-            height: 25
+            height: Screen.pixelDensity * 8.
             Layout.preferredHeight: height
             Layout.minimumHeight: height
             Layout.maximumHeight: height

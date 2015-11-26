@@ -1,6 +1,7 @@
 import QtQuick 2.0
 import QtQuick.Layouts 1.1
 import QtQuick.Controls 1.2
+import QtQuick.Window 2.2
 
 Item {
     id: viewAlbumDelegate
@@ -50,22 +51,22 @@ Item {
         }
 
         ColumnLayout {
-            Layout.preferredWidth: 10
+            Layout.preferredWidth: Screen.pixelDensity * 3.
             Layout.preferredHeight: viewAlbumDelegate.height
             Layout.fillWidth: true
             Layout.alignment: Qt.AlignVCenter | Qt.AlignLeft
             spacing: 0
 
             Item {
-                Layout.preferredHeight: 10
-                Layout.minimumHeight: 10
-                Layout.maximumHeight: 10
+                Layout.preferredHeight: Screen.pixelDensity * 3.
+                Layout.minimumHeight: Screen.pixelDensity * 3.
+                Layout.maximumHeight: Screen.pixelDensity * 3.
             }
 
             Label {
                 id: mainLabel
                 text: title
-                Layout.preferredWidth: 50
+                Layout.preferredWidth: Screen.pixelDensity * 12
                 Layout.fillWidth: true
                 Layout.alignment: Qt.AlignLeft
                 elide: "ElideRight"
@@ -78,16 +79,16 @@ Item {
             Label {
                 id: authorLabel
                 text: artist
-                Layout.preferredWidth: 50
+                Layout.preferredWidth: Screen.pixelDensity * 3
                 Layout.fillWidth: true
                 Layout.alignment: Qt.AlignLeft
                 elide: "ElideRight"
             }
 
             Item {
-                Layout.preferredHeight: 10
-                Layout.minimumHeight: 10
-                Layout.maximumHeight: 10
+                Layout.preferredHeight: Screen.pixelDensity * 3.
+                Layout.minimumHeight: Screen.pixelDensity * 3.
+                Layout.maximumHeight: Screen.pixelDensity * 3.
             }
         }
 
@@ -111,7 +112,7 @@ Item {
             Layout.preferredWidth: width
             Layout.minimumWidth: width
             Layout.maximumWidth: width
-            width: 50
+            width: Screen.pixelDensity * 12
         }
 
         ColumnLayout {
@@ -121,9 +122,9 @@ Item {
             spacing: 0
 
             Item {
-                Layout.preferredHeight: 10
-                Layout.minimumHeight: 10
-                Layout.maximumHeight: 10
+                Layout.preferredHeight: Screen.pixelDensity * 3.
+                Layout.minimumHeight: Screen.pixelDensity * 3.
+                Layout.maximumHeight: Screen.pixelDensity * 3.
             }
 
             Label {
@@ -145,16 +146,16 @@ Item {
             }
 
             Item {
-                Layout.preferredHeight: 10
-                Layout.minimumHeight: 10
-                Layout.maximumHeight: 10
+                Layout.preferredHeight: Screen.pixelDensity * 3.
+                Layout.minimumHeight: Screen.pixelDensity * 3.
+                Layout.maximumHeight: Screen.pixelDensity * 3.
             }
         }
 
         Item {
-            Layout.preferredWidth: 20
-            Layout.minimumWidth: 20
-            Layout.maximumWidth: 20
+            Layout.preferredWidth: Screen.pixelDensity * 6.
+            Layout.minimumWidth: Screen.pixelDensity * 6.
+            Layout.maximumWidth: Screen.pixelDensity * 6.
         }
     }
 }
