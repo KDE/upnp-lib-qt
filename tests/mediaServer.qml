@@ -54,6 +54,7 @@ Item {
         onPlayMusic: audioPlayer.play()
         onPauseMusic: audioPlayer.pause()
         onStopMusic: audioPlayer.stop()
+        onAudioPositionChanged: audioPlayer.seek(audioPosition)
     }
 
     ListModel {
@@ -78,8 +79,8 @@ Item {
             duration: audioPlayer.duration
             seekable: audioPlayer.seekable
 
-            volume: playListControler.audioVolume
-            position: playListControler.audioPosition
+            volume: playListControler.playControlVolume
+            position: playListControler.playControlPosition
             skipBackwardEnabled: playListControler.skipBackwardControlEnabled
             skipForwardEnabled: playListControler.skipForwardControlEnabled
             playEnabled: playListControler.playControlEnabled

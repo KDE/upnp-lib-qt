@@ -142,16 +142,30 @@ Item {
             }
 
             Slider {
+                property bool seekStarted: false
+                property int seekValue
+
                 id: musicProgress
                 minimumValue: 0
                 maximumValue: musicWidget.duration
-                value: musicWidget.position
                 Layout.alignment: Qt.AlignVCenter
                 Layout.fillWidth: true
                 enabled: musicWidget.seekable && musicWidget.playEnabled
+                updateValueWhileDragging: true
+
+                onValueChanged: {
+                    if (seekStarted) {
+                        seekValue = value
+                    }
+                }
+
                 onPressedChanged: {
-                    if (!pressed) {
-                        musicWidget.seek(value)
+                    if (pressed) {
+                        seekStarted = true;
+                        seekValue = value
+                    } else {
+                        musicWidget.seek(seekValue)
+                        seekStarted = false;
                     }
                 }
             }
@@ -230,5 +244,9 @@ Item {
             }
         }
     }
+
+    onPositionChanged: if (!musicProgress.seekStarted) {
+                           musicProgress.value = position
+                       }
 }
 

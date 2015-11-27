@@ -291,12 +291,18 @@ void PlayListControler::playPause()
 
 void PlayListControler::playerSeek(int position)
 {
-    qDebug() << "PlayListControler::playerSeek" << position;
+    mAudioPosition = position;
+    Q_EMIT audioPositionChanged();
+    mPlayControlPosition = position;
+    Q_EMIT playControlPositionChanged();
 }
 
 void PlayListControler::audioPlayerPositionChanged(int position)
 {
     mRealAudioPosition = position;
+    mAudioPosition = position;
+    mPlayControlPosition = mRealAudioPosition;
+    Q_EMIT playControlPositionChanged();
 }
 
 void PlayListControler::audioPlayerFinished(bool finished)
