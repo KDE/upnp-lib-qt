@@ -16,6 +16,8 @@ Item {
     property string globalFilter: '*'
     property string globalSortCriteria: ''
 
+    id: contentDirectoryRoot
+
     UpnpContentDirectoryModel {
         id: contentDirectoryModel
         browseFlag: globalBrowseFlag
@@ -51,6 +53,14 @@ Item {
             Layout.fillHeight: true
             Layout.fillWidth: true
 
+            initialItem: MediaServerListing {
+                contentDirectoryService: contentDirectoryModel.contentDirectory
+                rootId: '0'
+                stackView: listingView
+                contentModel: contentDirectoryModel
+                playListModel: contentDirectoryRoot.playListModel
+            }
+
             // Implements back key navigation
             focus: true
             Keys.onReleased: if (event.key === Qt.Key_Back && stackView.depth > 1) {
@@ -63,15 +73,5 @@ Item {
     Component.onCompleted: {
         console.log(parentStackView)
         connectionManager = mediaServerDevice.serviceById('urn:upnp-org:serviceId:ConnectionManager')
-        listingView.push({
-                             item: Qt.resolvedUrl("mediaServerListing.qml"),
-                             properties: {
-                                 'contentDirectoryService': contentDirectoryModel.contentDirectory,
-                                 'rootId': '0',
-                                 'stackView': listingView,
-                                 'contentModel': contentDirectoryModel,
-                                 'playListModel': playListModel,
-                             }
-                         })
     }
 }

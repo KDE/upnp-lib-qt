@@ -6,9 +6,9 @@ set(upnpControl_SOURCES
     playlistcontroler.cpp
     upnpControl.qml
     mediaServer.qml
-    mediaServerListing.qml
-    mediaAlbumView.qml
     genericDevice.qml
+    MediaServerListing.qml
+    MediaAlbumView.qml
     RatingStar.qml
     AudioTrackDelegate.qml
     MediaPlayerControl.qml

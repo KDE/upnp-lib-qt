@@ -57,7 +57,7 @@ Item {
                                 else if (itemClass == UpnpContentDirectoryModel.Album)
                                 {
                                     stackView.push({
-                                                       item: Qt.resolvedUrl("mediaAlbumView.qml"),
+                                                       item: Qt.resolvedUrl("MediaAlbumView.qml"),
                                                        properties: {
                                                            'contentDirectoryService': contentDirectoryService,
                                                            'rootId': contentModel.objectIdByIndex(delegateContentModel.modelIndex(mediaServerEntry.DelegateModel.itemsIndex)),
@@ -70,7 +70,7 @@ Item {
                                 else
                                 {
                                     stackView.push({
-                                                       item: Qt.resolvedUrl("mediaServerListing.qml"),
+                                                       item: Qt.resolvedUrl("MediaServerListing.qml"),
                                                        properties: {
                                                            'contentDirectoryService': contentDirectoryService,
                                                            'rootId': contentModel.objectIdByIndex(delegateContentModel.modelIndex(mediaServerEntry.DelegateModel.itemsIndex)),

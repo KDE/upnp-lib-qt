@@ -3,15 +3,15 @@
         <file>AudioTrackDelegate.qml</file>
         <file>binaryLight.qml</file>
         <file>genericDevice.qml</file>
-        <file>mediaAlbumView.qml</file>
         <file>MediaPlayerControl.qml</file>
         <file>MediaServerEntry.qml</file>
-        <file>mediaServerListing.qml</file>
         <file>mediaServer.qml</file>
         <file>RatingStar.qml</file>
         <file>upnpControl.qml</file>
         <file>MediaContentDirectory.qml</file>
         <file>MediaPlayListView.qml</file>
+        <file>MediaServerListing.qml</file>
+        <file>MediaAlbumView.qml</file>
     </qresource>
     <qresource prefix="/+android">
         <file>AudioTrackDelegateMobile.qml</file>
