@@ -113,6 +113,7 @@ Item {
                 frameVisible: false
                 focus: true
                 backgroundVisible: false
+                z: 2
 
                 rowDelegate: Rectangle {
                     color: '#EFF0F1'
@@ -157,6 +158,7 @@ Item {
 
                 Layout.fillHeight: true
                 Layout.fillWidth: true
+                z: 1
 
                 Tab {
                     MediaContentDirectory {
@@ -169,6 +171,7 @@ Item {
 
                         width: mainContentView.width
                         height: mainContentView.height
+                        z: 0
                     }
                 }
 
