@@ -7,20 +7,45 @@ import QtQml.Models 2.1
 import org.mgallien.QmlExtension 1.0
 import QtMultimedia 5.4
 
-Item {
+ApplicationWindow {
+    visible: true
+    minimumWidth: 800
+    minimumHeight: 400
+    title: 'upnp'
+    id: mainWindow
+
     property UpnpDeviceDescription aDevice
-    property StackView parentStackView
     property UpnpControlConnectionManager connectionManager
 
-    id: rootElement
+    UpnpSsdpEngine {
+        id: mySsdpEngine
 
-    width: parent.width
-    height: parent.height
+        Component.onCompleted: {
+            mySsdpEngine.initialize();
+            mySsdpEngine.searchAllUpnpDevice();
+        }
 
-    UpnpControlMediaServer {
-        id: upnpDevice
+        onNewService: viewModeModel.newDevice(serviceDiscovery)
 
-        description: aDevice
+        onRemovedService: viewModeModel.removedDevice(serviceDiscovery)
+    }
+
+    ViewPagesModel {
+        id: viewModeModel
+        property var mediaServiceComponent
+        property var mediaViewComponent
+
+        onRowsInserted: {
+            mainContentView.insertTab(first, '', Qt.createComponent(Qt.resolvedUrl('MediaContentDirectory.qml')))
+            mainContentView.getTab(first).active = true
+            mainContentView.getTab(first).item.pagesModel = viewModeModel
+            mainContentView.getTab(first).item.mediaServerDeviceUDN = viewModeModel.udn(first)
+            mainContentView.getTab(first).item.playListModel = playListModelItem
+            mainContentView.getTab(first).item.width = mainContentView.width
+            mainContentView.getTab(first).item.height = mainContentView.height
+            mainContentView.getTab(first).item.z = 0
+            mainContentView.getTab(first).item.init()
+        }
     }
 
     Audio {
@@ -55,18 +80,6 @@ Item {
         onPauseMusic: audioPlayer.pause()
         onStopMusic: audioPlayer.stop()
         onAudioPositionChanged: audioPlayer.seek(audioPosition)
-    }
-
-    ListModel {
-        id: viewModeModel
-
-        ListElement {
-            name: "Content"
-        }
-
-        ListElement {
-            name: "PlayList"
-        }
     }
 
     ColumnLayout {
@@ -143,9 +156,13 @@ Item {
                     width: viewModeView.width
                 }
 
-                Component.onCompleted: {
-                    currentRow = 0
-                    selection.select(0, 0)
+                onCurrentRowChanged: mainContentView.currentIndex = currentRow
+
+                onRowCountChanged:
+                {
+                    viewModeView.selection.clear()
+                    viewModeView.currentRow = 0
+                    viewModeView.selection.select(0)
                 }
             }
 
@@ -154,34 +171,15 @@ Item {
 
                 tabsVisible: false
 
-                currentIndex: viewModeView.currentRow
-
                 Layout.fillHeight: true
                 Layout.fillWidth: true
                 z: 1
 
                 Tab {
-                    MediaContentDirectory {
-                        id: contentBrowser
-
-                        mediaServerDevice: upnpDevice
-                        parentStackView: rootElement.parentStackView
-                        connectionManager: rootElement.connectionManager
-                        playListModel: playListModelItem
-
-                        width: mainContentView.width
-                        height: mainContentView.height
-                        z: 0
-                    }
-                }
-
-                Tab {
                     MediaPlayListView {
                         id: playList
 
-                        mediaServerDevice: upnpDevice
-                        parentStackView: rootElement.parentStackView
-                        connectionManager: rootElement.connectionManager
+                        connectionManager: mainWindow.connectionManager
                         playControl: playControlItem
                         playListModel: playListModelItem
 

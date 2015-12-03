@@ -4,8 +4,9 @@ set(upnpControl_SOURCES
     upnpControl.cpp
     mediaplaylist.cpp
     playlistcontroler.cpp
+    viewpagesmodel.cpp
     upnpControl.qml
-    mediaServer.qml
+    MediaServer.qml
     genericDevice.qml
     MediaServerListing.qml
     MediaAlbumView.qml

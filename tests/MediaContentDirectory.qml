@@ -7,9 +7,10 @@ import org.mgallien.QmlExtension 1.0
 import QtMultimedia 5.4
 
 Item {
-    property UpnpControlMediaServer mediaServerDevice
+    property string mediaServerDeviceUDN
+    property var pagesModel
+    property var mediaServerDevice
     property StackView parentStackView
-    property UpnpControlConnectionManager connectionManager
     property MediaPlayList playListModel
 
     property string globalBrowseFlag: 'BrowseDirectChildren'
@@ -23,7 +24,6 @@ Item {
         browseFlag: globalBrowseFlag
         filter: globalFilter
         sortCriteria: globalSortCriteria
-        contentDirectory: mediaServerDevice.serviceById('urn:upnp-org:serviceId:ContentDirectory')
     }
 
     ColumnLayout {
@@ -70,8 +70,8 @@ Item {
         }
     }
 
-    Component.onCompleted: {
-        console.log(parentStackView)
-        connectionManager = mediaServerDevice.serviceById('urn:upnp-org:serviceId:ConnectionManager')
+    function init() {
+        mediaServerDevice = pagesModel.service(mediaServerDeviceUDN)
+        contentDirectoryModel.contentDirectory = contentDirectoryRoot.mediaServerDevice
     }
 }

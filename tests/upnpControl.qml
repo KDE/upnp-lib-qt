@@ -78,7 +78,7 @@ ApplicationWindow {
                     var viewName = 'genericDevice.qml'
 
                     if (deviceType === 'urn:schemas-upnp-org:device:MediaServer:1') {
-                        viewName = 'mediaServer.qml';
+                        viewName = 'MediaServer.qml';
                     }
 
                     globalStackView.push({

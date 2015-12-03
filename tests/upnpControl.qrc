@@ -5,13 +5,13 @@
         <file>genericDevice.qml</file>
         <file>MediaPlayerControl.qml</file>
         <file>MediaServerEntry.qml</file>
-        <file>mediaServer.qml</file>
         <file>RatingStar.qml</file>
         <file>upnpControl.qml</file>
         <file>MediaContentDirectory.qml</file>
         <file>MediaPlayListView.qml</file>
         <file>MediaServerListing.qml</file>
         <file>MediaAlbumView.qml</file>
+        <file>MediaServer.qml</file>
     </qresource>
     <qresource prefix="/+android">
         <file>AudioTrackDelegateMobile.qml</file>

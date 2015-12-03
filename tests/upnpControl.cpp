@@ -30,10 +30,12 @@
 #include "upnpcontrolmediaserver.h"
 #include "upnpcontrolcontentdirectory.h"
 #include "upnpcontentdirectorymodel.h"
-#include "mediaplaylist.h"
-#include "playlistcontroler.h"
 
 #include "upnpdevicedescription.h"
+
+#include "mediaplaylist.h"
+#include "playlistcontroler.h"
+#include "viewpagesmodel.h"
 
 #if KF5Declarative_FOUND
 #include <KDeclarative/KDeclarative>
@@ -62,8 +64,10 @@ int __attribute__((visibility("default"))) main(int argc, char *argv[])
     qmlRegisterType<UpnpControlContentDirectory>("org.mgallien.QmlExtension", 1, 0, "UpnpControlContentDirectory");
     qmlRegisterType<UpnpContentDirectoryModel>("org.mgallien.QmlExtension", 1, 0, "UpnpContentDirectoryModel");
     qmlRegisterType<UpnpDeviceDescription>("org.mgallien.QmlExtension", 1, 0, "UpnpDeviceDescription");
+
     qmlRegisterType<MediaPlayList>("org.mgallien.QmlExtension", 1, 0, "MediaPlayList");
     qmlRegisterType<PlayListControler>("org.mgallien.QmlExtension", 1, 0, "PlayListControler");
+    qmlRegisterType<ViewPagesModel>("org.mgallien.QmlExtension", 1, 0, "ViewPagesModel");
 
     qRegisterMetaType<A_ARG_TYPE_InstanceID>();
     qRegisterMetaType<QPointer<UpnpAbstractDevice> >();
@@ -71,7 +75,7 @@ int __attribute__((visibility("default"))) main(int argc, char *argv[])
     qRegisterMetaType<UpnpContentDirectoryModel*>();
     qRegisterMetaType<UpnpDeviceDescription*>();
 
-    QQmlApplicationEngine engine(QUrl(QStringLiteral("qrc:/upnpControl.qml")));
+    QQmlApplicationEngine engine;
     QQmlFileSelector selector(&engine);
 
 #if KF5Declarative_FOUND
@@ -79,6 +83,8 @@ int __attribute__((visibility("default"))) main(int argc, char *argv[])
     decl.setDeclarativeEngine(&engine);
     decl.setupBindings();
 #endif
+
+    engine.load(QUrl(QStringLiteral("qrc:/MediaServer.qml")));
 
     app.exec();
 

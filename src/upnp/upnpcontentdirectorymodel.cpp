@@ -305,6 +305,10 @@ bool UpnpContentDirectoryModel::canFetchMore(const QModelIndex &parent) const
 
 void UpnpContentDirectoryModel::fetchMore(const QModelIndex &parent)
 {
+    if (!d->mContentDirectory) {
+        return;
+    }
+
     if (!parent.isValid()) {
         return;
     }
@@ -369,6 +373,10 @@ void UpnpContentDirectoryModel::setContentDirectory(UpnpControlContentDirectory 
 
     d->mContentDirectory = directory;
     Q_EMIT contentDirectoryChanged();
+
+    if (!d->mContentDirectory) {
+        return;
+    }
 
     connect(d->mContentDirectory, &UpnpControlContentDirectory::browseFinished, this, &UpnpContentDirectoryModel::browseFinished);
 }
