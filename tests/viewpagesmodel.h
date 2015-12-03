@@ -29,6 +29,7 @@
 class ViewPagesModelPrivate;
 class UpnpDiscoveryResult;
 class UpnpControlContentDirectory;
+class RemoteServerEntry;
 
 class ViewPagesModel : public QAbstractListModel
 {
@@ -52,9 +53,7 @@ public:
 
     QHash<int, QByteArray> roleNames() const override;
 
-    Q_INVOKABLE QVariant udn(int index) const;
-
-    Q_INVOKABLE UpnpControlContentDirectory *service(int index) const;
+    Q_INVOKABLE RemoteServerEntry *remoteServer(int index) const;
 
 public Q_SLOTS:
 

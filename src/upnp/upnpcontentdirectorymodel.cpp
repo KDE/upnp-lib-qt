@@ -366,19 +366,25 @@ UpnpControlContentDirectory *UpnpContentDirectoryModel::contentDirectory() const
 
 void UpnpContentDirectoryModel::setContentDirectory(UpnpControlContentDirectory *directory)
 {
-    Q_ASSERT(directory);
+    if (directory) {
+        beginResetModel();
+    }
+
     if (d->mContentDirectory) {
         disconnect(d->mContentDirectory, &UpnpControlContentDirectory::browseFinished, this, &UpnpContentDirectoryModel::browseFinished);
     }
 
     d->mContentDirectory = directory;
-    Q_EMIT contentDirectoryChanged();
 
     if (!d->mContentDirectory) {
+        Q_EMIT contentDirectoryChanged();
         return;
     }
 
     connect(d->mContentDirectory, &UpnpControlContentDirectory::browseFinished, this, &UpnpContentDirectoryModel::browseFinished);
+    endResetModel();
+
+    Q_EMIT contentDirectoryChanged();
 }
 
 bool UpnpContentDirectoryModel::useLocalIcons() const
@@ -581,10 +587,7 @@ void UpnpContentDirectoryModel::browseFinished(const QString &result, int number
             return;
         }
 
-        qDebug() << "new items to be added to the model" << parentId << parentInternalId;
-
         if (!childData.isEmpty()) {
-            qDebug() << "remove existing data";
             beginRemoveRows(indexFromInternalId(parentInternalId), 0, childData.size() - 1);
             d->mChilds[parentInternalId].clear();
             endRemoveRows();

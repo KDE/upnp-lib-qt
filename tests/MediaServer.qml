@@ -39,12 +39,11 @@ ApplicationWindow {
             mainContentView.insertTab(first, '', Qt.createComponent(Qt.resolvedUrl('MediaContentDirectory.qml')))
             mainContentView.getTab(first).active = true
             mainContentView.getTab(first).item.pagesModel = viewModeModel
-            mainContentView.getTab(first).item.mediaServerDeviceUDN = viewModeModel.udn(first)
             mainContentView.getTab(first).item.playListModel = playListModelItem
             mainContentView.getTab(first).item.width = mainContentView.width
             mainContentView.getTab(first).item.height = mainContentView.height
             mainContentView.getTab(first).item.z = 0
-            mainContentView.getTab(first).item.init()
+            mainContentView.getTab(first).item.remoteMediaServer = viewModeModel.remoteServer(first)
         }
     }
 
@@ -61,6 +60,7 @@ ApplicationWindow {
         onStopped: playListControler.playerStopped()
         onPositionChanged: playListControler.audioPlayerPositionChanged(position)
         onStatusChanged: playListControler.audioPlayerFinished(status == Audio.EndOfMedia)
+        onErrorChanged: console.log(errorString)
     }
 
     MediaPlayList {
@@ -145,6 +145,7 @@ ApplicationWindow {
                            else
                                '#EFF0F1'
                     Label {
+                        id: nameLabel
                         anchors.fill: parent
                         width: viewModeView.width
                         text: model.name
@@ -156,7 +157,10 @@ ApplicationWindow {
                     width: viewModeView.width
                 }
 
-                onCurrentRowChanged: mainContentView.currentIndex = currentRow
+                onCurrentRowChanged:
+                {
+                    mainContentView.currentIndex = currentRow
+                }
 
                 onRowCountChanged:
                 {

@@ -238,9 +238,9 @@ void UpnpControlContentDirectory::finishedBrowseCall(KDSoapPendingCallWatcher *s
     }
 
     //qDebug() << "Result:" << result;
-    qDebug() << "NumberReturned:" << numberReturned;
-    qDebug() << "TotalMatches:" << totalMatches;
-    qDebug() << "UpdateID:" << d->mSystemUpdateID;
+    //qDebug() << "NumberReturned:" << numberReturned;
+    //qDebug() << "TotalMatches:" << totalMatches;
+    //qDebug() << "UpdateID:" << d->mSystemUpdateID;
 
     Q_EMIT browseFinished(result, numberReturned, totalMatches, d->mSystemUpdateID, !self->returnMessage().isFault());
 }

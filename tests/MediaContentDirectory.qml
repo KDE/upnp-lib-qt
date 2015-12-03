@@ -7,9 +7,8 @@ import org.mgallien.QmlExtension 1.0
 import QtMultimedia 5.4
 
 Item {
-    property string mediaServerDeviceUDN
+    property var remoteMediaServer: ({})
     property var pagesModel
-    property var mediaServerDevice
     property StackView parentStackView
     property MediaPlayList playListModel
 
@@ -24,6 +23,9 @@ Item {
         browseFlag: globalBrowseFlag
         filter: globalFilter
         sortCriteria: globalSortCriteria
+        contentDirectory: remoteMediaServer.contentDirectory
+
+        onContentDirectoryChanged: listingView.initialItem.rootIndex = contentDirectoryModel.indexFromId('0')
     }
 
     ColumnLayout {
@@ -54,8 +56,8 @@ Item {
             Layout.fillWidth: true
 
             initialItem: MediaServerListing {
-                contentDirectoryService: contentDirectoryModel.contentDirectory
-                rootId: '0'
+                contentDirectoryService: remoteMediaServer.contentDirectory
+                rootIndex: remoteMediaServer ? '0' : ''
                 stackView: listingView
                 contentModel: contentDirectoryModel
                 playListModel: contentDirectoryRoot.playListModel
@@ -68,10 +70,5 @@ Item {
                                  event.accepted = true;
                              }
         }
-    }
-
-    function init() {
-        mediaServerDevice = pagesModel.service(mediaServerDeviceUDN)
-        contentDirectoryModel.contentDirectory = contentDirectoryRoot.mediaServerDevice
     }
 }

@@ -5,6 +5,7 @@ set(upnpControl_SOURCES
     mediaplaylist.cpp
     playlistcontroler.cpp
     viewpagesmodel.cpp
+    remoteserverentry.cpp
     upnpControl.qml
     MediaServer.qml
     genericDevice.qml

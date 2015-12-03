@@ -30,12 +30,12 @@
 #include "upnpcontrolmediaserver.h"
 #include "upnpcontrolcontentdirectory.h"
 #include "upnpcontentdirectorymodel.h"
-
 #include "upnpdevicedescription.h"
 
 #include "mediaplaylist.h"
 #include "playlistcontroler.h"
 #include "viewpagesmodel.h"
+#include "remoteserverentry.h"
 
 #if KF5Declarative_FOUND
 #include <KDeclarative/KDeclarative>
@@ -74,6 +74,7 @@ int __attribute__((visibility("default"))) main(int argc, char *argv[])
     qRegisterMetaType<UpnpControlConnectionManager*>();
     qRegisterMetaType<UpnpContentDirectoryModel*>();
     qRegisterMetaType<UpnpDeviceDescription*>();
+    qRegisterMetaType<RemoteServerEntry*>();
 
     QQmlApplicationEngine engine;
     QQmlFileSelector selector(&engine);

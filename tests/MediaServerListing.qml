@@ -7,10 +7,12 @@ import QtMultimedia 5.4
 
 Item {
     property UpnpControlContentDirectory contentDirectoryService
-    property string rootId
+    property var rootIndex
     property StackView stackView
     property UpnpContentDirectoryModel contentModel
     property MediaPlayList playListModel
+
+    id: rootElement
 
     Rectangle {
         color: 'white'
@@ -26,7 +28,7 @@ Item {
                 model: DelegateModel {
                     id: delegateContentModel
                     model: contentModel
-                    rootIndex: contentModel.indexFromId(rootId)
+                    rootIndex: rootElement.rootIndex
 
                     delegate: Rectangle {
                         id: mediaServerEntry
@@ -73,7 +75,7 @@ Item {
                                                        item: Qt.resolvedUrl("MediaServerListing.qml"),
                                                        properties: {
                                                            'contentDirectoryService': contentDirectoryService,
-                                                           'rootId': contentModel.objectIdByIndex(delegateContentModel.modelIndex(mediaServerEntry.DelegateModel.itemsIndex)),
+                                                           'rootIndex': delegateContentModel.modelIndex(mediaServerEntry.DelegateModel.itemsIndex),
                                                            'stackView': stackView,
                                                            'contentModel': contentModel,
                                                            'playListModel': playListModel
