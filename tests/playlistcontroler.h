@@ -66,11 +66,6 @@ class PlayListControler : public QObject
                WRITE setIsPlayingRole
                NOTIFY isPlayingRoleChanged)
 
-    Q_PROPERTY(double audioVolume
-               READ audioVolume
-               WRITE setAudioVolume
-               NOTIFY audioVolumeChanged)
-
     Q_PROPERTY(int audioPosition
                READ audioPosition
                WRITE setAudioPosition
@@ -80,11 +75,6 @@ class PlayListControler : public QObject
                READ audioDuration
                WRITE setAudioDuration
                NOTIFY audioDurationChanged)
-
-    Q_PROPERTY(double playControlVolume
-               READ playControlVolume
-               WRITE setPlayControlVolume
-               NOTIFY playControlVolumeChanged)
 
     Q_PROPERTY(int playControlPosition
                READ playControlPosition
@@ -126,10 +116,6 @@ public:
 
     int isPlayingRole() const;
 
-    void setAudioVolume(double value);
-
-    double audioVolume() const;
-
     void setAudioPosition(int value);
 
     int audioPosition() const;
@@ -137,10 +123,6 @@ public:
     void setAudioDuration(int value);
 
     int audioDuration() const;
-
-    void setPlayControlVolume(double value);
-
-    double playControlVolume() const;
 
     void setPlayControlPosition(int value);
 
@@ -170,13 +152,9 @@ Q_SIGNALS:
 
     void isPlayingRoleChanged();
 
-    void audioVolumeChanged();
-
     void audioPositionChanged();
 
     void audioDurationChanged();
-
-    void playControlVolumeChanged();
 
     void playControlPositionChanged();
 
@@ -231,15 +209,11 @@ private:
 
     PlayerState mPlayerState;
 
-    double mAudioVolume;
-
     int mAudioPosition;
 
     int mAudioDuration;
 
     int mRealAudioPosition;
-
-    double mPlayControlVolume;
 
     int mPlayControlPosition;
 

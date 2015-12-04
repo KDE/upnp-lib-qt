@@ -219,13 +219,6 @@ Item {
                 onValueChanged: {
                     if (!musicWidget.muted) {
                         musicWidget.volume = value
-                    } else {
-                        if (musicWidget.muted && value != 0) {
-                            musicWidget.volume = value
-                            musicWidget.muted = false
-                        } else {
-                            musicWidget.volume = value
-                        }
                     }
                 }
 

@@ -24,7 +24,7 @@
 PlayListControler::PlayListControler(QObject *parent)
     : QObject(parent), mPlayListModel(nullptr), mCurrentTrack(), mUrlRole(Qt::DisplayRole),
       mIsPlayingRole(Qt::DisplayRole), mPlayerState(PlayListControler::PlayerState::Stopped),
-      mAudioVolume(1.0), mAudioPosition(0), mPlayControlVolume(1.0), mPlayControlPosition(0)
+      mAudioPosition(0), mPlayControlPosition(0)
 {
 }
 
@@ -126,17 +126,6 @@ int PlayListControler::isPlayingRole() const
     return mIsPlayingRole;
 }
 
-void PlayListControler::setAudioVolume(double value)
-{
-    mAudioVolume = value;
-    Q_EMIT audioVolumeChanged();
-}
-
-double PlayListControler::audioVolume() const
-{
-    return mAudioVolume;
-}
-
 void PlayListControler::setAudioPosition(int value)
 {
     mAudioPosition = value;
@@ -157,17 +146,6 @@ void PlayListControler::setAudioDuration(int value)
 int PlayListControler::audioDuration() const
 {
     return mAudioDuration;
-}
-
-void PlayListControler::setPlayControlVolume(double value)
-{
-    mPlayControlVolume = value;
-    Q_EMIT playControlVolumeChanged();
-}
-
-double PlayListControler::playControlVolume() const
-{
-    return mPlayControlVolume;
 }
 
 void PlayListControler::setPlayControlPosition(int value)

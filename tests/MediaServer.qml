@@ -50,9 +50,9 @@ ApplicationWindow {
     Audio {
         id: audioPlayer
 
-        muted: audioPlayer.muted
+        muted: playControlItem.muted
 
-        volume: playListControler.audioVolume
+        volume: playControlItem.volume
         source: playListControler.playerSource
 
         onPlaying: playListControler.playerPlaying()
@@ -92,7 +92,7 @@ ApplicationWindow {
             duration: audioPlayer.duration
             seekable: audioPlayer.seekable
 
-            volume: playListControler.playControlVolume
+            volume: 1.0
             position: playListControler.playControlPosition
             skipBackwardEnabled: playListControler.skipBackwardControlEnabled
             skipForwardEnabled: playListControler.skipForwardControlEnabled
