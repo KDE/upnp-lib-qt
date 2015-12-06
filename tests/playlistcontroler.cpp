@@ -253,8 +253,11 @@ void PlayListControler::playListReset()
 {
     if (!mCurrentTrack.isValid()) {
         mCurrentTrack = mPlayListModel->index(0, 0);
+
+        Q_EMIT remainingTracksChanged();
     }
 
+    Q_EMIT remainingTracksChanged();
     Q_EMIT playControlEnabledChanged();
     Q_EMIT skipBackwardControlEnabledChanged();
     Q_EMIT skipForwardControlEnabledChanged();
@@ -278,6 +281,7 @@ void PlayListControler::tracksInserted(const QModelIndex &parent, int first, int
         signaTrackChange();
     }
 
+    Q_EMIT remainingTracksChanged();
     Q_EMIT playControlEnabledChanged();
     Q_EMIT skipForwardControlEnabledChanged();
 }
@@ -306,6 +310,7 @@ void PlayListControler::tracksRemoved(const QModelIndex &parent, int first, int 
         signaTrackChange();
     }
 
+    Q_EMIT remainingTracksChanged();
     Q_EMIT playControlEnabledChanged();
     Q_EMIT skipBackwardControlEnabledChanged();
     Q_EMIT skipForwardControlEnabledChanged();
@@ -454,6 +459,7 @@ void PlayListControler::signaTrackChange()
     Q_EMIT titleChanged();
     Q_EMIT albumChanged();
     Q_EMIT imageChanged();
+    Q_EMIT remainingTracksChanged();
 }
 
 

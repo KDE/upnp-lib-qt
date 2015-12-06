@@ -99,7 +99,7 @@ ApplicationWindow {
             Layout.maximumHeight: Layout.preferredHeight
             Layout.fillWidth: true
 
-            tracksCount: playListModelItem.rowCount()
+            tracksCount: playListControler.remainingTracks
             album: playListControler.album
             title: playListControler.title
             artist: playListControler.artist

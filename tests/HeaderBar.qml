@@ -128,6 +128,20 @@ Item {
                 Layout.fillWidth: true
             }
 
+            Label {
+                id: remainingTracksLabel
+                text: tracksCount + ' tracks remaining'
+                Layout.alignment: Qt.AlignRight | Qt.AlignBottom
+                elide: "ElideRight"
+                visible: tracksCount > 0
+            }
+
+            Item {
+                Layout.preferredWidth: Screen.pixelDensity * 40.
+                Layout.minimumWidth: Screen.pixelDensity * 40.
+                Layout.maximumWidth: Screen.pixelDensity * 40.
+                Layout.fillHeight: true
+            }
         }
 
         Item {
