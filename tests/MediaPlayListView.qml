@@ -33,6 +33,59 @@ Item {
         anchors.fill: parent
         spacing: 0
 
+        RowLayout {
+            Layout.preferredHeight: Screen.pixelDensity * 5.5
+            Layout.minimumHeight: Screen.pixelDensity * 5.5
+            Layout.maximumHeight: Screen.pixelDensity * 5.5
+            Layout.alignment: Qt.AlignVCenter
+
+            Layout.fillWidth: true
+
+            CheckBox {
+                id: shuffleOption
+
+                text: 'Shuffle'
+
+                Layout.alignment: Qt.AlignVCenter
+            }
+
+            Item {
+                Layout.preferredWidth: Screen.pixelDensity * 1.5
+                Layout.minimumWidth: Screen.pixelDensity * 1.5
+                Layout.maximumWidth: Screen.pixelDensity * 1.5
+            }
+
+            CheckBox {
+                id: repeatOption
+
+                text: 'Repeat'
+
+                Layout.alignment: Qt.AlignVCenter
+            }
+
+            Item {
+                Layout.fillWidth: true
+            }
+
+            Label {
+                id: playListInfo
+                text: playListView.rowCount + ' tracks'
+
+                Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
+            }
+        }
+
+        Rectangle {
+            border.width: 1
+            border.color: "#DDDDDD"
+            color: "#DDDDDD"
+
+            Layout.fillWidth: true
+            Layout.preferredHeight: 1
+            Layout.minimumHeight: 1
+            Layout.maximumHeight: 1
+        }
+
         TableView {
             id: playListView
 
