@@ -78,7 +78,7 @@ Item {
 
             Label {
                 id: authorLabel
-                text: artist
+                text: artist + ' - ' + album
                 Layout.preferredWidth: Screen.pixelDensity * 3
                 Layout.fillWidth: true
                 Layout.alignment: Qt.AlignLeft
