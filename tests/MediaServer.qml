@@ -142,6 +142,8 @@ ApplicationWindow {
 
                 Layout.fillHeight: true
                 Layout.preferredWidth: Screen.pixelDensity * 50.
+                Layout.minimumWidth: Screen.pixelDensity * 50.
+                Layout.maximumWidth: Screen.pixelDensity * 50.
 
                 headerVisible: false
                 frameVisible: false

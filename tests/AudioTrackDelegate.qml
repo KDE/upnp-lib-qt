@@ -58,9 +58,9 @@ Item {
             spacing: 0
 
             Item {
-                Layout.preferredHeight: Screen.pixelDensity * 3.
-                Layout.minimumHeight: Screen.pixelDensity * 3.
-                Layout.maximumHeight: Screen.pixelDensity * 3.
+                Layout.preferredHeight: Screen.pixelDensity * 4.
+                Layout.minimumHeight: Screen.pixelDensity * 4.
+                Layout.maximumHeight: Screen.pixelDensity * 4.
             }
 
             Label {
@@ -86,9 +86,9 @@ Item {
             }
 
             Item {
-                Layout.preferredHeight: Screen.pixelDensity * 3.
-                Layout.minimumHeight: Screen.pixelDensity * 3.
-                Layout.maximumHeight: Screen.pixelDensity * 3.
+                Layout.preferredHeight: Screen.pixelDensity * 4.
+                Layout.minimumHeight: Screen.pixelDensity * 4.
+                Layout.maximumHeight: Screen.pixelDensity * 4.
             }
         }
 
