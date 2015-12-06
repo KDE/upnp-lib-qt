@@ -22,9 +22,9 @@ Item {
 
         Item {
             id: rowDelegateContent
-            height: Screen.pixelDensity * 20.
+            height: Screen.pixelDensity * 15.
             Rectangle {
-                color: "#fff"
+                color: "#FFFFFF"
                 anchors.fill: parent
             }
         }
@@ -42,7 +42,7 @@ Item {
                 rootIndex: contentModel.indexFromId(rootId)
 
                 delegate: AudioTrackDelegate {
-                    height: Screen.pixelDensity * 20.
+                    height: Screen.pixelDensity * 15.
                     width: contentDirectoryView.width
                     title: if (model != undefined && model.title !== undefined)
                                model.title
@@ -71,6 +71,7 @@ Item {
                 }
             }
 
+            backgroundVisible: false
             headerVisible: false
             frameVisible: false
             focus: true

@@ -179,7 +179,17 @@ ApplicationWindow {
                 Layout.fillWidth: true
                 z: 1
 
+                Rectangle {
+                    anchors.fill: parent
+                    color: "#FFFFFF"
+                }
+
                 Tab {
+                    Rectangle {
+                        anchors.fill: parent
+                        color: "#FFFFFF"
+                    }
+
                     MediaPlayListView {
                         id: playList
 
@@ -187,8 +197,8 @@ ApplicationWindow {
                         playControl: playControlItem
                         playListModel: playListModelItem
 
-                        width: mainContentView.width
-                        height: mainContentView.height
+                        anchors.fill: parent
+                        anchors.margins: 3
                     }
                 }
             }

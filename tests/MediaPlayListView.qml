@@ -14,16 +14,18 @@ Item {
     property MediaPlayerControl playControl
     property MediaPlayList playListModel
 
+    Rectangle {
+        color: "#FFFFFF"
+        anchors.fill: parent
+    }
+
     Component {
         id: rowDelegate
 
-        Item {
-            id: rowDelegateContent
-            height: Screen.pixelDensity * 20.
-            Rectangle {
-                color: "#fff"
-                anchors.fill: parent
-            }
+        Rectangle {
+            height: Screen.pixelDensity * 15.
+            color: "#FFFFFF"
+            anchors.fill: parent
         }
     }
 
@@ -38,7 +40,7 @@ Item {
                 model: playListModel
 
                 delegate: AudioTrackDelegate {
-                    height: Screen.pixelDensity * 20.
+                    height: Screen.pixelDensity * 15.
                     width: playListView.width
                     title: if (model != undefined && model.title !== undefined)
                                model.title
@@ -64,6 +66,7 @@ Item {
                 }
             }
 
+            backgroundVisible: false
             headerVisible: false
             frameVisible: false
             focus: true
@@ -76,6 +79,12 @@ Item {
 
             Layout.fillHeight: true
             Layout.fillWidth: true
+
+            Rectangle {
+                color: "#FFFFFF"
+                anchors.fill: parent
+                z: parent.z - 1
+            }
         }
     }
 }
