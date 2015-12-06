@@ -467,10 +467,14 @@ void UpnpContentDirectoryModel::browseFinished(const QString &result, int number
                 chilData[ColumnsRoles::TitleRole] = titleNode.toElement().text();
             }
 
-            const QDomNode &authorNode = containerNode.firstChildElement(QStringLiteral("dc:creator"));
+            const QDomNode &authorNode = containerNode.firstChildElement(QStringLiteral("upnp:artist"));
             if (!authorNode.isNull()) {
-                chilData[ColumnsRoles::CreatorRole] = authorNode.toElement().text();
                 chilData[ColumnsRoles::ArtistRole] = authorNode.toElement().text();
+            }
+
+            const QDomNode &albumNode = containerNode.firstChildElement(QStringLiteral("upnp:album"));
+            if (!albumNode.isNull()) {
+                chilData[ColumnsRoles::AlbumRole] = albumNode.toElement().text();
             }
 
             const QDomNode &resourceNode = containerNode.firstChildElement(QStringLiteral("res"));
@@ -525,9 +529,14 @@ void UpnpContentDirectoryModel::browseFinished(const QString &result, int number
                 chilData[ColumnsRoles::TitleRole] = titleNode.toElement().text();
             }
 
-            const QDomNode &authorNode = itemNode.firstChildElement(QStringLiteral("dc:creator"));
+            const QDomNode &authorNode = itemNode.firstChildElement(QStringLiteral("upnp:artist"));
             if (!authorNode.isNull()) {
-                chilData[ColumnsRoles::CreatorRole] = authorNode.toElement().text();
+                chilData[ColumnsRoles::ArtistRole] = authorNode.toElement().text();
+            }
+
+            const QDomNode &albumNode = itemNode.firstChildElement(QStringLiteral("upnp:album"));
+            if (!albumNode.isNull()) {
+                chilData[ColumnsRoles::AlbumRole] = albumNode.toElement().text();
             }
 
             const QDomNode &resourceNode = itemNode.firstChildElement(QStringLiteral("res"));
