@@ -262,10 +262,17 @@ void PlayListControler::playListReset()
 
 void PlayListControler::playListLayoutChanged(const QList<QPersistentModelIndex> &parents, QAbstractItemModel::LayoutChangeHint hint)
 {
+    qDebug() << "PlayListControler::playListLayoutChanged";
+    Q_UNUSED(parents);
+    Q_UNUSED(hint);
 }
 
 void PlayListControler::tracksInserted(const QModelIndex &parent, int first, int last)
 {
+    Q_UNUSED(parent);
+    Q_UNUSED(first);
+    Q_UNUSED(last);
+
     if (!mCurrentTrack.isValid()) {
         mCurrentTrack = mPlayListModel->index(0, 0);
         signaTrackChange();
@@ -277,10 +284,23 @@ void PlayListControler::tracksInserted(const QModelIndex &parent, int first, int
 
 void PlayListControler::tracksMoved(const QModelIndex &parent, int start, int end, const QModelIndex &destination, int row)
 {
+    Q_UNUSED(parent);
+    Q_UNUSED(start);
+    Q_UNUSED(end);
+    Q_UNUSED(destination);
+    Q_UNUSED(row);
+
+    qDebug() << "PlayListControler::tracksMoved";
 }
 
 void PlayListControler::tracksRemoved(const QModelIndex &parent, int first, int last)
 {
+    Q_UNUSED(parent);
+    Q_UNUSED(first);
+    Q_UNUSED(last);
+
+    qDebug() << "PlayListControler::tracksRemoved";
+
     if (!mCurrentTrack.isValid()) {
         mCurrentTrack = mPlayListModel->index(0, 0);
         signaTrackChange();
