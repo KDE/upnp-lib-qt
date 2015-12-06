@@ -26,6 +26,7 @@ set(upnpControl_SOURCES
     MediaPlayerControlMobile.qml
     MediaServerEntryMobile.qml
     MediaContentDirectoryMobile.qml
+    HeaderBar.qml
 )
 
 qt5_add_resources(upnpControl_SOURCES upnpControl.qrc)

@@ -74,6 +74,11 @@ ApplicationWindow {
 
         urlRole: MediaPlayList.ResourceRole
         isPlayingRole: MediaPlayList.IsPlayingRole
+        artistRole: MediaPlayList.ArtistRole
+        titleRole: MediaPlayList.TitleRole
+        albumRole: MediaPlayList.AlbumRole
+        imageRole: MediaPlayList.ImageRole
+
         audioDuration: audioPlayer.duration
 
         onPlayMusic: audioPlayer.play()
@@ -85,6 +90,22 @@ ApplicationWindow {
     ColumnLayout {
         anchors.fill: parent
         spacing: 0
+
+        HeaderBar {
+            id: headerBar
+
+            Layout.preferredHeight: Screen.pixelDensity * 28.
+            Layout.minimumHeight: Layout.preferredHeight
+            Layout.maximumHeight: Layout.preferredHeight
+            Layout.fillWidth: true
+
+            tracksCount: playListModelItem.rowCount()
+            album: playListControler.album
+            title: playListControler.title
+            artist: playListControler.artist
+            image: playListControler.image
+            ratingVisible: false
+        }
 
         MediaPlayerControl {
             id: playControlItem

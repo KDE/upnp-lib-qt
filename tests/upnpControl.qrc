@@ -12,6 +12,7 @@
         <file>MediaServerListing.qml</file>
         <file>MediaAlbumView.qml</file>
         <file>MediaServer.qml</file>
+        <file>HeaderBar.qml</file>
     </qresource>
     <qresource prefix="/+android">
         <file>AudioTrackDelegateMobile.qml</file>
