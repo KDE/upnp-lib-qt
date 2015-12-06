@@ -23,8 +23,9 @@
 
 PlayListControler::PlayListControler(QObject *parent)
     : QObject(parent), mPlayListModel(nullptr), mCurrentTrack(), mUrlRole(Qt::DisplayRole),
-      mIsPlayingRole(Qt::DisplayRole), mPlayerState(PlayListControler::PlayerState::Stopped),
-      mAudioPosition(0), mPlayControlPosition(0)
+      mIsPlayingRole(Qt::DisplayRole), mArtistRole(Qt::DisplayRole), mTitleRole(Qt::DisplayRole),
+      mAlbumRole(Qt::DisplayRole), mImageRole(Qt::DisplayRole),
+      mPlayerState(PlayListControler::PlayerState::Stopped), mAudioPosition(0), mPlayControlPosition(0)
 {
 }
 
@@ -126,6 +127,50 @@ int PlayListControler::isPlayingRole() const
     return mIsPlayingRole;
 }
 
+void PlayListControler::setArtistRole(int value)
+{
+    mArtistRole = value;
+    Q_EMIT artistRoleChanged();
+}
+
+int PlayListControler::artistRole() const
+{
+    return mArtistRole;
+}
+
+void PlayListControler::setTitleRole(int value)
+{
+    mTitleRole = value;
+    Q_EMIT titleRoleChanged();
+}
+
+int PlayListControler::titleRole() const
+{
+    return mTitleRole;
+}
+
+void PlayListControler::setAlbumRole(int value)
+{
+    mAlbumRole = value;
+    Q_EMIT albumRoleChanged();
+}
+
+int PlayListControler::albumRole() const
+{
+    return mAlbumRole;
+}
+
+void PlayListControler::setImageRole(int value)
+{
+    mImageRole = value;
+    Q_EMIT imageRoleChanged();
+}
+
+int PlayListControler::imageRole() const
+{
+    return mImageRole;
+}
+
 void PlayListControler::setAudioPosition(int value)
 {
     mAudioPosition = value;
@@ -159,11 +204,55 @@ int PlayListControler::playControlPosition() const
     return mPlayControlPosition;
 }
 
+QVariant PlayListControler::album() const
+{
+    if (!mCurrentTrack.isValid()) {
+        return QStringLiteral("");
+    }
+
+    return mCurrentTrack.data(mAlbumRole);
+}
+
+QVariant PlayListControler::title() const
+{
+    if (!mCurrentTrack.isValid()) {
+        return QStringLiteral("");
+    }
+
+    return mCurrentTrack.data(mTitleRole);
+}
+
+QVariant PlayListControler::artist() const
+{
+    if (!mCurrentTrack.isValid()) {
+        return QStringLiteral("");
+    }
+
+    return mCurrentTrack.data(mArtistRole);
+}
+
+QVariant PlayListControler::image() const
+{
+    if (!mCurrentTrack.isValid()) {
+        return QStringLiteral("");
+    }
+
+    return mCurrentTrack.data(mImageRole);
+}
+
+int PlayListControler::remainingTracks() const
+{
+    if (!mCurrentTrack.isValid()) {
+        return -1;
+    }
+
+    return mPlayListModel->rowCount(mCurrentTrack.parent()) - mCurrentTrack.row() - 1;
+}
+
 void PlayListControler::playListReset()
 {
     if (!mCurrentTrack.isValid()) {
         mCurrentTrack = mPlayListModel->index(0, 0);
-        Q_EMIT playerSourceChanged();
     }
 
     Q_EMIT playControlEnabledChanged();
@@ -179,7 +268,7 @@ void PlayListControler::tracksInserted(const QModelIndex &parent, int first, int
 {
     if (!mCurrentTrack.isValid()) {
         mCurrentTrack = mPlayListModel->index(0, 0);
-        Q_EMIT playerSourceChanged();
+        signaTrackChange();
     }
 
     Q_EMIT playControlEnabledChanged();
@@ -194,7 +283,7 @@ void PlayListControler::tracksRemoved(const QModelIndex &parent, int first, int 
 {
     if (!mCurrentTrack.isValid()) {
         mCurrentTrack = mPlayListModel->index(0, 0);
-        Q_EMIT playerSourceChanged();
+        signaTrackChange();
     }
 
     Q_EMIT playControlEnabledChanged();
@@ -247,7 +336,7 @@ void PlayListControler::skipPreviousTrack()
     mCurrentTrack = mPlayListModel->index(mCurrentTrack.row() - 1, mCurrentTrack.column(), mCurrentTrack.parent());
     Q_EMIT skipBackwardControlEnabledChanged();
     Q_EMIT skipForwardControlEnabledChanged();
-    Q_EMIT playerSourceChanged();
+    signaTrackChange();
     startPlayer();
 }
 
@@ -296,7 +385,7 @@ void PlayListControler::startPlayer()
         mCurrentTrack = mPlayListModel->index(0, 0);
         Q_EMIT skipBackwardControlEnabledChanged();
         Q_EMIT skipForwardControlEnabledChanged();
-        Q_EMIT playerSourceChanged();
+        signaTrackChange();
     }
 
     Q_EMIT playMusic();
@@ -326,7 +415,7 @@ void PlayListControler::gotoNextTrack()
         mCurrentTrack = mPlayListModel->index(0, mCurrentTrack.column(), mCurrentTrack.parent());
         Q_EMIT skipBackwardControlEnabledChanged();
         Q_EMIT skipForwardControlEnabledChanged();
-        Q_EMIT playerSourceChanged();
+        signaTrackChange();
         stopPlayer();
         return;
     }
@@ -334,8 +423,17 @@ void PlayListControler::gotoNextTrack()
     mCurrentTrack = mPlayListModel->index(mCurrentTrack.row() + 1, mCurrentTrack.column(), mCurrentTrack.parent());
     Q_EMIT skipBackwardControlEnabledChanged();
     Q_EMIT skipForwardControlEnabledChanged();
-    Q_EMIT playerSourceChanged();
+    signaTrackChange();
     startPlayer();
+}
+
+void PlayListControler::signaTrackChange()
+{
+    Q_EMIT playerSourceChanged();
+    Q_EMIT artistChanged();
+    Q_EMIT titleChanged();
+    Q_EMIT albumChanged();
+    Q_EMIT imageChanged();
 }
 
 

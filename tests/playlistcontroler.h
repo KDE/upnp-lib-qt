@@ -66,6 +66,26 @@ class PlayListControler : public QObject
                WRITE setIsPlayingRole
                NOTIFY isPlayingRoleChanged)
 
+    Q_PROPERTY(int artistRole
+               READ artistRole
+               WRITE setArtistRole
+               NOTIFY artistRoleChanged)
+
+    Q_PROPERTY(int titleRole
+               READ titleRole
+               WRITE setTitleRole
+               NOTIFY titleRoleChanged)
+
+    Q_PROPERTY(int albumRole
+               READ albumRole
+               WRITE setAlbumRole
+               NOTIFY albumRoleChanged)
+
+    Q_PROPERTY(int imageRole
+               READ imageRole
+               WRITE setImageRole
+               NOTIFY imageRoleChanged)
+
     Q_PROPERTY(int audioPosition
                READ audioPosition
                WRITE setAudioPosition
@@ -80,6 +100,26 @@ class PlayListControler : public QObject
                READ playControlPosition
                WRITE setPlayControlPosition
                NOTIFY playControlPositionChanged)
+
+    Q_PROPERTY(QVariant artist
+               READ artist
+               NOTIFY artistChanged)
+
+    Q_PROPERTY(QVariant title
+               READ title
+               NOTIFY titleChanged)
+
+    Q_PROPERTY(QVariant album
+               READ album
+               NOTIFY albumChanged)
+
+    Q_PROPERTY(QVariant image
+               READ image
+               NOTIFY imageChanged)
+
+    Q_PROPERTY(int remainingTracks
+               READ remainingTracks
+               NOTIFY remainingTracksChanged)
 
 public:
 
@@ -116,6 +156,22 @@ public:
 
     int isPlayingRole() const;
 
+    void setArtistRole(int value);
+
+    int artistRole() const;
+
+    void setTitleRole(int value);
+
+    int titleRole() const;
+
+    void setAlbumRole(int value);
+
+    int albumRole() const;
+
+    void setImageRole(int value);
+
+    int imageRole() const;
+
     void setAudioPosition(int value);
 
     int audioPosition() const;
@@ -127,6 +183,16 @@ public:
     void setPlayControlPosition(int value);
 
     int playControlPosition() const;
+
+    QVariant album() const;
+
+    QVariant title() const;
+
+    QVariant artist() const;
+
+    QVariant image() const;
+
+    int remainingTracks() const;
 
 Q_SIGNALS:
 
@@ -152,11 +218,29 @@ Q_SIGNALS:
 
     void isPlayingRoleChanged();
 
+    void artistRoleChanged();
+
+    void titleRoleChanged();
+
+    void albumRoleChanged();
+
+    void imageRoleChanged();
+
     void audioPositionChanged();
 
     void audioDurationChanged();
 
     void playControlPositionChanged();
+
+    void artistChanged();
+
+    void titleChanged();
+
+    void albumChanged();
+
+    void imageChanged();
+
+    void remainingTracksChanged();
 
 public Q_SLOTS:
 
@@ -199,6 +283,8 @@ private:
 
     void gotoNextTrack();
 
+    void signaTrackChange();
+
     QAbstractItemModel *mPlayListModel;
 
     QModelIndex mCurrentTrack;
@@ -206,6 +292,14 @@ private:
     int mUrlRole;
 
     int mIsPlayingRole;
+
+    int mArtistRole;
+
+    int mTitleRole;
+
+    int mAlbumRole;
+
+    int mImageRole;
 
     PlayerState mPlayerState;
 
