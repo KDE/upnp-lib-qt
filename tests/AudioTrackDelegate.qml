@@ -12,6 +12,10 @@ Item {
     property string duration
     property int trackRating
     property bool isPlaying
+    property bool showHoverButtons
+    property int itemIndex
+
+    signal remove(int indexToRemove)
 
     RowLayout {
         width: parent.width
@@ -41,6 +45,19 @@ Item {
                 sourceSize.height: width
                 fillMode: Image.PreserveAspectFit
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
+
+                Button {
+                    id: removeButton
+                    iconName: 'list-remove'
+
+                    anchors.fill: parent
+
+                    visible: showHoverButtons
+                    opacity: 0.8
+                    enabled: true
+
+                    onClicked: remove(itemIndex)
+                }
             }
 
             Item {

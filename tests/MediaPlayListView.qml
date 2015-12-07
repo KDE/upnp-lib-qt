@@ -115,7 +115,22 @@ Item {
                                      model.rating
                                  else
                                      ''
+
                     isPlaying: model.isPlaying
+                    showHoverButtons: false
+                    itemIndex: index
+
+                    onRemove: playListModel.removeRows(indexToRemove, 1, playListView.model.rootIndex)
+
+                    MouseArea {
+                        anchors.fill: parent
+                        propagateComposedEvents: true
+                        hoverEnabled: true
+                        acceptedButtons: Qt.NoButton
+
+                        onEntered: parent.showHoverButtons = true
+                        onExited: parent.showHoverButtons = false
+                    }
                 }
             }
 

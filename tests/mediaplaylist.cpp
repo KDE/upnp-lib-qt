@@ -139,6 +139,18 @@ QHash<int, QByteArray> MediaPlayList::roleNames() const
     return roles;
 }
 
+bool MediaPlayList::removeRows(int row, int count, const QModelIndex &parent)
+{
+    beginRemoveRows(parent, row, row + count - 1);
+    for (int i = row, cpt = 0; cpt < count; ++i, ++cpt) {
+        d->mData.removeAt(i);
+        d->mIsPlaying.removeAt(i);
+    }
+    endRemoveRows();
+
+    return false;
+}
+
 int MediaPlayList::trackCount() const
 {
     return d->mData.size();

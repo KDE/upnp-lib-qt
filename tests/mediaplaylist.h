@@ -63,6 +63,8 @@ public:
 
     QHash<int, QByteArray> roleNames() const override;
 
+    Q_INVOKABLE bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex()) override;
+
     int trackCount() const;
 
     Q_INVOKABLE void enqueue(const QModelIndex &newTrack);

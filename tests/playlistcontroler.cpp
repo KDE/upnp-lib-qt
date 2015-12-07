@@ -19,6 +19,7 @@
 
 #include "playlistcontroler.h"
 
+#include <QtCore/QTimer>
 #include <QtCore/QDebug>
 
 PlayListControler::PlayListControler(QObject *parent)
@@ -299,21 +300,41 @@ void PlayListControler::tracksMoved(const QModelIndex &parent, int start, int en
 
 void PlayListControler::tracksRemoved(const QModelIndex &parent, int first, int last)
 {
-    Q_UNUSED(parent);
-    Q_UNUSED(first);
-    Q_UNUSED(last);
-
-    qDebug() << "PlayListControler::tracksRemoved";
-
-    if (!mCurrentTrack.isValid()) {
-        mCurrentTrack = mPlayListModel->index(0, 0);
-        signaTrackChange();
+    if (mCurrentTrack.parent() != parent) {
+        Q_EMIT remainingTracksChanged();
+        Q_EMIT playControlEnabledChanged();
+        Q_EMIT skipBackwardControlEnabledChanged();
+        Q_EMIT skipForwardControlEnabledChanged();
+        return;
     }
 
-    Q_EMIT remainingTracksChanged();
-    Q_EMIT playControlEnabledChanged();
+    if (mCurrentTrack.row() < first || mCurrentTrack.row() > last) {
+        if (mCurrentTrack.row() > last) {
+            mCurrentTrack = mPlayListModel->index(mCurrentTrack.row() - (last - first + 1), 0);
+        }
+
+        Q_EMIT remainingTracksChanged();
+        Q_EMIT playControlEnabledChanged();
+        Q_EMIT skipBackwardControlEnabledChanged();
+        Q_EMIT skipForwardControlEnabledChanged();
+        return;
+    }
+
+    if (mPlayListModel->rowCount(parent) <= first) {
+        stopPlayer();
+        mCurrentTrack = mPlayListModel->index(0, 0);
+        signaTrackChange();
+        return;
+    }
+
+    mCurrentTrack = mPlayListModel->index(first, 0);
     Q_EMIT skipBackwardControlEnabledChanged();
     Q_EMIT skipForwardControlEnabledChanged();
+    signaTrackChange();
+
+    // one cannot call startPlayer directly here or the isPlaying information will end up in the wrong delegate instance
+    // seems something to check
+    QTimer::singleShot(0, [this]() {this->startPlayer();});
 }
 
 void PlayListControler::playerPaused()
