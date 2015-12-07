@@ -40,7 +40,6 @@ Item {
                 Layout.preferredWidth: parent.height - 2
                 Layout.preferredHeight: parent.height - 2
                 width: parent.height - 2
-                //height: parent.height
                 sourceSize.width: width
                 sourceSize.height: width
                 fillMode: Image.PreserveAspectFit

@@ -266,7 +266,6 @@ void PlayListControler::playListReset()
 
 void PlayListControler::playListLayoutChanged(const QList<QPersistentModelIndex> &parents, QAbstractItemModel::LayoutChangeHint hint)
 {
-    qDebug() << "PlayListControler::playListLayoutChanged";
     Q_UNUSED(parents);
     Q_UNUSED(hint);
 }
@@ -294,8 +293,6 @@ void PlayListControler::tracksMoved(const QModelIndex &parent, int start, int en
     Q_UNUSED(end);
     Q_UNUSED(destination);
     Q_UNUSED(row);
-
-    qDebug() << "PlayListControler::tracksMoved";
 }
 
 void PlayListControler::tracksRemoved(const QModelIndex &parent, int first, int last)
