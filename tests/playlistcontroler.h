@@ -337,6 +337,8 @@ private:
 
     bool mRepeatPlay;
 
+    bool mIsInPlayingState;
+
 };
 
 #endif // PLAYLISTCONTROLER_H

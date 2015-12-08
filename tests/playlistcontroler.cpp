@@ -26,7 +26,7 @@ PlayListControler::PlayListControler(QObject *parent)
     : QObject(parent), mPlayListModel(nullptr), mCurrentTrack(), mUrlRole(Qt::DisplayRole),
       mIsPlayingRole(Qt::DisplayRole), mArtistRole(Qt::DisplayRole), mTitleRole(Qt::DisplayRole),
       mAlbumRole(Qt::DisplayRole), mImageRole(Qt::DisplayRole), mPlayerState(PlayListControler::PlayerState::Stopped),
-      mAudioPosition(0), mPlayControlPosition(0), mRandomPlay(false), mRepeatPlay(false)
+      mAudioPosition(0), mPlayControlPosition(0), mRandomPlay(false), mRepeatPlay(false), mIsInPlayingState(false)
 {
 }
 
@@ -397,7 +397,7 @@ void PlayListControler::skipPreviousTrack()
     }
 
     if (mCurrentTrack.row() <= 0) {
-        stopPlayer();
+        return;
     }
 
     mCurrentTrack = mPlayListModel->index(mCurrentTrack.row() - 1, mCurrentTrack.column(), mCurrentTrack.parent());
@@ -448,6 +448,8 @@ void PlayListControler::audioPlayerFinished(bool finished)
 
 void PlayListControler::startPlayer()
 {
+    mIsInPlayingState = true;
+
     if (!mCurrentTrack.isValid()) {
         mCurrentTrack = mPlayListModel->index(0, 0);
         Q_EMIT skipBackwardControlEnabledChanged();
@@ -465,6 +467,8 @@ void PlayListControler::pausePlayer()
 
 void PlayListControler::stopPlayer()
 {
+    mIsInPlayingState = false;
+
     Q_EMIT stopMusic();
 }
 
@@ -491,7 +495,9 @@ void PlayListControler::gotoNextTrack()
     Q_EMIT skipBackwardControlEnabledChanged();
     Q_EMIT skipForwardControlEnabledChanged();
     signaTrackChange();
-    startPlayer();
+    if (mIsInPlayingState) {
+        startPlayer();
+    }
 }
 
 void PlayListControler::signaTrackChange()
