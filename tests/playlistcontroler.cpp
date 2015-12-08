@@ -25,8 +25,8 @@
 PlayListControler::PlayListControler(QObject *parent)
     : QObject(parent), mPlayListModel(nullptr), mCurrentTrack(), mUrlRole(Qt::DisplayRole),
       mIsPlayingRole(Qt::DisplayRole), mArtistRole(Qt::DisplayRole), mTitleRole(Qt::DisplayRole),
-      mAlbumRole(Qt::DisplayRole), mImageRole(Qt::DisplayRole),
-      mPlayerState(PlayListControler::PlayerState::Stopped), mAudioPosition(0), mPlayControlPosition(0)
+      mAlbumRole(Qt::DisplayRole), mImageRole(Qt::DisplayRole), mPlayerState(PlayListControler::PlayerState::Stopped),
+      mAudioPosition(0), mPlayControlPosition(0), mRandomPlay(false), mRepeatPlay(false)
 {
 }
 
@@ -248,6 +248,30 @@ int PlayListControler::remainingTracks() const
     }
 
     return mPlayListModel->rowCount(mCurrentTrack.parent()) - mCurrentTrack.row() - 1;
+}
+
+void PlayListControler::setRandomPlay(bool value)
+{
+    qDebug() << "PlayListControler::setRandomPlay" << (value ? "true" : "false");
+    mRandomPlay = value;
+    Q_EMIT randomPlayChanged();
+}
+
+bool PlayListControler::randomPlay() const
+{
+    return mRandomPlay;
+}
+
+void PlayListControler::setRepeatPlay(bool value)
+{
+    qDebug() << "PlayListControler::setRepeatPlay" << (value ? "true" : "false");
+    mRepeatPlay = value;
+    Q_EMIT repeatPlayChanged();
+}
+
+bool PlayListControler::repeatPlay() const
+{
+    return mRepeatPlay;
 }
 
 void PlayListControler::playListReset()

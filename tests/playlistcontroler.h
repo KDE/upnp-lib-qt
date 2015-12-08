@@ -121,6 +121,16 @@ class PlayListControler : public QObject
                READ remainingTracks
                NOTIFY remainingTracksChanged)
 
+    Q_PROPERTY(bool randomPlay
+               READ randomPlay
+               WRITE setRandomPlay
+               NOTIFY randomPlayChanged)
+
+    Q_PROPERTY(bool repeatPlay
+               READ repeatPlay
+               WRITE setRepeatPlay
+               NOTIFY repeatPlayChanged)
+
 public:
 
     enum class PlayerState
@@ -194,6 +204,14 @@ public:
 
     int remainingTracks() const;
 
+    void setRandomPlay(bool value);
+
+    bool randomPlay() const;
+
+    void setRepeatPlay(bool value);
+
+    bool repeatPlay() const;
+
 Q_SIGNALS:
 
     void playMusic();
@@ -241,6 +259,10 @@ Q_SIGNALS:
     void imageChanged();
 
     void remainingTracksChanged();
+
+    void randomPlayChanged();
+
+    void repeatPlayChanged();
 
 public Q_SLOTS:
 
@@ -310,6 +332,10 @@ private:
     int mRealAudioPosition;
 
     int mPlayControlPosition;
+
+    bool mRandomPlay;
+
+    bool mRepeatPlay;
 
 };
 

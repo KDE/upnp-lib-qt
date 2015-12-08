@@ -222,6 +222,12 @@ ApplicationWindow {
 
                         anchors.fill: parent
                         anchors.margins: 3
+
+                        Component.onCompleted:
+                        {
+                            playListControler.randomPlay = Qt.binding(function() { return playList.randomPlayChecked })
+                            playListControler.repeatPlay = Qt.binding(function() { return playList.repeatPlayChecked })
+                        }
                     }
                 }
             }

@@ -13,6 +13,8 @@ Item {
     property UpnpControlConnectionManager connectionManager
     property MediaPlayerControl playControl
     property MediaPlayList playListModel
+    property alias randomPlayChecked: shuffleOption.checked
+    property alias repeatPlayChecked: repeatOption.checked
 
     Rectangle {
         color: "#FFFFFF"
