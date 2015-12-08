@@ -277,9 +277,9 @@ bool PlayListControler::repeatPlay() const
 void PlayListControler::playListReset()
 {
     if (!mCurrentTrack.isValid()) {
-        mCurrentTrack = mPlayListModel->index(0, 0);
-
-        Q_EMIT remainingTracksChanged();
+        resetCurrentTrack();
+        Q_EMIT playControlEnabledChanged();
+        return;
     }
 
     Q_EMIT remainingTracksChanged();
@@ -301,8 +301,7 @@ void PlayListControler::tracksInserted(const QModelIndex &parent, int first, int
     Q_UNUSED(last);
 
     if (!mCurrentTrack.isValid()) {
-        mCurrentTrack = mPlayListModel->index(0, 0);
-        signaTrackChange();
+        resetCurrentTrack();
     }
 
     Q_EMIT remainingTracksChanged();
@@ -343,19 +342,18 @@ void PlayListControler::tracksRemoved(const QModelIndex &parent, int first, int 
 
     if (mPlayListModel->rowCount(parent) <= first) {
         stopPlayer();
-        mCurrentTrack = mPlayListModel->index(0, 0);
-        signaTrackChange();
+        resetCurrentTrack();
         return;
     }
 
     mCurrentTrack = mPlayListModel->index(first, 0);
-    Q_EMIT skipBackwardControlEnabledChanged();
-    Q_EMIT skipForwardControlEnabledChanged();
     signaTrackChange();
 
-    // one cannot call startPlayer directly here or the isPlaying information will end up in the wrong delegate instance
-    // seems something to check
-    QTimer::singleShot(0, [this]() {this->startPlayer();});
+    if (mIsInPlayingState) {
+        // one cannot call startPlayer directly here or the isPlaying information will end up in the wrong delegate instance
+        // seems something to check
+        QTimer::singleShot(0, [this]() {this->startPlayer();});
+    }
 }
 
 void PlayListControler::playerPaused()
@@ -380,7 +378,9 @@ void PlayListControler::playerStopped()
 
 void PlayListControler::skipNextTrack()
 {
+    bool wasPlaying = mIsInPlayingState;
     stopPlayer();
+    mIsInPlayingState = wasPlaying;
     gotoNextTrack();
 }
 
@@ -401,8 +401,6 @@ void PlayListControler::skipPreviousTrack()
     }
 
     mCurrentTrack = mPlayListModel->index(mCurrentTrack.row() - 1, mCurrentTrack.column(), mCurrentTrack.parent());
-    Q_EMIT skipBackwardControlEnabledChanged();
-    Q_EMIT skipForwardControlEnabledChanged();
     signaTrackChange();
     startPlayer();
 }
@@ -451,10 +449,7 @@ void PlayListControler::startPlayer()
     mIsInPlayingState = true;
 
     if (!mCurrentTrack.isValid()) {
-        mCurrentTrack = mPlayListModel->index(0, 0);
-        Q_EMIT skipBackwardControlEnabledChanged();
-        Q_EMIT skipForwardControlEnabledChanged();
-        signaTrackChange();
+        resetCurrentTrack();
     }
 
     Q_EMIT playMusic();
@@ -483,17 +478,16 @@ void PlayListControler::gotoNextTrack()
     }
 
     if (mCurrentTrack.row() >= mPlayListModel->rowCount(mCurrentTrack.parent()) - 1) {
-        mCurrentTrack = mPlayListModel->index(0, mCurrentTrack.column(), mCurrentTrack.parent());
-        Q_EMIT skipBackwardControlEnabledChanged();
-        Q_EMIT skipForwardControlEnabledChanged();
-        signaTrackChange();
-        stopPlayer();
+        resetCurrentTrack();
+        if (mRepeatPlay) {
+            startPlayer();
+        } else {
+            stopPlayer();
+        }
         return;
     }
 
     mCurrentTrack = mPlayListModel->index(mCurrentTrack.row() + 1, mCurrentTrack.column(), mCurrentTrack.parent());
-    Q_EMIT skipBackwardControlEnabledChanged();
-    Q_EMIT skipForwardControlEnabledChanged();
     signaTrackChange();
     if (mIsInPlayingState) {
         startPlayer();
@@ -508,6 +502,14 @@ void PlayListControler::signaTrackChange()
     Q_EMIT albumChanged();
     Q_EMIT imageChanged();
     Q_EMIT remainingTracksChanged();
+    Q_EMIT skipBackwardControlEnabledChanged();
+    Q_EMIT skipForwardControlEnabledChanged();
+}
+
+void PlayListControler::resetCurrentTrack()
+{
+    mCurrentTrack = mPlayListModel->index(0, 0);
+    signaTrackChange();
 }
 
 

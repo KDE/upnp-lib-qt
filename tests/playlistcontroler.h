@@ -307,6 +307,8 @@ private:
 
     void signaTrackChange();
 
+    void resetCurrentTrack();
+
     QAbstractItemModel *mPlayListModel;
 
     QModelIndex mCurrentTrack;
