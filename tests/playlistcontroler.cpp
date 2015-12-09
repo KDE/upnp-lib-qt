@@ -62,7 +62,7 @@ bool PlayListControler::skipBackwardControlEnabled() const
         return false;
     }
 
-    return mCurrentTrack.row() > 0;
+    return mCurrentTrack.row() > 0 && mIsInPlayingState;
 }
 
 bool PlayListControler::skipForwardControlEnabled() const
@@ -75,7 +75,7 @@ bool PlayListControler::skipForwardControlEnabled() const
         return false;
     }
 
-    return mCurrentTrack.row() < mPlayListModel->rowCount(mCurrentTrack.parent()) - 1;
+    return (mCurrentTrack.row() < mPlayListModel->rowCount(mCurrentTrack.parent()) - 1) && mIsInPlayingState;
 }
 
 bool PlayListControler::musicPlaying() const
@@ -380,12 +380,30 @@ void PlayListControler::skipNextTrack()
 {
     bool wasPlaying = mIsInPlayingState;
     stopPlayer();
+
+    if (!mPlayListModel) {
+        return;
+    }
+
+    if (!mCurrentTrack.isValid()) {
+        return;
+    }
+
+    if (mCurrentTrack.row() >= mPlayListModel->rowCount(mCurrentTrack.parent()) - 1) {
+        return;
+    }
+
+    mCurrentTrack = mPlayListModel->index(mCurrentTrack.row() + 1, mCurrentTrack.column(), mCurrentTrack.parent());
+    signaTrackChange();
     mIsInPlayingState = wasPlaying;
-    gotoNextTrack();
+    if (mIsInPlayingState) {
+        startPlayer();
+    }
 }
 
 void PlayListControler::skipPreviousTrack()
 {
+    bool wasPlaying = mIsInPlayingState;
     stopPlayer();
 
     if (!mPlayListModel) {
@@ -402,7 +420,10 @@ void PlayListControler::skipPreviousTrack()
 
     mCurrentTrack = mPlayListModel->index(mCurrentTrack.row() - 1, mCurrentTrack.column(), mCurrentTrack.parent());
     signaTrackChange();
-    startPlayer();
+    mIsInPlayingState = wasPlaying;
+    if (mIsInPlayingState) {
+        startPlayer();
+    }
 }
 
 void PlayListControler::playPause()
@@ -447,6 +468,8 @@ void PlayListControler::audioPlayerFinished(bool finished)
 void PlayListControler::startPlayer()
 {
     mIsInPlayingState = true;
+    Q_EMIT skipForwardControlEnabledChanged();
+    Q_EMIT skipBackwardControlEnabledChanged();
 
     if (!mCurrentTrack.isValid()) {
         resetCurrentTrack();
@@ -464,6 +487,8 @@ void PlayListControler::stopPlayer()
 {
     mIsInPlayingState = false;
 
+    Q_EMIT skipForwardControlEnabledChanged();
+    Q_EMIT skipBackwardControlEnabledChanged();
     Q_EMIT stopMusic();
 }
 
