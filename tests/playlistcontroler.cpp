@@ -19,8 +19,11 @@
 
 #include "playlistcontroler.h"
 
+#include <QtCore/QTime>
 #include <QtCore/QTimer>
 #include <QtCore/QDebug>
+
+#include <cstdlib>
 
 PlayListControler::PlayListControler(QObject *parent)
     : QObject(parent), mPlayListModel(nullptr), mCurrentTrack(), mUrlRole(Qt::DisplayRole),
@@ -502,7 +505,7 @@ void PlayListControler::gotoNextTrack()
         return;
     }
 
-    if (mCurrentTrack.row() >= mPlayListModel->rowCount(mCurrentTrack.parent()) - 1) {
+    if (!mRandomPlay && (mCurrentTrack.row() >= mPlayListModel->rowCount(mCurrentTrack.parent()) - 1)) {
         resetCurrentTrack();
         if (mRepeatPlay) {
             startPlayer();
@@ -512,7 +515,18 @@ void PlayListControler::gotoNextTrack()
         return;
     }
 
-    mCurrentTrack = mPlayListModel->index(mCurrentTrack.row() + 1, mCurrentTrack.column(), mCurrentTrack.parent());
+    if (mRandomPlay) {
+        static bool firstTime = true;
+        if (firstTime) {
+            qsrand(QTime::currentTime().msec());
+            firstTime = false;
+        }
+        int randomValue = qrand();
+        randomValue = randomValue % (mPlayListModel->rowCount(mCurrentTrack.parent()) + 1);
+        mCurrentTrack = mPlayListModel->index(randomValue, mCurrentTrack.column(), mCurrentTrack.parent());
+    } else {
+        mCurrentTrack = mPlayListModel->index(mCurrentTrack.row() + 1, mCurrentTrack.column(), mCurrentTrack.parent());
+    }
     signaTrackChange();
     if (mIsInPlayingState) {
         startPlayer();
