@@ -77,6 +77,7 @@ int __attribute__((visibility("default"))) main(int argc, char *argv[])
     qRegisterMetaType<RemoteServerEntry*>();
 
     QQmlApplicationEngine engine;
+    engine.addImportPath(QStringLiteral("qrc:/imports"));
     QQmlFileSelector selector(&engine);
 
 #if KF5Declarative_FOUND
