@@ -105,7 +105,15 @@ Item {
         height: parent.height
         MouseArea {
             anchors.fill: parent
+            drag {
+                target: itemMouse
+                axis: Drag.XAxis
+                maximumX: 0
+            }
             onClicked: itemMouse.x = 0;
+            onPressed: handleArea.mouseDown(mouse);
+            onPositionChanged: handleArea.positionChanged(mouse);
+            onReleased: handleArea.released(mouse);
         }
         RowLayout {
             anchors {
@@ -116,7 +124,7 @@ Item {
             height: Math.min( parent.height / 1.5, Units.iconSizes.medium)
             property bool exclusive: false
             property Item checkedButton
-            spacing: 0
+            spacing: Units.largeSpacing
             Repeater {
                 model: {
                     if (listItem.actions.length == 0) {
@@ -132,7 +140,6 @@ Item {
                     Layout.fillHeight: true
                     Layout.minimumWidth: height
                     iconName: modelData.iconName
-                    property bool flat: false
                     onClicked: {
                         if (modelData && modelData.trigger !== undefined) {
                             modelData.trigger();
@@ -186,7 +193,7 @@ Item {
             }
         }
     }
-    
+
     MouseArea {
         id: itemMouse
         property bool changeBackgroundOnPress: !listItem.checked && !listItem.sectionDelegate
@@ -223,7 +230,27 @@ Item {
                 }
             }
 
+            Timer {
+                id: speedSampler
+                interval: 100
+                repeat: true
+                property real speed
+                property real oldItemMouseX
+                onTriggered: {
+                    speed = itemMouse.x - oldItemMouseX;
+                    oldItemMouseX = itemMouse.x;
+                }
+                onRunningChanged: {
+                    if (running) {
+                        speed = 0;
+                    } else {
+                        speed = itemMouse.x - oldItemMouseX;
+                    }
+                    oldItemMouseX = itemMouse.x;
+                }
+            }
             MouseArea {
+                id: handleArea
                 width: Units.iconSizes.smallMedium
                 height: width
                 preventStealing: true
@@ -237,11 +264,21 @@ Item {
                     axis: Drag.XAxis
                     maximumX: 0
                 }
+                function mouseDown(mouse) {
+                    speedSampler.speed = 0;
+                    speedSampler.running = true;
+                }
+                onPressed: mouseDown(mouse);
+                onCanceled: speedSampler.running = false;
                 onReleased: {
-                    if (itemMouse.x > -itemMouse.width/2) {
+                    speedSampler.running = false;
+
+                    if (speedSampler.speed < -Units.gridUnit * 3) {
+                        itemMouse.x = -itemMouse.width + width * 2;
+                    } else if (speedSampler.speed > Units.gridUnit * 3 || itemMouse.x > -itemMouse.width/3) {
                         itemMouse.x = 0;
                     } else {
-                        itemMouse.x = -itemMouse.width + width * 2
+                        itemMouse.x = -itemMouse.width + width * 2;
                     }
                 }
                 onClicked: {
