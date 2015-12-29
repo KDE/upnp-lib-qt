@@ -18,16 +18,18 @@
  */
 
 #include "upnpserverwebsocket.h"
+#include "upnpwebsocketclient.h"
 
+#include <QtWebSockets/QWebSocketServer>
 #include <QtWebSockets/QWebSocket>
 
-#include <QtCore/QScopedPointer>
+#include <QtCore/QPointer>
 
 class UpnpSsdpServerSocketPrivate
 {
 public:
 
-    QScopedPointer<QWebSocket> mClientSocket;
+    QPointer<QWebSocketServer> mServerSocket;
 
 };
 
@@ -41,9 +43,65 @@ UpnpSsdpServerSocket::~UpnpSsdpServerSocket()
     delete d;
 }
 
-void UpnpSsdpServerSocket::init()
+void UpnpSsdpServerSocket::init(const QString &serverName)
 {
-    d->mClientSocket.reset(new QWebSocket);
+    d->mServerSocket = new QWebSocketServer(serverName, QWebSocketServer::NonSecureMode);
+
+    connect(d->mServerSocket.data(), &QWebSocketServer::acceptError, this, &UpnpSsdpServerSocket::acceptError);
+    connect(d->mServerSocket.data(), &QWebSocketServer::closed, this, &UpnpSsdpServerSocket::closed);
+    connect(d->mServerSocket.data(), &QWebSocketServer::newConnection, this, &UpnpSsdpServerSocket::newConnection);
+    connect(d->mServerSocket.data(), &QWebSocketServer::originAuthenticationRequired, this, &UpnpSsdpServerSocket::originAuthenticationRequired);
+    connect(d->mServerSocket.data(), &QWebSocketServer::peerVerifyError, this, &UpnpSsdpServerSocket::peerVerifyError);
+    connect(d->mServerSocket.data(), &QWebSocketServer::serverError, this, &UpnpSsdpServerSocket::serverError);
+    connect(d->mServerSocket.data(), &QWebSocketServer::sslErrors, this, &UpnpSsdpServerSocket::sslErrors);
+
+    d->mServerSocket->listen(QHostAddress::Any, 11443);
+}
+
+void UpnpSsdpServerSocket::acceptError(QAbstractSocket::SocketError socketError)
+{
+    Q_UNUSED(socketError);
+
+    qDebug() << "UpnpSsdpServerSocket::acceptError";
+}
+
+void UpnpSsdpServerSocket::closed()
+{
+    qDebug() << "UpnpSsdpServerSocket::closed";
+}
+
+void UpnpSsdpServerSocket::newConnection()
+{
+    QScopedPointer<QWebSocket> newConnection(d->mServerSocket->nextPendingConnection());
+
+    if (!newConnection) {
+        return;
+    }
+
+    new UpnpWebSocketClient(newConnection);
+}
+
+void UpnpSsdpServerSocket::originAuthenticationRequired(QWebSocketCorsAuthenticator *authenticator)
+{
+    authenticator->setAllowed(true);
+}
+
+void UpnpSsdpServerSocket::peerVerifyError(const QSslError &error)
+{
+    Q_UNUSED(error);
+    qDebug() << "UpnpSsdpServerSocket::peerVerifyError";
+}
+
+void UpnpSsdpServerSocket::serverError(QWebSocketProtocol::CloseCode closeCode)
+{
+    Q_UNUSED(closeCode);
+    qDebug() << "UpnpSsdpServerSocket::serverError" << closeCode << d->mServerSocket->errorString();
+}
+
+void UpnpSsdpServerSocket::sslErrors(const QList<QSslError> &errors)
+{
+    Q_UNUSED(errors);
+    qDebug() << "UpnpSsdpServerSocket::sslErrors";
 }
 
 

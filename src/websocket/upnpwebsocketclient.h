@@ -17,51 +17,47 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#ifndef UPNPSSDPSERVERSOCKET_H
-#define UPNPSSDPSERVERSOCKET_H
+#ifndef UPNPWEBSOCKETCLIENT_H
+#define UPNPWEBSOCKETCLIENT_H
 
 #include "upnpQtWebSocket_export.h"
-
-#include <QtWebSockets/QWebSocketCorsAuthenticator>
-#include <QtWebSockets/qwebsocketprotocol.h>
 
 #include <QtNetwork/QAbstractSocket>
 #include <QtNetwork/QSslError>
 
 #include <QtCore/QObject>
+#include <QtCore/QScopedPointer>
 
-class UpnpSsdpServerSocketPrivate;
+class QWebSocket;
+class UpnpWebSocketClientPrivate;
 
-class UPNPQTWEBSOCKET_EXPORT UpnpSsdpServerSocket : public QObject
+class UpnpWebSocketClient : public QObject
 {
-
     Q_OBJECT
-
 public:
 
-    explicit UpnpSsdpServerSocket(QObject *parent = 0);
+    explicit UpnpWebSocketClient(QScopedPointer<QWebSocket> &socket, QObject *parent = 0);
 
-    virtual ~UpnpSsdpServerSocket();
-
-    Q_INVOKABLE void init(const QString &serverName);
-
-Q_SIGNALS:
+    virtual ~UpnpWebSocketClient();
 
 private Q_SLOTS:
 
-    void acceptError(QAbstractSocket::SocketError socketError);
-    void closed();
-    void newConnection();
-    void originAuthenticationRequired(QWebSocketCorsAuthenticator *authenticator);
-    void peerVerifyError(const QSslError &error);
-    void serverError(QWebSocketProtocol::CloseCode closeCode);
+    void aboutToClose();
+    void binaryMessageReceived(const QByteArray &message);
+    void bytesWritten(qint64 bytes);
+    void disconnected();
+    void error(QAbstractSocket::SocketError error);
+    void pong(quint64 elapsedTime, const QByteArray &payload);
+    void proxyAuthenticationRequired(const QNetworkProxy &proxy, QAuthenticator *authenticator);
+    void readChannelFinished();
     void sslErrors(const QList<QSslError> &errors);
+    void stateChanged(QAbstractSocket::SocketState state);
+    void textMessageReceived(const QString &message);
 
 private:
 
-    UpnpSsdpServerSocketPrivate *d;
+    UpnpWebSocketClientPrivate *d;
 
 };
 
-#endif
-
+#endif // UPNPWEBSOCKETCLIENT_H

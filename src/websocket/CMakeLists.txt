@@ -3,6 +3,8 @@ add_definitions(-std=c++11)
 set(upnpQtWebSocket_SOURCES
     upnpproxywebsocket.cpp
     upnpserverwebsocket.cpp
+    upnpwebsocketclient.cpp
+    upnpwebsocketcommon.h
 )
 
 ecm_generate_headers(

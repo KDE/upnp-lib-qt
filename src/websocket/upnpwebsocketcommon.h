@@ -17,49 +17,15 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#ifndef UPNPPROXYWEBSOCKET_H
-#define UPNPPROXYWEBSOCKET_H
+#ifndef UPNPWEBSOCKETCOMMON_H
+#define UPNPWEBSOCKETCOMMON_H
 
 #include "upnpQtWebSocket_export.h"
 
-#include <QtCore/QObject>
-
-class UpnpProxyWebSocketPrivate;
-
-class UPNPQTWEBSOCKET_EXPORT UpnpProxyWebSocket : public QObject
-{
-
-    Q_OBJECT
-
-    Q_PROPERTY(QString serverName
-               READ serverName
-               WRITE setServerName
-               NOTIFY serverNameChanged)
-
-public:
-
-    explicit UpnpProxyWebSocket(QObject *parent = 0);
-
-    virtual ~UpnpProxyWebSocket();
-
-    const QString& serverName() const;
-
-    void setServerName(const QString &value);
-
-    Q_INVOKABLE void init();
-
-Q_SIGNALS:
-
-    void serverNameChanged();
-
-private Q_SLOTS:
-
-    void newClientConnection();
-
-private:
-
-    UpnpProxyWebSocketPrivate *d;
-
+enum class MessageType {
+    Hello = 1,
+    HelloAck,
 };
 
-#endif
+#endif // UPNPWEBSOCKETCOMMON_H
+
