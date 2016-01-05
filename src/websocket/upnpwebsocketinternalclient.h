@@ -17,8 +17,8 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#ifndef UPNPWEBSOCKETCLIENT_H
-#define UPNPWEBSOCKETCLIENT_H
+#ifndef UPNPWEBSOCKETINTERNALCLIENT_H
+#define UPNPWEBSOCKETINTERNALCLIENT_H
 
 #include "upnpQtWebSocket_export.h"
 
@@ -34,52 +34,20 @@
 class QWebSocket;
 class UpnpWebSocketClientPrivate;
 
-class UPNPQTWEBSOCKET_EXPORT UpnpWebSocketClient : public QObject
+class UPNPQTWEBSOCKET_NO_EXPORT UpnpWebSocketInternalClient : public QObject
 {
     Q_OBJECT
-
-    Q_PROPERTY(QString certificateAuthorityFileName
-               READ certificateAuthorityFileName
-               WRITE setCertificateAuthorityFileName
-               NOTIFY certificateAuthorityFileNameChanged)
-
-    Q_PROPERTY(QString certificateFileName
-               READ certificateFileName
-               WRITE setCertificateFileName
-               NOTIFY certificateFileNameChanged)
-
 public:
 
-    explicit UpnpWebSocketClient(QObject *parent = 0);
+    explicit UpnpWebSocketInternalClient(QWebSocket *socket, QObject *parent = 0);
 
-    virtual ~UpnpWebSocketClient();
-
-    const QString& certificateAuthorityFileName() const;
-
-    void setCertificateAuthorityFileName(const QString &value);
-
-    const QString& certificateFileName() const;
-
-    void setCertificateFileName(const QString &value);
-
-Q_SIGNALS:
-
-    void certificateAuthorityFileNameChanged();
-
-    void certificateFileNameChanged();
-
-public Q_SLOTS:
-
-    void connectServer(const QUrl &serverUrl);
-
-    void sendHello();
+    virtual ~UpnpWebSocketInternalClient();
 
 private Q_SLOTS:
 
     void aboutToClose();
     void binaryMessageReceived(const QByteArray &message);
     void bytesWritten(qint64 bytes);
-    void connected();
     void disconnected();
     void error(QAbstractSocket::SocketError error);
     void pong(quint64 elapsedTime, const QByteArray &payload);
@@ -91,14 +59,16 @@ private Q_SLOTS:
 
 private:
 
-    void handleHelloAck(QJsonObject aObject);
+    QJsonDocument createMessage(UpnpWebSocketMessageType type);
+
+    void sendError();
+
+    void handleHello(QJsonObject aObject);
 
     static UpnpWebSocketMessageType getType(QJsonObject aObject);
-
-    QJsonDocument createMessage(UpnpWebSocketMessageType type);
 
     UpnpWebSocketClientPrivate *d;
 
 };
 
-#endif // UPNPWEBSOCKETCLIENT_H
+#endif // UPNPWEBSOCKETINTERNALCLIENT_H

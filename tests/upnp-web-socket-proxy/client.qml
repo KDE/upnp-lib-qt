@@ -17,18 +17,17 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#ifndef UPNPWEBSOCKETCOMMON_H
-#define UPNPWEBSOCKETCOMMON_H
+import QtQml 2.2
 
-#include "upnpQtWebSocket_export.h"
+import org.mgallien.QmlExtension 1.0
 
-enum class UpnpWebSocketMessageType {
-    Undefined = 0,
-    Error,
-    Hello,
-    HelloAck,
-    ServiceList,
-};
+UpnpWebSocketClient {
+    id: server
 
-#endif // UPNPWEBSOCKETCOMMON_H
+    certificateAuthorityFileName: './rootKey.crt'
+    certificateFileName: './moi_test.pem'
 
+    Component.onCompleted: {
+        connectServer('wss://moulinette:11443/')
+    }
+}

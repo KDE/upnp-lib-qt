@@ -4,6 +4,7 @@ set(upnpQtWebSocket_SOURCES
     upnpproxywebsocket.cpp
     upnpserverwebsocket.cpp
     upnpwebsocketclient.cpp
+    upnpwebsocketinternalclient.cpp
     upnpwebsocketcommon.h
 )
 

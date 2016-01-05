@@ -29,6 +29,7 @@
 #include <QtNetwork/QSslError>
 
 #include <QtCore/QObject>
+#include <QtCore/QString>
 
 class UpnpSsdpServerSocketPrivate;
 
@@ -36,6 +37,16 @@ class UPNPQTWEBSOCKET_EXPORT UpnpSsdpServerSocket : public QObject
 {
 
     Q_OBJECT
+
+    Q_PROPERTY(QString certificateAuthorityFileName
+               READ certificateAuthorityFileName
+               WRITE setCertificateAuthorityFileName
+               NOTIFY certificateAuthorityFileNameChanged)
+
+    Q_PROPERTY(QString certificateServerFileName
+               READ certificateServerFileName
+               WRITE setCertificateServerFileName
+               NOTIFY certificateServerFileNameChanged)
 
 public:
 
@@ -45,7 +56,19 @@ public:
 
     Q_INVOKABLE void init(const QString &serverName);
 
+    const QString& certificateAuthorityFileName() const;
+
+    void setCertificateAuthorityFileName(const QString &value);
+
+    const QString& certificateServerFileName() const;
+
+    void setCertificateServerFileName(const QString &value);
+
 Q_SIGNALS:
+
+    void certificateAuthorityFileNameChanged();
+
+    void certificateServerFileNameChanged();
 
 private Q_SLOTS:
 

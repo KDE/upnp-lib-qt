@@ -17,18 +17,25 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#ifndef UPNPWEBSOCKETCOMMON_H
-#define UPNPWEBSOCKETCOMMON_H
+#include "upnpwebsocketclient.h"
 
-#include "upnpQtWebSocket_export.h"
+#include <QtWidgets/QApplication>
 
-enum class UpnpWebSocketMessageType {
-    Undefined = 0,
-    Error,
-    Hello,
-    HelloAck,
-    ServiceList,
-};
+#include <QtQml/QQmlApplicationEngine>
+#include <QtQml/QQmlEngine>
+#include <QtQml/QQmlFileSelector>
+#include <QtQml>
 
-#endif // UPNPWEBSOCKETCOMMON_H
+int __attribute__((visibility("default"))) main(int argc, char *argv[])
+{
+    QApplication app(argc, argv);
 
+    QQmlApplicationEngine engine;
+    QQmlFileSelector selector(&engine);
+
+    qmlRegisterType<UpnpWebSocketClient>("org.mgallien.QmlExtension", 1, 0, "UpnpWebSocketClient");
+
+    engine.load(QUrl(QStringLiteral("qrc:/client.qml")));
+
+    return app.exec();
+}

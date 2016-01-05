@@ -18,12 +18,21 @@
  */
 
 #include "upnpserverwebsocket.h"
-#include "upnpwebsocketclient.h"
+#include "upnpwebsocketinternalclient.h"
 
 #include <QtWebSockets/QWebSocketServer>
 #include <QtWebSockets/QWebSocket>
 
+#include <QtNetwork/QSslCertificate>
+#include <QtNetwork/QSslSocket>
+#include <QtNetwork/QSslConfiguration>
+#include <QtNetwork/QSslKey>
+
 #include <QtCore/QPointer>
+#include <QtCore/QSharedPointer>
+#include <QtCore/QList>
+#include <QtCore/QFile>
+#include <QtCore/QDebug>
 
 class UpnpSsdpServerSocketPrivate
 {
@@ -31,6 +40,13 @@ public:
 
     QPointer<QWebSocketServer> mServerSocket;
 
+    QString mCertificateAuthorityFileName;
+
+    QString mCertificateServerFileName;
+
+    QList<QSslCertificate> mCertificateAuthority;
+
+    QSslCertificate mCertificateServer;
 };
 
 UpnpSsdpServerSocket::UpnpSsdpServerSocket(QObject *parent)
@@ -45,7 +61,26 @@ UpnpSsdpServerSocket::~UpnpSsdpServerSocket()
 
 void UpnpSsdpServerSocket::init(const QString &serverName)
 {
-    d->mServerSocket = new QWebSocketServer(serverName, QWebSocketServer::NonSecureMode);
+    d->mCertificateAuthority = QSslCertificate::fromPath(d->mCertificateAuthorityFileName);
+    QSslSocket::addDefaultCaCertificates(d->mCertificateAuthority);
+
+    auto readCertificates = QSslCertificate::fromPath(d->mCertificateServerFileName);
+    if (readCertificates.size() != 1) {
+        return;
+    }
+
+    QFile myCertificate(d->mCertificateServerFileName);
+    myCertificate.open(QIODevice::ReadOnly);
+    QSslKey myPrivateKey(&myCertificate, QSsl::Rsa, QSsl::Pem, QSsl::PrivateKey, "");
+
+    QSslConfiguration myConfiguration;
+    myConfiguration.setCaCertificates(d->mCertificateAuthority);
+    myConfiguration.setLocalCertificate(readCertificates[0]);
+    myConfiguration.setPrivateKey(myPrivateKey);
+    myConfiguration.setPeerVerifyMode(QSslSocket::VerifyPeer);
+
+    d->mServerSocket = new QWebSocketServer(serverName, QWebSocketServer::SecureMode);
+    d->mServerSocket->setSslConfiguration(myConfiguration);
 
     connect(d->mServerSocket.data(), &QWebSocketServer::acceptError, this, &UpnpSsdpServerSocket::acceptError);
     connect(d->mServerSocket.data(), &QWebSocketServer::closed, this, &UpnpSsdpServerSocket::closed);
@@ -56,6 +91,28 @@ void UpnpSsdpServerSocket::init(const QString &serverName)
     connect(d->mServerSocket.data(), &QWebSocketServer::sslErrors, this, &UpnpSsdpServerSocket::sslErrors);
 
     d->mServerSocket->listen(QHostAddress::Any, 11443);
+}
+
+const QString &UpnpSsdpServerSocket::certificateAuthorityFileName() const
+{
+    return d->mCertificateAuthorityFileName;
+}
+
+void UpnpSsdpServerSocket::setCertificateAuthorityFileName(const QString &value)
+{
+    d->mCertificateAuthorityFileName = value;
+    Q_EMIT certificateAuthorityFileNameChanged();
+}
+
+const QString &UpnpSsdpServerSocket::certificateServerFileName() const
+{
+    return d->mCertificateServerFileName;
+}
+
+void UpnpSsdpServerSocket::setCertificateServerFileName(const QString &value)
+{
+    d->mCertificateServerFileName = value;
+    Q_EMIT certificateServerFileNameChanged();
 }
 
 void UpnpSsdpServerSocket::acceptError(QAbstractSocket::SocketError socketError)
@@ -72,13 +129,15 @@ void UpnpSsdpServerSocket::closed()
 
 void UpnpSsdpServerSocket::newConnection()
 {
-    QScopedPointer<QWebSocket> newConnection(d->mServerSocket->nextPendingConnection());
+    qDebug() << "UpnpSsdpServerSocket::newConnection";
+
+    QWebSocket* newConnection(d->mServerSocket->nextPendingConnection());
 
     if (!newConnection) {
         return;
     }
 
-    new UpnpWebSocketClient(newConnection);
+    new UpnpWebSocketInternalClient(newConnection);
 }
 
 void UpnpSsdpServerSocket::originAuthenticationRequired(QWebSocketCorsAuthenticator *authenticator)
@@ -101,7 +160,7 @@ void UpnpSsdpServerSocket::serverError(QWebSocketProtocol::CloseCode closeCode)
 void UpnpSsdpServerSocket::sslErrors(const QList<QSslError> &errors)
 {
     Q_UNUSED(errors);
-    qDebug() << "UpnpSsdpServerSocket::sslErrors";
+    qDebug() << "UpnpSsdpServerSocket::sslErrors" << errors;
 }
 
 
