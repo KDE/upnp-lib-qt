@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Matthieu Gallien <matthieu_gallien@yahoo.fr>
+ * Copyright 2015-2016 Matthieu Gallien <matthieu_gallien@yahoo.fr>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -28,25 +28,18 @@
 #include <QtNetwork/QSslError>
 
 #include <QtCore/QObject>
-#include <QtCore/QScopedPointer>
 #include <QtCore/QJsonObject>
 
 class QWebSocket;
 class UpnpWebSocketClientPrivate;
+class UpnpSsdpCertificateConfiguration;
 
 class UPNPQTWEBSOCKET_EXPORT UpnpWebSocketClient : public QObject
 {
     Q_OBJECT
 
-    Q_PROPERTY(QString certificateAuthorityFileName
-               READ certificateAuthorityFileName
-               WRITE setCertificateAuthorityFileName
-               NOTIFY certificateAuthorityFileNameChanged)
-
-    Q_PROPERTY(QString certificateFileName
-               READ certificateFileName
-               WRITE setCertificateFileName
-               NOTIFY certificateFileNameChanged)
+    Q_PROPERTY(UpnpSsdpCertificateConfiguration* certificateConfiguration
+               READ certificateConfiguration)
 
 public:
 
@@ -54,19 +47,11 @@ public:
 
     virtual ~UpnpWebSocketClient();
 
-    const QString& certificateAuthorityFileName() const;
-
-    void setCertificateAuthorityFileName(const QString &value);
-
-    const QString& certificateFileName() const;
-
-    void setCertificateFileName(const QString &value);
+    UpnpSsdpCertificateConfiguration* certificateConfiguration() const;
 
 Q_SIGNALS:
 
-    void certificateAuthorityFileNameChanged();
-
-    void certificateFileNameChanged();
+    void certificateConfigurationChanged();
 
 public Q_SLOTS:
 

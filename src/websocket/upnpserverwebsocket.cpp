@@ -18,20 +18,14 @@
  */
 
 #include "upnpserverwebsocket.h"
+
 #include "upnpwebsocketinternalclient.h"
+#include "upnpwebsocketcertificateconfiguration.h"
 
 #include <QtWebSockets/QWebSocketServer>
 #include <QtWebSockets/QWebSocket>
 
-#include <QtNetwork/QSslCertificate>
-#include <QtNetwork/QSslSocket>
-#include <QtNetwork/QSslConfiguration>
-#include <QtNetwork/QSslKey>
-
 #include <QtCore/QPointer>
-#include <QtCore/QSharedPointer>
-#include <QtCore/QList>
-#include <QtCore/QFile>
 #include <QtCore/QDebug>
 
 class UpnpSsdpServerSocketPrivate
@@ -40,13 +34,8 @@ public:
 
     QPointer<QWebSocketServer> mServerSocket;
 
-    QString mCertificateAuthorityFileName;
+    UpnpSsdpCertificateConfiguration mCertificateConfiguration;
 
-    QString mCertificateServerFileName;
-
-    QList<QSslCertificate> mCertificateAuthority;
-
-    QSslCertificate mCertificateServer;
 };
 
 UpnpSsdpServerSocket::UpnpSsdpServerSocket(QObject *parent)
@@ -61,23 +50,8 @@ UpnpSsdpServerSocket::~UpnpSsdpServerSocket()
 
 void UpnpSsdpServerSocket::init(const QString &serverName)
 {
-    d->mCertificateAuthority = QSslCertificate::fromPath(d->mCertificateAuthorityFileName);
-    QSslSocket::addDefaultCaCertificates(d->mCertificateAuthority);
-
-    auto readCertificates = QSslCertificate::fromPath(d->mCertificateServerFileName);
-    if (readCertificates.size() != 1) {
-        return;
-    }
-
-    QFile myCertificate(d->mCertificateServerFileName);
-    myCertificate.open(QIODevice::ReadOnly);
-    QSslKey myPrivateKey(&myCertificate, QSsl::Rsa, QSsl::Pem, QSsl::PrivateKey, "");
-
     QSslConfiguration myConfiguration;
-    myConfiguration.setCaCertificates(d->mCertificateAuthority);
-    myConfiguration.setLocalCertificate(readCertificates[0]);
-    myConfiguration.setPrivateKey(myPrivateKey);
-    myConfiguration.setPeerVerifyMode(QSslSocket::VerifyPeer);
+    d->mCertificateConfiguration.initialize(&myConfiguration);
 
     d->mServerSocket = new QWebSocketServer(serverName, QWebSocketServer::SecureMode);
     d->mServerSocket->setSslConfiguration(myConfiguration);
@@ -93,26 +67,9 @@ void UpnpSsdpServerSocket::init(const QString &serverName)
     d->mServerSocket->listen(QHostAddress::Any, 11443);
 }
 
-const QString &UpnpSsdpServerSocket::certificateAuthorityFileName() const
+UpnpSsdpCertificateConfiguration *UpnpSsdpServerSocket::certificateConfiguration() const
 {
-    return d->mCertificateAuthorityFileName;
-}
-
-void UpnpSsdpServerSocket::setCertificateAuthorityFileName(const QString &value)
-{
-    d->mCertificateAuthorityFileName = value;
-    Q_EMIT certificateAuthorityFileNameChanged();
-}
-
-const QString &UpnpSsdpServerSocket::certificateServerFileName() const
-{
-    return d->mCertificateServerFileName;
-}
-
-void UpnpSsdpServerSocket::setCertificateServerFileName(const QString &value)
-{
-    d->mCertificateServerFileName = value;
-    Q_EMIT certificateServerFileNameChanged();
+    return &d->mCertificateConfiguration;
 }
 
 void UpnpSsdpServerSocket::acceptError(QAbstractSocket::SocketError socketError)

@@ -18,6 +18,7 @@
  */
 
 #include "upnpserverwebsocket.h"
+#include "upnpwebsocketcertificateconfiguration.h"
 
 #include <QtWidgets/QApplication>
 
@@ -34,6 +35,7 @@ int __attribute__((visibility("default"))) main(int argc, char *argv[])
     QQmlFileSelector selector(&engine);
 
     qmlRegisterType<UpnpSsdpServerSocket>("org.mgallien.QmlExtension", 1, 0, "UpnpSsdpServerSocket");
+    qmlRegisterType<UpnpSsdpCertificateConfiguration>("org.mgallien.QmlExtension", 1, 0, "UpnpSsdpCertificateConfiguration");
 
     engine.load(QUrl(QStringLiteral("qrc:/proxy.qml")));
 

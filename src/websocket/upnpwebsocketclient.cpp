@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Matthieu Gallien <matthieu_gallien@yahoo.fr>
+ * Copyright 2015-2016 Matthieu Gallien <matthieu_gallien@yahoo.fr>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -19,15 +19,12 @@
 
 #include "upnpwebsocketclient.h"
 
+#include "upnpwebsocketcertificateconfiguration.h"
+
 #include <QtWebSockets/QWebSocket>
 
 #include <QtNetwork/QAuthenticator>
-#include <QtNetwork/QSslCertificate>
-#include <QtNetwork/QSslSocket>
-#include <QtNetwork/QSslConfiguration>
-#include <QtNetwork/QSslKey>
 
-#include <QtCore/QFile>
 #include <QtCore/QPointer>
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
@@ -36,11 +33,7 @@ class UpnpWebSocketClientPrivate
 {
 public:
 
-    QString mCertificateAuthorityFileName;
-
-    QString mCertificateFileName;
-
-    QList<QSslCertificate> mCertificateAuthority;
+    UpnpSsdpCertificateConfiguration mCertificateConfiguration;
 
     QPointer<QWebSocket> mSocket;
 };
@@ -55,32 +48,15 @@ UpnpWebSocketClient::~UpnpWebSocketClient()
     delete d;
 }
 
-const QString &UpnpWebSocketClient::certificateAuthorityFileName() const
+UpnpSsdpCertificateConfiguration *UpnpWebSocketClient::certificateConfiguration() const
 {
-    return d->mCertificateAuthorityFileName;
-}
-
-void UpnpWebSocketClient::setCertificateAuthorityFileName(const QString &value)
-{
-    d->mCertificateAuthorityFileName = value;
-    Q_EMIT certificateAuthorityFileNameChanged();
-}
-
-const QString &UpnpWebSocketClient::certificateFileName() const
-{
-    return d->mCertificateFileName;
-}
-
-void UpnpWebSocketClient::setCertificateFileName(const QString &value)
-{
-    d->mCertificateFileName = value;
-    Q_EMIT certificateFileNameChanged();
+    return &d->mCertificateConfiguration;
 }
 
 void UpnpWebSocketClient::connectServer(const QUrl &serverUrl)
 {
-    d->mCertificateAuthority = QSslCertificate::fromPath(d->mCertificateAuthorityFileName);
-    QSslSocket::addDefaultCaCertificates(d->mCertificateAuthority);
+    QSslConfiguration myConfiguration;
+    d->mCertificateConfiguration.initialize(&myConfiguration);
 
     d->mSocket = new QWebSocket();
 
@@ -95,21 +71,6 @@ void UpnpWebSocketClient::connectServer(const QUrl &serverUrl)
     connect(d->mSocket.data(), &QWebSocket::sslErrors, this, &UpnpWebSocketClient::sslErrors);
     connect(d->mSocket.data(), &QWebSocket::stateChanged, this, &UpnpWebSocketClient::stateChanged);
     connect(d->mSocket.data(), &QWebSocket::textMessageReceived, this, &UpnpWebSocketClient::textMessageReceived);
-
-    auto readCertificates = QSslCertificate::fromPath(d->mCertificateFileName);
-    if (readCertificates.size() != 1) {
-        return;
-    }
-
-    QFile myCertificate(d->mCertificateFileName);
-    myCertificate.open(QIODevice::ReadOnly);
-    QSslKey myPrivateKey(&myCertificate, QSsl::Rsa, QSsl::Pem, QSsl::PrivateKey, "");
-
-    QSslConfiguration myConfiguration;
-    myConfiguration.setCaCertificates(d->mCertificateAuthority);
-    myConfiguration.setLocalCertificate(readCertificates[0]);
-    myConfiguration.setPrivateKey(myPrivateKey);
-    myConfiguration.setPeerVerifyMode(QSslSocket::VerifyPeer);
 
     d->mSocket->setSslConfiguration(myConfiguration);
 

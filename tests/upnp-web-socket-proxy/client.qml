@@ -24,8 +24,8 @@ import org.mgallien.QmlExtension 1.0
 UpnpWebSocketClient {
     id: server
 
-    certificateAuthorityFileName: './rootKey.crt'
-    certificateFileName: './moi_test.pem'
+    certificateConfiguration.certificateAuthorityFileName: './rootKey.crt'
+    certificateConfiguration.certificateFileName: './moi_test.pem'
 
     Component.onCompleted: {
         connectServer('wss://moulinette:11443/')

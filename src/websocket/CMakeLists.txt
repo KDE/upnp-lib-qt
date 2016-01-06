@@ -5,6 +5,7 @@ set(upnpQtWebSocket_SOURCES
     upnpserverwebsocket.cpp
     upnpwebsocketclient.cpp
     upnpwebsocketinternalclient.cpp
+    upnpwebsocketcertificateconfiguration.cpp
     upnpwebsocketcommon.h
 )
 

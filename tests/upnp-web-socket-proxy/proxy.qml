@@ -23,8 +23,9 @@ import org.mgallien.QmlExtension 1.0
 
 UpnpSsdpServerSocket {
     id: server
-    certificateAuthorityFileName: './rootKey.crt'
-    certificateServerFileName: './moulinette.pem'
+
+    certificateConfiguration.certificateAuthorityFileName: './rootKey.crt'
+    certificateConfiguration.certificateFileName: './moulinette.pem'
 
     Component.onCompleted: init('testServer')
 }
