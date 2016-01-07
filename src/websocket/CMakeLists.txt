@@ -3,7 +3,9 @@ add_definitions(-std=c++11)
 set(upnpQtWebSocket_SOURCES
     upnpproxywebsocket.cpp
     upnpserverwebsocket.cpp
+    upnpwebsocketbaseclient.cpp
     upnpwebsocketclient.cpp
+    upnpwebsocketpublisher.cpp
     upnpwebsocketinternalclient.cpp
     upnpwebsocketcertificateconfiguration.cpp
     upnpwebsocketcommon.h

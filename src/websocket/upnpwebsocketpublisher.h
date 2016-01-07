@@ -17,8 +17,8 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#ifndef UPNPWEBSOCKETCLIENT_H
-#define UPNPWEBSOCKETCLIENT_H
+#ifndef UPNPWEBSOCKETPUBLISHER_H
+#define UPNPWEBSOCKETPUBLISHER_H
 
 #include "upnpQtWebSocket_export.h"
 
@@ -27,27 +27,37 @@
 
 #include <QtCore/QJsonObject>
 
-class QWebSocket;
-class UpnpWebSocketClientPrivate;
-class UpnpSsdpCertificateConfiguration;
+class UpnpWebSocketPublisherPrivate;
+class UpnpDeviceDescription;
 
-class UPNPQTWEBSOCKET_EXPORT UpnpWebSocketClient : public UpnpWebSocketBaseClient
+class UPNPQTWEBSOCKET_EXPORT UpnpWebSocketPublisher : public UpnpWebSocketBaseClient
 {
     Q_OBJECT
 
+    Q_PROPERTY(UpnpDeviceDescription* description
+               READ description
+               WRITE setDescription
+               NOTIFY descriptionChanged)
+
 public:
 
-    explicit UpnpWebSocketClient(QObject *parent = 0);
+    explicit UpnpWebSocketPublisher(QObject *parent = 0);
 
-    virtual ~UpnpWebSocketClient();
+    virtual ~UpnpWebSocketPublisher();
 
-    void askDeviceList();
+    void setDescription(UpnpDeviceDescription *value);
 
-    void askDeviceDetail();
+    UpnpDeviceDescription* description();
+
+    const UpnpDeviceDescription* description() const;
 
 Q_SIGNALS:
 
+    void descriptionChanged();
+
 public Q_SLOTS:
+
+    void publish();
 
 private Q_SLOTS:
 
@@ -57,8 +67,8 @@ protected:
 
 private:
 
-    UpnpWebSocketClientPrivate *d;
+    UpnpWebSocketPublisherPrivate *d;
 
 };
 
-#endif // UPNPWEBSOCKETCLIENT_H
+#endif // UPNPWEBSOCKETPUBLISHER_H

@@ -17,9 +17,10 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#include "upnpwebsocketclient.h"
+#include "upnpwebsocketpublisher.h"
 
 #include "upnpwebsocketcertificateconfiguration.h"
+#include "upnpdevicedescription.h"
 
 #include <QtWebSockets/QWebSocket>
 
@@ -29,33 +30,45 @@
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
 
-class UpnpWebSocketClientPrivate
+class UpnpWebSocketPublisherPrivate
 {
 public:
 
+    QSharedPointer<UpnpDeviceDescription> mDevice;
+
 };
 
-UpnpWebSocketClient::UpnpWebSocketClient(QObject *parent)
-    : UpnpWebSocketBaseClient(parent), d(new UpnpWebSocketClientPrivate)
+UpnpWebSocketPublisher::UpnpWebSocketPublisher(QObject *parent)
+    : UpnpWebSocketBaseClient(parent), d(new UpnpWebSocketPublisherPrivate)
 {
 }
 
-UpnpWebSocketClient::~UpnpWebSocketClient()
+UpnpWebSocketPublisher::~UpnpWebSocketPublisher()
 {
     delete d;
 }
 
-void UpnpWebSocketClient::askDeviceList()
+void UpnpWebSocketPublisher::setDescription(UpnpDeviceDescription *value)
 {
-
+    d->mDevice.reset(value);
+    Q_EMIT descriptionChanged();
 }
 
-void UpnpWebSocketClient::askDeviceDetail()
+UpnpDeviceDescription *UpnpWebSocketPublisher::description()
 {
-
+    return d->mDevice.data();
 }
 
-bool UpnpWebSocketClient::handleMessage(const QJsonObject &newMessage)
+const UpnpDeviceDescription *UpnpWebSocketPublisher::description() const
+{
+    return d->mDevice.data();
+}
+
+void UpnpWebSocketPublisher::publish()
+{
+}
+
+bool UpnpWebSocketPublisher::handleMessage(const QJsonObject &newMessage)
 {
     bool messageHandled = UpnpWebSocketBaseClient::handleMessage(newMessage);
 
@@ -77,4 +90,4 @@ bool UpnpWebSocketClient::handleMessage(const QJsonObject &newMessage)
 }
 
 
-#include "moc_upnpwebsocketclient.cpp"
+#include "moc_upnpwebsocketpublisher.cpp"
