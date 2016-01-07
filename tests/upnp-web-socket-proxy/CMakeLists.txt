@@ -32,3 +32,21 @@ target_link_libraries(upnpWebSocketClient
         Qt5::Widgets
 )
 
+set(binaryLight_SOURCES
+    binaryLight.cpp
+    binaryLight.qml
+    upnpbinarylight.cpp
+    upnpswitchpower.cpp
+)
+
+qt5_add_resources(binaryLight_SOURCES binaryLight.qrc)
+
+add_executable(binaryLight ${binaryLight_SOURCES})
+
+target_link_libraries(binaryLight
+    LINK_PRIVATE
+        upnpQtWebSocket
+        upnpQt
+        Qt5::Quick
+        Qt5::Widgets
+)

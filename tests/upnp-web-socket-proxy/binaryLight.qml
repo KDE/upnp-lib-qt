@@ -17,33 +17,17 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#ifndef UPNPBINARYLIGHT_H
-#define UPNPBINARYLIGHT_H
+import QtQml 2.2
 
-#include "upnpQt_export.h"
+import org.mgallien.QmlExtension 1.0
 
-#include "upnpabstractdevice.h"
+UpnpWebSocketClient {
+    id: server
 
-#include <QtCore/QUrl>
+    certificateConfiguration.certificateAuthorityFileName: './rootKey.crt'
+    certificateConfiguration.certificateFileName: './moi_test.pem'
 
-class BinaryLightPrivate;
-
-class UPNPQT_EXPORT BinaryLight : public UpnpAbstractDevice
-{
-    Q_OBJECT
-public:
-    explicit BinaryLight(int cacheDuration = 1800, QObject *parent = 0);
-
-    virtual ~BinaryLight();
-
-Q_SIGNALS:
-
-public Q_SLOTS:
-
-private:
-
-    BinaryLightPrivate *d;
-
-};
-
-#endif
+    Component.onCompleted: {
+        connectServer('wss://moulinette:11443/')
+    }
+}

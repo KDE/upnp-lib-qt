@@ -33,10 +33,12 @@ public:
 
     UpnpDeviceSoapServer mServer;
 
+    QSharedPointer<UpnpDeviceDescription> mDevice;
+
 };
 
 BinaryLight::BinaryLight(int cacheDuration, QObject *parent)
-    : UpnpAbstractDevice(parent), d(new BinaryLightPrivate)
+    : QObject(parent), d(new BinaryLightPrivate)
 {
     description()->setDeviceType(QStringLiteral("urn:schemas-upnp-org:device:BinaryLight:1"));
     description()->setFriendlyName(QStringLiteral("Binary Light for Test"));
@@ -56,7 +58,7 @@ BinaryLight::BinaryLight(int cacheDuration, QObject *parent)
     QPointer<UpnpAbstractService> switchPowerService(new UpnpSwitchPower);
     const int serviceIndex = 0/*addService(switchPowerService)*/;
 
-    const int deviceIndex = d->mServer.addDevice(this);
+    const int deviceIndex = 1/*d->mServer.addDevice(this)*/;
 
     QUrl eventUrl = d->mServer.urlPrefix();
     eventUrl.setPath(QStringLiteral("/") + QString::number(deviceIndex) + QStringLiteral("/") + QString::number(serviceIndex) + QStringLiteral("/event"));
@@ -80,6 +82,22 @@ BinaryLight::BinaryLight(int cacheDuration, QObject *parent)
 BinaryLight::~BinaryLight()
 {
     delete d;
+}
+
+void BinaryLight::setDescription(UpnpDeviceDescription *value)
+{
+    d->mDevice.reset(value);
+    Q_EMIT descriptionChanged();
+}
+
+UpnpDeviceDescription *BinaryLight::description()
+{
+    return d->mDevice.data();
+}
+
+const UpnpDeviceDescription *BinaryLight::description() const
+{
+    return d->mDevice.data();
 }
 
 #include "moc_upnpbinarylight.cpp"

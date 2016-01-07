@@ -17,37 +17,45 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#ifndef UPNPDEVICESOAPSERVER_H
-#define UPNPDEVICESOAPSERVER_H
+#ifndef UPNPBINARYLIGHT_H
+#define UPNPBINARYLIGHT_H
 
-#include "upnpQt_export.h"
+#include "upnpabstractdevice.h"
 
-#include <KDSoapServer/KDSoapServer.h>
+#include <QtCore/QUrl>
 
-#include <QtCore/QObject>
+class BinaryLightPrivate;
 
-class UpnpAbstractDevice;
-class UpnpDeviceSoapServerPrivate;
-
-class UPNPQT_EXPORT UpnpDeviceSoapServer : public KDSoapServer
+class BinaryLight : public QObject
 {
     Q_OBJECT
+
+    Q_PROPERTY(UpnpDeviceDescription* description
+               READ description
+               WRITE setDescription
+               NOTIFY descriptionChanged)
+
 public:
-    UpnpDeviceSoapServer(QObject * parent = 0);
+    explicit BinaryLight(int cacheDuration = 1800, QObject *parent = 0);
 
-    virtual ~UpnpDeviceSoapServer();
+    virtual ~BinaryLight();
 
-    int addDevice(UpnpAbstractDevice *device);
+    void setDescription(UpnpDeviceDescription *value);
 
-    void removeDevice(int index);
+    UpnpDeviceDescription* description();
 
-    QObject* createServerObject() Q_DECL_OVERRIDE;
+    const UpnpDeviceDescription* description() const;
 
-    QUrl urlPrefix() const;
+Q_SIGNALS:
+
+    void descriptionChanged();
+
+public Q_SLOTS:
 
 private:
 
-    UpnpDeviceSoapServerPrivate *d;
+    BinaryLightPrivate *d;
+
 };
 
 #endif

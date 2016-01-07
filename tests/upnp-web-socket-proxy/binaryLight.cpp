@@ -17,37 +17,27 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#ifndef UPNPDEVICESOAPSERVER_H
-#define UPNPDEVICESOAPSERVER_H
+#include "upnpwebsocketclient.h"
+#include "upnpwebsocketcertificateconfiguration.h"
 
-#include "upnpQt_export.h"
+#include <QtWidgets/QApplication>
 
-#include <KDSoapServer/KDSoapServer.h>
+#include <QtQml/QQmlApplicationEngine>
+#include <QtQml/QQmlEngine>
+#include <QtQml/QQmlFileSelector>
+#include <QtQml>
 
-#include <QtCore/QObject>
-
-class UpnpAbstractDevice;
-class UpnpDeviceSoapServerPrivate;
-
-class UPNPQT_EXPORT UpnpDeviceSoapServer : public KDSoapServer
+int __attribute__((visibility("default"))) main(int argc, char *argv[])
 {
-    Q_OBJECT
-public:
-    UpnpDeviceSoapServer(QObject * parent = 0);
+    QApplication app(argc, argv);
 
-    virtual ~UpnpDeviceSoapServer();
+    QQmlApplicationEngine engine;
+    QQmlFileSelector selector(&engine);
 
-    int addDevice(UpnpAbstractDevice *device);
+    qmlRegisterType<UpnpWebSocketClient>("org.mgallien.QmlExtension", 1, 0, "UpnpWebSocketClient");
+    qmlRegisterType<UpnpSsdpCertificateConfiguration>("org.mgallien.QmlExtension", 1, 0, "UpnpSsdpCertificateConfiguration");
 
-    void removeDevice(int index);
+    engine.load(QUrl(QStringLiteral("qrc:/binaryLight.qml")));
 
-    QObject* createServerObject() Q_DECL_OVERRIDE;
-
-    QUrl urlPrefix() const;
-
-private:
-
-    UpnpDeviceSoapServerPrivate *d;
-};
-
-#endif
+    return app.exec();
+}

@@ -16,8 +16,6 @@ set(upnpQt_SOURCES
     upnpabstractservice.cpp
     upnpdevicesoapserver.cpp
     upnpdevicesoapserverobject.cpp
-    upnpbinarylight.cpp
-    upnpswitchpower.cpp
     upnpbasictypes.h
     upnpeventsubscriber.cpp
     upnpcontrolmediaserver.cpp
@@ -45,8 +43,6 @@ ecm_generate_headers(
     UpnpAbstractService
     UpnpDeviceSoapServer
     UpnpDeviceSoapServerObject
-    UpnpBinaryLight
-    UpnpSwitchPower
     UpnpBasicTypes
     UpnpEventSubscriber
     UpnpDiscoveryResult
