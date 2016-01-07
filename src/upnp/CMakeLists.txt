@@ -65,17 +65,17 @@ target_link_libraries(upnpQt
     LINK_PRIVATE
         Qt5::Network
         Qt5::Xml
-        KDSoap::kdsoap-server
 )
 
 target_link_libraries(upnpQt
     LINK_PUBLIC
         Qt5::Core
         KDSoap::kdsoap
+        KDSoap::kdsoap-server
         upnpQtBase
 )
 
-target_include_directories(upnpQt PRIVATE ${KDSoap_INCLUDE_DIRS})
+target_include_directories(upnpQt PUBLIC ${KDSoap_INCLUDE_DIRS})
 
 target_include_directories(upnpQt PUBLIC "$<BUILD_INTERFACE:${upnpQt_INCLUDE_DIRS}>")
 
