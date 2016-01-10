@@ -143,20 +143,25 @@ void UpnpWebSocketInternalClient::textMessageReceived(const QString &message)
     Q_UNUSED(message);
 }
 
-QJsonDocument UpnpWebSocketInternalClient::createMessage(UpnpWebSocketMessageType type)
+QJsonObject UpnpWebSocketInternalClient::createMessage(UpnpWebSocketMessageType type)
 {
     QJsonObject answerObject;
     answerObject.insert(QStringLiteral("messageType"), QJsonValue(static_cast<int>(type)));
 
-    QJsonDocument answer;
-    answer.setObject(answerObject);
+    return answerObject;
+}
 
-    return answer;
+void UpnpWebSocketInternalClient::sendMessage(const QJsonObject &messageObject)
+{
+    QJsonDocument newMessage;
+    newMessage.setObject(messageObject);
+
+    d->mSocket->sendBinaryMessage(newMessage.toBinaryData());
 }
 
 void UpnpWebSocketInternalClient::sendError()
 {
-    d->mSocket->sendBinaryMessage(createMessage(UpnpWebSocketMessageType::Error).toBinaryData());
+    sendMessage(createMessage(UpnpWebSocketMessageType::Error));
 }
 
 void UpnpWebSocketInternalClient::handleHello(QJsonObject aObject)
@@ -165,7 +170,7 @@ void UpnpWebSocketInternalClient::handleHello(QJsonObject aObject)
 
     qDebug() << "UpnpWebSocketInternalClient::handleHello";
 
-    d->mSocket->sendBinaryMessage(createMessage(UpnpWebSocketMessageType::HelloAck).toBinaryData());
+    sendMessage(createMessage(UpnpWebSocketMessageType::HelloAck));
 }
 
 void UpnpWebSocketInternalClient::handleNewService(QJsonObject aObject)

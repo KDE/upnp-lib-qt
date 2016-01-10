@@ -62,7 +62,9 @@ private Q_SLOTS:
 
 private:
 
-    QJsonDocument createMessage(UpnpWebSocketMessageType type);
+    QJsonObject createMessage(UpnpWebSocketMessageType type);
+
+    void sendMessage(const QJsonObject &messageObject);
 
     void sendError();
 
