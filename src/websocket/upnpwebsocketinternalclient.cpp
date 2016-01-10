@@ -192,6 +192,12 @@ void UpnpWebSocketInternalClient::handleNewService(QJsonObject aObject)
 
     qDebug() << newDevice;
     qDebug() << newDeviceDescription->deviceType();
+
+    auto newObject = createMessage(UpnpWebSocketMessageType::ServiceIsPublished);
+
+    newObject.insert(QStringLiteral("UDN"), newDeviceDescription->UDN());
+
+    sendMessage(newObject);
 }
 
 UpnpWebSocketMessageType UpnpWebSocketInternalClient::getType(QJsonObject aObject)
