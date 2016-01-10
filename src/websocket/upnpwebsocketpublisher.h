@@ -29,6 +29,7 @@
 
 class UpnpWebSocketPublisherPrivate;
 class UpnpDeviceDescription;
+class UpnpServiceDescription;
 
 class UPNPQTWEBSOCKET_EXPORT UpnpWebSocketPublisher : public UpnpWebSocketBaseClient
 {
@@ -51,6 +52,10 @@ public:
 
     const UpnpDeviceDescription* description() const;
 
+    static QJsonObject serviceDescriptionToJson(const UpnpServiceDescription *serviceDescription);
+
+    static QJsonObject deviceDescriptionToJson(const UpnpDeviceDescription *deviceDescription);
+
 Q_SIGNALS:
 
     void descriptionChanged();
@@ -66,6 +71,10 @@ protected:
     bool handleMessage(const QJsonObject &newMessage) override;
 
 private:
+
+    void addDeviceDescription(QJsonObject &newMessage, const UpnpDeviceDescription *deviceDescription);
+
+    void handleHelloAck(QJsonObject aObject);
 
     UpnpWebSocketPublisherPrivate *d;
 

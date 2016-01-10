@@ -21,13 +21,19 @@ import QtQml 2.2
 
 import org.mgallien.QmlExtension 1.0
 
-UpnpWebSocketClient {
-    id: server
+BinaryLight {
+    id: myLight
 
-    certificateConfiguration.certificateAuthorityFileName: './rootKey.crt'
-    certificateConfiguration.certificateFileName: './moi_test.pem'
+    webSocketPublisher: UpnpWebSocketPublisher {
+        id: server
 
-    Component.onCompleted: {
-        connectServer('wss://moulinette:11443/')
+        certificateConfiguration.certificateAuthorityFileName: './rootKey.crt'
+        certificateConfiguration.certificateFileName: './moi_test.pem'
+
+        description: myLight.description
+
+        Component.onCompleted: {
+            connectServer('wss://moulinette:11443/')
+        }
     }
 }

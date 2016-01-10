@@ -28,6 +28,7 @@ enum class UpnpWebSocketMessageType {
     Hello,
     HelloAck,
     ServiceList,
+    PublishService,
 };
 
 #endif // UPNPWEBSOCKETCOMMON_H

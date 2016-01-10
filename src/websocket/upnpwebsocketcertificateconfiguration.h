@@ -17,8 +17,8 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#ifndef UPNPSSDPCERTIFICATECONFIGURATION_H
-#define UPNPSSDPCERTIFICATECONFIGURATION_H
+#ifndef UPNPWEBSOCKETCERTIFICATECONFIGURATION_H
+#define UPNPWEBSOCKETCERTIFICATECONFIGURATION_H
 
 #include "upnpQtWebSocket_export.h"
 
@@ -28,7 +28,7 @@
 class UpnpSsdpCertificateConfigurationPrivate;
 class QSslConfiguration;
 
-class UPNPQTWEBSOCKET_EXPORT UpnpSsdpCertificateConfiguration : public QObject
+class UPNPQTWEBSOCKET_EXPORT UpnpWebSocketCertificateConfiguration : public QObject
 {
     Q_OBJECT
 
@@ -44,9 +44,9 @@ class UPNPQTWEBSOCKET_EXPORT UpnpSsdpCertificateConfiguration : public QObject
 
 public:
 
-    explicit UpnpSsdpCertificateConfiguration(QObject *parent = 0);
+    explicit UpnpWebSocketCertificateConfiguration(QObject *parent = 0);
 
-    virtual ~UpnpSsdpCertificateConfiguration();
+    virtual ~UpnpWebSocketCertificateConfiguration();
 
     const QString& certificateAuthorityFileName() const;
 

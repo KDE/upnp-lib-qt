@@ -2,7 +2,7 @@ add_definitions(-std=c++11)
 
 set(upnpQtWebSocket_SOURCES
     upnpproxywebsocket.cpp
-    upnpserverwebsocket.cpp
+    upnpwebsocketserversocket.cpp
     upnpwebsocketbaseclient.cpp
     upnpwebsocketclient.cpp
     upnpwebsocketpublisher.cpp
@@ -15,7 +15,7 @@ ecm_generate_headers(
   upnpQtWebSocket_CamelCase_HEADERS
   HEADER_NAMES
     UpnpProxyWebSocket
-    UpnpServerWebSocket
+    UpnpWebSocketServerSocket
 
   PREFIX upnpQtWebSocket
   REQUIRED_HEADERS upnpQtWebSocket_HEADERS

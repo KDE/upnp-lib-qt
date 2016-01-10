@@ -65,6 +65,8 @@ private:
 
     void handleHello(QJsonObject aObject);
 
+    void handleNewService(QJsonObject aObject);
+
     static UpnpWebSocketMessageType getType(QJsonObject aObject);
 
     UpnpWebSocketClientPrivate *d;

@@ -32,13 +32,13 @@
 
 class QWebSocket;
 class UpnpWebSocketBaseClientPrivate;
-class UpnpSsdpCertificateConfiguration;
+class UpnpWebSocketCertificateConfiguration;
 
 class UPNPQTWEBSOCKET_EXPORT UpnpWebSocketBaseClient : public QObject
 {
     Q_OBJECT
 
-    Q_PROPERTY(UpnpSsdpCertificateConfiguration* certificateConfiguration
+    Q_PROPERTY(UpnpWebSocketCertificateConfiguration* certificateConfiguration
                READ certificateConfiguration)
 
 public:
@@ -47,7 +47,7 @@ public:
 
     virtual ~UpnpWebSocketBaseClient();
 
-    UpnpSsdpCertificateConfiguration* certificateConfiguration() const;
+    UpnpWebSocketCertificateConfiguration* certificateConfiguration() const;
 
 Q_SIGNALS:
 
@@ -82,9 +82,9 @@ protected:
 
     QJsonObject createMessage(UpnpWebSocketMessageType type);
 
-private:
+    void sendMessage(const QJsonObject &messageObject);
 
-    void handleHelloAck(QJsonObject aObject);
+private:
 
     UpnpWebSocketBaseClientPrivate *d;
 

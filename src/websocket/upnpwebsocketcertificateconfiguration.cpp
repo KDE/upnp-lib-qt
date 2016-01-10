@@ -39,39 +39,39 @@ public:
 
 };
 
-UpnpSsdpCertificateConfiguration::UpnpSsdpCertificateConfiguration(QObject *parent)
+UpnpWebSocketCertificateConfiguration::UpnpWebSocketCertificateConfiguration(QObject *parent)
     : QObject(parent), d(new UpnpSsdpCertificateConfigurationPrivate)
 {
 }
 
-UpnpSsdpCertificateConfiguration::~UpnpSsdpCertificateConfiguration()
+UpnpWebSocketCertificateConfiguration::~UpnpWebSocketCertificateConfiguration()
 {
     delete d;
 }
 
-const QString &UpnpSsdpCertificateConfiguration::certificateAuthorityFileName() const
+const QString &UpnpWebSocketCertificateConfiguration::certificateAuthorityFileName() const
 {
     return d->mCertificateAuthorityFileName;
 }
 
-void UpnpSsdpCertificateConfiguration::setCertificateAuthorityFileName(const QString &value)
+void UpnpWebSocketCertificateConfiguration::setCertificateAuthorityFileName(const QString &value)
 {
     d->mCertificateAuthorityFileName = value;
     Q_EMIT certificateAuthorityFileNameChanged();
 }
 
-const QString &UpnpSsdpCertificateConfiguration::certificateFileName() const
+const QString &UpnpWebSocketCertificateConfiguration::certificateFileName() const
 {
     return d->mCertificateFileName;
 }
 
-void UpnpSsdpCertificateConfiguration::setCertificateFileName(const QString &value)
+void UpnpWebSocketCertificateConfiguration::setCertificateFileName(const QString &value)
 {
     d->mCertificateFileName = value;
     Q_EMIT certificateFileNameChanged();
 }
 
-void UpnpSsdpCertificateConfiguration::initialize(QSslConfiguration *configuration)
+void UpnpWebSocketCertificateConfiguration::initialize(QSslConfiguration *configuration)
 {
     d->mCertificateAuthority = QSslCertificate::fromPath(d->mCertificateAuthorityFileName);
     QSslSocket::addDefaultCaCertificates(d->mCertificateAuthority);

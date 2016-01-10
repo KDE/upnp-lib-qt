@@ -25,6 +25,7 @@
 #include <QtCore/QUrl>
 
 class BinaryLightPrivate;
+class UpnpWebSocketPublisher;
 
 class BinaryLight : public QObject
 {
@@ -32,23 +33,31 @@ class BinaryLight : public QObject
 
     Q_PROPERTY(UpnpDeviceDescription* description
                READ description
-               WRITE setDescription
                NOTIFY descriptionChanged)
+
+    Q_PROPERTY(UpnpWebSocketPublisher* webSocketPublisher
+               READ webSocketPublisher
+               WRITE setWebSocketPublisher
+               NOTIFY webSocketPublisherChanged)
 
 public:
     explicit BinaryLight(int cacheDuration = 1800, QObject *parent = 0);
 
     virtual ~BinaryLight();
 
-    void setDescription(UpnpDeviceDescription *value);
-
     UpnpDeviceDescription* description();
 
     const UpnpDeviceDescription* description() const;
 
+    void setWebSocketPublisher(UpnpWebSocketPublisher *value);
+
+    UpnpWebSocketPublisher* webSocketPublisher() const;
+
 Q_SIGNALS:
 
     void descriptionChanged();
+
+    void webSocketPublisherChanged();
 
 public Q_SLOTS:
 

@@ -21,6 +21,7 @@
 
 #include "upnpwebsocketcertificateconfiguration.h"
 #include "upnpdevicedescription.h"
+#include "upnpservicedescription.h"
 
 #include <QtWebSockets/QWebSocket>
 
@@ -29,6 +30,7 @@
 #include <QtCore/QPointer>
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
+#include <QtCore/QJsonArray>
 
 class UpnpWebSocketPublisherPrivate
 {
@@ -64,8 +66,49 @@ const UpnpDeviceDescription *UpnpWebSocketPublisher::description() const
     return d->mDevice.data();
 }
 
+QJsonObject UpnpWebSocketPublisher::serviceDescriptionToJson(const UpnpServiceDescription *serviceDescription)
+{
+    QJsonObject result;
+
+    result.insert(QStringLiteral("serviceType"), serviceDescription->serviceType());
+    result.insert(QStringLiteral("serviceId"), serviceDescription->serviceId());
+
+    return result;
+}
+
+QJsonObject UpnpWebSocketPublisher::deviceDescriptionToJson(const UpnpDeviceDescription *deviceDescription)
+{
+    QJsonObject result;
+
+    result.insert(QStringLiteral("UDN"), deviceDescription->UDN());
+    result.insert(QStringLiteral("UPC"), deviceDescription->UPC());
+    result.insert(QStringLiteral("deviceType"), deviceDescription->deviceType());
+    result.insert(QStringLiteral("friendlyName"), deviceDescription->friendlyName());
+    result.insert(QStringLiteral("manufacturer"), deviceDescription->manufacturer());
+    result.insert(QStringLiteral("manufacturerURL"), deviceDescription->manufacturerURL().toString());
+    result.insert(QStringLiteral("modelDescription"), deviceDescription->modelDescription());
+    result.insert(QStringLiteral("modelName"), deviceDescription->modelName());
+    result.insert(QStringLiteral("modelNumber"), deviceDescription->modelNumber());
+    result.insert(QStringLiteral("modelURL"), deviceDescription->modelURL().toString());
+    result.insert(QStringLiteral("serialNumber"), deviceDescription->serialNumber());
+
+    QJsonArray allServices;
+
+    for (auto service : deviceDescription->services()) {
+        allServices.append(serviceDescriptionToJson(service.data()));
+    }
+
+    result.insert(QStringLiteral("services"), allServices);
+
+    return result;
+}
+
 void UpnpWebSocketPublisher::publish()
 {
+    auto newObject = createMessage(UpnpWebSocketMessageType::PublishService);
+
+    addDeviceDescription(newObject, description());
+    sendMessage(newObject);
 }
 
 bool UpnpWebSocketPublisher::handleMessage(const QJsonObject &newMessage)
@@ -78,15 +121,29 @@ bool UpnpWebSocketPublisher::handleMessage(const QJsonObject &newMessage)
 
     switch(getType(newMessage))
     {
-    /*case UpnpWebSocketMessageType::HelloAck:
+    case UpnpWebSocketMessageType::HelloAck:
         handleHelloAck(newMessage);
         messageHandled = true;
-        break;*/
+        break;
     default:
         break;
     }
 
     return messageHandled;
+}
+
+void UpnpWebSocketPublisher::addDeviceDescription(QJsonObject &newMessage, const UpnpDeviceDescription *deviceDescription)
+{
+    newMessage.insert(QStringLiteral("device"), deviceDescriptionToJson(deviceDescription));
+}
+
+void UpnpWebSocketPublisher::handleHelloAck(QJsonObject aObject)
+{
+    Q_UNUSED(aObject);
+
+    qDebug() << "UpnpWebSocketPublisher::handleHelloAck";
+
+    publish();
 }
 
 

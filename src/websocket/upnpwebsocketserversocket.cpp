@@ -17,7 +17,7 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#include "upnpserverwebsocket.h"
+#include "upnpwebsocketserversocket.h"
 
 #include "upnpwebsocketinternalclient.h"
 #include "upnpwebsocketcertificateconfiguration.h"
@@ -34,21 +34,21 @@ public:
 
     QPointer<QWebSocketServer> mServerSocket;
 
-    UpnpSsdpCertificateConfiguration mCertificateConfiguration;
+    UpnpWebSocketCertificateConfiguration mCertificateConfiguration;
 
 };
 
-UpnpSsdpServerSocket::UpnpSsdpServerSocket(QObject *parent)
+UpnpWebSocketServerSocket::UpnpWebSocketServerSocket(QObject *parent)
     : QObject(parent), d(new UpnpSsdpServerSocketPrivate)
 {
 }
 
-UpnpSsdpServerSocket::~UpnpSsdpServerSocket()
+UpnpWebSocketServerSocket::~UpnpWebSocketServerSocket()
 {
     delete d;
 }
 
-void UpnpSsdpServerSocket::init(const QString &serverName)
+void UpnpWebSocketServerSocket::init(const QString &serverName)
 {
     QSslConfiguration myConfiguration;
     d->mCertificateConfiguration.initialize(&myConfiguration);
@@ -56,35 +56,35 @@ void UpnpSsdpServerSocket::init(const QString &serverName)
     d->mServerSocket = new QWebSocketServer(serverName, QWebSocketServer::SecureMode);
     d->mServerSocket->setSslConfiguration(myConfiguration);
 
-    connect(d->mServerSocket.data(), &QWebSocketServer::acceptError, this, &UpnpSsdpServerSocket::acceptError);
-    connect(d->mServerSocket.data(), &QWebSocketServer::closed, this, &UpnpSsdpServerSocket::closed);
-    connect(d->mServerSocket.data(), &QWebSocketServer::newConnection, this, &UpnpSsdpServerSocket::newConnection);
-    connect(d->mServerSocket.data(), &QWebSocketServer::originAuthenticationRequired, this, &UpnpSsdpServerSocket::originAuthenticationRequired);
-    connect(d->mServerSocket.data(), &QWebSocketServer::peerVerifyError, this, &UpnpSsdpServerSocket::peerVerifyError);
-    connect(d->mServerSocket.data(), &QWebSocketServer::serverError, this, &UpnpSsdpServerSocket::serverError);
-    connect(d->mServerSocket.data(), &QWebSocketServer::sslErrors, this, &UpnpSsdpServerSocket::sslErrors);
+    connect(d->mServerSocket.data(), &QWebSocketServer::acceptError, this, &UpnpWebSocketServerSocket::acceptError);
+    connect(d->mServerSocket.data(), &QWebSocketServer::closed, this, &UpnpWebSocketServerSocket::closed);
+    connect(d->mServerSocket.data(), &QWebSocketServer::newConnection, this, &UpnpWebSocketServerSocket::newConnection);
+    connect(d->mServerSocket.data(), &QWebSocketServer::originAuthenticationRequired, this, &UpnpWebSocketServerSocket::originAuthenticationRequired);
+    connect(d->mServerSocket.data(), &QWebSocketServer::peerVerifyError, this, &UpnpWebSocketServerSocket::peerVerifyError);
+    connect(d->mServerSocket.data(), &QWebSocketServer::serverError, this, &UpnpWebSocketServerSocket::serverError);
+    connect(d->mServerSocket.data(), &QWebSocketServer::sslErrors, this, &UpnpWebSocketServerSocket::sslErrors);
 
     d->mServerSocket->listen(QHostAddress::Any, 11443);
 }
 
-UpnpSsdpCertificateConfiguration *UpnpSsdpServerSocket::certificateConfiguration() const
+UpnpWebSocketCertificateConfiguration *UpnpWebSocketServerSocket::certificateConfiguration() const
 {
     return &d->mCertificateConfiguration;
 }
 
-void UpnpSsdpServerSocket::acceptError(QAbstractSocket::SocketError socketError)
+void UpnpWebSocketServerSocket::acceptError(QAbstractSocket::SocketError socketError)
 {
     Q_UNUSED(socketError);
 
     qDebug() << "UpnpSsdpServerSocket::acceptError";
 }
 
-void UpnpSsdpServerSocket::closed()
+void UpnpWebSocketServerSocket::closed()
 {
     qDebug() << "UpnpSsdpServerSocket::closed";
 }
 
-void UpnpSsdpServerSocket::newConnection()
+void UpnpWebSocketServerSocket::newConnection()
 {
     qDebug() << "UpnpSsdpServerSocket::newConnection";
 
@@ -97,28 +97,28 @@ void UpnpSsdpServerSocket::newConnection()
     new UpnpWebSocketInternalClient(newConnection);
 }
 
-void UpnpSsdpServerSocket::originAuthenticationRequired(QWebSocketCorsAuthenticator *authenticator)
+void UpnpWebSocketServerSocket::originAuthenticationRequired(QWebSocketCorsAuthenticator *authenticator)
 {
     authenticator->setAllowed(true);
 }
 
-void UpnpSsdpServerSocket::peerVerifyError(const QSslError &error)
+void UpnpWebSocketServerSocket::peerVerifyError(const QSslError &error)
 {
     Q_UNUSED(error);
     qDebug() << "UpnpSsdpServerSocket::peerVerifyError";
 }
 
-void UpnpSsdpServerSocket::serverError(QWebSocketProtocol::CloseCode closeCode)
+void UpnpWebSocketServerSocket::serverError(QWebSocketProtocol::CloseCode closeCode)
 {
     Q_UNUSED(closeCode);
     qDebug() << "UpnpSsdpServerSocket::serverError" << closeCode << d->mServerSocket->errorString();
 }
 
-void UpnpSsdpServerSocket::sslErrors(const QList<QSslError> &errors)
+void UpnpWebSocketServerSocket::sslErrors(const QList<QSslError> &errors)
 {
     Q_UNUSED(errors);
     qDebug() << "UpnpSsdpServerSocket::sslErrors" << errors;
 }
 
 
-#include "moc_upnpserverwebsocket.cpp"
+#include "moc_upnpwebsocketserversocket.cpp"

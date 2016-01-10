@@ -33,7 +33,7 @@ class UpnpWebSocketBaseClientPrivate
 {
 public:
 
-    UpnpSsdpCertificateConfiguration mCertificateConfiguration;
+    UpnpWebSocketCertificateConfiguration mCertificateConfiguration;
 
     QPointer<QWebSocket> mSocket;
 };
@@ -48,7 +48,7 @@ UpnpWebSocketBaseClient::~UpnpWebSocketBaseClient()
     delete d;
 }
 
-UpnpSsdpCertificateConfiguration *UpnpWebSocketBaseClient::certificateConfiguration() const
+UpnpWebSocketCertificateConfiguration *UpnpWebSocketBaseClient::certificateConfiguration() const
 {
     return &d->mCertificateConfiguration;
 }
@@ -80,11 +80,7 @@ void UpnpWebSocketBaseClient::connectServer(const QUrl &serverUrl)
 void UpnpWebSocketBaseClient::sendHello()
 {
     auto newObject = createMessage(UpnpWebSocketMessageType::Hello);
-
-    QJsonDocument newMessage;
-    newMessage.setObject(newObject);
-
-    d->mSocket->sendBinaryMessage(newMessage.toBinaryData());
+    sendMessage(newObject);
 }
 
 void UpnpWebSocketBaseClient::aboutToClose()
@@ -167,29 +163,15 @@ bool UpnpWebSocketBaseClient::handleMessage(const QJsonObject &newMessage)
 
     switch(getType(newMessage))
     {
-    case UpnpWebSocketMessageType::HelloAck:
+    /*case UpnpWebSocketMessageType::HelloAck:
         handleHelloAck(newMessage);
         messageHandled = true;
-        break;
+        break;*/
     default:
         break;
     }
 
     return messageHandled;
-}
-
-void UpnpWebSocketBaseClient::handleHelloAck(QJsonObject aObject)
-{
-    Q_UNUSED(aObject);
-
-    qDebug() << "UpnpWebSocketBaseClient::handleHelloAck";
-
-    auto newObject = createMessage(UpnpWebSocketMessageType::ServiceList);
-
-    QJsonDocument newMessage;
-    newMessage.setObject(newObject);
-
-    d->mSocket->sendBinaryMessage(newMessage.toBinaryData());
 }
 
 UpnpWebSocketMessageType UpnpWebSocketBaseClient::getType(QJsonObject aObject)
@@ -223,6 +205,14 @@ QJsonObject UpnpWebSocketBaseClient::createMessage(UpnpWebSocketMessageType type
     answerObject.insert(QStringLiteral("messageType"), QJsonValue(static_cast<int>(type)));
 
     return answerObject;
+}
+
+void UpnpWebSocketBaseClient::sendMessage(const QJsonObject &messageObject)
+{
+    QJsonDocument newMessage;
+    newMessage.setObject(messageObject);
+
+    d->mSocket->sendBinaryMessage(newMessage.toBinaryData());
 }
 
 

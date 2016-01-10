@@ -35,7 +35,7 @@ int __attribute__((visibility("default"))) main(int argc, char *argv[])
     QQmlFileSelector selector(&engine);
 
     qmlRegisterType<UpnpWebSocketClient>("org.mgallien.QmlExtension", 1, 0, "UpnpWebSocketClient");
-    qmlRegisterType<UpnpSsdpCertificateConfiguration>("org.mgallien.QmlExtension", 1, 0, "UpnpSsdpCertificateConfiguration");
+    qmlRegisterType<UpnpWebSocketCertificateConfiguration>("org.mgallien.QmlExtension", 1, 0, "UpnpSsdpCertificateConfiguration");
 
     engine.load(QUrl(QStringLiteral("qrc:/client.qml")));
 

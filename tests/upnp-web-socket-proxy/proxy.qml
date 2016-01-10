@@ -21,7 +21,7 @@ import QtQml 2.2
 
 import org.mgallien.QmlExtension 1.0
 
-UpnpSsdpServerSocket {
+UpnpWebSocketServerSocket {
     id: server
 
     certificateConfiguration.certificateAuthorityFileName: './rootKey.crt'

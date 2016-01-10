@@ -84,6 +84,9 @@ void UpnpWebSocketInternalClient::binaryMessageReceived(const QByteArray &messag
     case UpnpWebSocketMessageType::Hello:
         handleHello(newMessageObject);
         break;
+    case UpnpWebSocketMessageType::PublishService:
+        handleNewService(newMessageObject);
+        break;
     default:
         qDebug() << "UpnpWebSocketInternalClient::binaryMessageReceived" << "unknown message" << static_cast<int>(getType(newMessageObject));
         break;
@@ -160,6 +163,24 @@ void UpnpWebSocketInternalClient::handleHello(QJsonObject aObject)
     d->mSocket->sendBinaryMessage(createMessage(UpnpWebSocketMessageType::HelloAck).toBinaryData());
 }
 
+void UpnpWebSocketInternalClient::handleNewService(QJsonObject aObject)
+{
+    qDebug() << "UpnpWebSocketInternalClient::handleNewService";
+
+    auto deviceKey = aObject.find(QStringLiteral("device"));
+    if (deviceKey == aObject.end()) {
+        return;
+    }
+
+    if (deviceKey.value().isUndefined() || deviceKey.value().isNull() || !deviceKey.value().isObject()) {
+        return;
+    }
+
+    auto newDevice = deviceKey.value().toObject();
+
+    qDebug() << newDevice;
+}
+
 UpnpWebSocketMessageType UpnpWebSocketInternalClient::getType(QJsonObject aObject)
 {
     auto messageTypeKey = aObject.find(QStringLiteral("messageType"));
@@ -178,7 +199,7 @@ UpnpWebSocketMessageType UpnpWebSocketInternalClient::getType(QJsonObject aObjec
     int messageTypeInt = static_cast<int>(messageTypeKey.value().toDouble());
 
     if (messageTypeInt < static_cast<int>(UpnpWebSocketMessageType::Hello) ||
-            messageTypeInt > static_cast<int>(UpnpWebSocketMessageType::HelloAck)) {
+            messageTypeInt > static_cast<int>(UpnpWebSocketMessageType::PublishService)) {
         return UpnpWebSocketMessageType::Undefined;
     }
 

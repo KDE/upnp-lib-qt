@@ -17,7 +17,7 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#include "upnpserverwebsocket.h"
+#include "upnpwebsocketserversocket.h"
 #include "upnpwebsocketcertificateconfiguration.h"
 
 #include <QtWidgets/QApplication>
@@ -34,8 +34,8 @@ int __attribute__((visibility("default"))) main(int argc, char *argv[])
     QQmlApplicationEngine engine;
     QQmlFileSelector selector(&engine);
 
-    qmlRegisterType<UpnpSsdpServerSocket>("org.mgallien.QmlExtension", 1, 0, "UpnpSsdpServerSocket");
-    qmlRegisterType<UpnpSsdpCertificateConfiguration>("org.mgallien.QmlExtension", 1, 0, "UpnpSsdpCertificateConfiguration");
+    qmlRegisterType<UpnpWebSocketServerSocket>("org.mgallien.QmlExtension", 1, 0, "UpnpWebSocketServerSocket");
+    qmlRegisterType<UpnpWebSocketCertificateConfiguration>("org.mgallien.QmlExtension", 1, 0, "UpnpWebSocketCertificateConfiguration");
 
     engine.load(QUrl(QStringLiteral("qrc:/proxy.qml")));
 

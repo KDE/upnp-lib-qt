@@ -29,7 +29,7 @@
 
 class QWebSocket;
 class UpnpWebSocketClientPrivate;
-class UpnpSsdpCertificateConfiguration;
+class UpnpWebSocketCertificateConfiguration;
 
 class UPNPQTWEBSOCKET_EXPORT UpnpWebSocketClient : public UpnpWebSocketBaseClient
 {

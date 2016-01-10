@@ -19,6 +19,10 @@
 
 #include "upnpwebsocketclient.h"
 #include "upnpwebsocketcertificateconfiguration.h"
+#include "upnpwebsocketpublisher.h"
+#include "upnpbinarylight.h"
+
+#include "upnpdevicedescription.h"
 
 #include <QtWidgets/QApplication>
 
@@ -35,7 +39,11 @@ int __attribute__((visibility("default"))) main(int argc, char *argv[])
     QQmlFileSelector selector(&engine);
 
     qmlRegisterType<UpnpWebSocketClient>("org.mgallien.QmlExtension", 1, 0, "UpnpWebSocketClient");
-    qmlRegisterType<UpnpSsdpCertificateConfiguration>("org.mgallien.QmlExtension", 1, 0, "UpnpSsdpCertificateConfiguration");
+    qmlRegisterType<UpnpWebSocketCertificateConfiguration>("org.mgallien.QmlExtension", 1, 0, "UpnpSsdpCertificateConfiguration");
+    qmlRegisterType<UpnpWebSocketPublisher>("org.mgallien.QmlExtension", 1, 0, "UpnpWebSocketPublisher");
+    qmlRegisterType<BinaryLight>("org.mgallien.QmlExtension", 1, 0, "BinaryLight");
+
+    qRegisterMetaType<UpnpDeviceDescription*>();
 
     engine.load(QUrl(QStringLiteral("qrc:/binaryLight.qml")));
 

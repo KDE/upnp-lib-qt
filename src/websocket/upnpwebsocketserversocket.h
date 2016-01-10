@@ -17,8 +17,8 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#ifndef UPNPSSDPSERVERSOCKET_H
-#define UPNPSSDPSERVERSOCKET_H
+#ifndef UPNPWEBSOCKETSERVSERSOCKET_H
+#define UPNPWEBSOCKETSERVSERSOCKET_H
 
 #include "upnpQtWebSocket_export.h"
 
@@ -32,25 +32,25 @@
 #include <QtCore/QList>
 
 class UpnpSsdpServerSocketPrivate;
-class UpnpSsdpCertificateConfiguration;
+class UpnpWebSocketCertificateConfiguration;
 
-class UPNPQTWEBSOCKET_EXPORT UpnpSsdpServerSocket : public QObject
+class UPNPQTWEBSOCKET_EXPORT UpnpWebSocketServerSocket : public QObject
 {
 
     Q_OBJECT
 
-    Q_PROPERTY(UpnpSsdpCertificateConfiguration* certificateConfiguration
+    Q_PROPERTY(UpnpWebSocketCertificateConfiguration* certificateConfiguration
                READ certificateConfiguration)
 
 public:
 
-    explicit UpnpSsdpServerSocket(QObject *parent = 0);
+    explicit UpnpWebSocketServerSocket(QObject *parent = 0);
 
-    virtual ~UpnpSsdpServerSocket();
+    virtual ~UpnpWebSocketServerSocket();
 
     Q_INVOKABLE void init(const QString &serverName);
 
-    UpnpSsdpCertificateConfiguration* certificateConfiguration() const;
+    UpnpWebSocketCertificateConfiguration* certificateConfiguration() const;
 
 Q_SIGNALS:
 
