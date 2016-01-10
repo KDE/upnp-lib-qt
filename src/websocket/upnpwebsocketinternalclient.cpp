@@ -207,7 +207,7 @@ UpnpWebSocketMessageType UpnpWebSocketInternalClient::getType(QJsonObject aObjec
     int messageTypeInt = static_cast<int>(messageTypeKey.value().toDouble());
 
     if (messageTypeInt < static_cast<int>(UpnpWebSocketMessageType::Hello) ||
-            messageTypeInt > static_cast<int>(UpnpWebSocketMessageType::PublishService)) {
+            messageTypeInt > static_cast<int>(UpnpWebSocketMessageType::ServiceIsSubscribed)) {
         return UpnpWebSocketMessageType::Undefined;
     }
 

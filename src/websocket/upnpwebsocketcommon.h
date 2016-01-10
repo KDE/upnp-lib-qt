@@ -32,6 +32,10 @@ enum class UpnpWebSocketMessageType {
     HelloAck,
     ServiceList,
     PublishService,
+    ServiceIsPublished,
+    UnpublishService,
+    SubscribeService,
+    ServiceIsSubscribed,
 };
 
 class UpnpServiceDescription;
