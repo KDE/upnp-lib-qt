@@ -19,6 +19,8 @@
 
 #include "upnpwebsocketinternalclient.h"
 
+#include "upnpdevicedescription.h"
+
 #include <QtWebSockets/QWebSocket>
 
 #include <QtNetwork/QAuthenticator>
@@ -32,15 +34,17 @@ class UpnpWebSocketClientPrivate
 {
 public:
 
+    int mIdClient;
+
     QWebSocket *mSocket;
 };
 
-UpnpWebSocketInternalClient::UpnpWebSocketInternalClient(QWebSocket *socket, QObject *parent)
+UpnpWebSocketInternalClient::UpnpWebSocketInternalClient(int idClient, QWebSocket *socket, QObject *parent)
     : QObject(parent), d(new UpnpWebSocketClientPrivate)
 {
+    d->mIdClient = idClient;
     d->mSocket = socket;
 
-    connect(d->mSocket, &QWebSocket::aboutToClose, this, &UpnpWebSocketInternalClient::aboutToClose);
     connect(d->mSocket, &QWebSocket::binaryMessageReceived, this, &UpnpWebSocketInternalClient::binaryMessageReceived);
     connect(d->mSocket, &QWebSocket::bytesWritten, this, &UpnpWebSocketInternalClient::bytesWritten);
     connect(d->mSocket, &QWebSocket::disconnected, this, &UpnpWebSocketInternalClient::disconnected);
@@ -55,10 +59,6 @@ UpnpWebSocketInternalClient::UpnpWebSocketInternalClient(QWebSocket *socket, QOb
 UpnpWebSocketInternalClient::~UpnpWebSocketInternalClient()
 {
     delete d;
-}
-
-void UpnpWebSocketInternalClient::aboutToClose()
-{
 }
 
 void UpnpWebSocketInternalClient::binaryMessageReceived(const QByteArray &message)
@@ -100,11 +100,14 @@ void UpnpWebSocketInternalClient::bytesWritten(qint64 bytes)
 
 void UpnpWebSocketInternalClient::disconnected()
 {
+    Q_EMIT closeClient(d->mIdClient);
 }
 
 void UpnpWebSocketInternalClient::error(QAbstractSocket::SocketError error)
 {
     Q_UNUSED(error);
+
+    Q_EMIT closeClient(d->mIdClient);
 }
 
 void UpnpWebSocketInternalClient::pong(quint64 elapsedTime, const QByteArray &payload)
@@ -126,6 +129,8 @@ void UpnpWebSocketInternalClient::readChannelFinished()
 void UpnpWebSocketInternalClient::sslErrors(const QList<QSslError> &errors)
 {
     Q_UNUSED(errors);
+
+    Q_EMIT closeClient(d->mIdClient);
 }
 
 void UpnpWebSocketInternalClient::stateChanged(QAbstractSocket::SocketState state)
@@ -178,7 +183,10 @@ void UpnpWebSocketInternalClient::handleNewService(QJsonObject aObject)
 
     auto newDevice = deviceKey.value().toObject();
 
+    auto newDeviceDescription = UpnpWebSocketProtocol::deviceDescriptionFromJson(newDevice);
+
     qDebug() << newDevice;
+    qDebug() << newDeviceDescription->deviceType();
 }
 
 UpnpWebSocketMessageType UpnpWebSocketInternalClient::getType(QJsonObject aObject)

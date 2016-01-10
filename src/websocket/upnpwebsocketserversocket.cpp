@@ -36,11 +36,16 @@ public:
 
     UpnpWebSocketCertificateConfiguration mCertificateConfiguration;
 
+    int mIdNextClient;
+
+    QMap<int, QSharedPointer<UpnpWebSocketInternalClient> > mAllClients;
+
 };
 
 UpnpWebSocketServerSocket::UpnpWebSocketServerSocket(QObject *parent)
     : QObject(parent), d(new UpnpSsdpServerSocketPrivate)
 {
+    d->mIdNextClient = 1;
 }
 
 UpnpWebSocketServerSocket::~UpnpWebSocketServerSocket()
@@ -72,6 +77,13 @@ UpnpWebSocketCertificateConfiguration *UpnpWebSocketServerSocket::certificateCon
     return &d->mCertificateConfiguration;
 }
 
+void UpnpWebSocketServerSocket::clientHasClosed(int idClient)
+{
+    qDebug() << "UpnpWebSocketServerSocket::clientHasClosed" << idClient;
+
+    d->mAllClients.remove(idClient);
+}
+
 void UpnpWebSocketServerSocket::acceptError(QAbstractSocket::SocketError socketError)
 {
     Q_UNUSED(socketError);
@@ -94,7 +106,11 @@ void UpnpWebSocketServerSocket::newConnection()
         return;
     }
 
-    new UpnpWebSocketInternalClient(newConnection);
+    d->mAllClients[d->mIdNextClient].reset(new UpnpWebSocketInternalClient(d->mIdNextClient, newConnection));
+
+    connect(d->mAllClients[d->mIdNextClient].data(), &UpnpWebSocketInternalClient::closeClient, this, &UpnpWebSocketServerSocket::clientHasClosed);
+
+    ++d->mIdNextClient;
 }
 
 void UpnpWebSocketServerSocket::originAuthenticationRequired(QWebSocketCorsAuthenticator *authenticator)

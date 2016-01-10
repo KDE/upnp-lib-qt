@@ -20,12 +20,12 @@
 #ifndef UPNPBINARYLIGHT_H
 #define UPNPBINARYLIGHT_H
 
-#include "upnpabstractdevice.h"
-
+#include <QtCore/QObject>
 #include <QtCore/QUrl>
 
 class BinaryLightPrivate;
 class UpnpWebSocketPublisher;
+class UpnpDeviceDescription;
 
 class BinaryLight : public QObject
 {

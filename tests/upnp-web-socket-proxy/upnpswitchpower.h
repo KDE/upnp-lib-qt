@@ -22,13 +22,20 @@
 
 #include "upnpQt_export.h"
 
-#include "upnpabstractservice.h"
+#include <QtCore/QObject>
+#include <QtCore/QString>
+#include <QtCore/QByteArray>
 
 class UpnpSwitchPowerPrivate;
+class UpnpServiceDescription;
 
-class UpnpSwitchPower : public UpnpAbstractService
+class UpnpSwitchPower : public QObject
 {
     Q_OBJECT
+
+    Q_PROPERTY(UpnpServiceDescription* description
+               READ description
+               NOTIFY descriptionChanged)
 
     Q_PROPERTY(bool target
                READ target
@@ -44,6 +51,12 @@ public:
 
     virtual ~UpnpSwitchPower();
 
+    QSharedPointer<UpnpServiceDescription> sharedDescription();
+
+    UpnpServiceDescription* description();
+
+    const UpnpServiceDescription* description() const;
+
     void setTarget(bool value);
 
     bool target() const;
@@ -52,9 +65,9 @@ public:
 
     bool status() const;
 
-    QList<QPair<QString, QVariant> > invokeAction(const QString &actionName, const QList<QVariant> &arguments, bool &isInError) Q_DECL_OVERRIDE;
-
 Q_SIGNALS:
+
+    void descriptionChanged();
 
     void statusChanged(const QString &serviceId, const QByteArray &propertyName);
 

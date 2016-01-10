@@ -55,7 +55,8 @@ BinaryLight::BinaryLight(int cacheDuration, QObject *parent)
     d->mDevice.setUPC(QStringLiteral("test"));
     d->mDevice.setCacheControl(cacheDuration);
 
-    QPointer<UpnpAbstractService> switchPowerService(new UpnpSwitchPower);
+    QSharedPointer<UpnpSwitchPower> switchPowerService(new UpnpSwitchPower);
+    d->mDevice.addService(switchPowerService->sharedDescription());
     const int serviceIndex = 0/*addService(switchPowerService)*/;
 
     const int deviceIndex = 1/*d->mServer.addDevice(this)*/;
@@ -69,9 +70,9 @@ BinaryLight::BinaryLight(int cacheDuration, QObject *parent)
     QUrl serviceDescriptionUrl /*= d->mServer.urlPrefix()*/;
     serviceDescriptionUrl.setPath(QStringLiteral("/") + QString::number(deviceIndex) + QStringLiteral("/") + QString::number(serviceIndex) + QStringLiteral("/service.xml"));
 
-    switchPowerService->description()->setControlURL(controlUrl);
-    switchPowerService->description()->setEventURL(eventUrl);
-    switchPowerService->description()->setSCPDURL(serviceDescriptionUrl);
+    /*switchPowerService->setControlURL(controlUrl);
+    switchPowerService->setEventURL(eventUrl);
+    switchPowerService->setSCPDURL(serviceDescriptionUrl);*/
 
     QUrl deviceDescriptionUrl /*= d->mServer.urlPrefix();
     d->mDevice.setURLBase(d->mServer.urlPrefix().toString())*/;

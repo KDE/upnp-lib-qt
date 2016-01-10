@@ -22,6 +22,9 @@
 
 #include "upnpQtWebSocket_export.h"
 
+#include "upnpactiondescription.h"
+#include "upnpstatevariabledescription.h"
+
 enum class UpnpWebSocketMessageType {
     Undefined = 0,
     Error,
@@ -30,6 +33,34 @@ enum class UpnpWebSocketMessageType {
     ServiceList,
     PublishService,
 };
+
+class UpnpServiceDescription;
+class UpnpDeviceDescription;
+
+namespace UpnpWebSocketProtocol
+{
+
+UpnpActionArgumentDescription actionArgumentDescriptionFromJson(const QJsonObject &argument);
+
+UpnpStateVariableDescription variableDescriptionFromJson(const QJsonObject &variableDescription);
+
+UpnpActionDescription actionDescriptionFromJson(const QJsonObject &actionDescription);
+
+UpnpServiceDescription *serviceDescriptionFromJson(const QJsonObject &serviceDescription);
+
+UpnpDeviceDescription *deviceDescriptionFromJson(const QJsonObject &deviceDescription);
+
+QJsonObject actionArgumentDescriptionToJson(const UpnpActionArgumentDescription &argument);
+
+QJsonObject variableDescriptionToJson(const UpnpStateVariableDescription &variableDescription);
+
+QJsonObject actionDescriptionToJson(const UpnpActionDescription &actionDescription);
+
+QJsonObject serviceDescriptionToJson(const UpnpServiceDescription *serviceDescription);
+
+QJsonObject deviceDescriptionToJson(const UpnpDeviceDescription *deviceDescription);
+
+}
 
 #endif // UPNPWEBSOCKETCOMMON_H
 

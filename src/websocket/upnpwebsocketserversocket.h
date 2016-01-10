@@ -56,6 +56,8 @@ Q_SIGNALS:
 
 private Q_SLOTS:
 
+    void clientHasClosed(int idClient);
+
     void acceptError(QAbstractSocket::SocketError socketError);
     void closed();
     void newConnection();

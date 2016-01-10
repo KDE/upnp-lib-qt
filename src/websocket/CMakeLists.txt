@@ -8,7 +8,7 @@ set(upnpQtWebSocket_SOURCES
     upnpwebsocketpublisher.cpp
     upnpwebsocketinternalclient.cpp
     upnpwebsocketcertificateconfiguration.cpp
-    upnpwebsocketcommon.h
+    upnpwebsocketcommon.cpp
 )
 
 ecm_generate_headers(

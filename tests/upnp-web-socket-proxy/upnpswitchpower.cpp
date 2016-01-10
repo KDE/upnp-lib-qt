@@ -28,14 +28,17 @@
 #include <QtCore/QDebug>
 #include <QtCore/QMetaObject>
 #include <QtCore/QMetaProperty>
+#include <QtCore/QSharedPointer>
 
 class UpnpSwitchPowerPrivate
 {
 public:
 
-    UpnpSwitchPowerPrivate() : mTarget(true), mStatus(true)
+    UpnpSwitchPowerPrivate() : mService(new UpnpServiceDescription), mTarget(true), mStatus(true)
     {
     }
+
+    QSharedPointer<UpnpServiceDescription> mService;
 
     bool mTarget;
 
@@ -43,7 +46,7 @@ public:
 };
 
 UpnpSwitchPower::UpnpSwitchPower(QObject *parent) :
-    UpnpAbstractService(parent), d(new UpnpSwitchPowerPrivate)
+    QObject(parent), d(new UpnpSwitchPowerPrivate)
 {
     //setBaseURL();
     description()->setServiceId(QStringLiteral("urn:upnp-org:serviceId:SwitchPower"));
@@ -61,7 +64,7 @@ UpnpSwitchPower::UpnpSwitchPower(QObject *parent) :
     setTargetAction.mNumberInArgument = 1;
     setTargetAction.mNumberOutArgument = 0;
 
-    addAction(setTargetAction);
+    description()->addAction(setTargetAction);
 
     UpnpActionDescription getTargetAction;
     getTargetAction.mName = QStringLiteral("GetTarget");
@@ -75,7 +78,7 @@ UpnpSwitchPower::UpnpSwitchPower(QObject *parent) :
     getTargetAction.mNumberInArgument = 0;
     getTargetAction.mNumberOutArgument = 1;
 
-    addAction(getTargetAction);
+    description()->addAction(getTargetAction);
 
     UpnpActionDescription getStatusAction;
     getStatusAction.mName = QStringLiteral("GetStatus");
@@ -89,7 +92,7 @@ UpnpSwitchPower::UpnpSwitchPower(QObject *parent) :
     getStatusAction.mNumberInArgument = 0;
     getStatusAction.mNumberOutArgument = 1;
 
-    addAction(getStatusAction);
+    description()->addAction(getStatusAction);
 
     UpnpStateVariableDescription targetStateVariable;
     targetStateVariable.mUpnpName = QStringLiteral("Target");
@@ -106,7 +109,7 @@ UpnpSwitchPower::UpnpSwitchPower(QObject *parent) :
     targetStateVariable.mDataType = QStringLiteral("boolean");
     targetStateVariable.mDefaultValue = QStringLiteral("0");
 
-    addStateVariable(targetStateVariable);
+    description()->addStateVariable(targetStateVariable);
 
     UpnpStateVariableDescription statusStateVariable;
     statusStateVariable.mUpnpName = QStringLiteral("Status");
@@ -123,12 +126,27 @@ UpnpSwitchPower::UpnpSwitchPower(QObject *parent) :
     statusStateVariable.mDataType = QStringLiteral("boolean");
     statusStateVariable.mDefaultValue = QStringLiteral("0");
 
-    addStateVariable(statusStateVariable);
+    description()->addStateVariable(statusStateVariable);
 }
 
 UpnpSwitchPower::~UpnpSwitchPower()
 {
     delete d;
+}
+
+QSharedPointer<UpnpServiceDescription> UpnpSwitchPower::sharedDescription()
+{
+    return d->mService;
+}
+
+UpnpServiceDescription *UpnpSwitchPower::description()
+{
+    return d->mService.data();
+}
+
+const UpnpServiceDescription *UpnpSwitchPower::description() const
+{
+    return d->mService.data();
 }
 
 void UpnpSwitchPower::setTarget(bool value)
@@ -152,7 +170,7 @@ bool UpnpSwitchPower::status() const
     return d->mStatus;
 }
 
-QList<QPair<QString, QVariant> > UpnpSwitchPower::invokeAction(const QString &actionName, const QList<QVariant> &arguments, bool &isInError)
+/*QList<QPair<QString, QVariant> > UpnpSwitchPower::invokeAction(const QString &actionName, const QList<QVariant> &arguments, bool &isInError)
 {
     if (actionName == QStringLiteral("GetStatus")) {
         const QList<QPair<QString, QVariant> > &returnValues(getStatusAction());
@@ -184,7 +202,7 @@ QList<QPair<QString, QVariant> > UpnpSwitchPower::invokeAction(const QString &ac
 
     isInError = true;
     return {};
-}
+}*/
 
 void UpnpSwitchPower::switchTarget()
 {

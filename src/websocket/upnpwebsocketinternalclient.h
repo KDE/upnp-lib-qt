@@ -39,13 +39,16 @@ class UPNPQTWEBSOCKET_NO_EXPORT UpnpWebSocketInternalClient : public QObject
     Q_OBJECT
 public:
 
-    explicit UpnpWebSocketInternalClient(QWebSocket *socket, QObject *parent = 0);
+    explicit UpnpWebSocketInternalClient(int idClient, QWebSocket *socket, QObject *parent = 0);
 
     virtual ~UpnpWebSocketInternalClient();
 
+Q_SIGNALS:
+
+    void closeClient(int idClient);
+
 private Q_SLOTS:
 
-    void aboutToClose();
     void binaryMessageReceived(const QByteArray &message);
     void bytesWritten(qint64 bytes);
     void disconnected();
