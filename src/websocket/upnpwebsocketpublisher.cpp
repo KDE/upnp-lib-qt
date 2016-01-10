@@ -91,6 +91,7 @@ bool UpnpWebSocketPublisher::handleMessage(const QJsonObject &newMessage)
         messageHandled = true;
         break;
     default:
+        qDebug() << "unknown message" << static_cast<int>(getType(newMessage));
         break;
     }
 
