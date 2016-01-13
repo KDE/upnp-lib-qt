@@ -83,6 +83,10 @@ bool UpnpWebSocketClient::handleMessage(const QJsonObject &newMessage)
     return messageHandled;
 }
 
+void UpnpWebSocketClient::hasBeenDisconnected()
+{
+}
+
 void UpnpWebSocketClient::handleHelloAck(QJsonObject aObject)
 {
     Q_UNUSED(aObject);

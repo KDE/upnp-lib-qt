@@ -55,6 +55,8 @@ protected:
 
     bool handleMessage(const QJsonObject &newMessage) override;
 
+    void hasBeenDisconnected() override;
+
 private:
 
     void handleHelloAck(QJsonObject aObject);

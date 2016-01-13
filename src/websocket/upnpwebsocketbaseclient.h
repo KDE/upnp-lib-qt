@@ -84,6 +84,8 @@ protected:
 
     void sendMessage(const QJsonObject &messageObject);
 
+    virtual void hasBeenDisconnected();
+
 private:
 
     UpnpWebSocketBaseClientPrivate *d;

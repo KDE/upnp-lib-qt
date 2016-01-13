@@ -121,6 +121,7 @@ void UpnpWebSocketBaseClient::connected()
 void UpnpWebSocketBaseClient::disconnected()
 {
     QTimer::singleShot(200, [this]() {this->d->mSocket->open(this->d->mServerUrl);});
+    hasBeenDisconnected();
 }
 
 void UpnpWebSocketBaseClient::error(QAbstractSocket::SocketError error)
@@ -219,6 +220,10 @@ void UpnpWebSocketBaseClient::sendMessage(const QJsonObject &messageObject)
     newMessage.setObject(messageObject);
 
     d->mSocket->sendBinaryMessage(newMessage.toBinaryData());
+}
+
+void UpnpWebSocketBaseClient::hasBeenDisconnected()
+{
 }
 
 
