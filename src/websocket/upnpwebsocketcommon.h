@@ -54,7 +54,7 @@ UpnpActionDescription actionDescriptionFromJson(const QJsonObject &actionDescrip
 
 UpnpServiceDescription *serviceDescriptionFromJson(const QJsonObject &serviceDescription);
 
-UpnpDeviceDescription *deviceDescriptionFromJson(const QJsonObject &deviceDescription);
+QSharedPointer<UpnpDeviceDescription> deviceDescriptionFromJson(const QJsonObject &deviceDescription);
 
 QJsonObject actionArgumentDescriptionToJson(const UpnpActionArgumentDescription &argument);
 

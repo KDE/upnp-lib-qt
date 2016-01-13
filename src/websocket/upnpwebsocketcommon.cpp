@@ -47,21 +47,43 @@ UpnpActionArgumentDescription actionArgumentDescriptionFromJson(const QJsonObjec
     UpnpActionArgumentDescription result;
 
     auto nameValue = getField(argument, QStringLiteral("name"));
+    if (nameValue.isNull() || !nameValue.isString()) {
+        result.mIsValid = false;
+        return result;
+    }
     result.mName = nameValue.toString();
 
     auto directionValue = getField(argument, QStringLiteral("direction"));
+    if (directionValue.isNull() || !directionValue.isString()) {
+        result.mIsValid = false;
+        return result;
+    }
+
     if (directionValue == QStringLiteral("in")) {
         result.mDirection = UpnpArgumentDirection::In;
-    }
-    if (directionValue == QStringLiteral("out")) {
+    } else if (directionValue == QStringLiteral("out")) {
         result.mDirection = UpnpArgumentDirection::Out;
+    } else {
+        result.mDirection = UpnpArgumentDirection::Invalid;
+        result.mIsValid = false;
+        return result;
     }
 
     auto stateVariableValue = getField(argument, QStringLiteral("stateVariable"));
+    if (stateVariableValue.isNull() || !stateVariableValue.isString()) {
+        result.mIsValid = false;
+        return result;
+    }
     result.mRelatedStateVariable = stateVariableValue.toString();
 
     auto isReturnValueValue = getField(argument, QStringLiteral("isReturnValue"));
+    if (isReturnValueValue.isNull() || !isReturnValueValue.isBool()) {
+        result.mIsValid = false;
+        return result;
+    }
     result.mIsReturnValue = isReturnValueValue.toBool();
+
+    result.mIsValid = true;
 
     return result;
 }
@@ -71,10 +93,20 @@ UpnpStateVariableDescription variableDescriptionFromJson(const QJsonObject &vari
     UpnpStateVariableDescription result;
 
     auto nameValue = getField(variableDescription, QStringLiteral("name"));
+    if (nameValue.isNull() || !nameValue.isString()) {
+        result.mIsValid = false;
+        return result;
+    }
     result.mUpnpName = nameValue.toString();
 
     auto typeValue = getField(variableDescription, QStringLiteral("type"));
-    result.mDataType = typeValue.toBool();
+    if (typeValue.isNull() || !typeValue.isString()) {
+        result.mIsValid = false;
+        return result;
+    }
+    result.mDataType = typeValue.toString();
+
+    result.mIsValid = true;
 
     return result;
 }
@@ -84,13 +116,24 @@ UpnpActionDescription actionDescriptionFromJson(const QJsonObject &actionDescrip
     UpnpActionDescription result;
 
     auto nameValue = getField(actionDescription, QStringLiteral("name"));
+    if (nameValue.isNull() || !nameValue.isString()) {
+        result.mIsValid = false;
+        return result;
+    }
     result.mName = nameValue.toString();
 
     auto argumentsValue = getField(actionDescription, QStringLiteral("arguments"));
     const auto allArguments = argumentsValue.toArray();
     for (auto oneArgument: allArguments) {
-        result.mArguments.push_back(actionArgumentDescriptionFromJson(oneArgument.toObject()));
+        auto decodedArgument = actionArgumentDescriptionFromJson(oneArgument.toObject());
+        if (!decodedArgument.mIsValid) {
+            result.mIsValid = false;
+            return result;
+        }
+        result.mArguments.push_back(decodedArgument);
     }
+
+    result.mIsValid = true;
 
     return result;
 }
@@ -100,70 +143,121 @@ UpnpServiceDescription *serviceDescriptionFromJson(const QJsonObject &serviceDes
     QScopedPointer<UpnpServiceDescription> result(new UpnpServiceDescription);
 
     auto serviceTypeValue = getField(serviceDescription, QStringLiteral("serviceType"));
+    if (serviceTypeValue.isNull() || !serviceTypeValue.isString()) {
+        return nullptr;
+    }
     result->setServiceType(serviceTypeValue.toString());
 
     auto serviceIdValue = getField(serviceDescription, QStringLiteral("serviceId"));
+    if (serviceIdValue.isNull() || !serviceIdValue.isString()) {
+        return nullptr;
+    }
     result->setServiceId(serviceIdValue.toString());
 
     auto variablesValue = getField(serviceDescription, QStringLiteral("variables"));
     const auto allVariables = variablesValue.toArray();
     for (auto oneVariable: allVariables) {
-        result->addStateVariable(variableDescriptionFromJson(oneVariable.toObject()));
+        const auto &newVariable = variableDescriptionFromJson(oneVariable.toObject());
+        if (!newVariable.mIsValid) {
+            return nullptr;
+        }
+        result->addStateVariable(newVariable);
     }
 
     auto actionsValue = getField(serviceDescription, QStringLiteral("actions"));
     const auto allActions = actionsValue.toArray();
     for (auto oneAction: allActions) {
-        result->addAction(actionDescriptionFromJson(oneAction.toObject()));
+        const auto &newAction = actionDescriptionFromJson(oneAction.toObject());
+        if (!newAction.mIsValid) {
+            return nullptr;
+        }
+        result->addAction(newAction);
     }
 
     return result.take();
 }
 
-UpnpDeviceDescription *deviceDescriptionFromJson(const QJsonObject &deviceDescription)
+QSharedPointer<UpnpDeviceDescription> deviceDescriptionFromJson(const QJsonObject &deviceDescription)
 {
     QScopedPointer<UpnpDeviceDescription> result(new UpnpDeviceDescription);
 
     auto udnValue = getField(deviceDescription, QStringLiteral("UDN"));
+    if (udnValue.isNull() || !udnValue.isString()) {
+        return {};
+    }
     result->setUDN(udnValue.toString());
 
     auto upcValue = getField(deviceDescription, QStringLiteral("UPC"));
+    if (upcValue.isNull() || !upcValue.isString()) {
+        return {};
+    }
     result->setUPC(upcValue.toString());
 
     auto deviceTypeValue = getField(deviceDescription, QStringLiteral("deviceType"));
+    if (deviceTypeValue.isNull() || !deviceTypeValue.isString()) {
+        return {};
+    }
     result->setDeviceType(deviceTypeValue.toString());
 
     auto friendlyNameValue = getField(deviceDescription, QStringLiteral("friendlyName"));
+    if (friendlyNameValue.isNull() || !friendlyNameValue.isString()) {
+        return {};
+    }
     result->setFriendlyName(friendlyNameValue.toString());
 
     auto manufacturerValue = getField(deviceDescription, QStringLiteral("manufacturer"));
+    if (manufacturerValue.isNull() || !manufacturerValue.isString()) {
+        return {};
+    }
     result->setManufacturer(manufacturerValue.toString());
 
     auto manufacturerURLValue = getField(deviceDescription, QStringLiteral("manufacturerURL"));
+    if (manufacturerURLValue.isNull() || !manufacturerURLValue.isString()) {
+        return {};
+    }
     result->setManufacturerURL(QUrl::fromUserInput(manufacturerURLValue.toString()));
 
     auto modelDescriptionValue = getField(deviceDescription, QStringLiteral("modelDescription"));
+    if (modelDescriptionValue.isNull() || !modelDescriptionValue.isString()) {
+        return {};
+    }
     result->setModelDescription(modelDescriptionValue.toString());
 
     auto modelNameValue = getField(deviceDescription, QStringLiteral("modelName"));
+    if (modelNameValue.isNull() || !modelNameValue.isString()) {
+        return {};
+    }
     result->setModelName(modelNameValue.toString());
 
     auto modelNumberValue = getField(deviceDescription, QStringLiteral("modelNumber"));
+    if (modelNumberValue.isNull() || !modelNumberValue.isString()) {
+        return {};
+    }
     result->setModelNumber(modelNumberValue.toString());
 
     auto modelURLValue = getField(deviceDescription, QStringLiteral("modelURL"));
+    if (modelURLValue.isNull() || !modelURLValue.isString()) {
+        return {};
+    }
     result->setModelURL(QUrl::fromUserInput(modelURLValue.toString()));
 
     auto serialNumberValue = getField(deviceDescription, QStringLiteral("serialNumber"));
+    if (serialNumberValue.isNull() || !serialNumberValue.isString()) {
+        return {};
+    }
     result->setSerialNumber(serialNumberValue.toString());
 
     auto servicesValue = getField(deviceDescription, QStringLiteral("services"));
     const auto allServices = servicesValue.toArray();
     for (auto oneService: allServices) {
-        result->addService(QSharedPointer<UpnpServiceDescription>(serviceDescriptionFromJson(oneService.toObject())));
+        QScopedPointer<UpnpServiceDescription> newService(serviceDescriptionFromJson(oneService.toObject()));
+        if (!newService) {
+            return {};
+        }
+        result->addService(QSharedPointer<UpnpServiceDescription>(newService.take()));
     }
 
-    return result.take();
+    return QSharedPointer<UpnpDeviceDescription>(result.take());
 }
 
 QJsonObject actionArgumentDescriptionToJson(const UpnpActionArgumentDescription &argument)
@@ -178,6 +272,8 @@ QJsonObject actionArgumentDescriptionToJson(const UpnpActionArgumentDescription 
         break;
     case UpnpArgumentDirection::Out:
         result.insert(QStringLiteral("direction"), QStringLiteral("out"));
+        break;
+    default:
         break;
     }
 
