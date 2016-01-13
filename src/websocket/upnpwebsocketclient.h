@@ -57,6 +57,12 @@ protected:
 
 private:
 
+    void handleHelloAck(QJsonObject aObject);
+
+    void handleServiceList(QJsonObject aObject);
+
+    void handleNewService(QJsonObject aObject);
+
     UpnpWebSocketClientPrivate *d;
 
 };

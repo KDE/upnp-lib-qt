@@ -28,6 +28,7 @@
 #include <QtCore/QPointer>
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
+#include <QtCore/QJsonArray>
 
 class UpnpWebSocketClientPrivate
 {
@@ -47,12 +48,9 @@ UpnpWebSocketClient::~UpnpWebSocketClient()
 
 void UpnpWebSocketClient::askDeviceList()
 {
+    auto newObject = createMessage(UpnpWebSocketMessageType::AskServiceList);
 
-}
-
-void UpnpWebSocketClient::askDeviceDetail()
-{
-
+    sendMessage(newObject);
 }
 
 bool UpnpWebSocketClient::handleMessage(const QJsonObject &newMessage)
@@ -65,15 +63,50 @@ bool UpnpWebSocketClient::handleMessage(const QJsonObject &newMessage)
 
     switch(getType(newMessage))
     {
-    /*case UpnpWebSocketMessageType::HelloAck:
+    case UpnpWebSocketMessageType::HelloAck:
         handleHelloAck(newMessage);
         messageHandled = true;
-        break;*/
+        break;
+    case UpnpWebSocketMessageType::ServiceList:
+        handleServiceList(newMessage);
+        messageHandled = true;
+        break;
+    case UpnpWebSocketMessageType::NewService:
+        handleNewService(newMessage);
+        messageHandled = true;
+        break;
     default:
+        qDebug() << "unknown message" << static_cast<int>(getType(newMessage));
         break;
     }
 
     return messageHandled;
+}
+
+void UpnpWebSocketClient::handleHelloAck(QJsonObject aObject)
+{
+    Q_UNUSED(aObject);
+
+    askDeviceList();
+}
+
+void UpnpWebSocketClient::handleServiceList(QJsonObject aObject)
+{
+    const auto &listDeviceValue = UpnpWebSocketProtocol::getField(aObject, QStringLiteral("devices"));
+    if (listDeviceValue.isNull() || !listDeviceValue.isArray()) {
+        return;
+    }
+
+    const auto &listDeviceArray = listDeviceValue.toArray();
+    for (auto oneDevice : listDeviceArray) {
+        qDebug() << "new device" << oneDevice.toString();
+    }
+}
+
+void UpnpWebSocketClient::handleNewService(QJsonObject aObject)
+{
+    const auto &newDeviceValue = UpnpWebSocketProtocol::getField(aObject, QStringLiteral("device"));
+    qDebug() << "new device" << newDeviceValue.toString();
 }
 
 

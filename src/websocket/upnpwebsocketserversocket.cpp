@@ -22,9 +22,12 @@
 #include "upnpwebsocketinternalclient.h"
 #include "upnpwebsocketcertificateconfiguration.h"
 
+#include "upnpdevicedescription.h"
+
 #include <QtWebSockets/QWebSocketServer>
 #include <QtWebSockets/QWebSocket>
 
+#include <QtCore/QPair>
 #include <QtCore/QPointer>
 #include <QtCore/QDebug>
 
@@ -38,8 +41,13 @@ public:
 
     int mIdNextClient;
 
-    QMap<int, QSharedPointer<UpnpWebSocketInternalClient> > mAllClients;
+    QMap<int, QSharedPointer<UpnpWebSocketInternalClient>> mAllClients;
 
+    QMap<int, QMap<QString, QSharedPointer<UpnpDeviceDescription>>> mAllDevices;
+
+    QList<QString> mAllDeviceUDN;
+
+    QMap<QString, int> mDeviceUdnToClientId;
 };
 
 UpnpWebSocketServerSocket::UpnpWebSocketServerSocket(QObject *parent)
@@ -77,6 +85,22 @@ UpnpWebSocketCertificateConfiguration *UpnpWebSocketServerSocket::certificateCon
     return &d->mCertificateConfiguration;
 }
 
+bool UpnpWebSocketServerSocket::addDevice(QSharedPointer<UpnpDeviceDescription> newDevice, int clientId)
+{
+    d->mAllDevices[clientId][newDevice->UDN()] = newDevice;
+    d->mAllDeviceUDN.push_back(newDevice->UDN());
+    d->mDeviceUdnToClientId[newDevice->UDN()] = clientId;
+
+    Q_EMIT newDeviceHasBeenPublished(newDevice->UDN());
+
+    return true;
+}
+
+QList<QString> UpnpWebSocketServerSocket::allDeviceUDN()
+{
+    return d->mAllDeviceUDN;
+}
+
 void UpnpWebSocketServerSocket::clientHasClosed(int idClient)
 {
     qDebug() << "UpnpWebSocketServerSocket::clientHasClosed" << idClient;
@@ -106,7 +130,7 @@ void UpnpWebSocketServerSocket::newConnection()
         return;
     }
 
-    d->mAllClients[d->mIdNextClient].reset(new UpnpWebSocketInternalClient(d->mIdNextClient, newConnection));
+    d->mAllClients[d->mIdNextClient].reset(new UpnpWebSocketInternalClient(d->mIdNextClient, newConnection, this));
 
     connect(d->mAllClients[d->mIdNextClient].data(), &UpnpWebSocketInternalClient::closeClient, this, &UpnpWebSocketServerSocket::clientHasClosed);
 

@@ -30,9 +30,11 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QList>
+#include <QtCore/QSharedPointer>
 
 class UpnpSsdpServerSocketPrivate;
 class UpnpWebSocketCertificateConfiguration;
+class UpnpDeviceDescription;
 
 class UPNPQTWEBSOCKET_EXPORT UpnpWebSocketServerSocket : public QObject
 {
@@ -52,7 +54,13 @@ public:
 
     UpnpWebSocketCertificateConfiguration* certificateConfiguration() const;
 
+    bool addDevice(QSharedPointer<UpnpDeviceDescription> newDevice, int clientId);
+
+    QList<QString> allDeviceUDN();
+
 Q_SIGNALS:
+
+    void newDeviceHasBeenPublished(const QString &udn);
 
 private Q_SLOTS:
 

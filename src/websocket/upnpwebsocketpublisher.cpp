@@ -73,6 +73,7 @@ void UpnpWebSocketPublisher::publish()
     auto newObject = createMessage(UpnpWebSocketMessageType::PublishService);
 
     addDeviceDescription(newObject, description());
+
     sendMessage(newObject);
 }
 
@@ -89,6 +90,9 @@ bool UpnpWebSocketPublisher::handleMessage(const QJsonObject &newMessage)
     case UpnpWebSocketMessageType::HelloAck:
         handleHelloAck(newMessage);
         messageHandled = true;
+        break;
+    case UpnpWebSocketMessageType::NewService:
+        //ignore those messages
         break;
     default:
         qDebug() << "unknown message" << static_cast<int>(getType(newMessage));

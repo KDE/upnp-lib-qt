@@ -33,13 +33,14 @@
 
 class QWebSocket;
 class UpnpWebSocketClientPrivate;
+class UpnpWebSocketServerSocket;
 
 class UPNPQTWEBSOCKET_NO_EXPORT UpnpWebSocketInternalClient : public QObject
 {
     Q_OBJECT
 public:
 
-    explicit UpnpWebSocketInternalClient(int idClient, QWebSocket *socket, QObject *parent = 0);
+    explicit UpnpWebSocketInternalClient(int idClient, QWebSocket *socket, UpnpWebSocketServerSocket *server, QObject *parent = 0);
 
     virtual ~UpnpWebSocketInternalClient();
 
@@ -59,6 +60,7 @@ private Q_SLOTS:
     void sslErrors(const QList<QSslError> &errors);
     void stateChanged(QAbstractSocket::SocketState state);
     void textMessageReceived(const QString &message);
+    void newDeviceHasBeenPublished(const QString &udn);
 
 private:
 
@@ -71,6 +73,8 @@ private:
     void handleHello(QJsonObject aObject);
 
     void handleNewService(QJsonObject aObject);
+
+    void handleAskServiceList(QJsonObject aObject);
 
     static UpnpWebSocketMessageType getType(QJsonObject aObject);
 

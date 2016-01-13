@@ -21,6 +21,8 @@
 
 #include "upnpdevicedescription.h"
 
+#include "upnpwebsocketserversocket.h"
+
 #include <QtWebSockets/QWebSocket>
 
 #include <QtNetwork/QAuthenticator>
@@ -28,6 +30,7 @@
 #include <QtCore/QPointer>
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
+#include <QtCore/QJsonArray>
 #include <QtCore/QDebug>
 
 class UpnpWebSocketClientPrivate
@@ -37,13 +40,16 @@ public:
     int mIdClient;
 
     QWebSocket *mSocket;
+
+    UpnpWebSocketServerSocket *mServer;
 };
 
-UpnpWebSocketInternalClient::UpnpWebSocketInternalClient(int idClient, QWebSocket *socket, QObject *parent)
+UpnpWebSocketInternalClient::UpnpWebSocketInternalClient(int idClient, QWebSocket *socket, UpnpWebSocketServerSocket *server, QObject *parent)
     : QObject(parent), d(new UpnpWebSocketClientPrivate)
 {
     d->mIdClient = idClient;
     d->mSocket = socket;
+    d->mServer = server;
 
     connect(d->mSocket, &QWebSocket::binaryMessageReceived, this, &UpnpWebSocketInternalClient::binaryMessageReceived);
     connect(d->mSocket, &QWebSocket::bytesWritten, this, &UpnpWebSocketInternalClient::bytesWritten);
@@ -54,6 +60,7 @@ UpnpWebSocketInternalClient::UpnpWebSocketInternalClient(int idClient, QWebSocke
     connect(d->mSocket, &QWebSocket::sslErrors, this, &UpnpWebSocketInternalClient::sslErrors);
     connect(d->mSocket, &QWebSocket::stateChanged, this, &UpnpWebSocketInternalClient::stateChanged);
     connect(d->mSocket, &QWebSocket::textMessageReceived, this, &UpnpWebSocketInternalClient::textMessageReceived);
+    connect(d->mServer, &UpnpWebSocketServerSocket::newDeviceHasBeenPublished, this, &UpnpWebSocketInternalClient::newDeviceHasBeenPublished);
 }
 
 UpnpWebSocketInternalClient::~UpnpWebSocketInternalClient()
@@ -86,6 +93,9 @@ void UpnpWebSocketInternalClient::binaryMessageReceived(const QByteArray &messag
         break;
     case UpnpWebSocketMessageType::PublishService:
         handleNewService(newMessageObject);
+        break;
+    case UpnpWebSocketMessageType::AskServiceList:
+        handleAskServiceList(newMessageObject);
         break;
     default:
         qDebug() << "UpnpWebSocketInternalClient::binaryMessageReceived" << "unknown message" << static_cast<int>(getType(newMessageObject));
@@ -143,6 +153,15 @@ void UpnpWebSocketInternalClient::textMessageReceived(const QString &message)
     Q_UNUSED(message);
 }
 
+void UpnpWebSocketInternalClient::newDeviceHasBeenPublished(const QString &udn)
+{
+    auto newMessage = createMessage(UpnpWebSocketMessageType::NewService);
+
+    newMessage.insert(QStringLiteral("device"), udn);
+
+    sendMessage(newMessage);
+}
+
 QJsonObject UpnpWebSocketInternalClient::createMessage(UpnpWebSocketMessageType type)
 {
     QJsonObject answerObject;
@@ -191,11 +210,46 @@ void UpnpWebSocketInternalClient::handleNewService(QJsonObject aObject)
     auto newDeviceDescription = UpnpWebSocketProtocol::deviceDescriptionFromJson(newDevice);
 
     qDebug() << newDevice;
-    qDebug() << newDeviceDescription->deviceType();
+    if (newDeviceDescription) {
+        qDebug() << newDeviceDescription->deviceType();
+        auto result = d->mServer->addDevice(newDeviceDescription, d->mIdClient);
 
-    auto newObject = createMessage(UpnpWebSocketMessageType::ServiceIsPublished);
+        if (!result) {
+            auto newObject = createMessage(UpnpWebSocketMessageType::ServiceIsNotPublished);
 
-    newObject.insert(QStringLiteral("UDN"), newDeviceDescription->UDN());
+            newObject.insert(QStringLiteral("UDN"), newDeviceDescription->UDN());
+
+            sendMessage(newObject);
+        }
+
+        auto newObject = createMessage(UpnpWebSocketMessageType::ServiceIsPublished);
+
+        newObject.insert(QStringLiteral("UDN"), newDeviceDescription->UDN());
+
+        sendMessage(newObject);
+    } else {
+        qDebug() << "decode problem";
+
+        auto newObject = createMessage(UpnpWebSocketMessageType::ServiceIsNotPublished);
+
+        sendMessage(newObject);
+    }
+}
+
+void UpnpWebSocketInternalClient::handleAskServiceList(QJsonObject aObject)
+{
+    Q_UNUSED(aObject);
+
+    auto newObject = createMessage(UpnpWebSocketMessageType::ServiceList);
+
+    QJsonArray allDeviceUDN;
+
+    for(auto &oneDevice : d->mServer->allDeviceUDN()) {
+        allDeviceUDN.append(oneDevice);
+    }
+
+    newObject.insert(QStringLiteral("devices"), allDeviceUDN);
+
 
     sendMessage(newObject);
 }
