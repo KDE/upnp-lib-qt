@@ -25,6 +25,7 @@
 
 #include <QtNetwork/QAuthenticator>
 
+#include <QtCore/QTimer>
 #include <QtCore/QPointer>
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
@@ -36,6 +37,8 @@ public:
     UpnpWebSocketCertificateConfiguration mCertificateConfiguration;
 
     QPointer<QWebSocket> mSocket;
+
+    QUrl mServerUrl;
 };
 
 UpnpWebSocketBaseClient::UpnpWebSocketBaseClient(QObject *parent)
@@ -57,6 +60,8 @@ void UpnpWebSocketBaseClient::connectServer(const QUrl &serverUrl)
 {
     QSslConfiguration myConfiguration;
     d->mCertificateConfiguration.initialize(&myConfiguration);
+
+    d->mServerUrl = serverUrl;
 
     d->mSocket = new QWebSocket();
 
@@ -115,6 +120,7 @@ void UpnpWebSocketBaseClient::connected()
 
 void UpnpWebSocketBaseClient::disconnected()
 {
+    QTimer::singleShot(200, [this]() {this->d->mSocket->open(this->d->mServerUrl);});
 }
 
 void UpnpWebSocketBaseClient::error(QAbstractSocket::SocketError error)
