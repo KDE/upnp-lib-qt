@@ -48,7 +48,7 @@ UpnpWebSocketClient::~UpnpWebSocketClient()
 
 void UpnpWebSocketClient::askDeviceList()
 {
-    auto newObject = createMessage(UpnpWebSocketMessageType::AskServiceList);
+    auto newObject = createMessage(UpnpWebSocketMessageType::AskDeviceList);
 
     sendMessage(newObject);
 }
@@ -67,11 +67,11 @@ bool UpnpWebSocketClient::handleMessage(const QJsonObject &newMessage)
         handleHelloAck(newMessage);
         messageHandled = true;
         break;
-    case UpnpWebSocketMessageType::ServiceList:
+    case UpnpWebSocketMessageType::DeviceList:
         handleServiceList(newMessage);
         messageHandled = true;
         break;
-    case UpnpWebSocketMessageType::NewService:
+    case UpnpWebSocketMessageType::NewDevice:
         handleNewService(newMessage);
         messageHandled = true;
         break;

@@ -70,7 +70,7 @@ const UpnpDeviceDescription *UpnpWebSocketPublisher::description() const
 
 void UpnpWebSocketPublisher::publish()
 {
-    auto newObject = createMessage(UpnpWebSocketMessageType::PublishService);
+    auto newObject = createMessage(UpnpWebSocketMessageType::PublishDevice);
 
     addDeviceDescription(newObject, description());
 
@@ -91,7 +91,8 @@ bool UpnpWebSocketPublisher::handleMessage(const QJsonObject &newMessage)
         handleHelloAck(newMessage);
         messageHandled = true;
         break;
-    case UpnpWebSocketMessageType::NewService:
+    case UpnpWebSocketMessageType::NewDevice:
+    case UpnpWebSocketMessageType::RemovedDevice:
         //ignore those messages
         break;
     default:
