@@ -29,11 +29,16 @@ enum class UpnpArgumentDirection
 {
     In,
     Out,
+    Invalid,
 };
 
 class UPNPQTBASE_EXPORT UpnpActionArgumentDescription
 {
 public:
+
+    UpnpActionArgumentDescription();
+
+    bool mIsValid;
 
     QString mName;
 
@@ -49,6 +54,8 @@ class UPNPQTBASE_EXPORT UpnpActionDescription
 public:
 
     UpnpActionDescription();
+
+    bool mIsValid;
 
     QString mName;
 

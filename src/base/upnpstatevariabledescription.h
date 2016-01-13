@@ -33,6 +33,8 @@ public:
 
     UpnpStateVariableDescription();
 
+    bool mIsValid;
+
     QString mUpnpName;
 
     QByteArray mPropertyName;

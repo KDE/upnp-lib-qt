@@ -19,8 +19,12 @@
 
 #include "upnpactiondescription.h"
 
+UpnpActionArgumentDescription::UpnpActionArgumentDescription()
+    : mIsValid(false), mName(), mDirection(UpnpArgumentDirection::Invalid), mIsReturnValue(false), mRelatedStateVariable()
+{
+}
 
 UpnpActionDescription::UpnpActionDescription()
-    : mName(), mArguments(), mNumberInArgument(0), mNumberOutArgument(0)
+    : mIsValid(false), mName(), mArguments(), mNumberInArgument(0), mNumberOutArgument(0)
 {
 }
