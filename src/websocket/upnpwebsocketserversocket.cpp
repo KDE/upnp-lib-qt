@@ -101,10 +101,40 @@ QList<QString> UpnpWebSocketServerSocket::allDeviceUDN()
     return d->mAllDeviceUDN;
 }
 
+QSharedPointer<UpnpDeviceDescription> UpnpWebSocketServerSocket::device(const QString &udn) const
+{
+    auto clientId = d->mDeviceUdnToClientId.find(udn);
+
+    if (clientId == d->mDeviceUdnToClientId.end()) {
+        return {};
+    }
+
+    auto clientDevices = d->mAllDevices.find((clientId.value()));
+    if (clientDevices == d->mAllDevices.end()) {
+        return {};
+    }
+
+    auto oneDevice = clientDevices->find(udn);
+    if (oneDevice == clientDevices->end()) {
+        return {};
+    }
+
+    return oneDevice.value();
+}
+
 void UpnpWebSocketServerSocket::clientHasClosed(int idClient)
 {
     qDebug() << "UpnpWebSocketServerSocket::clientHasClosed" << idClient;
 
+    const auto &clientDevices = d->mAllDevices[idClient];
+
+    for(auto oneDevice : clientDevices) {
+        Q_EMIT deviceHasBeenRemoved(oneDevice->UDN());
+        d->mAllDeviceUDN.removeAll(oneDevice->UDN());
+        d->mDeviceUdnToClientId.remove(oneDevice->UDN());
+    }
+
+    d->mAllDevices.remove(idClient);
     d->mAllClients.remove(idClient);
 }
 

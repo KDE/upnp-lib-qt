@@ -60,7 +60,9 @@ UpnpWebSocketInternalClient::UpnpWebSocketInternalClient(int idClient, QWebSocke
     connect(d->mSocket, &QWebSocket::sslErrors, this, &UpnpWebSocketInternalClient::sslErrors);
     connect(d->mSocket, &QWebSocket::stateChanged, this, &UpnpWebSocketInternalClient::stateChanged);
     connect(d->mSocket, &QWebSocket::textMessageReceived, this, &UpnpWebSocketInternalClient::textMessageReceived);
+
     connect(d->mServer, &UpnpWebSocketServerSocket::newDeviceHasBeenPublished, this, &UpnpWebSocketInternalClient::newDeviceHasBeenPublished);
+    connect(d->mServer, &UpnpWebSocketServerSocket::deviceHasBeenRemoved, this, &UpnpWebSocketInternalClient::deviceHasBeenRemoved);
 }
 
 UpnpWebSocketInternalClient::~UpnpWebSocketInternalClient()
@@ -157,7 +159,28 @@ void UpnpWebSocketInternalClient::newDeviceHasBeenPublished(const QString &udn)
 {
     auto newMessage = createMessage(UpnpWebSocketMessageType::NewDevice);
 
-    newMessage.insert(QStringLiteral("device"), udn);
+    auto newDevice = d->mServer->device(udn);
+
+    if (!newDevice) {
+        return;
+    }
+
+    newMessage.insert(QStringLiteral("device"), UpnpWebSocketProtocol::deviceDescriptionToJson(newDevice.data()));
+
+    sendMessage(newMessage);
+}
+
+void UpnpWebSocketInternalClient::deviceHasBeenRemoved(const QString &udn)
+{
+    auto newMessage = createMessage(UpnpWebSocketMessageType::RemovedDevice);
+
+    auto removedDevice = d->mServer->device(udn);
+
+    if (!removedDevice) {
+        return;
+    }
+
+    newMessage.insert(QStringLiteral("device"), UpnpWebSocketProtocol::deviceDescriptionToJson(removedDevice.data()));
 
     sendMessage(newMessage);
 }
@@ -245,7 +268,13 @@ void UpnpWebSocketInternalClient::handleAskServiceList(QJsonObject aObject)
     QJsonArray allDeviceUDN;
 
     for(auto &oneDevice : d->mServer->allDeviceUDN()) {
-        allDeviceUDN.append(oneDevice);
+        auto fullDevice = d->mServer->device(oneDevice);
+
+        if (!fullDevice) {
+            return;
+        }
+
+        allDeviceUDN.append(UpnpWebSocketProtocol::deviceDescriptionToJson(fullDevice.data()));
     }
 
     newObject.insert(QStringLiteral("devices"), allDeviceUDN);

@@ -60,7 +60,9 @@ private Q_SLOTS:
     void sslErrors(const QList<QSslError> &errors);
     void stateChanged(QAbstractSocket::SocketState state);
     void textMessageReceived(const QString &message);
+
     void newDeviceHasBeenPublished(const QString &udn);
+    void deviceHasBeenRemoved(const QString &udn);
 
 private:
 

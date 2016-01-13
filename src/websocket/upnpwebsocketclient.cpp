@@ -21,6 +21,8 @@
 
 #include "upnpwebsocketcertificateconfiguration.h"
 
+#include "upnpdevicedescription.h"
+
 #include <QtWebSockets/QWebSocket>
 
 #include <QtNetwork/QAuthenticator>
@@ -33,7 +35,7 @@
 class UpnpWebSocketClientPrivate
 {
 public:
-
+    QMap<QString, QSharedPointer<UpnpDeviceDescription>> mAllDevices;
 };
 
 UpnpWebSocketClient::UpnpWebSocketClient(QObject *parent)
@@ -75,6 +77,10 @@ bool UpnpWebSocketClient::handleMessage(const QJsonObject &newMessage)
         handleNewService(newMessage);
         messageHandled = true;
         break;
+    case UpnpWebSocketMessageType::RemovedDevice:
+        handleRemovedService(newMessage);
+        messageHandled = true;
+        break;
     default:
         qDebug() << "unknown message" << static_cast<int>(getType(newMessage));
         break;
@@ -85,6 +91,10 @@ bool UpnpWebSocketClient::handleMessage(const QJsonObject &newMessage)
 
 void UpnpWebSocketClient::hasBeenDisconnected()
 {
+    for (auto oneDevice : d->mAllDevices) {
+        qDebug() << "removed device" << oneDevice->UDN();
+    }
+    d->mAllDevices.clear();
 }
 
 void UpnpWebSocketClient::handleHelloAck(QJsonObject aObject)
@@ -102,15 +112,47 @@ void UpnpWebSocketClient::handleServiceList(QJsonObject aObject)
     }
 
     const auto &listDeviceArray = listDeviceValue.toArray();
-    for (auto oneDevice : listDeviceArray) {
-        qDebug() << "new device" << oneDevice.toString();
+    for (auto oneDeviceValue : listDeviceArray) {
+        if (oneDeviceValue.isNull() || !oneDeviceValue.isObject()) {
+            return;
+        }
+
+        auto oneDevice = UpnpWebSocketProtocol::deviceDescriptionFromJson(oneDeviceValue.toObject());
+        d->mAllDevices[oneDevice->UDN()] = oneDevice;
+        qDebug() << "new device" << oneDevice->UDN();
     }
 }
 
 void UpnpWebSocketClient::handleNewService(QJsonObject aObject)
 {
     const auto &newDeviceValue = UpnpWebSocketProtocol::getField(aObject, QStringLiteral("device"));
-    qDebug() << "new device" << newDeviceValue.toString();
+    if (newDeviceValue.isNull() || !newDeviceValue.isObject()) {
+        return;
+    }
+
+    auto newDevice = UpnpWebSocketProtocol::deviceDescriptionFromJson(newDeviceValue.toObject());
+    d->mAllDevices[newDevice->UDN()] = newDevice;
+    qDebug() << "new device" << newDevice->UDN();
+}
+
+void UpnpWebSocketClient::handleRemovedService(QJsonObject aObject)
+{
+    const auto &removedDeviceValue = UpnpWebSocketProtocol::getField(aObject, QStringLiteral("device"));
+    if (removedDeviceValue.isNull() || !removedDeviceValue.isObject()) {
+        return;
+    }
+
+    auto removedDevice = UpnpWebSocketProtocol::deviceDescriptionFromJson(removedDeviceValue.toObject());
+
+    auto removedDeviceIterator = d->mAllDevices.find(removedDevice->UDN());
+
+    if (removedDeviceIterator == d->mAllDevices.end()) {
+        return;
+    }
+
+    d->mAllDevices.erase(removedDeviceIterator);
+
+    qDebug() << "removed device" << removedDevice->UDN();
 }
 
 

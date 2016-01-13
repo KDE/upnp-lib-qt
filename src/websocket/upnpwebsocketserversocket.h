@@ -58,9 +58,13 @@ public:
 
     QList<QString> allDeviceUDN();
 
+    QSharedPointer<UpnpDeviceDescription> device(const QString &udn) const;
+
 Q_SIGNALS:
 
     void newDeviceHasBeenPublished(const QString &udn);
+
+    void deviceHasBeenRemoved(const QString &udn);
 
 private Q_SLOTS:
 

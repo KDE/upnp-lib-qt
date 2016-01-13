@@ -65,6 +65,8 @@ private:
 
     void handleNewService(QJsonObject aObject);
 
+    void handleRemovedService(QJsonObject aObject);
+
     UpnpWebSocketClientPrivate *d;
 
 };
