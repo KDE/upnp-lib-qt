@@ -28,7 +28,7 @@
 namespace UpnpWebSocketProtocol
 {
 
-static QJsonValue getField(const QJsonObject &data, const QString &fieldName)
+QJsonValue getField(const QJsonObject &data, const QString &fieldName)
 {
     auto fieldKey = data.find(fieldName);
     if (fieldKey == data.end()) {

@@ -44,6 +44,8 @@ class UpnpDeviceDescription;
 namespace UpnpWebSocketProtocol
 {
 
+QJsonValue getField(const QJsonObject &data, const QString &fieldName);
+
 UpnpActionArgumentDescription actionArgumentDescriptionFromJson(const QJsonObject &argument);
 
 UpnpStateVariableDescription variableDescriptionFromJson(const QJsonObject &variableDescription);
