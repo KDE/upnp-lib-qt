@@ -17,17 +17,75 @@
  * Boston, MA 02110-1301, USA.
  */
 
-import QtQml 2.2
+import QtQuick 2.4
+import QtQuick.Controls 1.3
+import QtQuick.Controls.Styles 1.3
+import QtQuick.Layouts 1.1
+import QtQuick.Window 2.2
+import QtQml.Models 2.1
 
 import org.mgallien.QmlExtension 1.0
 
-UpnpWebSocketClient {
-    id: server
+ApplicationWindow {
+    visible: true
+    minimumWidth: 800
+    minimumHeight: 400
+    title: 'web socket'
+    id: mainWindow
 
-    certificateConfiguration.certificateAuthorityFileName: './rootKey.crt'
-    certificateConfiguration.certificateFileName: './moi_test.pem'
+    UpnpWebSocketClient {
+        id: server
 
-    Component.onCompleted: {
-        connectServer('wss://moulinette:11443/')
+        certificateConfiguration.certificateAuthorityFileName: './rootKey.crt'
+        certificateConfiguration.certificateFileName: './moi_test.pem'
+
+        Component.onCompleted: {
+            connectServer('wss://moulinette:11443/')
+        }
+    }
+
+    UpnpWebSocketDeviceModel {
+        id: deviceModel
+        webSocketClient: server
+    }
+
+    Component {
+        id: rowDelegate
+
+        Item {
+            id: rowDelegateContent
+            height: Screen.pixelDensity * 15.
+            Rectangle {
+                color: "#FFFFFF"
+                anchors.fill: parent
+            }
+        }
+    }
+
+    RowLayout {
+        anchors.fill: parent
+        spacing: 0
+
+        TableView {
+            backgroundVisible: false
+            headerVisible: false
+            frameVisible: false
+            focus: true
+            rowDelegate: rowDelegate
+            model: deviceModel
+
+            TableViewColumn {
+                role: "name"
+                title: "name"
+            }
+
+            TableViewColumn {
+                role: "udn"
+                title: "UUID"
+            }
+
+            Layout.fillHeight: true
+            Layout.fillWidth: true
+        }
     }
 }

@@ -19,6 +19,7 @@
 
 #include "upnpwebsocketclient.h"
 #include "upnpwebsocketcertificateconfiguration.h"
+#include "upnpwebsocketdevicemodel.h"
 
 #include <QtWidgets/QApplication>
 
@@ -36,6 +37,7 @@ int __attribute__((visibility("default"))) main(int argc, char *argv[])
 
     qmlRegisterType<UpnpWebSocketClient>("org.mgallien.QmlExtension", 1, 0, "UpnpWebSocketClient");
     qmlRegisterType<UpnpWebSocketCertificateConfiguration>("org.mgallien.QmlExtension", 1, 0, "UpnpSsdpCertificateConfiguration");
+    qmlRegisterType<UpnpWebSocketDeviceModel>("org.mgallien.QmlExtension", 1, 0, "UpnpWebSocketDeviceModel");
 
     engine.load(QUrl(QStringLiteral("qrc:/client.qml")));
 
