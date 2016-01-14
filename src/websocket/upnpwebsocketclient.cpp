@@ -55,6 +55,17 @@ void UpnpWebSocketClient::askDeviceList()
     sendMessage(newObject);
 }
 
+QSharedPointer<UpnpDeviceDescription> UpnpWebSocketClient::device(const QString &udn) const
+{
+    auto deviceIterator = d->mAllDevices.find(udn);
+
+    if (deviceIterator == d->mAllDevices.end()) {
+        return {};
+    }
+
+    return*deviceIterator;
+}
+
 bool UpnpWebSocketClient::handleMessage(const QJsonObject &newMessage)
 {
     bool messageHandled = UpnpWebSocketBaseClient::handleMessage(newMessage);

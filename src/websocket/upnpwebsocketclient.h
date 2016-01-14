@@ -26,10 +26,12 @@
 #include "upnpwebsocketbaseclient.h"
 
 #include <QtCore/QJsonObject>
+#include <QtCore/QSharedPointer>
 
 class QWebSocket;
 class UpnpWebSocketClientPrivate;
 class UpnpWebSocketCertificateConfiguration;
+class UpnpDeviceDescription;
 
 class UPNPQTWEBSOCKET_EXPORT UpnpWebSocketClient : public UpnpWebSocketBaseClient
 {
@@ -44,6 +46,8 @@ public:
     void askDeviceList();
 
     void askDeviceDetail();
+
+    QSharedPointer<UpnpDeviceDescription> device(const QString &udn) const;
 
 Q_SIGNALS:
 
