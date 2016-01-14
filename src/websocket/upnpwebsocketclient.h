@@ -51,6 +51,10 @@ public:
 
 Q_SIGNALS:
 
+    void newDevice(const QString &udn);
+
+    void removedDevice(const QString &udn);
+
 public Q_SLOTS:
 
 private Q_SLOTS:

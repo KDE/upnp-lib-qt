@@ -104,6 +104,7 @@ void UpnpWebSocketClient::hasBeenDisconnected()
 {
     for (auto oneDevice : d->mAllDevices) {
         qDebug() << "removed device" << oneDevice->UDN();
+        Q_EMIT removedDevice(oneDevice->UDN());
     }
     d->mAllDevices.clear();
 }
@@ -131,6 +132,7 @@ void UpnpWebSocketClient::handleServiceList(QJsonObject aObject)
         auto oneDevice = UpnpWebSocketProtocol::deviceDescriptionFromJson(oneDeviceValue.toObject());
         d->mAllDevices[oneDevice->UDN()] = oneDevice;
         qDebug() << "new device" << oneDevice->UDN();
+        Q_EMIT newDevice(oneDevice->UDN());
     }
 }
 
@@ -141,9 +143,10 @@ void UpnpWebSocketClient::handleNewService(QJsonObject aObject)
         return;
     }
 
-    auto newDevice = UpnpWebSocketProtocol::deviceDescriptionFromJson(newDeviceValue.toObject());
-    d->mAllDevices[newDevice->UDN()] = newDevice;
-    qDebug() << "new device" << newDevice->UDN();
+    auto oneNewDevice = UpnpWebSocketProtocol::deviceDescriptionFromJson(newDeviceValue.toObject());
+    d->mAllDevices[oneNewDevice->UDN()] = oneNewDevice;
+    qDebug() << "new device" << oneNewDevice->UDN();
+    Q_EMIT newDevice(oneNewDevice->UDN());
 }
 
 void UpnpWebSocketClient::handleRemovedService(QJsonObject aObject)
@@ -153,9 +156,9 @@ void UpnpWebSocketClient::handleRemovedService(QJsonObject aObject)
         return;
     }
 
-    auto removedDevice = UpnpWebSocketProtocol::deviceDescriptionFromJson(removedDeviceValue.toObject());
+    auto oneRemovedDevice = UpnpWebSocketProtocol::deviceDescriptionFromJson(removedDeviceValue.toObject());
 
-    auto removedDeviceIterator = d->mAllDevices.find(removedDevice->UDN());
+    auto removedDeviceIterator = d->mAllDevices.find(oneRemovedDevice->UDN());
 
     if (removedDeviceIterator == d->mAllDevices.end()) {
         return;
@@ -163,7 +166,9 @@ void UpnpWebSocketClient::handleRemovedService(QJsonObject aObject)
 
     d->mAllDevices.erase(removedDeviceIterator);
 
-    qDebug() << "removed device" << removedDevice->UDN();
+    qDebug() << "removed device" << oneRemovedDevice->UDN();
+
+    Q_EMIT removedDevice(oneRemovedDevice->UDN());
 }
 
 
