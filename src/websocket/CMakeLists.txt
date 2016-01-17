@@ -8,6 +8,7 @@ set(upnpQtWebSocket_SOURCES
     upnpwebsocketpublisher.cpp
     upnpwebsocketinternalclient.cpp
     upnpwebsocketcertificateconfiguration.cpp
+    upnpwebsocketabstractservicecontrol.cpp
     upnpwebsocketcommon.cpp
 )
 
