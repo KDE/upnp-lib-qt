@@ -92,6 +92,10 @@ bool UpnpWebSocketClient::handleMessage(const QJsonObject &newMessage)
         handleRemovedService(newMessage);
         messageHandled = true;
         break;
+    case UpnpWebSocketMessageType::CallActionAck:
+        handleCallActionAck(newMessage);
+        messageHandled = true;
+        break;
     default:
         qDebug() << "unknown message" << static_cast<int>(getType(newMessage));
         break;
@@ -169,6 +173,21 @@ void UpnpWebSocketClient::handleRemovedService(QJsonObject aObject)
     qDebug() << "removed device" << oneRemovedDevice->UDN();
 
     Q_EMIT removedDevice(oneRemovedDevice->UDN());
+}
+
+void UpnpWebSocketClient::handleCallActionAck(QJsonObject aObject)
+{
+    const auto &actionValue = UpnpWebSocketProtocol::getField(aObject, QStringLiteral("action"));
+    if (actionValue.isNull() || !actionValue.isString()) {
+        return;
+    }
+
+    const auto &sequenceNumberValue = UpnpWebSocketProtocol::getField(aObject, QStringLiteral("sequenceNumber"));
+    if (sequenceNumberValue.isNull() || !sequenceNumberValue.isDouble()) {
+        return;
+    }
+
+    Q_EMIT actionAck(actionValue.toString(), qint64(sequenceNumberValue.toDouble()));
 }
 
 

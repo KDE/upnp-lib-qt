@@ -38,6 +38,8 @@ enum class UpnpWebSocketMessageType {
     DeviceIsPublished,
     DeviceIsNotPublished,
     UnpublishDevice,
+    CallAction,
+    CallActionAck,
     SubscribeService,
     ServiceIsSubscribed,
 };

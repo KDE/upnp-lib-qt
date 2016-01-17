@@ -55,6 +55,8 @@ Q_SIGNALS:
 
     void removedDevice(const QString &udn);
 
+    void actionAck(const QString &action, qint64 sequenceNumber);
+
 public Q_SLOTS:
 
 private Q_SLOTS:
@@ -74,6 +76,8 @@ private:
     void handleNewService(QJsonObject aObject);
 
     void handleRemovedService(QJsonObject aObject);
+
+    void handleCallActionAck(QJsonObject aObject);
 
     UpnpWebSocketClientPrivate *d;
 
