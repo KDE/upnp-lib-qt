@@ -49,6 +49,10 @@ public:
 
     UpnpWebSocketCertificateConfiguration* certificateConfiguration() const;
 
+    QJsonObject createMessage(UpnpWebSocketMessageType type);
+
+    void sendMessage(const QJsonObject &messageObject);
+
 Q_SIGNALS:
 
     void certificateConfigurationChanged();
@@ -79,10 +83,6 @@ protected:
     virtual bool handleMessage(const QJsonObject &newMessage);
 
     static UpnpWebSocketMessageType getType(QJsonObject aObject);
-
-    QJsonObject createMessage(UpnpWebSocketMessageType type);
-
-    void sendMessage(const QJsonObject &messageObject);
 
     virtual void hasBeenDisconnected();
 
