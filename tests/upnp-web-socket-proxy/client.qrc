@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/">
         <file>client.qml</file>
+        <file>BinaryLightControl.qml</file>
     </qresource>
 </RCC>

@@ -55,10 +55,6 @@ ApplicationWindow {
         Item {
             id: rowDelegateContent
             height: Screen.pixelDensity * 15.
-            Rectangle {
-                color: "#FFFFFF"
-                anchors.fill: parent
-            }
         }
     }
 
@@ -84,8 +80,20 @@ ApplicationWindow {
                 title: "UUID"
             }
 
+            onClicked: {
+                model.modelIndex(row)
+            }
+
             Layout.fillHeight: true
             Layout.fillWidth: true
+        }
+
+        BinaryLightControl {
+            id: lightControl
+
+            Layout.fillHeight: true
+            Layout.preferredWidth: Screen.pixelDensity * 30.
+            Layout.minimumWidth: Screen.pixelDensity * 20.
         }
     }
 }

@@ -19,6 +19,7 @@ target_link_libraries(upnpWebSocketProxy
 set(upnpWebSocketClient_SOURCES
     client.cpp
     upnpwebsocketdevicemodel.cpp
+    BinaryLightControl.qml
     client.qml
 )
 
