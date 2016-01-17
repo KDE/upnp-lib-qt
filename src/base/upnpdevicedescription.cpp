@@ -78,6 +78,17 @@ UpnpDeviceDescription::~UpnpDeviceDescription()
     delete d;
 }
 
+const QSharedPointer<UpnpServiceDescription> UpnpDeviceDescription::serviceById(const QString &serviceId) const
+{
+    for (auto oneService : d->mServices) {
+        if (oneService->serviceId() == serviceId) {
+            return oneService;
+        }
+    }
+
+    return {};
+}
+
 const QSharedPointer<UpnpServiceDescription> UpnpDeviceDescription::serviceByIndex(int serviceIndex) const
 {
     return d->mServices[serviceIndex];

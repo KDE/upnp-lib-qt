@@ -111,6 +111,8 @@ public:
 
     virtual ~UpnpDeviceDescription();
 
+    const QSharedPointer<UpnpServiceDescription> serviceById(const QString &serviceId) const;
+
     const QSharedPointer<UpnpServiceDescription> serviceByIndex(int serviceIndex) const;
 
     const QList<QSharedPointer<UpnpServiceDescription> >& services() const;
