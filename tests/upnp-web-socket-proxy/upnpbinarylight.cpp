@@ -138,13 +138,13 @@ void UpnpBinaryLight::actionCalled(const QString &action, const QVariantMap &arg
                 return;
             }
 
-            Q_EMIT SetTarget(sequenceNumber, itArg.value().toBool());
+            Q_EMIT setTarget(sequenceNumber, itArg.value().toBool());
         }
         if (action == QStringLiteral("GetTarget")) {
-            Q_EMIT GetTarget(sequenceNumber);
+            Q_EMIT getTarget(sequenceNumber);
         }
         if (action == QStringLiteral("GetStatus")) {
-            Q_EMIT GetStatus(sequenceNumber);
+            Q_EMIT getStatus(sequenceNumber);
         }
     }
 }

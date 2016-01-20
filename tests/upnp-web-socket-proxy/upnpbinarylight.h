@@ -70,11 +70,11 @@ Q_SIGNALS:
 
     void udnChanged();
 
-    void SetTarget(qint64 sequenceNumber, bool target);
+    void setTarget(qint64 sequenceNumber, bool target);
 
-    void GetTarget(qint64 sequenceNumber);
+    void getTarget(qint64 sequenceNumber);
 
-    void GetStatus(qint64 sequenceNumber);
+    void getStatus(qint64 sequenceNumber);
 
 public Q_SLOTS:
 
