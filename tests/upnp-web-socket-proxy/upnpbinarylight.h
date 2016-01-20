@@ -27,7 +27,7 @@ class BinaryLightPrivate;
 class UpnpWebSocketPublisher;
 class UpnpDeviceDescription;
 
-class BinaryLight : public QObject
+class UpnpBinaryLight : public QObject
 {
     Q_OBJECT
 
@@ -40,10 +40,15 @@ class BinaryLight : public QObject
                WRITE setWebSocketPublisher
                NOTIFY webSocketPublisherChanged)
 
-public:
-    explicit BinaryLight(int cacheDuration = 1800, QObject *parent = 0);
+    Q_PROPERTY(QString udn
+               READ udn
+               WRITE setUdn
+               NOTIFY udnChanged)
 
-    virtual ~BinaryLight();
+public:
+    explicit UpnpBinaryLight(int cacheDuration = 1800, QObject *parent = 0);
+
+    virtual ~UpnpBinaryLight();
 
     UpnpDeviceDescription* description();
 
@@ -53,13 +58,27 @@ public:
 
     UpnpWebSocketPublisher* webSocketPublisher() const;
 
+    void setUdn(const QString &value);
+
+    const QString &udn() const;
+
 Q_SIGNALS:
 
     void descriptionChanged();
 
     void webSocketPublisherChanged();
 
+    void udnChanged();
+
+    void SetTarget(qint64 sequenceNumber, bool target);
+
+    void GetTarget(qint64 sequenceNumber);
+
+    void GetStatus(qint64 sequenceNumber);
+
 public Q_SLOTS:
+
+    void actionCalled(const QString &action, const QVariantMap &arguments, qint64 sequenceNumber, const QString &serviceId);
 
 private:
 

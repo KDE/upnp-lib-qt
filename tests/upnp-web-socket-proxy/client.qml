@@ -20,6 +20,7 @@
 import QtQuick 2.4
 import QtQuick.Controls 1.3
 import QtQuick.Controls.Styles 1.3
+import QtQuick.Extras 1.4
 import QtQuick.Layouts 1.1
 import QtQuick.Window 2.2
 import QtQml.Models 2.1
@@ -44,56 +45,41 @@ ApplicationWindow {
         }
     }
 
-    UpnpWebSocketDeviceModel {
-        id: deviceModel
+    ToggleButton {
+        id: lightControl
+
+        anchors.centerIn: parent
+
+        width: Screen.pixelDensity * 30.
+        height: Screen.pixelDensity * 20.
+
+        onClicked: {
+            outsideSwitch.setTarget(checked)
+        }
+    }
+
+    UpnpWebSocketDeviceNotifier {
+        id: outsideSwitchNotifier
         webSocketClient: server
-    }
+        udn: '4424b320-9657-419c-8935-a9fe76170f09'
+        serviceId: 'urn:upnp-org:serviceId:SwitchPower'
 
-    Component {
-        id: rowDelegate
+        onDeviceValid: {
+            console.log("device is valid")
+            outsideSwitch.deviceDescription = server.rawDevice(udn)
+            lightControl.enabled = true
+        }
 
-        Item {
-            id: rowDelegateContent
-            height: Screen.pixelDensity * 15.
+        onDeviceInvalid: {
+            console.log("device is invalid")
+            lightControl.enabled = false
         }
     }
 
-    RowLayout {
-        anchors.fill: parent
-        spacing: 0
+    UpnpWebSocketControlSwitchPower {
+        id: outsideSwitch
 
-        TableView {
-            backgroundVisible: false
-            headerVisible: false
-            frameVisible: false
-            focus: true
-            rowDelegate: rowDelegate
-            model: deviceModel
-
-            TableViewColumn {
-                role: "name"
-                title: "name"
-            }
-
-            TableViewColumn {
-                role: "udn"
-                title: "UUID"
-            }
-
-            onClicked: {
-                model.modelIndex(row)
-            }
-
-            Layout.fillHeight: true
-            Layout.fillWidth: true
-        }
-
-        BinaryLightControl {
-            id: lightControl
-
-            Layout.fillHeight: true
-            Layout.preferredWidth: Screen.pixelDensity * 30.
-            Layout.minimumWidth: Screen.pixelDensity * 20.
-        }
+        webSocketClient: server
+        serviceId: 'urn:upnp-org:serviceId:SwitchPower'
     }
 }

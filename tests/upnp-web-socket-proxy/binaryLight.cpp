@@ -41,7 +41,7 @@ int __attribute__((visibility("default"))) main(int argc, char *argv[])
     qmlRegisterType<UpnpWebSocketClient>("org.mgallien.QmlExtension", 1, 0, "UpnpWebSocketClient");
     qmlRegisterType<UpnpWebSocketCertificateConfiguration>("org.mgallien.QmlExtension", 1, 0, "UpnpSsdpCertificateConfiguration");
     qmlRegisterType<UpnpWebSocketPublisher>("org.mgallien.QmlExtension", 1, 0, "UpnpWebSocketPublisher");
-    qmlRegisterType<BinaryLight>("org.mgallien.QmlExtension", 1, 0, "BinaryLight");
+    qmlRegisterType<UpnpBinaryLight>("org.mgallien.QmlExtension", 1, 0, "BinaryLight");
 
     qRegisterMetaType<UpnpDeviceDescription*>();
 

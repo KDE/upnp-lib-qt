@@ -20,6 +20,10 @@
 #include "upnpwebsocketclient.h"
 #include "upnpwebsocketcertificateconfiguration.h"
 #include "upnpwebsocketdevicemodel.h"
+#include "upnpwebsocketdevicenotifier.h"
+#include "upnpdevicedescription.h"
+
+#include "upnpwebsocketcontrolswitchpower.h"
 
 #include <QtWidgets/QApplication>
 
@@ -38,6 +42,10 @@ int __attribute__((visibility("default"))) main(int argc, char *argv[])
     qmlRegisterType<UpnpWebSocketClient>("org.mgallien.QmlExtension", 1, 0, "UpnpWebSocketClient");
     qmlRegisterType<UpnpWebSocketCertificateConfiguration>("org.mgallien.QmlExtension", 1, 0, "UpnpSsdpCertificateConfiguration");
     qmlRegisterType<UpnpWebSocketDeviceModel>("org.mgallien.QmlExtension", 1, 0, "UpnpWebSocketDeviceModel");
+    qmlRegisterType<UpnpWebSocketDeviceNotifier>("org.mgallien.QmlExtension", 1, 0, "UpnpWebSocketDeviceNotifier");
+    qmlRegisterType<UpnpWebSocketControlSwitchPower>("org.mgallien.QmlExtension", 1, 0, "UpnpWebSocketControlSwitchPower");
+
+    qRegisterMetaType<UpnpDeviceDescription*>();
 
     engine.load(QUrl(QStringLiteral("qrc:/client.qml")));
 

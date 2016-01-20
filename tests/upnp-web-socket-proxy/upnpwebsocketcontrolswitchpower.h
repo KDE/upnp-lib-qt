@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Matthieu Gallien <matthieu_gallien@yahoo.fr>
+ * Copyright 2015-2016 Matthieu Gallien <matthieu_gallien@yahoo.fr>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -17,27 +17,30 @@
  * Boston, MA 02110-1301, USA.
  */
 
-import QtQml 2.2
+#ifndef UPNPWEBSOCKETCONTROLSWITCHPOWER_H
+#define UPNPWEBSOCKETCONTROLSWITCHPOWER_H
 
-import org.mgallien.QmlExtension 1.0
+#include "upnpwebsocketabstractservicecontrol.h"
 
-BinaryLight {
-    id: myLight
+class UpnpWebSocketControlSwitchPower : public UpnpWebSocketAbstractServiceControl
+{
 
-    udn: '4424b320-9657-419c-8935-a9fe76170f09'
+    Q_OBJECT
 
-    webSocketPublisher: UpnpWebSocketPublisher {
-        id: server
+public:
 
-        certificateConfiguration.certificateAuthorityFileName: './rootKey.crt'
-        certificateConfiguration.certificateFileName: './moi_test.pem'
+    explicit UpnpWebSocketControlSwitchPower(QObject *parent = 0);
 
-        description: myLight.description
+    virtual ~UpnpWebSocketControlSwitchPower();
 
-        Component.onCompleted: {
-            connectServer('wss://moulinette:11443/')
-        }
-    }
+public Q_SLOTS:
 
-    onSetTarget: console.log(target + ' SetTarget')
-}
+    void setTarget(bool newTargetValue);
+
+    void getTarget();
+
+    void getStatus();
+
+};
+
+#endif // UPNPWEBSOCKETCONTROLSWITCHPOWER_H

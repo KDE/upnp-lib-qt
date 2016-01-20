@@ -21,6 +21,8 @@
 
 #include "upnpswitchpower.h"
 
+#include "upnpwebsocketpublisher.h"
+
 #include "upnpdevicedescription.h"
 #include "upnpservicedescription.h"
 
@@ -35,7 +37,7 @@ public:
     UpnpWebSocketPublisher* mWebSocketPublisher;
 };
 
-BinaryLight::BinaryLight(int cacheDuration, QObject *parent)
+UpnpBinaryLight::UpnpBinaryLight(int cacheDuration, QObject *parent)
     : QObject(parent), d(new BinaryLightPrivate)
 {
     d->mWebSocketPublisher = nullptr;
@@ -75,35 +77,76 @@ BinaryLight::BinaryLight(int cacheDuration, QObject *parent)
     switchPowerService->setSCPDURL(serviceDescriptionUrl);*/
 
     QUrl deviceDescriptionUrl /*= d->mServer.urlPrefix();
-    d->mDevice.setURLBase(d->mServer.urlPrefix().toString())*/;
+                                            d->mDevice.setURLBase(d->mServer.urlPrefix().toString())*/;
     deviceDescriptionUrl.setPath(QStringLiteral("/") + QString::number(deviceIndex) + QStringLiteral("/device.xml"));
     d->mDevice.setLocationUrl(deviceDescriptionUrl);
 }
 
-BinaryLight::~BinaryLight()
+UpnpBinaryLight::~UpnpBinaryLight()
 {
     delete d;
 }
 
-UpnpDeviceDescription *BinaryLight::description()
+UpnpDeviceDescription *UpnpBinaryLight::description()
 {
     return &d->mDevice;
 }
 
-const UpnpDeviceDescription *BinaryLight::description() const
+const UpnpDeviceDescription *UpnpBinaryLight::description() const
 {
     return &d->mDevice;
 }
 
-void BinaryLight::setWebSocketPublisher(UpnpWebSocketPublisher *value)
+void UpnpBinaryLight::setWebSocketPublisher(UpnpWebSocketPublisher *value)
 {
+    if (d->mWebSocketPublisher) {
+        disconnect(d->mWebSocketPublisher, &UpnpWebSocketPublisher::actionCalled, this, &UpnpBinaryLight::actionCalled);
+    }
+
     d->mWebSocketPublisher = value;
+
+    if (d->mWebSocketPublisher) {
+        connect(d->mWebSocketPublisher, &UpnpWebSocketPublisher::actionCalled, this, &UpnpBinaryLight::actionCalled);
+    }
+
     Q_EMIT webSocketPublisherChanged();
 }
 
-UpnpWebSocketPublisher *BinaryLight::webSocketPublisher() const
+UpnpWebSocketPublisher *UpnpBinaryLight::webSocketPublisher() const
 {
     return d->mWebSocketPublisher;
+}
+
+void UpnpBinaryLight::setUdn(const QString &value)
+{
+    d->mDevice.setUDN(value);
+    Q_EMIT udnChanged();
+}
+
+const QString &UpnpBinaryLight::udn() const
+{
+    return d->mDevice.UDN();
+}
+
+void UpnpBinaryLight::actionCalled(const QString &action, const QVariantMap &arguments, qint64 sequenceNumber, const QString &serviceId)
+{
+    if (serviceId == QStringLiteral("urn:upnp-org:serviceId:SwitchPower")) {
+        if (action == QStringLiteral("SetTarget")) {
+            auto itArg = arguments.find(QStringLiteral("newTargetValue"));
+
+            if (itArg == arguments.end()) {
+                return;
+            }
+
+            Q_EMIT SetTarget(sequenceNumber, itArg.value().toBool());
+        }
+        if (action == QStringLiteral("GetTarget")) {
+            Q_EMIT GetTarget(sequenceNumber);
+        }
+        if (action == QStringLiteral("GetStatus")) {
+            Q_EMIT GetStatus(sequenceNumber);
+        }
+    }
 }
 
 #include "moc_upnpbinarylight.cpp"
