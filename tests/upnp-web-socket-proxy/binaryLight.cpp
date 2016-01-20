@@ -17,10 +17,12 @@
  * Boston, MA 02110-1301, USA.
  */
 
+#include "upnpbinarylight.h"
+#include "olinuxinoremoterelay.h"
+
 #include "upnpwebsocketclient.h"
 #include "upnpwebsocketcertificateconfiguration.h"
 #include "upnpwebsocketpublisher.h"
-#include "upnpbinarylight.h"
 
 #include "upnpdevicedescription.h"
 
@@ -41,7 +43,8 @@ int __attribute__((visibility("default"))) main(int argc, char *argv[])
     qmlRegisterType<UpnpWebSocketClient>("org.mgallien.QmlExtension", 1, 0, "UpnpWebSocketClient");
     qmlRegisterType<UpnpWebSocketCertificateConfiguration>("org.mgallien.QmlExtension", 1, 0, "UpnpSsdpCertificateConfiguration");
     qmlRegisterType<UpnpWebSocketPublisher>("org.mgallien.QmlExtension", 1, 0, "UpnpWebSocketPublisher");
-    qmlRegisterType<UpnpBinaryLight>("org.mgallien.QmlExtension", 1, 0, "BinaryLight");
+    qmlRegisterType<UpnpBinaryLight>("org.mgallien.QmlExtension", 1, 0, "UpnpBinaryLight");
+    qmlRegisterType<OlinuxinoRemoteRelay>("org.mgallien.QmlExtension", 1, 0, "OlinuxinoRemoteRelay");
 
     qRegisterMetaType<UpnpDeviceDescription*>();
 

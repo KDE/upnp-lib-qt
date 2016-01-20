@@ -21,8 +21,10 @@ import QtQml 2.2
 
 import org.mgallien.QmlExtension 1.0
 
-BinaryLight {
+UpnpBinaryLight {
     id: myLight
+
+    property var actuator
 
     udn: '4424b320-9657-419c-8935-a9fe76170f09'
 
@@ -39,5 +41,19 @@ BinaryLight {
         }
     }
 
-    onSetTarget: console.log(target + ' SetTarget')
+    actuator: OlinuxinoRemoteRelay {
+        id: myExteriorLight
+
+        relayAddress: '192.168.0.5'
+        relayIndex: 0
+    }
+
+    onSetTarget: {
+        console.log(target + ' SetTarget')
+        if (target) {
+            myExteriorLight.activate(OlinuxinoRemoteRelay.SwitchOn)
+        } else {
+            myExteriorLight.activate(OlinuxinoRemoteRelay.SwitchOff)
+        }
+    }
 }

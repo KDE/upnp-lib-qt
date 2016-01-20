@@ -39,6 +39,7 @@ set(binaryLight_SOURCES
     binaryLight.qml
     upnpbinarylight.cpp
     upnpswitchpower.cpp
+    olinuxinoremoterelay.cpp
 )
 
 qt5_add_resources(binaryLight_SOURCES binaryLight.qrc)
