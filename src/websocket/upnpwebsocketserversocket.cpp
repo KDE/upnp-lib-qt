@@ -122,6 +122,24 @@ QSharedPointer<UpnpDeviceDescription> UpnpWebSocketServerSocket::device(const QS
     return oneDevice.value();
 }
 
+bool UpnpWebSocketServerSocket::proxy(const QString &udn, const QJsonObject &message)
+{
+    auto clientId = d->mDeviceUdnToClientId.find(udn);
+
+    if (clientId == d->mDeviceUdnToClientId.end()) {
+        return false;
+    }
+
+    auto clientDevice = d->mAllClients.find((clientId.value()));
+    if (clientDevice == d->mAllClients.end()) {
+        return false;
+    }
+
+    (*clientDevice)->sendMessage(message);
+
+    return true;
+}
+
 void UpnpWebSocketServerSocket::clientHasClosed(int idClient)
 {
     qDebug() << "UpnpWebSocketServerSocket::clientHasClosed" << idClient;

@@ -99,6 +99,9 @@ void UpnpWebSocketInternalClient::binaryMessageReceived(const QByteArray &messag
     case UpnpWebSocketMessageType::AskDeviceList:
         handleAskServiceList(newMessageObject);
         break;
+    case UpnpWebSocketMessageType::CallAction:
+        handleCallAction(newMessageObject);
+        break;
     default:
         qDebug() << "UpnpWebSocketInternalClient::binaryMessageReceived" << "unknown message" << static_cast<int>(getType(newMessageObject));
         break;
@@ -281,6 +284,20 @@ void UpnpWebSocketInternalClient::handleAskServiceList(QJsonObject aObject)
 
 
     sendMessage(newObject);
+}
+
+void UpnpWebSocketInternalClient::handleCallAction(QJsonObject aObject)
+{
+    const auto &udnValue = UpnpWebSocketProtocol::getField(aObject, QStringLiteral("udn"));
+    if (udnValue.isNull() || !udnValue.isString()) {
+        return;
+    }
+
+    auto result = d->mServer->proxy(udnValue.toString(), aObject);
+    if (!result) {
+        auto answerMessage = createMessage(UpnpWebSocketMessageType::CallActionAck);
+        sendMessage(answerMessage);
+    }
 }
 
 UpnpWebSocketMessageType UpnpWebSocketInternalClient::getType(QJsonObject aObject)

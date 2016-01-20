@@ -44,6 +44,8 @@ public:
 
     virtual ~UpnpWebSocketInternalClient();
 
+    void sendMessage(const QJsonObject &messageObject);
+
 Q_SIGNALS:
 
     void closeClient(int idClient);
@@ -68,8 +70,6 @@ private:
 
     QJsonObject createMessage(UpnpWebSocketMessageType type);
 
-    void sendMessage(const QJsonObject &messageObject);
-
     void sendError();
 
     void handleHello(QJsonObject aObject);
@@ -77,6 +77,8 @@ private:
     void handleNewService(QJsonObject aObject);
 
     void handleAskServiceList(QJsonObject aObject);
+
+    void handleCallAction(QJsonObject aObject);
 
     static UpnpWebSocketMessageType getType(QJsonObject aObject);
 

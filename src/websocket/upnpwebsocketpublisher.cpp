@@ -91,6 +91,9 @@ bool UpnpWebSocketPublisher::handleMessage(const QJsonObject &newMessage)
         handleHelloAck(newMessage);
         messageHandled = true;
         break;
+    case UpnpWebSocketMessageType::CallAction:
+        handleCallAction(newMessage);
+        break;
     case UpnpWebSocketMessageType::NewDevice:
     case UpnpWebSocketMessageType::RemovedDevice:
         //ignore those messages
@@ -101,6 +104,33 @@ bool UpnpWebSocketPublisher::handleMessage(const QJsonObject &newMessage)
     }
 
     return messageHandled;
+}
+
+void UpnpWebSocketPublisher::handleCallAction(QJsonObject aObject)
+{
+    const auto &actionValue = UpnpWebSocketProtocol::getField(aObject, QStringLiteral("action"));
+    if (actionValue.isNull() || !actionValue.isString()) {
+        return;
+    }
+
+    const auto &sequenceNumberValue = UpnpWebSocketProtocol::getField(aObject, QStringLiteral("sequenceNumber"));
+    if (sequenceNumberValue.isNull() || !sequenceNumberValue.isDouble()) {
+        return;
+    }
+    auto sequenceNumber = static_cast<qint64>(sequenceNumberValue.toDouble());
+
+    const auto &serviceIdValue = UpnpWebSocketProtocol::getField(aObject, QStringLiteral("serviceId"));
+    if (serviceIdValue.isNull() || !serviceIdValue.isString()) {
+        return;
+    }
+
+    const auto &argumentsValue = UpnpWebSocketProtocol::getField(aObject, QStringLiteral("arguments"));
+    if (argumentsValue.isNull() || !argumentsValue.isObject()) {
+        return;
+    }
+    auto arguments = argumentsValue.toObject().toVariantMap();
+
+    Q_EMIT actionCalled(actionValue.toString(), arguments, sequenceNumber, serviceIdValue.toString());
 }
 
 void UpnpWebSocketPublisher::addDeviceDescription(QJsonObject &newMessage, const UpnpDeviceDescription *deviceDescription)

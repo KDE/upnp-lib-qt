@@ -31,6 +31,7 @@
 #include <QtCore/QObject>
 #include <QtCore/QList>
 #include <QtCore/QSharedPointer>
+#include <QtCore/QJsonObject>
 
 class UpnpSsdpServerSocketPrivate;
 class UpnpWebSocketCertificateConfiguration;
@@ -59,6 +60,8 @@ public:
     QList<QString> allDeviceUDN();
 
     QSharedPointer<UpnpDeviceDescription> device(const QString &udn) const;
+
+    bool proxy(const QString &udn, const QJsonObject &message);
 
 Q_SIGNALS:
 

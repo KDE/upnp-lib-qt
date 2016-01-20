@@ -26,6 +26,7 @@
 #include "upnpwebsocketbaseclient.h"
 
 #include <QtCore/QJsonObject>
+#include <QtCore/QVariantMap>
 
 class UpnpWebSocketPublisherPrivate;
 class UpnpDeviceDescription;
@@ -59,6 +60,8 @@ Q_SIGNALS:
 
     void descriptionChanged();
 
+    void actionCalled(const QString &action, const QVariantMap &arguments, qint64 sequenceNumber, const QString &serviceId);
+
 public Q_SLOTS:
 
     void publish();
@@ -68,6 +71,8 @@ private Q_SLOTS:
 protected:
 
     bool handleMessage(const QJsonObject &newMessage) override;
+
+    void handleCallAction(QJsonObject aObject);
 
 private:
 
