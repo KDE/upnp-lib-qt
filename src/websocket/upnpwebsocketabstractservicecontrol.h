@@ -58,7 +58,7 @@ public:
 
     virtual ~UpnpWebSocketAbstractServiceControl();
 
-    Q_INVOKABLE qint64 callAction(const QString &udn, const QString &action, const QList<QVariant> &arguments);
+    Q_INVOKABLE qint64 callAction(const QString &action, const QList<QVariant> &arguments);
 
     Q_INVOKABLE void subscribeEvents();
 

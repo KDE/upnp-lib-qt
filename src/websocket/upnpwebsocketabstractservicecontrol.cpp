@@ -52,7 +52,7 @@ UpnpWebSocketAbstractServiceControl::~UpnpWebSocketAbstractServiceControl()
     delete d;
 }
 
-qint64 UpnpWebSocketAbstractServiceControl::callAction(const QString &udn, const QString &action, const QList<QVariant> &arguments)
+qint64 UpnpWebSocketAbstractServiceControl::callAction(const QString &action, const QList<QVariant> &arguments)
 {
     if (!d->mWebSocketClient) {
         return INVALID_SEQUENCE_NUMBER;
@@ -65,7 +65,7 @@ qint64 UpnpWebSocketAbstractServiceControl::callAction(const QString &udn, const
 
     auto newMessage = d->mWebSocketClient->createMessage(UpnpWebSocketMessageType::CallAction);
     newMessage.insert(QStringLiteral("action"), action);
-    newMessage.insert(QStringLiteral("udn"), udn);
+    newMessage.insert(QStringLiteral("udn"), d->mDeviceDescription->UDN());
     newMessage.insert(QStringLiteral("serviceId"), d->mServiceDescription->serviceId());
     newMessage.insert(QStringLiteral("sequenceNumber"), d->mSequenceNumber);
 
