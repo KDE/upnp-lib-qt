@@ -74,7 +74,7 @@ QSharedPointer<UpnpDeviceDescription> UpnpWebSocketClient::device(const QString 
         return {};
     }
 
-    return*deviceIterator;
+    return *deviceIterator;
 }
 
 bool UpnpWebSocketClient::handleMessage(const QJsonObject &newMessage)
