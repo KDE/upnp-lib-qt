@@ -97,6 +97,9 @@ void UpnpWebSocketAbstractServiceControl::setDeviceDescription(UpnpDeviceDescrip
 {
     d->mDeviceDescription = value;
     Q_EMIT deviceDescriptionChanged();
+    if (d->mDeviceDescription && !d->mServiceId.isEmpty()) {
+        d->mServiceDescription = d->mDeviceDescription->serviceById(d->mServiceId);
+    }
 }
 
 UpnpDeviceDescription *UpnpWebSocketAbstractServiceControl::deviceDescription() const
@@ -108,7 +111,9 @@ void UpnpWebSocketAbstractServiceControl::setServiceId(const QString &value)
 {
     d->mServiceId = value;
     Q_EMIT serviceIdChanged();
-    d->mServiceDescription = d->mDeviceDescription->serviceById(d->mServiceId);
+    if (d->mDeviceDescription && !d->mServiceId.isEmpty()) {
+        d->mServiceDescription = d->mDeviceDescription->serviceById(d->mServiceId);
+    }
 }
 
 const QString &UpnpWebSocketAbstractServiceControl::serviceId() const
