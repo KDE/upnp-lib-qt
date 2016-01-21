@@ -20,7 +20,8 @@
 #ifndef OLINUXINOREMOTERELAY_H
 #define OLINUXINOREMOTERELAY_H
 
-#include <QtCore/QObject>
+#include "abstractrelayactuator.h"
+
 #include <QtCore/QList>
 #include <QtCore/QScopedPointer>
 
@@ -29,7 +30,7 @@
 class QNetworkAccessManager;
 class QNetworkReply;
 
-class OlinuxinoRemoteRelay : public QObject
+class OlinuxinoRemoteRelay : public AbstractRelayActuator
 {
 
     Q_OBJECT
@@ -44,22 +45,7 @@ class OlinuxinoRemoteRelay : public QObject
                WRITE setRelayIndex
                NOTIFY relayIndexChanged)
 
-    Q_PROPERTY(RelayState relayState
-               READ relayState
-               NOTIFY relayStateChanged)
-
-    Q_PROPERTY(bool status
-               READ status
-               NOTIFY statusChanged)
-
 public:
-
-    enum RelayState {
-        SwitchOn,
-        SwitchOff,
-    };
-
-    Q_ENUM(RelayState)
 
     explicit OlinuxinoRemoteRelay(QObject *parent = 0);
 
@@ -69,19 +55,11 @@ public:
 
     int relayIndex() const;
 
-    RelayState relayState() const;
-
-    bool status() const;
-
 Q_SIGNALS:
 
     void addressChanged(QString relayAddress);
 
     void relayIndexChanged(int relayIndex);
-
-    void relayStateChanged(RelayState relayState);
-
-    void statusChanged(bool status);
 
 public Q_SLOTS:
 
@@ -89,11 +67,13 @@ public Q_SLOTS:
 
     void setRelayIndex(int relayIndice);
 
-    void activate(RelayState newState);
-
     void sslErrors(QNetworkReply *reply, const QList<QSslError> &errors);
 
-    void finished();
+    void finished(QNetworkReply *reply);
+
+protected:
+
+    bool doActivate(RelayState newState) override;
 
 private:
 
@@ -101,11 +81,8 @@ private:
 
     int mRelayIndex;
 
-    RelayState mRelayState;
-
     QScopedPointer<QNetworkAccessManager> mNetworkAccess;
 
-    bool mStatus;
 };
 
 #endif // OLINUXINOREMOTERELAY_H

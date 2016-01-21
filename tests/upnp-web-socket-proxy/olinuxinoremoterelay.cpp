@@ -26,10 +26,11 @@
 #include <QtCore/QUrl>
 
 OlinuxinoRemoteRelay::OlinuxinoRemoteRelay(QObject *parent)
-    : QObject(parent), mRelayAddress(), mRelayIndex(0), mRelayState(OlinuxinoRemoteRelay::SwitchOff),
-      mNetworkAccess(new QNetworkAccessManager), mStatus(true)
-{   
+    : AbstractRelayActuator(parent), mRelayAddress(), mRelayIndex(0),
+      mNetworkAccess(new QNetworkAccessManager)
+{
     connect(mNetworkAccess.data(), &QNetworkAccessManager::sslErrors, this, &OlinuxinoRemoteRelay::sslErrors);
+    connect(mNetworkAccess.data(), &QNetworkAccessManager::finished, this, &OlinuxinoRemoteRelay::finished);
 }
 
 OlinuxinoRemoteRelay::~OlinuxinoRemoteRelay()
@@ -44,16 +45,6 @@ QString OlinuxinoRemoteRelay::relayAddress() const
 int OlinuxinoRemoteRelay::relayIndex() const
 {
     return mRelayIndex;
-}
-
-OlinuxinoRemoteRelay::RelayState OlinuxinoRemoteRelay::relayState() const
-{
-    return mRelayState;
-}
-
-bool OlinuxinoRemoteRelay::status() const
-{
-    return mStatus;
 }
 
 void OlinuxinoRemoteRelay::setAddress(QString relayAddress)
@@ -74,8 +65,12 @@ void OlinuxinoRemoteRelay::setRelayIndex(int relayIndice)
     emit relayIndexChanged(relayIndice);
 }
 
-void OlinuxinoRemoteRelay::activate(OlinuxinoRemoteRelay::RelayState newState)
+bool OlinuxinoRemoteRelay::doActivate(OlinuxinoRemoteRelay::RelayState newState)
 {
+    if (relayState() == newState) {
+        return false;
+    }
+
     QUrl myRequestUrl;
 
     myRequestUrl.setScheme(QStringLiteral("https"));
@@ -91,7 +86,7 @@ void OlinuxinoRemoteRelay::activate(OlinuxinoRemoteRelay::RelayState newState)
         myRequestUrl.setPath(QStringLiteral("/cgi-bin/luci/relay/switch1"));
         break;
     default:
-        return;
+        return false;
     }
 
     switch(newState)
@@ -104,27 +99,34 @@ void OlinuxinoRemoteRelay::activate(OlinuxinoRemoteRelay::RelayState newState)
         break;
     }
 
-    auto reply = mNetworkAccess->get(QNetworkRequest(myRequestUrl));
+    mNetworkAccess->get(QNetworkRequest(myRequestUrl));
 
-    connect(reply, &QNetworkReply::finished, this, &OlinuxinoRemoteRelay::finished);
+    return true;
 }
 
 void OlinuxinoRemoteRelay::sslErrors(QNetworkReply *reply, const QList<QSslError> &errors)
 {
+    Q_UNUSED(errors);
+
     reply->ignoreSslErrors();
 }
 
-void OlinuxinoRemoteRelay::finished()
+void OlinuxinoRemoteRelay::finished(QNetworkReply *reply)
 {
-    auto reply = qobject_cast<QNetworkReply *>(sender());
-
     if (reply->error() != QNetworkReply::NoError) {
-        mStatus = false;
-        Q_EMIT statusChanged(mStatus);
+        setStatus(false);
     } else {
-        if (!mStatus) {
-            mStatus = true;
-            Q_EMIT statusChanged(mStatus);
+        if (!status()) {
+            setStatus(true);
+        }
+        switch (relayState())
+        {
+        case OlinuxinoRemoteRelay::SwitchOff:
+            setRelayState(OlinuxinoRemoteRelay::SwitchOn);
+            break;
+        case OlinuxinoRemoteRelay::SwitchOn:
+            setRelayState(OlinuxinoRemoteRelay::SwitchOff);
+            break;
         }
     }
 }

@@ -39,6 +39,7 @@ set(binaryLight_SOURCES
     binaryLight.qml
     upnpbinarylight.cpp
     upnpswitchpower.cpp
+    abstractrelayactuator.cpp
     olinuxinoremoterelay.cpp
 )
 
