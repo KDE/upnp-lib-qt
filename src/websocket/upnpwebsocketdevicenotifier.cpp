@@ -35,6 +35,10 @@ public:
 
     QString mUdn;
 
+    bool mIsDeviceValid = false;
+
+    UpnpDeviceDescription* mDeviceDescription = nullptr;
+
 };
 
 UpnpWebSocketDeviceNotifier::UpnpWebSocketDeviceNotifier(QObject *parent)
@@ -61,6 +65,16 @@ QString UpnpWebSocketDeviceNotifier::serviceId() const
 QString UpnpWebSocketDeviceNotifier::udn() const
 {
     return d->mUdn;
+}
+
+bool UpnpWebSocketDeviceNotifier::isDeviceValid() const
+{
+    return d->mIsDeviceValid;
+}
+
+UpnpDeviceDescription *UpnpWebSocketDeviceNotifier::deviceDescription() const
+{
+    return d->mDeviceDescription;
 }
 
 void UpnpWebSocketDeviceNotifier::setWebSocketClient(UpnpWebSocketClient *value)
@@ -107,14 +121,20 @@ void UpnpWebSocketDeviceNotifier::setUdn(QString value)
 void UpnpWebSocketDeviceNotifier::newDevice(const QString &udn)
 {
     if (udn == d->mUdn) {
-        Q_EMIT deviceValid();
+        d->mIsDeviceValid = true;
+        d->mDeviceDescription = d->mWebSocketClient->rawDevice(d->mUdn);
+        Q_EMIT isDeviceValidChanged();
+        Q_EMIT deviceDescriptionChanged();
     }
 }
 
 void UpnpWebSocketDeviceNotifier::removedDevice(const QString &udn)
 {
     if (udn == d->mUdn) {
-        Q_EMIT deviceInvalid();
+        d->mIsDeviceValid = false;
+        d->mDeviceDescription = nullptr;
+        Q_EMIT isDeviceValidChanged();
+        Q_EMIT deviceDescriptionChanged();
     }
 }
 

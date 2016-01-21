@@ -53,6 +53,8 @@ ApplicationWindow {
         width: Screen.pixelDensity * 30.
         height: Screen.pixelDensity * 20.
 
+        enabled: outsideSwitchNotifier.isDeviceValid
+
         onClicked: {
             outsideSwitch.setTarget(checked)
         }
@@ -63,17 +65,6 @@ ApplicationWindow {
         webSocketClient: server
         udn: '4424b320-9657-419c-8935-a9fe76170f09'
         serviceId: 'urn:upnp-org:serviceId:SwitchPower'
-
-        onDeviceValid: {
-            console.log("device is valid")
-            outsideSwitch.deviceDescription = server.rawDevice(udn)
-            lightControl.enabled = true
-        }
-
-        onDeviceInvalid: {
-            console.log("device is invalid")
-            lightControl.enabled = false
-        }
     }
 
     UpnpWebSocketControlSwitchPower {
@@ -81,5 +72,6 @@ ApplicationWindow {
 
         webSocketClient: server
         serviceId: 'urn:upnp-org:serviceId:SwitchPower'
+        deviceDescription: outsideSwitchNotifier.deviceDescription
     }
 }

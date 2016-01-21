@@ -27,6 +27,7 @@
 
 class UpnpWebSocketDeviceNotifierPrivate;
 class UpnpWebSocketClient;
+class UpnpDeviceDescription;
 
 class UPNPQTWEBSOCKET_EXPORT UpnpWebSocketDeviceNotifier : public QObject
 {
@@ -48,6 +49,14 @@ class UPNPQTWEBSOCKET_EXPORT UpnpWebSocketDeviceNotifier : public QObject
                WRITE setServiceId
                NOTIFY serviceIdChanged)
 
+    Q_PROPERTY(bool isDeviceValid
+               READ isDeviceValid
+               NOTIFY isDeviceValidChanged)
+
+    Q_PROPERTY(UpnpDeviceDescription* deviceDescription
+               READ deviceDescription
+               NOTIFY deviceDescriptionChanged)
+
 public:
 
     explicit UpnpWebSocketDeviceNotifier(QObject *parent = 0);
@@ -60,6 +69,10 @@ public:
 
     QString udn() const;
 
+    bool isDeviceValid() const;
+
+    UpnpDeviceDescription* deviceDescription() const;
+
 Q_SIGNALS:
 
     void webSocketClientChanged();
@@ -68,9 +81,9 @@ Q_SIGNALS:
 
     void udnChanged();
 
-    void deviceValid();
+    void isDeviceValidChanged();
 
-    void deviceInvalid();
+    void deviceDescriptionChanged();
 
 public Q_SLOTS:
 
@@ -87,6 +100,7 @@ public Q_SLOTS:
 private:
 
     UpnpWebSocketDeviceNotifierPrivate *d;
+
 };
 
 #endif // UPNPWEBSOCKETDEVICENOTIFIER_H
