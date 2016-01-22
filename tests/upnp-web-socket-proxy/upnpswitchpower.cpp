@@ -34,15 +34,12 @@ class UpnpSwitchPowerPrivate
 {
 public:
 
-    UpnpSwitchPowerPrivate() : mService(new UpnpServiceDescription), mTarget(true), mStatus(true)
+    UpnpSwitchPowerPrivate() : mService(new UpnpServiceDescription)
     {
     }
 
     QSharedPointer<UpnpServiceDescription> mService;
 
-    bool mTarget;
-
-    bool mStatus;
 };
 
 UpnpSwitchPower::UpnpSwitchPower(QObject *parent) :
@@ -147,93 +144,6 @@ UpnpServiceDescription *UpnpSwitchPower::description()
 const UpnpServiceDescription *UpnpSwitchPower::description() const
 {
     return d->mService.data();
-}
-
-void UpnpSwitchPower::setTarget(bool value)
-{
-    d->mTarget = value;
-}
-
-bool UpnpSwitchPower::target() const
-{
-    return d->mTarget;
-}
-
-void UpnpSwitchPower::setStatus(bool value)
-{
-    d->mStatus = value;
-    Q_EMIT statusChanged(description()->serviceId(), "status");
-}
-
-bool UpnpSwitchPower::status() const
-{
-    return d->mStatus;
-}
-
-/*QList<QPair<QString, QVariant> > UpnpSwitchPower::invokeAction(const QString &actionName, const QList<QVariant> &arguments, bool &isInError)
-{
-    if (actionName == QStringLiteral("GetStatus")) {
-        const QList<QPair<QString, QVariant> > &returnValues(getStatusAction());
-
-        isInError = false;
-
-        return returnValues;
-    }
-
-    if (actionName == QStringLiteral("SetTarget")) {
-        if (!arguments.first().canConvert<bool>()) {
-            qDebug() << "invalid type for argument";
-        }
-
-        const QList<QPair<QString, QVariant> > &returnValues(setTargetAction(arguments.first().toBool()));
-
-        isInError = false;
-
-        return returnValues;
-    }
-
-    if (actionName == QStringLiteral("GetTarget")) {
-        const QList<QPair<QString, QVariant> > &returnValues(getTargetAction());
-
-        isInError = false;
-
-        return returnValues;
-    }
-
-    isInError = true;
-    return {};
-}*/
-
-void UpnpSwitchPower::switchTarget()
-{
-    setTargetAction(!target());
-}
-
-QList<QPair<QString, QVariant> > UpnpSwitchPower::setTargetAction(bool newValue)
-{
-    qDebug() << "call setTargetAction";
-    d->mStatus = newValue;
-    d->mTarget = newValue;
-
-    Q_EMIT statusChanged(description()->serviceId(), "status");
-
-    qDebug() << "call setTargetAction" << d->mStatus;
-
-    return {};
-}
-
-QList<QPair<QString, QVariant> > UpnpSwitchPower::getTargetAction()
-{
-    qDebug() << "call getTargetAction";
-
-    return {{QStringLiteral("RetTargetValue"), d->mTarget}};
-}
-
-QList<QPair<QString, QVariant> > UpnpSwitchPower::getStatusAction()
-{
-    qDebug() << "call getStatusAction";
-
-    return {{QStringLiteral("ResultStatus"), d->mStatus}};
 }
 
 #include "moc_upnpswitchpower.cpp"

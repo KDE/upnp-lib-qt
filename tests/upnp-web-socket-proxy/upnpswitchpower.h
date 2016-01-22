@@ -37,15 +37,6 @@ class UpnpSwitchPower : public QObject
                READ description
                NOTIFY descriptionChanged)
 
-    Q_PROPERTY(bool target
-               READ target
-               WRITE setTarget)
-
-    Q_PROPERTY(bool status
-               READ status
-               WRITE setStatus
-               NOTIFY statusChanged)
-
 public:
     explicit UpnpSwitchPower(QObject *parent = 0);
 
@@ -57,29 +48,9 @@ public:
 
     const UpnpServiceDescription* description() const;
 
-    void setTarget(bool value);
-
-    bool target() const;
-
-    void setStatus(bool value);
-
-    bool status() const;
-
 Q_SIGNALS:
 
     void descriptionChanged();
-
-    void statusChanged(const QString &serviceId, const QByteArray &propertyName);
-
-public Q_SLOTS:
-
-    void switchTarget();
-
-    QList<QPair<QString, QVariant> > setTargetAction(bool newValue);
-
-    QList<QPair<QString, QVariant> > getTargetAction();
-
-    QList<QPair<QString, QVariant> > getStatusAction();
 
 private:
 
