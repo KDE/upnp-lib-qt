@@ -45,7 +45,7 @@ int __attribute__((visibility("default"))) main(int argc, char *argv[])
     qmlRegisterType<UpnpWebSocketDeviceNotifier>("org.mgallien.QmlExtension", 1, 0, "UpnpWebSocketDeviceNotifier");
     qmlRegisterType<UpnpWebSocketControlSwitchPower>("org.mgallien.QmlExtension", 1, 0, "UpnpWebSocketControlSwitchPower");
 
-    qRegisterMetaType<UpnpDeviceDescription*>();
+    qRegisterMetaType<QSharedPointer<UpnpDeviceDescription>>();
 
     engine.load(QUrl(QStringLiteral("qrc:/client.qml")));
 

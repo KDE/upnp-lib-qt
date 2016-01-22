@@ -52,20 +52,15 @@ UpnpWebSocketPublisher::~UpnpWebSocketPublisher()
     delete d;
 }
 
-void UpnpWebSocketPublisher::setDescription(UpnpDeviceDescription *value)
+void UpnpWebSocketPublisher::setDescription(QSharedPointer<UpnpDeviceDescription> value)
 {
-    d->mDevice.reset(value);
+    d->mDevice = value;
     Q_EMIT descriptionChanged();
 }
 
-UpnpDeviceDescription *UpnpWebSocketPublisher::description()
+QSharedPointer<UpnpDeviceDescription> UpnpWebSocketPublisher::description() const
 {
-    return d->mDevice.data();
-}
-
-const UpnpDeviceDescription *UpnpWebSocketPublisher::description() const
-{
-    return d->mDevice.data();
+    return d->mDevice;
 }
 
 void UpnpWebSocketPublisher::publish()
@@ -133,9 +128,9 @@ void UpnpWebSocketPublisher::handleCallAction(QJsonObject aObject)
     Q_EMIT actionCalled(actionValue.toString(), arguments, sequenceNumber, serviceIdValue.toString());
 }
 
-void UpnpWebSocketPublisher::addDeviceDescription(QJsonObject &newMessage, const UpnpDeviceDescription *deviceDescription)
+void UpnpWebSocketPublisher::addDeviceDescription(QJsonObject &newMessage, QSharedPointer<UpnpDeviceDescription> deviceDescription)
 {
-    newMessage.insert(QStringLiteral("device"), UpnpWebSocketProtocol::deviceDescriptionToJson(deviceDescription));
+    newMessage.insert(QStringLiteral("device"), UpnpWebSocketProtocol::deviceDescriptionToJson(deviceDescription.data()));
 }
 
 void UpnpWebSocketPublisher::handleHelloAck(QJsonObject aObject)

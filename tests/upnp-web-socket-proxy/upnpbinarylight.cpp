@@ -32,7 +32,7 @@ class BinaryLightPrivate
 {
 public:
 
-    UpnpDeviceDescription mDevice;
+    QSharedPointer<UpnpDeviceDescription> mDevice;
 
     UpnpWebSocketPublisher* mWebSocketPublisher;
 };
@@ -40,25 +40,26 @@ public:
 UpnpBinaryLight::UpnpBinaryLight(int cacheDuration, QObject *parent)
     : QObject(parent), d(new BinaryLightPrivate)
 {
+    d->mDevice.reset(new UpnpDeviceDescription);
     d->mWebSocketPublisher = nullptr;
 
-    d->mDevice.setDeviceType(QStringLiteral("urn:schemas-upnp-org:device:BinaryLight:1"));
-    d->mDevice.setFriendlyName(QStringLiteral("Binary Light for Test"));
-    d->mDevice.setManufacturer(QStringLiteral("Matthieu Gallien"));
-    d->mDevice.setManufacturerURL(QUrl(QStringLiteral("https://gitlab.com/homeautomationqt/upnp-player-qt")));
-    d->mDevice.setModelDescription(QStringLiteral("Test Device"));
-    d->mDevice.setModelName(QStringLiteral("Automatiq Binary Light"));
-    d->mDevice.setModelNumber(QStringLiteral("0.1"));
-    d->mDevice.setModelURL(QUrl(QStringLiteral("https://gitlab.com/homeautomationqt/upnp-player-qt")));
-    d->mDevice.setSerialNumber(QStringLiteral("test-0.1"));
+    d->mDevice->setDeviceType(QStringLiteral("urn:schemas-upnp-org:device:BinaryLight:1"));
+    d->mDevice->setFriendlyName(QStringLiteral("Binary Light for Test"));
+    d->mDevice->setManufacturer(QStringLiteral("Matthieu Gallien"));
+    d->mDevice->setManufacturerURL(QUrl(QStringLiteral("https://gitlab.com/homeautomationqt/upnp-player-qt")));
+    d->mDevice->setModelDescription(QStringLiteral("Test Device"));
+    d->mDevice->setModelName(QStringLiteral("Automatiq Binary Light"));
+    d->mDevice->setModelNumber(QStringLiteral("0.1"));
+    d->mDevice->setModelURL(QUrl(QStringLiteral("https://gitlab.com/homeautomationqt/upnp-player-qt")));
+    d->mDevice->setSerialNumber(QStringLiteral("test-0.1"));
 
     const QString &uuidString(QUuid::createUuid().toString());
-    d->mDevice.setUDN(uuidString.mid(1, uuidString.length() - 2));
-    d->mDevice.setUPC(QStringLiteral("test"));
-    d->mDevice.setCacheControl(cacheDuration);
+    d->mDevice->setUDN(uuidString.mid(1, uuidString.length() - 2));
+    d->mDevice->setUPC(QStringLiteral("test"));
+    d->mDevice->setCacheControl(cacheDuration);
 
     QSharedPointer<UpnpSwitchPower> switchPowerService(new UpnpSwitchPower);
-    d->mDevice.addService(switchPowerService->sharedDescription());
+    d->mDevice->addService(switchPowerService->sharedDescription());
     const int serviceIndex = 0/*addService(switchPowerService)*/;
 
     const int deviceIndex = 1/*d->mServer.addDevice(this)*/;
@@ -77,9 +78,9 @@ UpnpBinaryLight::UpnpBinaryLight(int cacheDuration, QObject *parent)
     switchPowerService->setSCPDURL(serviceDescriptionUrl);*/
 
     QUrl deviceDescriptionUrl /*= d->mServer.urlPrefix();
-                                            d->mDevice.setURLBase(d->mServer.urlPrefix().toString())*/;
+                                            d->mDevice->setURLBase(d->mServer.urlPrefix().toString())*/;
     deviceDescriptionUrl.setPath(QStringLiteral("/") + QString::number(deviceIndex) + QStringLiteral("/device.xml"));
-    d->mDevice.setLocationUrl(deviceDescriptionUrl);
+    d->mDevice->setLocationUrl(deviceDescriptionUrl);
 }
 
 UpnpBinaryLight::~UpnpBinaryLight()
@@ -87,14 +88,9 @@ UpnpBinaryLight::~UpnpBinaryLight()
     delete d;
 }
 
-UpnpDeviceDescription *UpnpBinaryLight::description()
+QSharedPointer<UpnpDeviceDescription> UpnpBinaryLight::description() const
 {
-    return &d->mDevice;
-}
-
-const UpnpDeviceDescription *UpnpBinaryLight::description() const
-{
-    return &d->mDevice;
+    return d->mDevice;
 }
 
 void UpnpBinaryLight::setWebSocketPublisher(UpnpWebSocketPublisher *value)
@@ -119,13 +115,13 @@ UpnpWebSocketPublisher *UpnpBinaryLight::webSocketPublisher() const
 
 void UpnpBinaryLight::setUdn(const QString &value)
 {
-    d->mDevice.setUDN(value);
+    d->mDevice->setUDN(value);
     Q_EMIT udnChanged();
 }
 
 const QString &UpnpBinaryLight::udn() const
 {
-    return d->mDevice.UDN();
+    return d->mDevice->UDN();
 }
 
 void UpnpBinaryLight::actionCalled(const QString &action, const QVariantMap &arguments, qint64 sequenceNumber, const QString &serviceId)

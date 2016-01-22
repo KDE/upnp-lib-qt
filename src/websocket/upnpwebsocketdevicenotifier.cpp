@@ -37,7 +37,7 @@ public:
 
     bool mIsDeviceValid = false;
 
-    UpnpDeviceDescription* mDeviceDescription = nullptr;
+    QSharedPointer<UpnpDeviceDescription> mDeviceDescription;
 
 };
 
@@ -72,7 +72,7 @@ bool UpnpWebSocketDeviceNotifier::isDeviceValid() const
     return d->mIsDeviceValid;
 }
 
-UpnpDeviceDescription *UpnpWebSocketDeviceNotifier::deviceDescription() const
+QSharedPointer<UpnpDeviceDescription> UpnpWebSocketDeviceNotifier::deviceDescription() const
 {
     return d->mDeviceDescription;
 }
@@ -122,7 +122,7 @@ void UpnpWebSocketDeviceNotifier::newDevice(const QString &udn)
 {
     if (udn == d->mUdn) {
         d->mIsDeviceValid = true;
-        d->mDeviceDescription = d->mWebSocketClient->rawDevice(d->mUdn);
+        d->mDeviceDescription = d->mWebSocketClient->device(d->mUdn);
         Q_EMIT isDeviceValidChanged();
         Q_EMIT deviceDescriptionChanged();
     }
@@ -132,7 +132,7 @@ void UpnpWebSocketDeviceNotifier::removedDevice(const QString &udn)
 {
     if (udn == d->mUdn) {
         d->mIsDeviceValid = false;
-        d->mDeviceDescription = nullptr;
+        d->mDeviceDescription.reset();
         Q_EMIT isDeviceValidChanged();
         Q_EMIT deviceDescriptionChanged();
     }

@@ -55,17 +55,6 @@ void UpnpWebSocketClient::askDeviceList()
     sendMessage(newObject);
 }
 
-UpnpDeviceDescription *UpnpWebSocketClient::rawDevice(const QString &udn) const
-{
-    auto deviceIterator = d->mAllDevices.find(udn);
-
-    if (deviceIterator == d->mAllDevices.end()) {
-        return nullptr;
-    }
-
-    return deviceIterator->data();
-}
-
 QSharedPointer<UpnpDeviceDescription> UpnpWebSocketClient::device(const QString &udn) const
 {
     auto deviceIterator = d->mAllDevices.find(udn);

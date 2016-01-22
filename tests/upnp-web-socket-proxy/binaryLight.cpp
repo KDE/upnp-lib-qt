@@ -46,7 +46,7 @@ int __attribute__((visibility("default"))) main(int argc, char *argv[])
     qmlRegisterType<UpnpBinaryLight>("org.mgallien.QmlExtension", 1, 0, "UpnpBinaryLight");
     qmlRegisterType<OlinuxinoRemoteRelay>("org.mgallien.QmlExtension", 1, 0, "OlinuxinoRemoteRelay");
 
-    qRegisterMetaType<UpnpDeviceDescription*>();
+    qRegisterMetaType<QSharedPointer<UpnpDeviceDescription>>();
 
     engine.load(QUrl(QStringLiteral("qrc:/binaryLight.qml")));
 

@@ -53,7 +53,7 @@ class UPNPQTWEBSOCKET_EXPORT UpnpWebSocketDeviceNotifier : public QObject
                READ isDeviceValid
                NOTIFY isDeviceValidChanged)
 
-    Q_PROPERTY(UpnpDeviceDescription* deviceDescription
+    Q_PROPERTY(QSharedPointer<UpnpDeviceDescription> deviceDescription
                READ deviceDescription
                NOTIFY deviceDescriptionChanged)
 
@@ -71,7 +71,7 @@ public:
 
     bool isDeviceValid() const;
 
-    UpnpDeviceDescription* deviceDescription() const;
+    QSharedPointer<UpnpDeviceDescription> deviceDescription() const;
 
 Q_SIGNALS:
 

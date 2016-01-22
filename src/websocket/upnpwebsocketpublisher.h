@@ -27,6 +27,7 @@
 
 #include <QtCore/QJsonObject>
 #include <QtCore/QVariantMap>
+#include <QtCore/QSharedPointer>
 
 class UpnpWebSocketPublisherPrivate;
 class UpnpDeviceDescription;
@@ -39,7 +40,7 @@ class UPNPQTWEBSOCKET_EXPORT UpnpWebSocketPublisher : public UpnpWebSocketBaseCl
 {
     Q_OBJECT
 
-    Q_PROPERTY(UpnpDeviceDescription* description
+    Q_PROPERTY(QSharedPointer<UpnpDeviceDescription> description
                READ description
                WRITE setDescription
                NOTIFY descriptionChanged)
@@ -50,11 +51,9 @@ public:
 
     virtual ~UpnpWebSocketPublisher();
 
-    void setDescription(UpnpDeviceDescription *value);
+    void setDescription(QSharedPointer<UpnpDeviceDescription> value);
 
-    UpnpDeviceDescription* description();
-
-    const UpnpDeviceDescription* description() const;
+    QSharedPointer<UpnpDeviceDescription> description() const;
 
 Q_SIGNALS:
 
@@ -76,7 +75,7 @@ protected:
 
 private:
 
-    void addDeviceDescription(QJsonObject &newMessage, const UpnpDeviceDescription *deviceDescription);
+    void addDeviceDescription(QJsonObject &newMessage, QSharedPointer<UpnpDeviceDescription> deviceDescription);
 
     void handleHelloAck(QJsonObject aObject);
 

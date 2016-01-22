@@ -22,6 +22,7 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QUrl>
+#include <QtCore/QSharedPointer>
 
 class BinaryLightPrivate;
 class UpnpWebSocketPublisher;
@@ -31,7 +32,7 @@ class UpnpBinaryLight : public QObject
 {
     Q_OBJECT
 
-    Q_PROPERTY(UpnpDeviceDescription* description
+    Q_PROPERTY(QSharedPointer<UpnpDeviceDescription> description
                READ description
                NOTIFY descriptionChanged)
 
@@ -50,9 +51,7 @@ public:
 
     virtual ~UpnpBinaryLight();
 
-    UpnpDeviceDescription* description();
-
-    const UpnpDeviceDescription* description() const;
+    QSharedPointer<UpnpDeviceDescription> description() const;
 
     void setWebSocketPublisher(UpnpWebSocketPublisher *value);
 

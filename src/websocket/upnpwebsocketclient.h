@@ -47,8 +47,6 @@ public:
 
     void askDeviceDetail();
 
-    Q_INVOKABLE UpnpDeviceDescription *rawDevice(const QString &udn) const;
-
     QSharedPointer<UpnpDeviceDescription> device(const QString &udn) const;
 
 Q_SIGNALS:

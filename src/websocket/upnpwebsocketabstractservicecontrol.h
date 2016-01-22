@@ -26,6 +26,7 @@
 #include <QtCore/QString>
 #include <QtCore/QVariant>
 #include <QtCore/QList>
+#include <QtCore/QSharedPointer>
 
 class UpnpWebSocketAbstractDeviceControlPrivate;
 class UpnpDeviceDescription;
@@ -35,7 +36,7 @@ class UPNPQTWEBSOCKET_EXPORT UpnpWebSocketAbstractServiceControl : public QObjec
 {
     Q_OBJECT
 
-    Q_PROPERTY(UpnpDeviceDescription* deviceDescription
+    Q_PROPERTY(QSharedPointer<UpnpDeviceDescription> deviceDescription
                READ deviceDescription
                WRITE setDeviceDescription
                NOTIFY deviceDescriptionChanged)
@@ -64,15 +65,15 @@ public:
 
     void handleEventNotification();
 
-    void setDeviceDescription(UpnpDeviceDescription *value);
+    void setDeviceDescription(QSharedPointer<UpnpDeviceDescription> value);
 
-    UpnpDeviceDescription *deviceDescription() const;
+    QSharedPointer<UpnpDeviceDescription> deviceDescription() const;
 
     void setServiceId(const QString &value);
 
     const QString &serviceId() const;
 
-    void setWebSocketClient(UpnpWebSocketClient *value);
+    void setWebSocketClient(UpnpWebSocketClient* value);
 
     UpnpWebSocketClient *webSocketClient() const;
 

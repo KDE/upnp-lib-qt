@@ -30,7 +30,7 @@ class UpnpWebSocketAbstractDeviceControlPrivate
 {
 public:
 
-    UpnpDeviceDescription *mDeviceDescription = nullptr;
+    QSharedPointer<UpnpDeviceDescription> mDeviceDescription;
 
     QSharedPointer<UpnpServiceDescription> mServiceDescription;
 
@@ -93,7 +93,7 @@ void UpnpWebSocketAbstractServiceControl::handleEventNotification()
 
 }
 
-void UpnpWebSocketAbstractServiceControl::setDeviceDescription(UpnpDeviceDescription *value)
+void UpnpWebSocketAbstractServiceControl::setDeviceDescription(QSharedPointer<UpnpDeviceDescription> value)
 {
     d->mDeviceDescription = value;
     Q_EMIT deviceDescriptionChanged();
@@ -102,7 +102,7 @@ void UpnpWebSocketAbstractServiceControl::setDeviceDescription(UpnpDeviceDescrip
     }
 }
 
-UpnpDeviceDescription *UpnpWebSocketAbstractServiceControl::deviceDescription() const
+QSharedPointer<UpnpDeviceDescription> UpnpWebSocketAbstractServiceControl::deviceDescription() const
 {
     return d->mDeviceDescription;
 }
