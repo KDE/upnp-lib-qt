@@ -16,23 +16,25 @@ target_link_libraries(upnpWebSocketProxy
         Qt5::Core
 )
 
-set(upnpWebSocketClient_SOURCES
-    client.cpp
-    upnpwebsocketdevicemodel.cpp
-    upnpwebsocketcontrolswitchpower.cpp
-    client.qml
-)
+if (Qt5Quick_FOUND AND Qt5Widgets_FOUND)
+    set(upnpWebSocketClient_SOURCES
+        client.cpp
+        upnpwebsocketdevicemodel.cpp
+        upnpwebsocketcontrolswitchpower.cpp
+        client.qml
+    )
 
-qt5_add_resources(upnpWebSocketClient_SOURCES client.qrc)
+    qt5_add_resources(upnpWebSocketClient_SOURCES client.qrc)
 
-add_executable(upnpWebSocketClient ${upnpWebSocketClient_SOURCES})
+    add_executable(upnpWebSocketClient ${upnpWebSocketClient_SOURCES})
 
-target_link_libraries(upnpWebSocketClient
-    LINK_PRIVATE
-        upnpQtWebSocket
-        Qt5::Quick
-        Qt5::Widgets
-)
+    target_link_libraries(upnpWebSocketClient
+        LINK_PRIVATE
+            upnpQtWebSocket
+            Qt5::Quick
+            Qt5::Widgets
+    )
+endif()
 
 set(binaryLight_SOURCES
     binaryLight.cpp
