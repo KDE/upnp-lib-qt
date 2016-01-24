@@ -12,8 +12,8 @@ add_executable(upnpWebSocketProxy ${upnpWebSocketProxy_SOURCES})
 target_link_libraries(upnpWebSocketProxy
     LINK_PRIVATE
         upnpQtWebSocket
-        Qt5::Quick
-        Qt5::Widgets
+        Qt5::Qml
+        Qt5::Core
 )
 
 set(upnpWebSocketClient_SOURCES
@@ -51,6 +51,6 @@ target_link_libraries(binaryLight
     LINK_PRIVATE
         upnpQtWebSocket
         upnpQt
-        Qt5::Quick
-        Qt5::Widgets
+        Qt5::Qml
+        Qt5::Core
 )

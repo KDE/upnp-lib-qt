@@ -26,7 +26,7 @@
 
 #include "upnpdevicedescription.h"
 
-#include <QtWidgets/QApplication>
+#include <QtCore/QCoreApplication>
 
 #include <QtQml/QQmlApplicationEngine>
 #include <QtQml/QQmlEngine>
@@ -35,7 +35,7 @@
 
 int __attribute__((visibility("default"))) main(int argc, char *argv[])
 {
-    QApplication app(argc, argv);
+    QCoreApplication app(argc, argv);
 
     QQmlApplicationEngine engine;
     QQmlFileSelector selector(&engine);
