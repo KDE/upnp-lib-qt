@@ -56,3 +56,11 @@ target_link_libraries(binaryLight
         Qt5::Qml
         Qt5::Core
 )
+
+install(TARGETS upnpWebSocketProxy ${INSTALL_TARGETS_DEFAULT_ARGS})
+
+if (Qt5Quick_FOUND AND Qt5Widgets_FOUND)
+    install(TARGETS upnpWebSocketClient ${INSTALL_TARGETS_DEFAULT_ARGS})
+endif()
+
+install(TARGETS binaryLight ${INSTALL_TARGETS_DEFAULT_ARGS})
