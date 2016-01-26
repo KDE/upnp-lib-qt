@@ -41,7 +41,7 @@ ApplicationWindow {
         certificateConfiguration.certificateFileName: './moi_test.pem'
 
         Component.onCompleted: {
-            connectServer('wss://moulinette:11443/')
+            connectServer('wss://home:11443/')
         }
     }
 

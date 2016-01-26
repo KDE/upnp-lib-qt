@@ -37,7 +37,7 @@ UpnpBinaryLight {
         description: myLight.description
 
         Component.onCompleted: {
-            connectServer('wss://moulinette:11443/')
+            connectServer('wss://home:11443/')
         }
     }
 
