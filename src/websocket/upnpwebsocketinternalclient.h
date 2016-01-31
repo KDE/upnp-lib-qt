@@ -80,6 +80,8 @@ private:
 
     void handleCallAction(QJsonObject aObject);
 
+    void handleSubscribeService(QJsonObject aObject);
+
     static UpnpWebSocketMessageType getType(QJsonObject aObject);
 
     UpnpWebSocketClientPrivate *d;

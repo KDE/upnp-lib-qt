@@ -43,10 +43,6 @@ public:
 
     virtual ~UpnpWebSocketClient();
 
-    void askDeviceList();
-
-    void askDeviceDetail();
-
     QSharedPointer<UpnpDeviceDescription> device(const QString &udn) const;
 
 Q_SIGNALS:
@@ -58,6 +54,10 @@ Q_SIGNALS:
     void actionAck(const QString &action, qint64 sequenceNumber);
 
 public Q_SLOTS:
+
+    void askDeviceList();
+
+    void subscribeService(const QString &udn, const QString serviceId);
 
 private Q_SLOTS:
 

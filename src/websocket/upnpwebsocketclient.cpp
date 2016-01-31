@@ -55,6 +55,16 @@ void UpnpWebSocketClient::askDeviceList()
     sendMessage(newObject);
 }
 
+void UpnpWebSocketClient::subscribeService(const QString &udn, const QString serviceId)
+{
+    auto newObject = createMessage(UpnpWebSocketMessageType::SubscribeService);
+
+    newObject.insert(QStringLiteral("udn"), udn);
+    newObject.insert(QStringLiteral("serviceId"), serviceId);
+
+    sendMessage(newObject);
+}
+
 QSharedPointer<UpnpDeviceDescription> UpnpWebSocketClient::device(const QString &udn) const
 {
     auto deviceIterator = d->mAllDevices.find(udn);

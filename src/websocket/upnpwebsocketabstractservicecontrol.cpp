@@ -86,6 +86,18 @@ qint64 UpnpWebSocketAbstractServiceControl::callAction(const QString &action, co
 
 void UpnpWebSocketAbstractServiceControl::subscribeEvents()
 {
+    if (d->mServiceId.isEmpty()) {
+        return;
+    }
+    if (!d->mWebSocketClient) {
+        return;
+    }
+
+    if (!d->mServiceDescription) {
+        return;
+    }
+
+    d->mWebSocketClient->subscribeService(d->mDeviceDescription->UDN(), d->mServiceId);
 }
 
 void UpnpWebSocketAbstractServiceControl::handleEventNotification()
@@ -99,6 +111,8 @@ void UpnpWebSocketAbstractServiceControl::setDeviceDescription(QSharedPointer<Up
     Q_EMIT deviceDescriptionChanged();
     if (d->mDeviceDescription && !d->mServiceId.isEmpty()) {
         d->mServiceDescription = d->mDeviceDescription->serviceById(d->mServiceId);
+
+        subscribeEvents();
     }
 }
 
@@ -113,6 +127,8 @@ void UpnpWebSocketAbstractServiceControl::setServiceId(const QString &value)
     Q_EMIT serviceIdChanged();
     if (d->mDeviceDescription && !d->mServiceId.isEmpty()) {
         d->mServiceDescription = d->mDeviceDescription->serviceById(d->mServiceId);
+
+        subscribeEvents();
     }
 }
 
