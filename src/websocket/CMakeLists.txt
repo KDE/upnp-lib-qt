@@ -46,7 +46,7 @@ target_include_directories(upnpQtWebSocket PRIVATE ${KDSoap_INCLUDE_DIRS})
 
 target_include_directories(upnpQtWebSocket PUBLIC "$<BUILD_INTERFACE:${upnpQtWebSocket_INCLUDE_DIRS}>")
 
-target_include_directories(upnpQtWebSocket INTERFACE "$<INSTALL_INTERFACE:${INCLUDE_INSTALL_DIR}/upnpQtWebSocket>")
+target_include_directories(upnpQtWebSocket INTERFACE "$<INSTALL_INTERFACE:${INCLUDE_INSTALL_DIR}/KF5/UPNPQTWEBSOCKET/upnpQtWebSocket>")
 
 target_include_directories(upnpQtWebSocket PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/..>")
 
@@ -57,4 +57,10 @@ set_target_properties(upnpQtWebSocket PROPERTIES VERSION ${UPNP_QT_VERSION_STRIN
 
 install(TARGETS upnpQtWebSocket EXPORT UPNPQTTargets ${KF5_INSTALL_TARGETS_DEFAULT_ARGS})
 install(TARGETS upnpQtWebSocket ${INSTALL_TARGETS_DEFAULT_ARGS})
+install(FILES ${upnpQtWebSocket_CamelCase_HEADERS} DESTINATION ${KDE_INSTALL_INCLUDEDIR_KF5}/UPNPQTWEBSOCKET/UPNPQTWBSOCKET COMPONENT Devel)
 
+install(FILES
+  ${CMAKE_CURRENT_BINARY_DIR}/upnpQtWebSocket_export.h
+  ${upnpQtWebSocket_HEADERS}
+  DESTINATION  ${KDE_INSTALL_INCLUDEDIR_KF5}/UPNPQTWEBSOCKET/upnpQtWebSocket COMPONENT Devel
+)

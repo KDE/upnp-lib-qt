@@ -14,7 +14,6 @@ find_package(Qt5 ${REQUIRED_QT_VERSION} CONFIG REQUIRED Core Network Xml Qml Web
 find_package(Qt5 ${REQUIRED_QT_VERSION} CONFIG OPTIONAL_COMPONENTS Quick Widgets Multimedia Svg Test)
 
 find_package(KDSoap CONFIG REQUIRED)
-find_package(KF5Declarative CONFIG)
 
 include(FeatureSummary)
 include(GenerateExportHeader)
@@ -25,8 +24,6 @@ include(CMakePackageConfigHelpers)
 ecm_setup_version(0.1.0 VARIABLE_PREFIX UPNP_QT
                         VERSION_HEADER "${CMAKE_CURRENT_BINARY_DIR}/upnpQt_version.h"
                         PACKAGE_VERSION_FILE "${CMAKE_CURRENT_BINARY_DIR}/UPNPQTConfigVersion.cmake")
-
-configure_file(config-upnp-qt.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config-upnp-qt.h )
 
 if (CMAKE_SYSTEM_NAME STREQUAL Android)
     set(QT_QMAKE_EXECUTABLE "$ENV{Qt5_android}/bin/qmake")

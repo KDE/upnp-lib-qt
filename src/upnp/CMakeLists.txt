@@ -29,23 +29,28 @@ set(upnpQt_SOURCES
 ecm_generate_headers(
   upnpQt_CamelCase_HEADERS
   HEADER_NAMES
-    UpnpSsdpEngine
+    UpnpBasicTypes
+    UpnpAbstractDevice
+    UpnpAbstractService
     UpnpControlAbstractService
     UpnpControlAbstractDevice
-    UpnpHttpServer
-    UpnpServerEventObject
     UpnpControlRenderingControl
     UpnpControlAVTransport
     UpnpControlSwitchpower
     UpnpControlDimming
+    UpnpControlConnectionManager
+    UpnpControlContentDirectory
+    UpnpControlMediaServer
     UpnpDeviceModel
-    UpnpAbstractDevice
-    UpnpAbstractService
+    UpnpContentDirectoryModel
+    UpnpEventSubscriber
+    UpnpSsdpEngine
+    UpnpDiscoveryResult
+    UpnpDeviceDescriptionParser
+    UpnpHttpServer
+    UpnpServerEventObject
     UpnpDeviceSoapServer
     UpnpDeviceSoapServerObject
-    UpnpBasicTypes
-    UpnpEventSubscriber
-    UpnpDiscoveryResult
 
   PREFIX upnpQt
   REQUIRED_HEADERS upnpQt_HEADERS
@@ -75,7 +80,7 @@ target_include_directories(upnpQt PUBLIC ${KDSoap_INCLUDE_DIRS})
 
 target_include_directories(upnpQt PUBLIC "$<BUILD_INTERFACE:${upnpQt_INCLUDE_DIRS}>")
 
-target_include_directories(upnpQt INTERFACE "$<INSTALL_INTERFACE:${INCLUDE_INSTALL_DIR}/upnpQt>")
+target_include_directories(upnpQt INTERFACE "$<INSTALL_INTERFACE:${INCLUDE_INSTALL_DIR}/KF5/UPNPQT/upnpQt>")
 
 target_include_directories(upnpQt PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/..>")
 
@@ -86,3 +91,10 @@ set_target_properties(upnpQt PROPERTIES VERSION ${UPNP_QT_VERSION_STRING}
 
 install(TARGETS upnpQt EXPORT UPNPQTTargets ${KF5_INSTALL_TARGETS_DEFAULT_ARGS})
 install(TARGETS upnpQt ${INSTALL_TARGETS_DEFAULT_ARGS})
+install(FILES ${upnpQt_CamelCase_HEADERS} DESTINATION ${KDE_INSTALL_INCLUDEDIR_KF5}/UPNPQT/UPNPQT COMPONENT Devel)
+
+install(FILES
+  ${CMAKE_CURRENT_BINARY_DIR}/upnpQt_export.h
+  ${upnpQt_HEADERS}
+  DESTINATION  ${KDE_INSTALL_INCLUDEDIR_KF5}/UPNPQT/upnpQt COMPONENT Devel
+)
