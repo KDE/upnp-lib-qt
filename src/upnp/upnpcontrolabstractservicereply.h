@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Matthieu Gallien <matthieu_gallien@yahoo.fr>
+ * Copyright 2016 Matthieu Gallien <matthieu_gallien@yahoo.fr>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -17,23 +17,50 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#ifndef UPNPCONTROLRENDERINGCONTROL_H
-#define UPNPCONTROLRENDERINGCONTROL_H
+#ifndef UPNPCONTROLABSTRACTSERVICEREPLY_H
+#define UPNPCONTROLABSTRACTSERVICEREPLY_H
 
 #include "upnpQt_export.h"
 
-#include <QObject>
+#include <QtCore/QObject>
+#include <QtCore/QVariantMap>
 
-class UpnpControlRenderingControl : public QObject
+class UpnpControlAbstractServiceReplyPrivate;
+class KDSoapPendingCall;
+
+class UPNPQT_EXPORT UpnpControlAbstractServiceReply : public QObject
 {
+
     Q_OBJECT
+
 public:
-    explicit UpnpControlRenderingControl(QObject *parent = 0);
-    ~UpnpControlRenderingControl();
+
+    explicit UpnpControlAbstractServiceReply(const KDSoapPendingCall &soapAnswer, QObject *parent = 0);
+
+    virtual ~UpnpControlAbstractServiceReply();
+
+    bool success() const;
+
+    QVariantMap result() const;
 
 Q_SIGNALS:
 
+    void finished(UpnpControlAbstractServiceReply *self);
+
 public Q_SLOTS:
+
+    void callFinished();
+
+protected:
+
+    virtual void parseAnswer();
+
+private:
+
+    UpnpControlAbstractServiceReplyPrivate *d;
+
 };
 
-#endif // UPNPCONTROLRENDERINGCONTROL_H
+
+
+#endif // UPNPCONTROLABSTRACTSERVICEREPLY_H

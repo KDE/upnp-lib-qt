@@ -22,15 +22,14 @@
 
 #include "upnpQt_export.h"
 
-#include <KDSoapClient/KDSoapPendingCall.h>
+#include "upnpabstractservice.h"
+#include "upnpcontrolabstractservicereply.h"
 
 #include <QtCore/QObject>
 #include <QtCore/QString>
 #include <QtCore/QVariant>
 #include <QtCore/QVariantList>
 #include <QtCore/QUrl>
-
-#include "upnpabstractservice.h"
 
 class UpnpAbstractServiceDescriptionPrivate;
 class QNetworkReply;
@@ -46,7 +45,7 @@ public:
 
     ~UpnpControlAbstractService();
 
-    Q_INVOKABLE KDSoapPendingCall callAction(const QString &action, const QList<QVariant> &arguments);
+    Q_INVOKABLE UpnpControlAbstractServiceReply *callAction(const QString &action, const QList<QVariant> &arguments);
 
     Q_INVOKABLE void subscribeEvents(int duration);
 

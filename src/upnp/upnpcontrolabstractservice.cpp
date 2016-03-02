@@ -90,7 +90,7 @@ UpnpControlAbstractService::~UpnpControlAbstractService()
     delete d;
 }
 
-KDSoapPendingCall UpnpControlAbstractService::callAction(const QString &actionName, const QList<QVariant> &arguments)
+UpnpControlAbstractServiceReply* UpnpControlAbstractService::callAction(const QString &actionName, const QList<QVariant> &arguments)
 {
     KDSoapMessage message;
 
@@ -113,7 +113,7 @@ KDSoapPendingCall UpnpControlAbstractService::callAction(const QString &actionNa
         d->mInterface->setStyle(KDSoapClientInterface::RPCStyle);
     }
 
-    return d->mInterface->asyncCall(actionName, message, description()->serviceType() + QStringLiteral("#") + actionName);
+    return new UpnpControlAbstractServiceReply(d->mInterface->asyncCall(actionName, message, description()->serviceType() + QStringLiteral("#") + actionName), this);
 }
 
 void UpnpControlAbstractService::subscribeEvents(int duration)

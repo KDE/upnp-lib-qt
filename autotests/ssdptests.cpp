@@ -18,7 +18,7 @@
  */
 
 #include "upnpssdpengine.h"
-#include "upnpdevicemodel.h"
+//#include "upnpdevicemodel.h"
 
 #include <QtCore/QScopedPointer>
 #include <QtCore/QStringList>

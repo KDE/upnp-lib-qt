@@ -20,10 +20,6 @@
 #include "upnpcontrolabstractdevice.h"
 
 #include "upnpcontrolabstractservice.h"
-#include "upnpcontrolavtransport.h"
-#include "upnpcontrolswitchpower.h"
-#include "upnpcontrolconnectionmanager.h"
-#include "upnpcontrolcontentdirectory.h"
 
 #include "upnpdevicedescription.h"
 #include "upnpservicedescription.h"
@@ -71,19 +67,7 @@ UpnpControlAbstractService* UpnpControlAbstractDevice::serviceFromDescription(Up
 {
     UpnpControlAbstractService *newService = nullptr;
 
-    if (description->serviceType() == QStringLiteral("urn:schemas-upnp-org:service:AVTransport:1")) {
-        newService = new UpnpControlAVTransport;
-    } else if (description->serviceType() == QStringLiteral("urn:schemas-upnp-org:service:RenderingControl:1")) {
-        newService = new UpnpControlSwitchPower;
-    } else if (description->serviceType() == QStringLiteral("urn:schemas-upnp-org:service:SwitchPower:1")) {
-        newService = new UpnpControlSwitchPower;
-    } else if (description->serviceType() == QStringLiteral("urn:schemas-upnp-org:service:ConnectionManager:1")) {
-        newService = new UpnpControlConnectionManager;
-    } else if (description->serviceType() == QStringLiteral("urn:schemas-upnp-org:service:ContentDirectory:1")) {
-        newService = new UpnpControlContentDirectory;
-    } else {
-        newService = new UpnpControlAbstractService;
-    }
+    newService = new UpnpControlAbstractService;
 
     newService->setDescription(description);
     return newService;

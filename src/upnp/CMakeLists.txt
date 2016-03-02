@@ -3,24 +3,16 @@ add_definitions(-std=c++11)
 set(upnpQt_SOURCES
     upnpssdpengine.cpp
     upnpcontrolabstractservice.cpp
+    upnpcontrolabstractservicereply.cpp
     upnpcontrolabstractdevice.cpp
     upnphttpserver.cpp
     upnpservereventobject.cpp
-    upnpcontrolrenderingcontrol.cpp
-    upnpcontrolavtransport.cpp
-    upnpcontrolswitchpower.cpp
-    upnpcontroldimming.cpp
-    upnpcontrolconnectionmanager.cpp
-    upnpdevicemodel.cpp
     upnpabstractdevice.cpp
     upnpabstractservice.cpp
     upnpdevicesoapserver.cpp
     upnpdevicesoapserverobject.cpp
     upnpbasictypes.h
     upnpeventsubscriber.cpp
-    upnpcontrolmediaserver.cpp
-    upnpcontrolcontentdirectory.cpp
-    upnpcontentdirectorymodel.cpp
     upnpdevicedescriptionparser.cpp
     upnpservicedescriptionparser.cpp
     upnpdiscoveryresult.cpp
@@ -33,16 +25,8 @@ ecm_generate_headers(
     UpnpAbstractDevice
     UpnpAbstractService
     UpnpControlAbstractService
+    UpnpControlAbstractServiceReply
     UpnpControlAbstractDevice
-    UpnpControlRenderingControl
-    UpnpControlAVTransport
-    UpnpControlSwitchpower
-    UpnpControlDimming
-    UpnpControlConnectionManager
-    UpnpControlContentDirectory
-    UpnpControlMediaServer
-    UpnpDeviceModel
-    UpnpContentDirectoryModel
     UpnpEventSubscriber
     UpnpSsdpEngine
     UpnpDiscoveryResult
@@ -87,7 +71,6 @@ target_include_directories(upnpQt PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINA
 set_target_properties(upnpQt PROPERTIES VERSION ${UPNP_QT_VERSION_STRING}
                                                SOVERSION ${UPNP_QT_SOVERSION}
                                                LINK_FLAGS "-Wl,--no-undefined")
-
 
 install(TARGETS upnpQt EXPORT UPNPQTTargets ${KF5_INSTALL_TARGETS_DEFAULT_ARGS})
 install(TARGETS upnpQt ${INSTALL_TARGETS_DEFAULT_ARGS})
