@@ -71,7 +71,7 @@ qint64 UpnpWebSocketAbstractServiceControl::callAction(const QString &action, co
 
     QJsonObject allArgs;
     int cptArg = 0;
-    for (auto oneArg : d->mServiceDescription->action(action).mArguments) {
+    for (const auto &oneArg : d->mServiceDescription->action(action).mArguments) {
         if (oneArg.mDirection == UpnpArgumentDirection::In) {
             allArgs.insert(oneArg.mName, arguments.at(cptArg).toString());
             ++cptArg;
@@ -161,6 +161,8 @@ void UpnpWebSocketAbstractServiceControl::actionCompleted(const QString &action,
 
 void UpnpWebSocketAbstractServiceControl::parseEventNotification(const QString &eventName, const QString &eventValue)
 {
+    Q_UNUSED(eventName);
+    Q_UNUSED(eventValue);
 }
 
 

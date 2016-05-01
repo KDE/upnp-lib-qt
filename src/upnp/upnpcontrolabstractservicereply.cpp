@@ -74,7 +74,7 @@ void UpnpControlAbstractServiceReply::parseAnswer()
 
     const auto &returnedValues = d->mAnswer.returnMessage().childValues();
 
-    for (KDSoapValue oneValue : returnedValues) {
+    for (const KDSoapValue &oneValue : returnedValues) {
         d->mResult[oneValue.name()] = oneValue.value();
     }
 }

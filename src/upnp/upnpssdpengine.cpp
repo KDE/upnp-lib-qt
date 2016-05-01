@@ -377,7 +377,6 @@ void UpnpSsdpEngine::parseSsdpAnnounceDatagram(const QByteArray &datagram, const
             }
         }
         if (header.startsWith("HOST") || header.startsWith("Host")) {
-            QString hostName;
             if ((header)[4] == ' ') {
                 newDiscovery->setLocation(QString::fromLatin1(header.mid(7, header.length() - 8)));
             } else {

@@ -29,7 +29,7 @@
 class UpnpAbstractService;
 class UpnpAbstractDevicePrivate;
 class QIODevice;
-class UpnpSearchQuery;
+struct UpnpSearchQuery;
 class UpnpSsdpEngine;
 class UpnpDeviceDescription;
 class UpnpServiceDescription;

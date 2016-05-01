@@ -146,7 +146,7 @@ void UpnpWebSocketServerSocket::clientHasClosed(int idClient)
 
     const auto &clientDevices = d->mAllDevices[idClient];
 
-    for(auto oneDevice : clientDevices) {
+    for(const auto &oneDevice : clientDevices) {
         Q_EMIT deviceHasBeenRemoved(oneDevice->UDN());
         d->mAllDeviceUDN.removeAll(oneDevice->UDN());
         d->mDeviceUdnToClientId.remove(oneDevice->UDN());

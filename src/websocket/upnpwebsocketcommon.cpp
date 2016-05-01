@@ -124,7 +124,7 @@ UpnpActionDescription actionDescriptionFromJson(const QJsonObject &actionDescrip
 
     auto argumentsValue = getField(actionDescription, QStringLiteral("arguments"));
     const auto allArguments = argumentsValue.toArray();
-    for (auto oneArgument: allArguments) {
+    for (const auto &oneArgument: allArguments) {
         auto decodedArgument = actionArgumentDescriptionFromJson(oneArgument.toObject());
         if (!decodedArgument.mIsValid) {
             result.mIsValid = false;
@@ -156,7 +156,7 @@ UpnpServiceDescription *serviceDescriptionFromJson(const QJsonObject &serviceDes
 
     auto variablesValue = getField(serviceDescription, QStringLiteral("variables"));
     const auto allVariables = variablesValue.toArray();
-    for (auto oneVariable: allVariables) {
+    for (const auto &oneVariable: allVariables) {
         const auto &newVariable = variableDescriptionFromJson(oneVariable.toObject());
         if (!newVariable.mIsValid) {
             return nullptr;
@@ -166,7 +166,7 @@ UpnpServiceDescription *serviceDescriptionFromJson(const QJsonObject &serviceDes
 
     auto actionsValue = getField(serviceDescription, QStringLiteral("actions"));
     const auto allActions = actionsValue.toArray();
-    for (auto oneAction: allActions) {
+    for (const auto &oneAction: allActions) {
         const auto &newAction = actionDescriptionFromJson(oneAction.toObject());
         if (!newAction.mIsValid) {
             return nullptr;
@@ -249,7 +249,7 @@ QSharedPointer<UpnpDeviceDescription> deviceDescriptionFromJson(const QJsonObjec
 
     auto servicesValue = getField(deviceDescription, QStringLiteral("services"));
     const auto allServices = servicesValue.toArray();
-    for (auto oneService: allServices) {
+    for (const auto &oneService: allServices) {
         QScopedPointer<UpnpServiceDescription> newService(serviceDescriptionFromJson(oneService.toObject()));
         if (!newService) {
             return {};
@@ -301,7 +301,7 @@ QJsonObject actionDescriptionToJson(const UpnpActionDescription &actionDescripti
 
     QJsonArray allArguments;
 
-    for (auto argument : actionDescription.mArguments) {
+    for (const auto &argument : actionDescription.mArguments) {
         allArguments.append(actionArgumentDescriptionToJson(argument));
     }
 
@@ -319,7 +319,7 @@ QJsonObject serviceDescriptionToJson(const UpnpServiceDescription *serviceDescri
 
     QJsonArray allVariables;
 
-    for (auto variable : serviceDescription->stateVariables()) {
+    for (const auto &variable : serviceDescription->stateVariables()) {
         allVariables.append(variableDescriptionToJson(variable));
     }
 
@@ -327,7 +327,7 @@ QJsonObject serviceDescriptionToJson(const UpnpServiceDescription *serviceDescri
 
     QJsonArray allActions;
 
-    for (auto action : serviceDescription->actions()) {
+    for (const auto &action : serviceDescription->actions()) {
         allActions.append(actionDescriptionToJson(action));
     }
 
@@ -354,7 +354,7 @@ QJsonObject deviceDescriptionToJson(const UpnpDeviceDescription *deviceDescripti
 
     QJsonArray allServices;
 
-    for (auto service : deviceDescription->services()) {
+    for (const auto &service : deviceDescription->services()) {
         allServices.append(serviceDescriptionToJson(service.data()));
     }
 

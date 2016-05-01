@@ -80,7 +80,7 @@ UpnpDeviceDescription::~UpnpDeviceDescription()
 
 const QSharedPointer<UpnpServiceDescription> UpnpDeviceDescription::serviceById(const QString &serviceId) const
 {
-    for (auto oneService : d->mServices) {
+    for (const auto &oneService : const_cast<const decltype(d->mServices) &>(d->mServices)) {
         if (oneService->serviceId() == serviceId) {
             return oneService;
         }
@@ -108,7 +108,7 @@ QList<QString> UpnpDeviceDescription::servicesName() const
 {
     QList<QString> result;
 
-    for (const auto &itService: d->mServices) {
+    for (const auto &itService: const_cast<const decltype(d->mServices) &>(d->mServices)) {
         result.push_back(itService->serviceType());
     }
 

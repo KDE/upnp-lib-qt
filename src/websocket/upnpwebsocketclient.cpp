@@ -116,7 +116,8 @@ bool UpnpWebSocketClient::handleMessage(const QJsonObject &newMessage)
 
 void UpnpWebSocketClient::hasBeenDisconnected()
 {
-    for (auto oneDevice : d->mAllDevices) {
+    const auto &allDevices = d->mAllDevices;
+    for (const auto &oneDevice : allDevices) {
         qDebug() << "removed device" << oneDevice->UDN();
         Q_EMIT removedDevice(oneDevice->UDN());
     }
@@ -138,7 +139,7 @@ void UpnpWebSocketClient::handleServiceList(QJsonObject aObject)
     }
 
     const auto &listDeviceArray = listDeviceValue.toArray();
-    for (auto oneDeviceValue : listDeviceArray) {
+    for (const auto &oneDeviceValue : listDeviceArray) {
         if (oneDeviceValue.isNull() || !oneDeviceValue.isObject()) {
             return;
         }

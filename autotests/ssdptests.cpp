@@ -43,7 +43,7 @@ public:
                             const QStringList &aAnnounceData = {},
                             QObject *parent = nullptr)
         : QObject(parent), mPortNumber(aPortNumber), mClientSocket(), mAnswerData(aAnswerData), mExpectedQuery(aExpectedQuery),
-          mHttpClientSocket(), mAnswerDelay(1700), mAutoRefresh(aAutoRefresh), mRefreshPeriod(aRefreshPeriod),
+          mHttpClientSocket(), mAutoRefresh(aAutoRefresh), mRefreshPeriod(aRefreshPeriod),
           mAnnounceData(aAnnounceData), mAutoRefreshTimer(), mSender(), mSenderPort(12345)
     {
         connect(&mAutoRefreshTimer, &QTimer::timeout, this, &MockSsdpClient::refreshAnnounce);
@@ -123,8 +123,6 @@ private:
     QByteArray mExpectedQuery;
 
     QUdpSocket mHttpClientSocket;
-
-    int mAnswerDelay;
 
     bool mAutoRefresh;
 

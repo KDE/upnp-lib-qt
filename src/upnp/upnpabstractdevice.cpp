@@ -58,7 +58,9 @@ UpnpAbstractDevice::~UpnpAbstractDevice()
 UpnpServiceDescription* UpnpAbstractDevice::serviceDescriptionById(const QString &serviceId) const
 {
     UpnpServiceDescription *result = nullptr;
-    for (auto service : d->mDevice->services()) {
+    const auto &allServices = d->mDevice->services();
+
+    for (const auto &service : allServices) {
         if (service->serviceId() == serviceId) {
             return service.data();
         }
@@ -83,8 +85,9 @@ const QList<QSharedPointer<UpnpServiceDescription> >& UpnpAbstractDevice::servic
 QList<QString> UpnpAbstractDevice::servicesName() const
 {
     QList<QString> result;
+    const auto &allServices = d->mDevice->services();
 
-    for (auto itService: d->mDevice->services()) {
+    for (const auto &itService : allServices) {
         result.push_back(itService->serviceType());
     }
 
@@ -140,7 +143,9 @@ QIODevice* UpnpAbstractDevice::buildAndGetXmlDescription()
 
         if (!d->mDevice->services().empty()) {
             insertStream.writeStartElement(QStringLiteral("serviceList"));
-            for (const auto &itService : d->mDevice->services()) {
+            const auto &allServices = d->mDevice->services();
+
+            for (const auto &itService : allServices) {
                 insertStream.writeStartElement(QStringLiteral("service"));
                 insertStream.writeTextElement(QStringLiteral("serviceType"), itService->serviceType());
                 insertStream.writeTextElement(QStringLiteral("serviceId"), itService->serviceId());

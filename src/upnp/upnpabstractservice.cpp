@@ -81,7 +81,8 @@ QIODevice* UpnpAbstractService::buildAndGetXmlDescription()
         insertStream.writeEndElement();
 
         insertStream.writeStartElement(QStringLiteral("actionList"));
-        for (const auto &itAction : description()->actions()) {
+        const auto &allActions = description()->actions();
+        for (const auto &itAction : allActions) {
             insertStream.writeStartElement(QStringLiteral("action"));
             insertStream.writeTextElement(QStringLiteral("name"), itAction.mName);
             insertStream.writeStartElement(QStringLiteral("argumentList"));
@@ -101,7 +102,9 @@ QIODevice* UpnpAbstractService::buildAndGetXmlDescription()
         insertStream.writeEndElement();
 
         insertStream.writeStartElement(QStringLiteral("serviceStateTable"));
-        for (const auto &itStateVariable : description()->stateVariables()) {
+
+        const auto &allStateVariables = description()->stateVariables();
+        for (const auto &itStateVariable : allStateVariables) {
             insertStream.writeStartElement(QStringLiteral("stateVariable"));
             if (itStateVariable.mEvented) {
                 insertStream.writeAttribute(QStringLiteral("sendEvents"), QStringLiteral("yes"));
@@ -175,7 +178,9 @@ QPointer<UpnpEventSubscriber> UpnpAbstractService::subscribeToEvents(const QByte
     if (signalIndex != -1) {
         newSubscriber->setUpnpService(this);
         d->mSubscribers.push_back(newSubscriber);
-        for (const UpnpStateVariableDescription &currentStateVariable : description()->stateVariables()) {
+
+        const auto &allStateVariables = description()->stateVariables();
+        for (const auto &currentStateVariable : allStateVariables) {
             if (currentStateVariable.mEvented) {
                 connect(this, metaObject()->property(currentStateVariable.mPropertyIndex).notifySignal(), newSubscriber, newSubscriber->metaObject()->method(signalIndex));
             }

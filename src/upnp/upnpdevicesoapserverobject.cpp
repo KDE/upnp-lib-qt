@@ -133,7 +133,7 @@ void UpnpDeviceSoapServerObject::processRequestWithPath(const KDSoapMessage &req
     const UpnpActionDescription &currentAction = currentService->action(actionNameString);
     qDebug() << "allArguments" << allArguments << "action arguments" << currentAction.mNumberInArgument;
 
-    QList<QVariant> checkedArguments;
+    QVector<QVariant> checkedArguments;
     bool argumentError = false;
 
     for (int argumentIndexMessage = 0, actionArgumentIndex = 0; !argumentError; ) {
