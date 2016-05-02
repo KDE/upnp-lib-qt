@@ -180,7 +180,8 @@ void UpnpWebSocketPublisher::handleSubscribeService(QJsonObject aObject)
     if (signalIndex != -1) {
         newSubscriber->setPublisher(this);
         d->mSubscribers.push_back(newSubscriber);
-        for (const UpnpStateVariableDescription &currentStateVariable : targetService->stateVariables()) {
+        const auto &allStateVariables = targetService->stateVariables();
+        for (const UpnpStateVariableDescription &currentStateVariable : allStateVariables) {
             if (currentStateVariable.mEvented) {
                 QObject *targetObject = currentStateVariable.mObject;
                 qDebug() << "connect from" << targetObject << currentStateVariable.mPropertyName;
@@ -192,7 +193,8 @@ void UpnpWebSocketPublisher::handleSubscribeService(QJsonObject aObject)
 
     sendEventNotification(newSubscriber);
 
-    for (const auto &oneStateVariable : targetService->stateVariables()) {
+    const auto &allStateVariables = targetService->stateVariables();
+    for (const auto &oneStateVariable : allStateVariables) {
         qDebug() << oneStateVariable.mPropertyName << oneStateVariable.mPropertyIndex;
     }
 }
