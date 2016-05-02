@@ -23,7 +23,7 @@
 #include "upnpQtBase_export.h"
 
 #include <QtCore/QPointer>
-#include <QtCore/QList>
+#include <QtCore/QVector>
 
 #include <QtCore/QObject>
 
@@ -115,11 +115,11 @@ public:
 
     const QSharedPointer<UpnpServiceDescription> serviceByIndex(int serviceIndex) const;
 
-    const QList<QSharedPointer<UpnpServiceDescription> >& services() const;
+    const QVector<QSharedPointer<UpnpServiceDescription> >& services() const;
 
-    QList<QSharedPointer<UpnpServiceDescription> >& services();
+    QVector<QSharedPointer<UpnpServiceDescription> >& services();
 
-    QList<QString> servicesName() const;
+    QVector<QString> servicesName() const;
 
     /**
      * @brief setUDN will set the UDN (i.e. Unique Device Name) of this device

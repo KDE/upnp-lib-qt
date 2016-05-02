@@ -23,7 +23,7 @@
 #include "upnpQtBase_export.h"
 
 #include <QtCore/QString>
-#include <QtCore/QList>
+#include <QtCore/QVector>
 
 enum class UpnpArgumentDirection
 {
@@ -59,7 +59,7 @@ public:
 
     QString mName;
 
-    QList<UpnpActionArgumentDescription> mArguments;
+    QVector<UpnpActionArgumentDescription> mArguments;
 
     int mNumberInArgument;
 

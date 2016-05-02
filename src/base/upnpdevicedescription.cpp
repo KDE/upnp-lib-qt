@@ -31,7 +31,7 @@ class UpnpDeviceDescriptionPrivate
 {
 public:
 
-    QList<QSharedPointer<UpnpServiceDescription> > mServices;
+    QVector<QSharedPointer<UpnpServiceDescription> > mServices;
 
     QString mDeviceUUID;
 
@@ -94,19 +94,19 @@ const QSharedPointer<UpnpServiceDescription> UpnpDeviceDescription::serviceByInd
     return d->mServices[serviceIndex];
 }
 
-const QList<QSharedPointer<UpnpServiceDescription> >& UpnpDeviceDescription::services() const
+const QVector<QSharedPointer<UpnpServiceDescription> > &UpnpDeviceDescription::services() const
 {
     return d->mServices;
 }
 
-QList<QSharedPointer<UpnpServiceDescription> >& UpnpDeviceDescription::services()
+QVector<QSharedPointer<UpnpServiceDescription> > &UpnpDeviceDescription::services()
 {
     return d->mServices;
 }
 
-QList<QString> UpnpDeviceDescription::servicesName() const
+QVector<QString> UpnpDeviceDescription::servicesName() const
 {
-    QList<QString> result;
+    QVector<QString> result;
 
     for (const auto &itService: const_cast<const decltype(d->mServices) &>(d->mServices)) {
         result.push_back(itService->serviceType());

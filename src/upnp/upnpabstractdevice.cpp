@@ -77,7 +77,7 @@ UpnpServiceDescription *UpnpAbstractDevice::serviceDescriptionByIndex(int servic
     return d->mDevice->services()[serviceIndex].data();
 }
 
-const QList<QSharedPointer<UpnpServiceDescription> >& UpnpAbstractDevice::services() const
+const QVector<QSharedPointer<UpnpServiceDescription> >& UpnpAbstractDevice::services() const
 {
     return d->mDevice->services();
 }

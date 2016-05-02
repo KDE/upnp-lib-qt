@@ -242,7 +242,7 @@ void UpnpSsdpEngine::publishDevice(UpnpAbstractDevice *device)
 
     d->mSsdpQuerySocket.writeDatagram(deviceMessage, QHostAddress(QStringLiteral("239.255.255.250")), d->mPortNumber);
 
-    const QList<QSharedPointer<UpnpServiceDescription> > &servicesList = device->description()->services();
+    const auto &servicesList = device->description()->services();
     for (const auto &oneService : servicesList) {
         QByteArray deviceMessage(allDiscoveryMessageCommonContent);
         deviceMessage += "NT: " + (oneService)->serviceType().toLatin1() + "\r\n";

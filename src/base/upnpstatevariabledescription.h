@@ -25,7 +25,7 @@
 #include <QtCore/QString>
 #include <QtCore/QByteArray>
 #include <QtCore/QVariant>
-#include <QtCore/QList>
+#include <QtCore/QVector>
 
 class UPNPQTBASE_EXPORT UpnpStateVariableDescription
 {
@@ -53,7 +53,7 @@ public:
 
     QVariant mStep;
 
-    QList<QString> mValueList;
+    QVector<QString> mValueList;
 };
 
 #endif // UPNPSTATEVARIABLEDESCRIPTION_H

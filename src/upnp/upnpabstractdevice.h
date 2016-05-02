@@ -53,7 +53,7 @@ public:
 
     Q_INVOKABLE UpnpServiceDescription* serviceDescriptionByIndex(int serviceIndex) const;
 
-    const QList<QSharedPointer<UpnpServiceDescription> > &services() const;
+    const QVector<QSharedPointer<UpnpServiceDescription> > &services() const;
 
     QList<QString> servicesName() const;
 

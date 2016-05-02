@@ -60,7 +60,7 @@ public:
 
     QMap<QString, UpnpStateVariableDescription> mStateVariables;
 
-    QList<QPointer<UpnpEventSubscriber> > mSubscribers;
+    QVector<QPointer<UpnpEventSubscriber> > mSubscribers;
 
     int mMaximumSubscriptionDuration;
 };
