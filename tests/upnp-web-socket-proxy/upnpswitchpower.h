@@ -37,6 +37,14 @@ class UpnpSwitchPower : public QObject
                READ description
                NOTIFY descriptionChanged)
 
+    Q_PROPERTY(bool target
+               READ target
+               NOTIFY targetChanged)
+
+    Q_PROPERTY(bool status
+               READ status
+               NOTIFY statusChanged)
+
 public:
     explicit UpnpSwitchPower(QObject *parent = 0);
 
@@ -48,9 +56,19 @@ public:
 
     const UpnpServiceDescription* description() const;
 
+public Q_SLOTS:
+
+    bool target() const;
+
+    bool status() const;
+
 Q_SIGNALS:
 
     void descriptionChanged();
+
+    void targetChanged(const QString &serviceId, const QByteArray &propertyName);
+
+    void statusChanged(const QString &serviceId, const QByteArray &propertyName);
 
 private:
 

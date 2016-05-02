@@ -24,6 +24,7 @@
 #include "upnpservicedescription.h"
 #include "upnpactiondescription.h"
 #include "upnpstatevariabledescription.h"
+#include "upnpwebsocketeventsubscriber.h"
 
 #include <QtWebSockets/QWebSocket>
 
@@ -33,12 +34,17 @@
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonArray>
+#include <QtCore/QMetaMethod>
+#include <QtCore/QSharedPointer>
+#include <QtCore/QTimer>
 
 class UpnpWebSocketPublisherPrivate
 {
 public:
 
     QSharedPointer<UpnpDeviceDescription> mDevice;
+
+    QList<QSharedPointer<UpnpWebSocketEventSubscriber> > mSubscribers;
 
 };
 
@@ -88,6 +94,9 @@ bool UpnpWebSocketPublisher::handleMessage(const QJsonObject &newMessage)
         break;
     case UpnpWebSocketMessageType::CallAction:
         handleCallAction(newMessage);
+        break;
+    case UpnpWebSocketMessageType::SubscribeService:
+        handleSubscribeService(newMessage);
         break;
     case UpnpWebSocketMessageType::NewDevice:
     case UpnpWebSocketMessageType::RemovedDevice:
@@ -140,6 +149,57 @@ void UpnpWebSocketPublisher::handleHelloAck(QJsonObject aObject)
     qDebug() << "UpnpWebSocketPublisher::handleHelloAck";
 
     publish();
+}
+
+void UpnpWebSocketPublisher::handleSubscribeService(QJsonObject aObject)
+{
+    qDebug() << "UpnpWebSocketPublisher::handleSubscribeService";
+
+    const auto &serviceIdValue = UpnpWebSocketProtocol::getField(aObject, QStringLiteral("serviceId"));
+    if (serviceIdValue.isNull() || !serviceIdValue.isString()) {
+        return;
+    }
+
+    auto targetService = d->mDevice->serviceById(serviceIdValue.toString());
+    if (!targetService) {
+        return;
+    }
+
+    qDebug() << targetService->stateVariables().keys();
+
+    QSharedPointer<UpnpWebSocketEventSubscriber> newSubscriber(new UpnpWebSocketEventSubscriber);
+
+    int signalIndex = -1;
+    for (int i = 0; i < newSubscriber->metaObject()->methodCount(); ++i) {
+        if (newSubscriber->metaObject()->method(i).name() == "notifyPropertyChange") {
+            signalIndex = i;
+            break;
+        }
+    }
+
+    if (signalIndex != -1) {
+        newSubscriber->setPublisher(this);
+        d->mSubscribers.push_back(newSubscriber);
+        for (const UpnpStateVariableDescription &currentStateVariable : targetService->stateVariables()) {
+            if (currentStateVariable.mEvented) {
+                QObject *targetObject = currentStateVariable.mObject;
+                qDebug() << "connect from" << targetObject << currentStateVariable.mPropertyName;
+                connect(targetObject, targetObject->metaObject()->property(currentStateVariable.mPropertyIndex).notifySignal(),
+                        newSubscriber.data(), newSubscriber->metaObject()->method(signalIndex));
+            }
+        }
+    }
+
+    sendEventNotification(newSubscriber);
+
+    for (const auto &oneStateVariable : targetService->stateVariables()) {
+        qDebug() << oneStateVariable.mPropertyName << oneStateVariable.mPropertyIndex;
+    }
+}
+
+void UpnpWebSocketPublisher::sendEventNotification(const QSharedPointer<UpnpWebSocketEventSubscriber> &currentSubscriber)
+{
+    QTimer::singleShot(0, currentSubscriber.data(), SLOT(sendEventNotification()));
 }
 
 

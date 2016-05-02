@@ -27,6 +27,8 @@
 #include <QtCore/QVariant>
 #include <QtCore/QVector>
 
+class QObject;
+
 class UPNPQTBASE_EXPORT UpnpStateVariableDescription
 {
 public:
@@ -36,6 +38,8 @@ public:
     bool mIsValid;
 
     QString mUpnpName;
+
+    QObject *mObject;
 
     QByteArray mPropertyName;
 

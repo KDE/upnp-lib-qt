@@ -24,8 +24,6 @@ import org.mgallien.QmlExtension 1.0
 UpnpBinaryLight {
     id: myLight
 
-    property var actuator
-
     udn: '4424b320-9657-419c-8935-a9fe76170f09'
 
     webSocketPublisher: UpnpWebSocketPublisher {
@@ -37,7 +35,7 @@ UpnpBinaryLight {
         description: myLight.description
 
         Component.onCompleted: {
-            connectServer('wss://home:11443/')
+            connectServer('wss://moulinette:11443/')
         }
     }
 
@@ -46,14 +44,5 @@ UpnpBinaryLight {
 
         relayAddress: '192.168.0.5'
         relayIndex: 0
-    }
-
-    onSetTarget: {
-        console.log(target + ' SetTarget')
-        if (target) {
-            myExteriorLight.activate(OlinuxinoRemoteRelay.SwitchOn)
-        } else {
-            myExteriorLight.activate(OlinuxinoRemoteRelay.SwitchOff)
-        }
     }
 }

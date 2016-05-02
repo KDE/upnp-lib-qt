@@ -19,6 +19,7 @@
 
 #include "upnpbinarylight.h"
 #include "olinuxinoremoterelay.h"
+#include "abstractrelayactuator.h"
 
 #include "upnpwebsocketclient.h"
 #include "upnpwebsocketcertificateconfiguration.h"
@@ -45,6 +46,7 @@ int __attribute__((visibility("default"))) main(int argc, char *argv[])
     qmlRegisterType<UpnpWebSocketPublisher>("org.mgallien.QmlExtension", 1, 0, "UpnpWebSocketPublisher");
     qmlRegisterType<UpnpBinaryLight>("org.mgallien.QmlExtension", 1, 0, "UpnpBinaryLight");
     qmlRegisterType<OlinuxinoRemoteRelay>("org.mgallien.QmlExtension", 1, 0, "OlinuxinoRemoteRelay");
+    qmlRegisterType<AbstractRelayActuator>("org.mgallien.QmlExtension", 1, 0, "AbstractRelayActuator");
 
     qRegisterMetaType<QSharedPointer<UpnpDeviceDescription>>();
 

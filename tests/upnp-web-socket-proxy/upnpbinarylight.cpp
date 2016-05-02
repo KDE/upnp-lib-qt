@@ -20,6 +20,7 @@
 #include "upnpbinarylight.h"
 
 #include "upnpswitchpower.h"
+#include "abstractrelayactuator.h"
 
 #include "upnpwebsocketpublisher.h"
 
@@ -34,14 +35,18 @@ public:
 
     QSharedPointer<UpnpDeviceDescription> mDevice;
 
-    UpnpWebSocketPublisher* mWebSocketPublisher;
+    UpnpWebSocketPublisher* mWebSocketPublisher = nullptr;
+
+    AbstractRelayActuator* mActuator = nullptr;
+
+    QSharedPointer<UpnpSwitchPower> mSwitchPowerService;
+
 };
 
 UpnpBinaryLight::UpnpBinaryLight(int cacheDuration, QObject *parent)
     : QObject(parent), d(new BinaryLightPrivate)
 {
     d->mDevice.reset(new UpnpDeviceDescription);
-    d->mWebSocketPublisher = nullptr;
 
     d->mDevice->setDeviceType(QStringLiteral("urn:schemas-upnp-org:device:BinaryLight:1"));
     d->mDevice->setFriendlyName(QStringLiteral("Binary Light for Test"));
@@ -58,8 +63,8 @@ UpnpBinaryLight::UpnpBinaryLight(int cacheDuration, QObject *parent)
     d->mDevice->setUPC(QStringLiteral("test"));
     d->mDevice->setCacheControl(cacheDuration);
 
-    QSharedPointer<UpnpSwitchPower> switchPowerService(new UpnpSwitchPower);
-    d->mDevice->addService(switchPowerService->sharedDescription());
+    d->mSwitchPowerService.reset(new UpnpSwitchPower);
+    d->mDevice->addService(d->mSwitchPowerService->sharedDescription());
     const int serviceIndex = 0/*addService(switchPowerService)*/;
 
     const int deviceIndex = 1/*d->mServer.addDevice(this)*/;
@@ -124,8 +129,15 @@ const QString &UpnpBinaryLight::udn() const
     return d->mDevice->UDN();
 }
 
+AbstractRelayActuator *UpnpBinaryLight::actuator() const
+{
+    return d->mActuator;
+}
+
 void UpnpBinaryLight::actionCalled(const QString &action, const QVariantMap &arguments, qint64 sequenceNumber, const QString &serviceId)
 {
+    Q_UNUSED(sequenceNumber);
+
     if (serviceId == QStringLiteral("urn:upnp-org:serviceId:SwitchPower")) {
         if (action == QStringLiteral("SetTarget")) {
             auto itArg = arguments.find(QStringLiteral("newTargetValue"));
@@ -134,15 +146,33 @@ void UpnpBinaryLight::actionCalled(const QString &action, const QVariantMap &arg
                 return;
             }
 
-            Q_EMIT setTarget(sequenceNumber, itArg.value().toBool());
+            Q_EMIT setTarget(itArg.value().toBool());
         }
         if (action == QStringLiteral("GetTarget")) {
-            Q_EMIT getTarget(sequenceNumber);
+            Q_EMIT getTarget();
         }
         if (action == QStringLiteral("GetStatus")) {
-            Q_EMIT getStatus(sequenceNumber);
+            Q_EMIT getStatus();
         }
     }
+}
+
+void UpnpBinaryLight::setActuator(AbstractRelayActuator *actuator)
+{
+    if (d->mActuator) {
+        disconnect(this, &UpnpBinaryLight::setTarget, d->mActuator, &AbstractRelayActuator::switchRelay);
+    }
+
+    if (d->mActuator == actuator)
+        return;
+
+    d->mActuator = actuator;
+
+    if (d->mActuator) {
+        connect(this, &UpnpBinaryLight::setTarget, d->mActuator, &AbstractRelayActuator::switchRelay);
+    }
+
+    Q_EMIT actuatorChanged();
 }
 
 #include "moc_upnpbinarylight.cpp"

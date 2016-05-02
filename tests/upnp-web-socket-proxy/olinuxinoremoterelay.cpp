@@ -114,9 +114,11 @@ void OlinuxinoRemoteRelay::sslErrors(QNetworkReply *reply, const QList<QSslError
 void OlinuxinoRemoteRelay::finished(QNetworkReply *reply)
 {
     if (reply->error() != QNetworkReply::NoError) {
+        qDebug() << "OlinuxinoRemoteRelay::finished" << "in error";
         setStatus(false);
     } else {
         if (!status()) {
+            qDebug() << "OlinuxinoRemoteRelay::finished" << "is working";
             setStatus(true);
         }
         switch (relayState())

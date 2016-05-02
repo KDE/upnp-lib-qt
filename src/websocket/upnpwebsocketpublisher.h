@@ -35,6 +35,7 @@ class UpnpServiceDescription;
 class UpnpActionDescription;
 class UpnpActionArgumentDescription;
 class UpnpStateVariableDescription;
+class UpnpWebSocketEventSubscriber;
 
 class UPNPQTWEBSOCKET_EXPORT UpnpWebSocketPublisher : public UpnpWebSocketBaseClient
 {
@@ -78,6 +79,10 @@ private:
     void addDeviceDescription(QJsonObject &newMessage, QSharedPointer<UpnpDeviceDescription> deviceDescription);
 
     void handleHelloAck(QJsonObject aObject);
+
+    void handleSubscribeService(QJsonObject aObject);
+
+    void sendEventNotification(const QSharedPointer<UpnpWebSocketEventSubscriber> &currentSubscriber);
 
     UpnpWebSocketPublisherPrivate *d;
 

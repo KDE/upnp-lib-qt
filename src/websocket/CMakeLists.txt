@@ -11,6 +11,7 @@ set(upnpQtWebSocket_SOURCES
     upnpwebsocketabstractservicecontrol.cpp
     upnpwebsocketdevicenotifier.cpp
     upnpwebsocketcommon.cpp
+    upnpwebsocketeventsubscriber.cpp
 )
 
 ecm_generate_headers(

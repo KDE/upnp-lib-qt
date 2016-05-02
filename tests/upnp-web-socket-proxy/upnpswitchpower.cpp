@@ -40,6 +40,10 @@ public:
 
     QSharedPointer<UpnpServiceDescription> mService;
 
+    bool mTarget = false;
+
+    bool mStatus = false;
+
 };
 
 UpnpSwitchPower::UpnpSwitchPower(QObject *parent) :
@@ -94,6 +98,7 @@ UpnpSwitchPower::UpnpSwitchPower(QObject *parent) :
     UpnpStateVariableDescription targetStateVariable;
     targetStateVariable.mUpnpName = QStringLiteral("Target");
     targetStateVariable.mPropertyName = "target";
+    targetStateVariable.mObject = this;
 
     for (int propertyIndex = 0; propertyIndex < metaObject()->propertyCount(); ++propertyIndex) {
         if (metaObject()->property(propertyIndex).name() == targetStateVariable.mPropertyName) {
@@ -111,6 +116,7 @@ UpnpSwitchPower::UpnpSwitchPower(QObject *parent) :
     UpnpStateVariableDescription statusStateVariable;
     statusStateVariable.mUpnpName = QStringLiteral("Status");
     statusStateVariable.mPropertyName = "status";
+    statusStateVariable.mObject = this;
 
     for (int propertyIndex = 0; propertyIndex < metaObject()->propertyCount(); ++propertyIndex) {
         if (metaObject()->property(propertyIndex).name() == statusStateVariable.mPropertyName) {
@@ -144,6 +150,16 @@ UpnpServiceDescription *UpnpSwitchPower::description()
 const UpnpServiceDescription *UpnpSwitchPower::description() const
 {
     return d->mService.data();
+}
+
+bool UpnpSwitchPower::target() const
+{
+    return d->mTarget;
+}
+
+bool UpnpSwitchPower::status() const
+{
+    return d->mStatus;
 }
 
 #include "moc_upnpswitchpower.cpp"

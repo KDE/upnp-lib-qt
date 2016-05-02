@@ -25,7 +25,7 @@ UpnpWebSocketServerSocket {
     id: server
 
     certificateConfiguration.certificateAuthorityFileName: './rootKey.crt'
-    certificateConfiguration.certificateFileName: './home.pem'
+    certificateConfiguration.certificateFileName: './moulinette.pem'
 
     Component.onCompleted: init('testServer')
 }

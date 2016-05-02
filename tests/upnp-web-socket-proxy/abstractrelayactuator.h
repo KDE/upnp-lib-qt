@@ -48,6 +48,8 @@ public:
 
     explicit AbstractRelayActuator(QObject *parent = 0);
 
+    virtual ~AbstractRelayActuator();
+
     RelayState relayState() const;
 
     bool status() const;
@@ -62,6 +64,8 @@ Q_SIGNALS:
 
 public Q_SLOTS:
 
+    bool switchRelay(bool switchedOn);
+
     bool activate(RelayState newState);
 
     void setRelayState(RelayState relayState);
@@ -70,7 +74,7 @@ public Q_SLOTS:
 
 protected:
 
-    virtual bool doActivate(RelayState newState) = 0;
+    virtual bool doActivate(RelayState newState);
 
 private:
 
@@ -79,6 +83,8 @@ private:
     bool mStatus;
 
 };
+
+
 
 
 

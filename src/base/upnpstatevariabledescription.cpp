@@ -21,7 +21,7 @@
 
 
 UpnpStateVariableDescription::UpnpStateVariableDescription()
-    : mIsValid(false), mUpnpName(), mPropertyName(), mPropertyIndex(-1), mEvented(false), mDataType(),
+    : mIsValid(false), mUpnpName(), mObject(nullptr), mPropertyName(), mPropertyIndex(-1), mEvented(false), mDataType(),
       mDefaultValue(), mMinimumValue(), mMaximumValue(), mStep(), mValueList()
 {
 }

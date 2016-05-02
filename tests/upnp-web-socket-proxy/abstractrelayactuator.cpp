@@ -24,6 +24,10 @@ AbstractRelayActuator::AbstractRelayActuator(QObject *parent)
 {
 }
 
+AbstractRelayActuator::~AbstractRelayActuator()
+{
+}
+
 AbstractRelayActuator::RelayState AbstractRelayActuator::relayState() const
 {
     return mRelayState;
@@ -32,6 +36,16 @@ AbstractRelayActuator::RelayState AbstractRelayActuator::relayState() const
 bool AbstractRelayActuator::status() const
 {
     return mStatus;
+}
+
+bool AbstractRelayActuator::switchRelay(bool switchedOn)
+{
+    return doActivate(switchedOn ? AbstractRelayActuator::SwitchOn : AbstractRelayActuator::SwitchOff);
+}
+
+bool AbstractRelayActuator::activate(AbstractRelayActuator::RelayState newState)
+{
+    return doActivate(newState);
 }
 
 void AbstractRelayActuator::setRelayState(AbstractRelayActuator::RelayState relayState)
@@ -52,9 +66,9 @@ void AbstractRelayActuator::setStatus(bool status)
     emit statusChanged(status);
 }
 
-bool AbstractRelayActuator::activate(AbstractRelayActuator::RelayState newState)
+bool AbstractRelayActuator::doActivate(AbstractRelayActuator::RelayState newState)
 {
-    return doActivate(newState);
+    return false;
 }
 
 

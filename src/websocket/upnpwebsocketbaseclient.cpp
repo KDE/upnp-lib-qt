@@ -157,6 +157,8 @@ void UpnpWebSocketBaseClient::sslErrors(const QList<QSslError> &errors)
 void UpnpWebSocketBaseClient::stateChanged(QAbstractSocket::SocketState state)
 {
     Q_UNUSED(state);
+
+    qDebug() << "UpnpWebSocketBaseClient::stateChanged" << state;
 }
 
 void UpnpWebSocketBaseClient::textMessageReceived(const QString &message)

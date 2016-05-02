@@ -27,6 +27,7 @@
 class BinaryLightPrivate;
 class UpnpWebSocketPublisher;
 class UpnpDeviceDescription;
+class AbstractRelayActuator;
 
 class UpnpBinaryLight : public QObject
 {
@@ -40,6 +41,11 @@ class UpnpBinaryLight : public QObject
                READ webSocketPublisher
                WRITE setWebSocketPublisher
                NOTIFY webSocketPublisherChanged)
+
+    Q_PROPERTY(AbstractRelayActuator* actuator
+               READ actuator
+               WRITE setActuator
+               NOTIFY actuatorChanged)
 
     Q_PROPERTY(QString udn
                READ udn
@@ -61,6 +67,8 @@ public:
 
     const QString &udn() const;
 
+    AbstractRelayActuator* actuator() const;
+
 Q_SIGNALS:
 
     void descriptionChanged();
@@ -69,15 +77,19 @@ Q_SIGNALS:
 
     void udnChanged();
 
-    void setTarget(qint64 sequenceNumber, bool target);
+    void setTarget(bool target);
 
-    void getTarget(qint64 sequenceNumber);
+    void getTarget();
 
-    void getStatus(qint64 sequenceNumber);
+    void getStatus();
+
+    void actuatorChanged();
 
 public Q_SLOTS:
 
     void actionCalled(const QString &action, const QVariantMap &arguments, qint64 sequenceNumber, const QString &serviceId);
+
+    void setActuator(AbstractRelayActuator* actuator);
 
 private:
 
