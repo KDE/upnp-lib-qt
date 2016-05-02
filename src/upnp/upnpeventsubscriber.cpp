@@ -120,7 +120,7 @@ void UpnpEventSubscriber::sendEventNotification()
     insertStream.writeStartDocument(QStringLiteral("1.0"));
     insertStream.writeNamespace(QStringLiteral("urn:schemas-upnp-org:event-1-0"), QStringLiteral("e"));
     insertStream.writeStartElement(QStringLiteral("urn:schemas-upnp-org:event-1-0"), QStringLiteral("propertyset"));
-    const QList<QString> &allStateVariables(d->mUpnpService->stateVariables());
+    const auto &allStateVariables(d->mUpnpService->stateVariables());
     for(const QString &itVariable : allStateVariables) {
         const UpnpStateVariableDescription &currentStateVariable(d->mUpnpService->stateVariable(itVariable));
         if (currentStateVariable.mEvented) {
@@ -168,7 +168,7 @@ void UpnpEventSubscriber::notifyPropertyChange(const QString &serviceId, const Q
     insertStream.writeStartDocument(QStringLiteral("1.0"));
     insertStream.writeNamespace(QStringLiteral("urn:schemas-upnp-org:event-1-0"), QStringLiteral("e"));
     insertStream.writeStartElement(QStringLiteral("urn:schemas-upnp-org:event-1-0"), QStringLiteral("propertyset"));
-    const QList<QString> &allStateVariables(d->mUpnpService->stateVariables());
+    const auto &allStateVariables(d->mUpnpService->stateVariables());
     for(const QString &itVariable : allStateVariables) {
         const UpnpStateVariableDescription &currentStateVariable(d->mUpnpService->stateVariable(itVariable));
         if (currentStateVariable.mEvented && currentStateVariable.mPropertyName == propertyName) {

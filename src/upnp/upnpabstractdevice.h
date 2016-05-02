@@ -55,7 +55,7 @@ public:
 
     const QVector<QSharedPointer<UpnpServiceDescription> > &services() const;
 
-    QList<QString> servicesName() const;
+    QVector<QString> servicesName() const;
 
     void setDescription(UpnpDeviceDescription *value);
 

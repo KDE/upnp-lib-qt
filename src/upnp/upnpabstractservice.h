@@ -68,7 +68,7 @@ public:
 
     QList<QString> stateVariables() const;
 
-    virtual QList<QPair<QString, QVariant> > invokeAction(const QString &actionName, const QList<QVariant> &arguments, bool &isInError);
+    virtual QVector<QPair<QString, QVariant> > invokeAction(const QString &actionName, const QVector<QVariant> &arguments, bool &isInError);
 
     void setDescription(UpnpServiceDescription *value);
 

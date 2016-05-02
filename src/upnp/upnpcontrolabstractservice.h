@@ -45,7 +45,7 @@ public:
 
     ~UpnpControlAbstractService();
 
-    Q_INVOKABLE UpnpControlAbstractServiceReply *callAction(const QString &action, const QList<QVariant> &arguments);
+    Q_INVOKABLE UpnpControlAbstractServiceReply *callAction(const QString &action, const QVector<QVariant> &arguments);
 
     Q_INVOKABLE void subscribeEvents(int duration);
 

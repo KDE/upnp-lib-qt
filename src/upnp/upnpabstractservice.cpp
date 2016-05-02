@@ -48,7 +48,7 @@ public:
 
     QPointer<QIODevice> mXmlDescription;
 
-    QList<QPointer<UpnpEventSubscriber> > mSubscribers;
+    QVector<QPointer<UpnpEventSubscriber> > mSubscribers;
 
 };
 
@@ -229,7 +229,7 @@ QList<QString> UpnpAbstractService::stateVariables() const
     return description()->stateVariables().keys();
 }
 
-QList<QPair<QString, QVariant> > UpnpAbstractService::invokeAction(const QString &actionName, const QList<QVariant> &arguments, bool &isInError)
+QVector<QPair<QString, QVariant> > UpnpAbstractService::invokeAction(const QString &actionName, const QVector<QVariant> &arguments, bool &isInError)
 {
     Q_UNUSED(actionName);
     Q_UNUSED(arguments);

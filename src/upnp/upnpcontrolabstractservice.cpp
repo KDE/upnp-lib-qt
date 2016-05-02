@@ -90,7 +90,7 @@ UpnpControlAbstractService::~UpnpControlAbstractService()
     delete d;
 }
 
-UpnpControlAbstractServiceReply* UpnpControlAbstractService::callAction(const QString &actionName, const QList<QVariant> &arguments)
+UpnpControlAbstractServiceReply* UpnpControlAbstractService::callAction(const QString &actionName, const QVector<QVariant> &arguments)
 {
     KDSoapMessage message;
 

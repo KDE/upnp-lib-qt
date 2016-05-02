@@ -82,9 +82,9 @@ const QVector<QSharedPointer<UpnpServiceDescription> >& UpnpAbstractDevice::serv
     return d->mDevice->services();
 }
 
-QList<QString> UpnpAbstractDevice::servicesName() const
+QVector<QString> UpnpAbstractDevice::servicesName() const
 {
-    QList<QString> result;
+    QVector<QString> result;
     const auto &allServices = d->mDevice->services();
 
     for (const auto &itService : allServices) {
