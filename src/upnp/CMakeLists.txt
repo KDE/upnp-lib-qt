@@ -73,7 +73,6 @@ set_target_properties(upnpQt PROPERTIES VERSION ${UPNP_QT_VERSION_STRING}
                                                LINK_FLAGS "-Wl,--no-undefined")
 
 install(TARGETS upnpQt EXPORT UPNPQTTargets ${KF5_INSTALL_TARGETS_DEFAULT_ARGS})
-install(TARGETS upnpQt ${INSTALL_TARGETS_DEFAULT_ARGS})
 install(FILES ${upnpQt_CamelCase_HEADERS} DESTINATION ${KDE_INSTALL_INCLUDEDIR_KF5}/UPNPQT/UPNPQT COMPONENT Devel)
 
 install(FILES
