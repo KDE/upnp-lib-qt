@@ -24,8 +24,11 @@
 
 #include "upnpdiscoveryresult.h"
 
-#include <QtCore/QObject>
 #include <QtNetwork/QHostAddress>
+#include <QtNetwork/QNetworkConfiguration>
+
+#include <QtCore/QObject>
+#include <QtCore/QString>
 
 enum class SearchTargetType
 {
@@ -172,6 +175,16 @@ private Q_SLOTS:
     void queryReceivedData();
 
     void discoveryResultTimeout(const QString &usn);
+
+    void networkConfigurationAdded(const QNetworkConfiguration &config);
+
+    void networkConfigurationRemoved(const QNetworkConfiguration &config);
+
+    void networkConfigurationChanged(const QNetworkConfiguration &config);
+
+    void networkOnlineStateChanged(bool isOnline);
+
+    void networkUpdateCompleted();
 
 private:
 
