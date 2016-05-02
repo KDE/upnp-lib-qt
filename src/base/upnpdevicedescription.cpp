@@ -94,12 +94,12 @@ const QSharedPointer<UpnpServiceDescription> UpnpDeviceDescription::serviceByInd
     return d->mServices[serviceIndex];
 }
 
-const QVector<QSharedPointer<UpnpServiceDescription> > &UpnpDeviceDescription::services() const
+const QVector<QSharedPointer<UpnpServiceDescription> >& UpnpDeviceDescription::services() const
 {
     return d->mServices;
 }
 
-QVector<QSharedPointer<UpnpServiceDescription> > &UpnpDeviceDescription::services()
+QVector<QSharedPointer<UpnpServiceDescription> >& UpnpDeviceDescription::services()
 {
     return d->mServices;
 }
