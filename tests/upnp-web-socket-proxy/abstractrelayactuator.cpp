@@ -68,6 +68,8 @@ void AbstractRelayActuator::setStatus(bool status)
 
 bool AbstractRelayActuator::doActivate(AbstractRelayActuator::RelayState newState)
 {
+    Q_UNUSED(newState);
+
     return false;
 }
 
