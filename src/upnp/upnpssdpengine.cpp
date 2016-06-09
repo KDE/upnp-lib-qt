@@ -106,37 +106,38 @@ void UpnpSsdpEngine::initialize()
 
             qDebug() << "try to open sockets";
             d->mSsdpQuerySocket.push_back({new QUdpSocket});
+            d->mSsdpStandardSocket.push_back({new QUdpSocket});
 
             auto &newQuerySocket = d->mSsdpQuerySocket.last();
 
             connect(newQuerySocket.data(), &QUdpSocket::readyRead, this, &UpnpSsdpEngine::queryReceivedData);
 
+            newQuerySocket->setSocketOption(QAbstractSocket::MulticastLoopbackOption, 1);
+            newQuerySocket->setSocketOption(QAbstractSocket::MulticastTtlOption, 4);
+
             if (oneInterface.addressEntries().isEmpty()) {
                 continue;
             }
 
-            bool result = newQuerySocket->bind(oneAddress.ip());
-            qDebug() << "bind" << oneAddress.ip() << (result ? "true" : "false");
+            auto result = newQuerySocket->bind(oneAddress.ip());
+            qDebug() << "bind" << (result ? "true" : "false");
             result = newQuerySocket->joinMulticastGroup(QHostAddress(QStringLiteral("239.255.255.250")), oneInterface);
             qDebug() << "joinMulticastGroup" << (result ? "true" : "false") << newQuerySocket->errorString();
-
-            newQuerySocket->setSocketOption(QAbstractSocket::MulticastLoopbackOption, {1});
-            newQuerySocket->setSocketOption(QAbstractSocket::MulticastTtlOption, {4});
         }
     }
-
     {
-        d->mSsdpStandardSocket.push_back({new QUdpSocket});
         auto &newStandardSocket = d->mSsdpStandardSocket.last();
 
         connect(newStandardSocket.data(), &QUdpSocket::readyRead, this, &UpnpSsdpEngine::standardReceivedData);
 
-        newStandardSocket->bind(QHostAddress::AnyIPv4, d->mPortNumber, QAbstractSocket::ShareAddress | QAbstractSocket::ReuseAddressHint);
-        newStandardSocket->joinMulticastGroup(QHostAddress(QStringLiteral("239.255.255.250")));
         newStandardSocket->setSocketOption(QAbstractSocket::MulticastLoopbackOption, 1);
         newStandardSocket->setSocketOption(QAbstractSocket::MulticastTtlOption, 4);
-    }
 
+        auto result = newStandardSocket->bind(QHostAddress(QStringLiteral("239.255.255.250")), d->mPortNumber, QAbstractSocket::ShareAddress);
+        qDebug() << "bind" << (result ? "true" : "false");
+        result = newStandardSocket->joinMulticastGroup(QHostAddress(QStringLiteral("239.255.255.250")));
+        qDebug() << "joinMulticastGroup" << (result ? "true" : "false") << newStandardSocket->errorString();
+    }
 
     d->mServerInformation = QSysInfo::kernelType() + QStringLiteral(" ") + QSysInfo::kernelVersion()  + QStringLiteral(" UPnP/1.0 ");
 }

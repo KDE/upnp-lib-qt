@@ -66,6 +66,15 @@ public:
         connect(&mHttpClientSocket, &QUdpSocket::readyRead, this, &MockSsdpClient::httpDataReceived);
 
         mHttpClientSocket.bind(QHostAddress::AnyIPv4, 8200);
+
+        bool result = mAnnounceSocket.bind(QHostAddress::AnyIPv4);
+        qDebug() << "bind" << QHostAddress::AnyIPv4 << (result ? "true" : "false");
+        result = mAnnounceSocket.joinMulticastGroup(QHostAddress(QStringLiteral("239.255.255.250")));
+        qDebug() << "joinMulticastGroup" << (result ? "true" : "false") << mAnnounceSocket.errorString();
+
+        mAnnounceSocket.setSocketOption(QAbstractSocket::MulticastLoopbackOption, {1});
+        mAnnounceSocket.setSocketOption(QAbstractSocket::MulticastTtlOption, {4});
+
     }
 
 public Q_SLOTS:
@@ -107,8 +116,9 @@ public Q_SLOTS:
 
     void refreshAnnounce()
     {
+        qDebug() << "refreshAnnounce";
         for (auto &announcement : mAnnounceData) {
-            mClientSocket.writeDatagram(announcement.toLatin1(), QHostAddress(QStringLiteral("239.255.255.250")), mPortNumber);
+            mAnnounceSocket.writeDatagram(announcement.toLatin1(), QHostAddress(QStringLiteral("239.255.255.250")), mPortNumber);
         }
     }
 
@@ -117,6 +127,8 @@ private:
     quint16 mPortNumber;
 
     QUdpSocket mClientSocket;
+
+    QUdpSocket mAnnounceSocket;
 
     QStringList mAnswerData;
 
