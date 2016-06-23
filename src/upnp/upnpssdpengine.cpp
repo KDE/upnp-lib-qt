@@ -55,8 +55,6 @@ public:
 
     bool mCanExportServices;
 
-    QMap<QString, bool> mInterfaceStatus;
-
     QHash<QString, QSharedPointer<UpnpDiscoveryResult> > mDiscoveryResults;
 
     QList<QPointer<QUdpSocket>> mSsdpQuerySocket;
@@ -66,6 +64,9 @@ public:
     QString mServerInformation;
 
     QNetworkConfigurationManager mNetworkManager;
+
+    QString mActiveConfiguration;
+
 };
 
 UpnpSsdpEngine::UpnpSsdpEngine(QObject *parent)
@@ -80,15 +81,6 @@ UpnpSsdpEngine::UpnpSsdpEngine(QObject *parent)
 
 void UpnpSsdpEngine::initialize()
 {
-    const auto &allConfigurations = d->mNetworkManager.allConfigurations();
-    for (const auto &oneConfiguration : allConfigurations) {
-        const auto &oneInterface = QNetworkInterface::interfaceFromName(oneConfiguration.name());
-
-        if (oneInterface.isValid()) {
-            d->mInterfaceStatus[oneInterface.name()] = oneConfiguration.isValid() && oneConfiguration.state().testFlag(QNetworkConfiguration::Active);
-        }
-    }
-
     const auto &allInterfaces = QNetworkInterface::allInterfaces();
     for (const auto &oneInterface : allInterfaces) {
         const auto &allAddresses = oneInterface.addressEntries();
@@ -401,6 +393,13 @@ void UpnpSsdpEngine::networkConfigurationRemoved(const QNetworkConfiguration &co
 void UpnpSsdpEngine::networkConfigurationChanged(const QNetworkConfiguration &config)
 {
     qDebug() << "UpnpSsdpEngine::networkConfigurationChanged" << config.name();
+
+    if (config.isValid() && config.state().testFlag(QNetworkConfiguration::Active)) {
+        if (d->mActiveConfiguration != config.name()) {
+            reconfigureNetwork();
+            d->mActiveConfiguration = config.name();
+        }
+    }
 }
 
 void UpnpSsdpEngine::networkOnlineStateChanged(bool isOnline)
@@ -411,6 +410,11 @@ void UpnpSsdpEngine::networkOnlineStateChanged(bool isOnline)
 void UpnpSsdpEngine::networkUpdateCompleted()
 {
     qDebug() << "UpnpSsdpEngine::networkUpdateCompleted";
+}
+
+void UpnpSsdpEngine::reconfigureNetwork()
+{
+
 }
 
 void UpnpSsdpEngine::parseSsdpQueryDatagram(const QByteArray &datagram, const QList<QByteArray> &headers)

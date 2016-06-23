@@ -188,6 +188,8 @@ private Q_SLOTS:
 
 private:
 
+    void reconfigureNetwork();
+
     void parseSsdpDatagram(const QByteArray &datagram);
 
     void parseSsdpQueryDatagram(const QByteArray &datagram, const QList<QByteArray> &headers);
