@@ -26,6 +26,8 @@
 #include <QtCore/QString>
 #include <QtCore/QTimer>
 
+#include <memory>
+
 enum class NotificationSubType
 {
     Invalid,
@@ -33,6 +35,8 @@ enum class NotificationSubType
     ByeBye,
     Discover,
 };
+
+class UpnpDiscoveryResultPrivate;
 
 class UPNPQT_EXPORT UpnpDiscoveryResult : public QObject
 {
@@ -125,34 +129,8 @@ public Q_SLOTS:
 
 private:
 
-    /**
-     * @brief mNT contains the header ST (i.e. search target) or NT (i.e. notification type) sent in an ssdp message. This is usefull to know the type of the discovered service.
-     */
-    QString mNT;
+    std::unique_ptr<UpnpDiscoveryResultPrivate> d;
 
-    /**
-     * @brief mUSN contains the header USN (i.e. unique service name) sent in an ssdp message. This uniquely identify the discovered service.
-     */
-    QString mUSN;
-
-    QString mLocation;
-
-    /**
-     * @brief mNTS contains the header NTS (i.e. notification sub type) sent in an ssdp message
-     */
-    NotificationSubType mNTS;
-
-    /**
-     * @brief mAnnounceDate contains the date sent in the SSDP message by the other side
-     */
-    QString mAnnounceDate;
-
-    /**
-     * @brief mCacheDuration duration of validity of the announce
-     */
-    int mCacheDuration;
-
-    QTimer mValidityTimer;
 };
 
 #endif // UPNPDISCOVERYRESULT_H

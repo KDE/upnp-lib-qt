@@ -26,6 +26,8 @@
 #include <QtCore/QPointer>
 #include <QtCore/QList>
 
+#include <memory>
+
 class UpnpAbstractService;
 class UpnpAbstractDevicePrivate;
 class QIODevice;
@@ -81,7 +83,7 @@ protected:
 
 private:
 
-    UpnpAbstractDevicePrivate *d;
+    std::unique_ptr<UpnpAbstractDevicePrivate> d;
 
 };
 

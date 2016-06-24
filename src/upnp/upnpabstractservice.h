@@ -29,6 +29,8 @@
 #include <QtCore/QList>
 #include <QtCore/QPair>
 
+#include <memory>
+
 class UpnpAbstractServicePrivate;
 class UpnpActionDescription;
 class UpnpStateVariableDescription;
@@ -86,7 +88,7 @@ private:
 
     void sendEventNotification(const QPointer<UpnpEventSubscriber> &currentSubscriber);
 
-    UpnpAbstractServicePrivate *d;
+    std::unique_ptr<UpnpAbstractServicePrivate> d;
 
 };
 

@@ -52,7 +52,6 @@ UpnpAbstractDevice::UpnpAbstractDevice(QObject *parent) :
 
 UpnpAbstractDevice::~UpnpAbstractDevice()
 {
-    delete d;
 }
 
 UpnpServiceDescription* UpnpAbstractDevice::serviceDescriptionById(const QString &serviceId) const

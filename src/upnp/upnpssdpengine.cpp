@@ -136,7 +136,6 @@ void UpnpSsdpEngine::initialize()
 
 UpnpSsdpEngine::~UpnpSsdpEngine()
 {
-    delete d;
 }
 
 quint16 UpnpSsdpEngine::port() const

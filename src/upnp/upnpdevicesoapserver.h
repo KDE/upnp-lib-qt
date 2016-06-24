@@ -26,6 +26,8 @@
 
 #include <QtCore/QObject>
 
+#include <memory>
+
 class UpnpAbstractDevice;
 class UpnpDeviceSoapServerPrivate;
 
@@ -47,7 +49,7 @@ public:
 
 private:
 
-    UpnpDeviceSoapServerPrivate *d;
+    std::unique_ptr<UpnpDeviceSoapServerPrivate> d;
 };
 
 #endif

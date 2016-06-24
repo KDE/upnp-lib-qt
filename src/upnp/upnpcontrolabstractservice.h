@@ -31,6 +31,8 @@
 #include <QtCore/QVariantList>
 #include <QtCore/QUrl>
 
+#include <memory>
+
 class UpnpAbstractServiceDescriptionPrivate;
 class QNetworkReply;
 class QHostInfo;
@@ -71,7 +73,7 @@ protected:
 
 private:
 
-    UpnpAbstractServiceDescriptionPrivate *d;
+    std::unique_ptr<UpnpAbstractServiceDescriptionPrivate> d;
 };
 
 #endif // UPNPSERVICECALLER_H

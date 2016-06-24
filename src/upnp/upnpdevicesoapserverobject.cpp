@@ -57,7 +57,6 @@ UpnpDeviceSoapServerObject::UpnpDeviceSoapServerObject(QList<UpnpAbstractDevice 
 
 UpnpDeviceSoapServerObject::~UpnpDeviceSoapServerObject()
 {
-    delete d;
 }
 
 void UpnpDeviceSoapServerObject::processRequest(const KDSoapMessage &request, KDSoapMessage &response, const QByteArray &soapAction)

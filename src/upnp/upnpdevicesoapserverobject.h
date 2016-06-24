@@ -28,6 +28,8 @@
 #include <QObject>
 #include <QtCore/QList>
 
+#include <memory>
+
 class UpnpAbstractDevice;
 class UpnpDeviceSoapServerObjectPrivate;
 
@@ -65,7 +67,7 @@ private:
 
     QIODevice* downloadServiceXmlDescription(UpnpAbstractDevice *device, const int serviceIndex, QByteArray &contentType);
 
-    UpnpDeviceSoapServerObjectPrivate *d;
+    std::unique_ptr<UpnpDeviceSoapServerObjectPrivate> d;
 };
 
 #endif // UPNPDEVICESOAPSERVEROBJECT_H

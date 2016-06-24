@@ -55,7 +55,6 @@ UpnpDeviceDescriptionParser::UpnpDeviceDescriptionParser(QNetworkAccessManager *
 
 UpnpDeviceDescriptionParser::~UpnpDeviceDescriptionParser()
 {
-    delete d;
 }
 
 void UpnpDeviceDescriptionParser::downloadDeviceDescription(const QUrl &deviceUrl)

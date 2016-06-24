@@ -28,6 +28,8 @@
 #include <QtCore/QUrl>
 #include <QtCore/QString>
 
+#include <memory>
+
 class UpnpEventSubscriberPrivate;
 class UpnpAbstractService;
 
@@ -67,7 +69,7 @@ private Q_SLOTS:
 
 private:
 
-    UpnpEventSubscriberPrivate *d;
+    std::unique_ptr<UpnpEventSubscriberPrivate> d;
 
 };
 

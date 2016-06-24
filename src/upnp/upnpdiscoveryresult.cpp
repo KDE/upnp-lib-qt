@@ -19,18 +19,61 @@
 
 #include "upnpdiscoveryresult.h"
 
-UpnpDiscoveryResult::UpnpDiscoveryResult(QObject *parent)
-    : QObject(parent), mNT(), mUSN(), mLocation(), mNTS(), mAnnounceDate(), mCacheDuration(), mValidityTimer()
+class UpnpDiscoveryResultPrivate
 {
-    connect(&mValidityTimer, &QTimer::timeout, this, &UpnpDiscoveryResult::validityTimeout);
+
+public:
+
+    UpnpDiscoveryResultPrivate() = default;
+
+    UpnpDiscoveryResultPrivate(const QString &aNT, const QString &aUSN, const QString &aLocation,
+                               NotificationSubType aNTS, const QString &aAnnounceDate, int aCacheDuration)
+        : mNT(aNT), mUSN(aUSN), mLocation(aLocation), mNTS(aNTS), mAnnounceDate(aAnnounceDate), mCacheDuration(aCacheDuration)
+    {
+    }
+
+    /**
+     * @brief mNT contains the header ST (i.e. search target) or NT (i.e. notification type) sent in an ssdp message. This is usefull to know the type of the discovered service.
+     */
+    QString mNT;
+
+    /**
+     * @brief mUSN contains the header USN (i.e. unique service name) sent in an ssdp message. This uniquely identify the discovered service.
+     */
+    QString mUSN;
+
+    QString mLocation;
+
+    /**
+     * @brief mNTS contains the header NTS (i.e. notification sub type) sent in an ssdp message
+     */
+    NotificationSubType mNTS;
+
+    /**
+     * @brief mAnnounceDate contains the date sent in the SSDP message by the other side
+     */
+    QString mAnnounceDate;
+
+    /**
+     * @brief mCacheDuration duration of validity of the announce
+     */
+    int mCacheDuration;
+
+    QTimer mValidityTimer;
+
+};
+
+UpnpDiscoveryResult::UpnpDiscoveryResult(QObject *parent)
+    : QObject(parent), d(new UpnpDiscoveryResultPrivate)
+{
+    connect(&d->mValidityTimer, &QTimer::timeout, this, &UpnpDiscoveryResult::validityTimeout);
 }
 
 UpnpDiscoveryResult::UpnpDiscoveryResult(const QString &aNT, const QString &aUSN, const QString &aLocation,
                     NotificationSubType aNTS, const QString &aAnnounceDate, int aCacheDuration, QObject *parent)
-    : QObject(parent), mNT(aNT), mUSN(aUSN), mLocation(aLocation), mNTS(aNTS),
-      mAnnounceDate(aAnnounceDate), mCacheDuration(aCacheDuration), mValidityTimer()
+    : QObject(parent), d(new UpnpDiscoveryResultPrivate(aNT, aUSN, aLocation, aNTS, aAnnounceDate, aCacheDuration))
 {
-    connect(&mValidityTimer, &QTimer::timeout, this, &UpnpDiscoveryResult::validityTimeout);
+    connect(&d->mValidityTimer, &QTimer::timeout, this, &UpnpDiscoveryResult::validityTimeout);
 }
 
 UpnpDiscoveryResult::~UpnpDiscoveryResult()
@@ -39,82 +82,82 @@ UpnpDiscoveryResult::~UpnpDiscoveryResult()
 
 void UpnpDiscoveryResult::setNT(const QString &value)
 {
-    mNT = value;
+    d->mNT = value;
     Q_EMIT ntChanged();
 }
 
 const QString &UpnpDiscoveryResult::nt() const
 {
-    return mNT;
+    return d->mNT;
 }
 
 void UpnpDiscoveryResult::setUSN(const QString &value)
 {
-    mUSN = value;
+    d->mUSN = value;
     Q_EMIT usnChanged();
 }
 
 const QString &UpnpDiscoveryResult::usn() const
 {
-    return mUSN;
+    return d->mUSN;
 }
 
 void UpnpDiscoveryResult::setLocation(const QString &value)
 {
-    mLocation = value;
+    d->mLocation = value;
     Q_EMIT locationChanged();
 }
 
 const QString &UpnpDiscoveryResult::location() const
 {
-    return mLocation;
+    return d->mLocation;
 }
 
 void UpnpDiscoveryResult::setNTS(NotificationSubType value)
 {
-    mNTS = value;
+    d->mNTS = value;
     Q_EMIT ntsChanged();
 }
 
 NotificationSubType UpnpDiscoveryResult::nts() const
 {
-    return mNTS;
+    return d->mNTS;
 }
 
 void UpnpDiscoveryResult::setAnnounceDate(const QString &value)
 {
-    mAnnounceDate = value;
+    d->mAnnounceDate = value;
     Q_EMIT announceDateChanged();
 }
 
 const QString &UpnpDiscoveryResult::announceDate() const
 {
-    return mAnnounceDate;
+    return d->mAnnounceDate;
 }
 
 void UpnpDiscoveryResult::setCacheDuration(int value)
 {
-    mCacheDuration = value;
+    d->mCacheDuration = value;
     Q_EMIT cacheDurationChanged();
 
-    mValidityTimer.setSingleShot(false);
-    mValidityTimer.start(mCacheDuration * 1000);
+    d->mValidityTimer.setSingleShot(false);
+    d->mValidityTimer.start(d->mCacheDuration * 1000);
 }
 
 int UpnpDiscoveryResult::cacheDuration() const
 {
-    return mCacheDuration;
+    return d->mCacheDuration;
 }
 
 void UpnpDiscoveryResult::discoveryIsAlive()
 {
 
-    mValidityTimer.start(mCacheDuration * 1000);
+    d->mValidityTimer.start(d->mCacheDuration * 1000);
 }
 
 void UpnpDiscoveryResult::validityTimeout()
 {
-    Q_EMIT timeout(mUSN);
+    Q_EMIT timeout(d->mUSN);
 }
 
 

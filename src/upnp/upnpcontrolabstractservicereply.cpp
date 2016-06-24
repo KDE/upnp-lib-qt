@@ -46,7 +46,6 @@ UpnpControlAbstractServiceReply::UpnpControlAbstractServiceReply(const KDSoapPen
 
 UpnpControlAbstractServiceReply::~UpnpControlAbstractServiceReply()
 {
-    delete d;
 }
 
 bool UpnpControlAbstractServiceReply::success() const

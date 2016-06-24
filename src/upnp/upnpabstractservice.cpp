@@ -59,7 +59,6 @@ UpnpAbstractService::UpnpAbstractService(QObject *parent) :
 
 UpnpAbstractService::~UpnpAbstractService()
 {
-    delete d;
 }
 
 QIODevice* UpnpAbstractService::buildAndGetXmlDescription()

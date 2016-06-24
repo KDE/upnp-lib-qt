@@ -30,6 +30,8 @@
 #include <QtCore/QObject>
 #include <QtCore/QString>
 
+#include <memory>
+
 enum class SearchTargetType
 {
     All,
@@ -196,7 +198,7 @@ private:
 
     void parseSsdpAnnounceDatagram(const QByteArray &datagram, const QList<QByteArray> &headers, SsdpMessageType messageType);
 
-    UpnpSsdpEnginePrivate *d;
+    std::unique_ptr<UpnpSsdpEnginePrivate> d;
 };
 
 #endif

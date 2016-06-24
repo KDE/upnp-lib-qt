@@ -68,7 +68,6 @@ UpnpEventSubscriber::UpnpEventSubscriber(QObject *parent)
 
 UpnpEventSubscriber::~UpnpEventSubscriber()
 {
-    delete d;
 }
 
 void UpnpEventSubscriber::setSecondTimeout(int newValue)

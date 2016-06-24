@@ -25,6 +25,8 @@
 #include <QtCore/QObject>
 #include <QtCore/QVariantMap>
 
+#include <memory>
+
 class UpnpControlAbstractServiceReplyPrivate;
 class KDSoapPendingCall;
 
@@ -57,7 +59,7 @@ protected:
 
 private:
 
-    UpnpControlAbstractServiceReplyPrivate *d;
+    std::unique_ptr<UpnpControlAbstractServiceReplyPrivate> d;
 
 };
 

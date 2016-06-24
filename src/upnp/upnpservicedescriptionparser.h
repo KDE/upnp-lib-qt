@@ -25,6 +25,8 @@
 #include <QtCore/QString>
 #include <QtCore/QSharedPointer>
 
+#include <memory>
+
 class QNetworkReply;
 class QIODevice;
 class QNetworkAccessManager;
@@ -59,7 +61,7 @@ private:
 
     void parseServiceDescription(QIODevice *serviceDescriptionContent);
 
-    UpnpServiceDescriptionParserPrivate *d;
+    std::unique_ptr<UpnpServiceDescriptionParserPrivate> d;
 
 };
 

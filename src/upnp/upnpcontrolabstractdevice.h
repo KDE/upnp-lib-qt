@@ -26,6 +26,8 @@
 
 #include <QtCore/QObject>
 
+#include <memory>
+
 class UpnpControlAbstractDevicePrivate;
 class QNetworkReply;
 class UpnpControlAbstractService;
@@ -58,7 +60,7 @@ protected:
 
 private:
 
-    UpnpControlAbstractDevicePrivate *d;
+    std::unique_ptr<UpnpControlAbstractDevicePrivate> d;
 
 };
 

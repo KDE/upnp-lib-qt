@@ -37,7 +37,6 @@ UpnpServerEventObject::UpnpServerEventObject(QObject *parent) : QObject(parent),
 
 UpnpServerEventObject::~UpnpServerEventObject()
 {
-    delete d;
 }
 
 bool UpnpServerEventObject::processCustomVerbRequest(const QByteArray &requestType, const QByteArray &requestData,

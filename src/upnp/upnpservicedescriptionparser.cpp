@@ -53,7 +53,6 @@ UpnpServiceDescriptionParser::UpnpServiceDescriptionParser(QNetworkAccessManager
 
 UpnpServiceDescriptionParser::~UpnpServiceDescriptionParser()
 {
-    delete d;
 }
 
 void UpnpServiceDescriptionParser::downloadServiceDescription(const QUrl &serviceUrl)

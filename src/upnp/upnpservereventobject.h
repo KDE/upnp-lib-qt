@@ -27,6 +27,8 @@
 
 #include <QObject>
 
+#include <memory>
+
 class UpnpControlAbstractService;
 class UpnpServerEventObjectPrivate;
 
@@ -56,7 +58,7 @@ public:
 
 private:
 
-    UpnpServerEventObjectPrivate *d;
+    std::unique_ptr<UpnpServerEventObjectPrivate> d;
 };
 
 #endif // UPNPSERVEREVENTOBJECT_H

@@ -26,6 +26,8 @@
 
 #include <QtCore/QObject>
 
+#include <memory>
+
 class UpnpControlAbstractService;
 class UpnpHttpServerPrivate;
 
@@ -43,7 +45,7 @@ public:
 
 private:
 
-    UpnpHttpServerPrivate *d;
+    std::unique_ptr<UpnpHttpServerPrivate> d;
 };
 
 #endif // UPNPHTTPSERVER_H

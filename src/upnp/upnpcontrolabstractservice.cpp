@@ -87,7 +87,6 @@ UpnpControlAbstractService::UpnpControlAbstractService(QObject *parent)
 UpnpControlAbstractService::~UpnpControlAbstractService()
 {
     delete d->mInterface;
-    delete d;
 }
 
 UpnpControlAbstractServiceReply* UpnpControlAbstractService::callAction(const QString &actionName, const QVector<QVariant> &arguments)
