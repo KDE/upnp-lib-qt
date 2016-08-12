@@ -34,6 +34,7 @@ class UpnpServiceDescriptionPrivate;
 class UpnpActionDescription;
 class UpnpStateVariableDescription;
 class UpnpEventSubscriber;
+class UpnpDeviceDescription;
 
 class UPNPQTBASE_EXPORT UpnpServiceDescription : public QObject
 {
@@ -74,6 +75,11 @@ class UPNPQTBASE_EXPORT UpnpServiceDescription : public QObject
                READ maximumSubscriptionDuration
                WRITE setMaximumSubscriptionDuration
                NOTIFY maximumSubscriptionDurationChanged)
+
+    Q_PROPERTY(UpnpDeviceDescription* deviceDescription
+               READ deviceDescription
+               WRITE setDeviceDescription
+               NOTIFY deviceDescriptionChanged)
 
 public:
     explicit UpnpServiceDescription(QObject *parent = 0);
@@ -124,6 +130,12 @@ public:
 
     const QMap<QString, UpnpStateVariableDescription>& stateVariables() const;
 
+    UpnpDeviceDescription* deviceDescription() const;
+
+public Q_SLOTS:
+
+    void setDeviceDescription(UpnpDeviceDescription* deviceDescription);
+
 Q_SIGNALS:
 
     void serviceTypeChanged(const QString &serviceId);
@@ -139,6 +151,8 @@ Q_SIGNALS:
     void eventURLChanged(const QString &serviceId);
 
     void maximumSubscriptionDurationChanged(const QString &serviceId);
+
+    void deviceDescriptionChanged(UpnpDeviceDescription* deviceDescription);
 
 private:
 

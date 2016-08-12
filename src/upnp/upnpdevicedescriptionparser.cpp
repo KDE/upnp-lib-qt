@@ -133,6 +133,7 @@ void UpnpDeviceDescriptionParser::parseDeviceDescription(QIODevice *deviceDescri
         const QDomNode &serviceNode(serviceList.at(serviceIndex));
         if (!serviceNode.isNull()) {
             QSharedPointer<UpnpServiceDescription> newService(new UpnpServiceDescription);
+            newService->setDeviceDescription(d->mDeviceDescription.data());
 
             const QDomNode &serviceTypeNode = serviceNode.firstChildElement(QStringLiteral("serviceType"));
 #if 0
