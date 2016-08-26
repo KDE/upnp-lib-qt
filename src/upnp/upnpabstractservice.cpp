@@ -44,7 +44,7 @@ public:
     {
     }
 
-    QSharedPointer<UpnpServiceDescription> mService;
+    UpnpServiceDescription *mService;
 
     QPointer<QIODevice> mXmlDescription;
 
@@ -239,18 +239,18 @@ QVector<QPair<QString, QVariant> > UpnpAbstractService::invokeAction(const QStri
 
 void UpnpAbstractService::setDescription(UpnpServiceDescription *value)
 {
-    d->mService.reset(value);
+    d->mService = value;
     Q_EMIT descriptionChanged();
 }
 
 UpnpServiceDescription *UpnpAbstractService::description()
 {
-    return d->mService.data();
+    return d->mService;
 }
 
 const UpnpServiceDescription *UpnpAbstractService::description() const
 {
-    return d->mService.data();
+    return d->mService;
 }
 void UpnpAbstractService::sendEventNotification(const QPointer<UpnpEventSubscriber> &currentSubscriber)
 {
