@@ -20,7 +20,7 @@
 #ifndef UPNPDEVICEDESCRIPTION_H
 #define UPNPDEVICEDESCRIPTION_H
 
-#include "upnpQtBase_export.h"
+#include "upnpQt_export.h"
 
 #include <QtCore/QPointer>
 #include <QtCore/QVector>
@@ -30,7 +30,7 @@
 class UpnpServiceDescription;
 class UpnpDeviceDescriptionPrivate;
 
-class UPNPQTBASE_EXPORT UpnpDeviceDescription : public QObject
+class UPNPQT_EXPORT UpnpDeviceDescription : public QObject
 {
 
     Q_OBJECT

@@ -37,7 +37,6 @@ if (CMAKE_SYSTEM_NAME STREQUAL Android)
 endif()
 
 add_subdirectory(src)
-add_subdirectory(tests)
 add_subdirectory(autotests)
 
 set(CMAKECONFIG_INSTALL_DIR "${KDE_INSTALL_CMAKEPACKAGEDIR}/UPNPQT")

@@ -17,54 +17,48 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#ifndef UPNPACTIONDESCRIPTION_H
-#define UPNPACTIONDESCRIPTION_H
+#ifndef UPNPSTATEVARIABLEDESCRIPTION_H
+#define UPNPSTATEVARIABLEDESCRIPTION_H
 
-#include "upnpQtBase_export.h"
+#include "upnpQt_export.h"
 
 #include <QtCore/QString>
+#include <QtCore/QByteArray>
+#include <QtCore/QVariant>
 #include <QtCore/QVector>
 
-enum class UpnpArgumentDirection
-{
-    In,
-    Out,
-    Invalid,
-};
+class QObject;
 
-class UPNPQTBASE_EXPORT UpnpActionArgumentDescription
+class UPNPQT_EXPORT UpnpStateVariableDescription
 {
 public:
 
-    UpnpActionArgumentDescription();
+    UpnpStateVariableDescription();
 
     bool mIsValid;
 
-    QString mName;
+    QString mUpnpName;
 
-    UpnpArgumentDirection mDirection;
+    QObject *mObject;
 
-    bool mIsReturnValue;
+    QByteArray mPropertyName;
 
-    QString mRelatedStateVariable;
+    int mPropertyIndex;
+
+    bool mEvented;
+
+    QString mDataType;
+
+    QVariant mDefaultValue;
+
+    QVariant mMinimumValue;
+
+    QVariant mMaximumValue;
+
+    QVariant mStep;
+
+    QVector<QString> mValueList;
 };
 
-class UPNPQTBASE_EXPORT UpnpActionDescription
-{
-public:
-
-    UpnpActionDescription();
-
-    bool mIsValid;
-
-    QString mName;
-
-    QVector<UpnpActionArgumentDescription> mArguments;
-
-    int mNumberInArgument;
-
-    int mNumberOutArgument;
-};
-
-#endif // UPNPACTIONDESCRIPTION_H
+#endif // UPNPSTATEVARIABLEDESCRIPTION_H
 

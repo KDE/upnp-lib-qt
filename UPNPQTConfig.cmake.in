@@ -1,7 +1,12 @@
 @PACKAGE_INIT@
 
 find_package(Qt5 @REQUIRED_QT_VERSION@ CONFIG REQUIRED Core Network)
+
 find_package(KDSoap CONFIG REQUIRED)
+set_package_properties(KDSoap PROPERTIES
+    DESCRIPTION "Tool for creating client applications for web services."
+    URL "https://www.kdab.com/development-resources/qt-tools/kd-soap/"
+    TYPE OPTIONAL)
 
 include("${CMAKE_CURRENT_LIST_DIR}/UPNPQTTargets.cmake")
 

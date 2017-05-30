@@ -17,27 +17,54 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#include "upnpwebsocketserversocket.h"
-#include "upnpwebsocketcertificateconfiguration.h"
+#ifndef UPNPACTIONDESCRIPTION_H
+#define UPNPACTIONDESCRIPTION_H
 
-#include <QtCore/QCoreApplication>
+#include "upnpQt_export.h"
 
-#include <QtQml/QQmlApplicationEngine>
-#include <QtQml/QQmlEngine>
-#include <QtQml/QQmlFileSelector>
-#include <QtQml>
+#include <QtCore/QString>
+#include <QtCore/QVector>
 
-int __attribute__((visibility("default"))) main(int argc, char *argv[])
+enum class UpnpArgumentDirection
 {
-    QCoreApplication app(argc, argv);
+    In,
+    Out,
+    Invalid,
+};
 
-    QQmlApplicationEngine engine;
-    QQmlFileSelector selector(&engine);
+class UPNPQT_EXPORT UpnpActionArgumentDescription
+{
+public:
 
-    qmlRegisterType<UpnpWebSocketServerSocket>("org.mgallien.QmlExtension", 1, 0, "UpnpWebSocketServerSocket");
-    qmlRegisterType<UpnpWebSocketCertificateConfiguration>("org.mgallien.QmlExtension", 1, 0, "UpnpWebSocketCertificateConfiguration");
+    UpnpActionArgumentDescription();
 
-    engine.load(QUrl(QStringLiteral("qrc:/proxy.qml")));
+    bool mIsValid;
 
-    return app.exec();
-}
+    QString mName;
+
+    UpnpArgumentDirection mDirection;
+
+    bool mIsReturnValue;
+
+    QString mRelatedStateVariable;
+};
+
+class UPNPQT_EXPORT UpnpActionDescription
+{
+public:
+
+    UpnpActionDescription();
+
+    bool mIsValid;
+
+    QString mName;
+
+    QVector<UpnpActionArgumentDescription> mArguments;
+
+    int mNumberInArgument;
+
+    int mNumberOutArgument;
+};
+
+#endif // UPNPACTIONDESCRIPTION_H
+
