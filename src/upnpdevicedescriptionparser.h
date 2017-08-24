@@ -45,7 +45,7 @@ public:
 
     explicit UpnpDeviceDescriptionParser(QNetworkAccessManager *aNetworkAccess, QSharedPointer<UpnpDeviceDescription> deviceDescription, QObject *parent = 0);
 
-    ~UpnpDeviceDescriptionParser();
+    ~UpnpDeviceDescriptionParser() override;
 
 Q_SIGNALS:
 

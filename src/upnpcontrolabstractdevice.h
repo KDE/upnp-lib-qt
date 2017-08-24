@@ -40,7 +40,7 @@ class UPNPQT_EXPORT UpnpControlAbstractDevice : public UpnpAbstractDevice
 public:
     explicit UpnpControlAbstractDevice(QObject *parent = 0);
 
-    ~UpnpControlAbstractDevice();
+    ~UpnpControlAbstractDevice() override;
 
     Q_INVOKABLE UpnpControlAbstractService* serviceById(const QString &serviceId) const;
 

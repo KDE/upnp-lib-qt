@@ -49,7 +49,7 @@ public:
 
     explicit UpnpAbstractDevice(QObject *parent = 0);
 
-    virtual ~UpnpAbstractDevice();
+    ~UpnpAbstractDevice() override;
 
     Q_INVOKABLE UpnpServiceDescription* serviceDescriptionById(const QString &serviceId) const;
 

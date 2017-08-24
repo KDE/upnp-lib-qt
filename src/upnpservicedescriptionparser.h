@@ -43,7 +43,7 @@ public:
 
     explicit UpnpServiceDescriptionParser(QNetworkAccessManager *aNetworkAccess, QSharedPointer<UpnpServiceDescription> serviceDescription, QObject *parent = 0);
 
-    ~UpnpServiceDescriptionParser();
+    ~UpnpServiceDescriptionParser() override;
 
 Q_SIGNALS:
 

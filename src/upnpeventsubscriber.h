@@ -41,7 +41,7 @@ public:
 
     UpnpEventSubscriber(QObject *parent = nullptr);
 
-    ~UpnpEventSubscriber();
+    ~UpnpEventSubscriber() override;
 
     void setSecondTimeout(int newValue);
 

@@ -110,7 +110,7 @@ public:
 
     explicit UpnpSsdpEngine(QObject *parent = 0);
 
-    virtual ~UpnpSsdpEngine();
+    ~UpnpSsdpEngine() override;
 
     quint16 port() const;
 

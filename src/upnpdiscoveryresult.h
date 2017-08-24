@@ -79,7 +79,7 @@ public:
     UpnpDiscoveryResult(const QString &aNT, const QString &aUSN, const QString &aLocation,
                         NotificationSubType aNTS, const QString &aAnnounceDate, int aCacheDuration, QObject *parent = 0);
 
-    virtual ~UpnpDiscoveryResult();
+    ~UpnpDiscoveryResult() override;
 
     void setNT(const QString &value);
 

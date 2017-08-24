@@ -109,7 +109,7 @@ public:
 
     explicit UpnpDeviceDescription(QObject *parent = 0);
 
-    virtual ~UpnpDeviceDescription();
+    ~UpnpDeviceDescription() override;
 
     const QSharedPointer<UpnpServiceDescription> serviceById(const QString &serviceId) const;
 

@@ -50,7 +50,7 @@ class UPNPQT_EXPORT UpnpAbstractService : public QObject
 public:
     explicit UpnpAbstractService(QObject *parent = 0);
 
-    virtual ~UpnpAbstractService();
+    ~UpnpAbstractService() override;
 
     QIODevice* buildAndGetXmlDescription();
 

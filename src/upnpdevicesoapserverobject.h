@@ -42,7 +42,7 @@ class UpnpDeviceSoapServerObject : public QObject, public KDSoapServerObjectInte
 public:
     UpnpDeviceSoapServerObject(QList<UpnpAbstractDevice *> &devices, QObject *parent = 0);
 
-    virtual ~UpnpDeviceSoapServerObject();
+    ~UpnpDeviceSoapServerObject() override;
 
     void processRequest(const KDSoapMessage &request, KDSoapMessage &response, const QByteArray &soapAction) override;
 

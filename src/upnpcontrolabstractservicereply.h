@@ -39,7 +39,7 @@ public:
 
     explicit UpnpControlAbstractServiceReply(const KDSoapPendingCall &soapAnswer, QObject *parent = 0);
 
-    virtual ~UpnpControlAbstractServiceReply();
+    ~UpnpControlAbstractServiceReply() override;
 
     bool success() const;
 

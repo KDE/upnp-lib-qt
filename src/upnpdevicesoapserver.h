@@ -37,7 +37,7 @@ class UPNPQT_EXPORT UpnpDeviceSoapServer : public KDSoapServer
 public:
     UpnpDeviceSoapServer(QObject * parent = 0);
 
-    virtual ~UpnpDeviceSoapServer();
+    ~UpnpDeviceSoapServer() override;
 
     int addDevice(UpnpAbstractDevice *device);
 

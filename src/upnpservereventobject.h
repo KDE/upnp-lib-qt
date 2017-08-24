@@ -41,7 +41,7 @@ class UpnpServerEventObject : public QObject, public KDSoapServerCustomVerbReque
 public:
     UpnpServerEventObject(QObject *parent = 0);
 
-    virtual ~UpnpServerEventObject();
+    ~UpnpServerEventObject() override;
 
     /**
      * Process a request made with a custom HTTP verb

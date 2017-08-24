@@ -84,7 +84,7 @@ class UPNPQT_EXPORT UpnpServiceDescription : public QObject
 public:
     explicit UpnpServiceDescription(QObject *parent = 0);
 
-    virtual ~UpnpServiceDescription();
+    ~UpnpServiceDescription() override;
 
     void setBaseURL(const QString &newBaseURL);
 

@@ -45,7 +45,7 @@ public:
 
     explicit UpnpControlAbstractService(QObject *parent = 0);
 
-    ~UpnpControlAbstractService();
+    ~UpnpControlAbstractService() override;
 
     Q_INVOKABLE UpnpControlAbstractServiceReply *callAction(const QString &action, const QVector<QVariant> &arguments);
 
