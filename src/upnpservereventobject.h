@@ -39,7 +39,7 @@ class UpnpServerEventObject : public QObject, public KDSoapServerCustomVerbReque
     Q_INTERFACES(KDSoapServerCustomVerbRequestInterface)
 
 public:
-    UpnpServerEventObject(QObject *parent = 0);
+    UpnpServerEventObject(QObject *parent = nullptr);
 
     ~UpnpServerEventObject() override;
 

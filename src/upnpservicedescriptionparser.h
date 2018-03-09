@@ -41,7 +41,7 @@ class UpnpServiceDescriptionParser : public QObject
 
 public:
 
-    explicit UpnpServiceDescriptionParser(QNetworkAccessManager *aNetworkAccess, QSharedPointer<UpnpServiceDescription> serviceDescription, QObject *parent = 0);
+    explicit UpnpServiceDescriptionParser(QNetworkAccessManager *aNetworkAccess, QSharedPointer<UpnpServiceDescription> serviceDescription, QObject *parent = nullptr);
 
     ~UpnpServiceDescriptionParser() override;
 

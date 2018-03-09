@@ -37,7 +37,7 @@ class UPNPQT_EXPORT UpnpControlAbstractServiceReply : public QObject
 
 public:
 
-    explicit UpnpControlAbstractServiceReply(const KDSoapPendingCall &soapAnswer, QObject *parent = 0);
+    explicit UpnpControlAbstractServiceReply(const KDSoapPendingCall &soapAnswer, QObject *parent = nullptr);
 
     ~UpnpControlAbstractServiceReply() override;
 

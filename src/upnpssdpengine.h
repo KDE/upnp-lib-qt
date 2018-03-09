@@ -108,7 +108,7 @@ public:
 
     Q_ENUM(SEARCH_TYPE)
 
-    explicit UpnpSsdpEngine(QObject *parent = 0);
+    explicit UpnpSsdpEngine(QObject *parent = nullptr);
 
     ~UpnpSsdpEngine() override;
 

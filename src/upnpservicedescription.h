@@ -82,7 +82,7 @@ class UPNPQT_EXPORT UpnpServiceDescription : public QObject
                NOTIFY deviceDescriptionChanged)
 
 public:
-    explicit UpnpServiceDescription(QObject *parent = 0);
+    explicit UpnpServiceDescription(QObject *parent = nullptr);
 
     ~UpnpServiceDescription() override;
 

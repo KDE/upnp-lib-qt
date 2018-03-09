@@ -47,7 +47,7 @@ class UPNPQT_EXPORT UpnpAbstractDevice : public QObject
 
 public:
 
-    explicit UpnpAbstractDevice(QObject *parent = 0);
+    explicit UpnpAbstractDevice(QObject *parent = nullptr);
 
     ~UpnpAbstractDevice() override;
 

@@ -74,10 +74,10 @@ class UPNPQT_EXPORT UpnpDiscoveryResult : public QObject
 
 public:
 
-    explicit UpnpDiscoveryResult(QObject *parent = 0);
+    explicit UpnpDiscoveryResult(QObject *parent = nullptr);
 
     UpnpDiscoveryResult(const QString &aNT, const QString &aUSN, const QString &aLocation,
-                        NotificationSubType aNTS, const QString &aAnnounceDate, int aCacheDuration, QObject *parent = 0);
+                        NotificationSubType aNTS, const QString &aAnnounceDate, int aCacheDuration, QObject *parent = nullptr);
 
     ~UpnpDiscoveryResult() override;
 

@@ -43,7 +43,7 @@ class UPNPQT_EXPORT UpnpControlAbstractService : public UpnpAbstractService
 
 public:
 
-    explicit UpnpControlAbstractService(QObject *parent = 0);
+    explicit UpnpControlAbstractService(QObject *parent = nullptr);
 
     ~UpnpControlAbstractService() override;
 

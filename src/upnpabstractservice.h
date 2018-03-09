@@ -48,7 +48,7 @@ class UPNPQT_EXPORT UpnpAbstractService : public QObject
                NOTIFY descriptionChanged)
 
 public:
-    explicit UpnpAbstractService(QObject *parent = 0);
+    explicit UpnpAbstractService(QObject *parent = nullptr);
 
     ~UpnpAbstractService() override;
 

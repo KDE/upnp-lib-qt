@@ -107,7 +107,7 @@ class UPNPQT_EXPORT UpnpDeviceDescription : public QObject
 
 public:
 
-    explicit UpnpDeviceDescription(QObject *parent = 0);
+    explicit UpnpDeviceDescription(QObject *parent = nullptr);
 
     ~UpnpDeviceDescription() override;
 
