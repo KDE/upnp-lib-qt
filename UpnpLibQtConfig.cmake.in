@@ -8,5 +8,5 @@ set_package_properties(KDSoap PROPERTIES
     URL "https://www.kdab.com/development-resources/qt-tools/kd-soap/"
     TYPE OPTIONAL)
 
-include("${CMAKE_CURRENT_LIST_DIR}/UPNPQTTargets.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/UpnpLibQtTargets.cmake")
 

@@ -20,7 +20,7 @@
 #ifndef UPNPCONTROLABSTRACTSERVICEREPLY_H
 #define UPNPCONTROLABSTRACTSERVICEREPLY_H
 
-#include "upnpQt_export.h"
+#include "upnplibqt_export.h"
 
 #include <QtCore/QObject>
 #include <QtCore/QVariantMap>
@@ -30,7 +30,7 @@
 class UpnpControlAbstractServiceReplyPrivate;
 class KDSoapPendingCall;
 
-class UPNPQT_EXPORT UpnpControlAbstractServiceReply : public QObject
+class UPNPLIBQT_EXPORT UpnpControlAbstractServiceReply : public QObject
 {
 
     Q_OBJECT

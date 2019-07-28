@@ -20,7 +20,7 @@
 #ifndef UPNPABSTRACTDEVICE_H
 #define UPNPABSTRACTDEVICE_H
 
-#include "upnpQt_export.h"
+#include "upnplibqt_export.h"
 
 #include <QtCore/QObject>
 #include <QtCore/QPointer>
@@ -36,7 +36,7 @@ class UpnpSsdpEngine;
 class UpnpDeviceDescription;
 class UpnpServiceDescription;
 
-class UPNPQT_EXPORT UpnpAbstractDevice : public QObject
+class UPNPLIBQT_EXPORT UpnpAbstractDevice : public QObject
 {
     Q_OBJECT
 
@@ -51,9 +51,9 @@ public:
 
     ~UpnpAbstractDevice() override;
 
-    Q_INVOKABLE UpnpServiceDescription* serviceDescriptionById(const QString &serviceId) const;
+    UpnpServiceDescription* serviceDescriptionById(const QString &serviceId) const;
 
-    Q_INVOKABLE UpnpServiceDescription* serviceDescriptionByIndex(int serviceIndex) const;
+    UpnpServiceDescription* serviceDescriptionByIndex(int serviceIndex) const;
 
     const QVector<QSharedPointer<UpnpServiceDescription> > &services() const;
 

@@ -20,7 +20,7 @@
 #ifndef UPNPSSDPENGINE_H
 #define UPNPSSDPENGINE_H
 
-#include "upnpQt_export.h"
+#include "upnplibqt_export.h"
 
 #include "upnpdiscoveryresult.h"
 
@@ -80,7 +80,7 @@ struct UpnpSearchQuery
 class UpnpAbstractDevice;
 class UpnpSsdpEnginePrivate;
 
-class UPNPQT_EXPORT UpnpSsdpEngine : public QObject
+class UPNPLIBQT_EXPORT UpnpSsdpEngine : public QObject
 {
 
     Q_OBJECT

@@ -20,7 +20,7 @@
 #ifndef UPNPDEVICESOAPSERVEROBJECT_H
 #define UPNPDEVICESOAPSERVEROBJECT_H
 
-#include "upnpQt_export.h"
+#include "upnplibqt_export.h"
 
 #include <KDSoapServer/KDSoapServerCustomVerbRequestInterface.h>
 #include <KDSoapServer/KDSoapServerObjectInterface.h>

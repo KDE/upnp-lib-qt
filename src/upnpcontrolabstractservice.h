@@ -20,7 +20,7 @@
 #ifndef UPNPABSTRACTSERVICEDESCRIPTION_H
 #define UPNPABSTRACTSERVICEDESCRIPTION_H
 
-#include "upnpQt_export.h"
+#include "upnplibqt_export.h"
 
 #include "upnpabstractservice.h"
 #include "upnpcontrolabstractservicereply.h"
@@ -37,7 +37,7 @@ class UpnpAbstractServiceDescriptionPrivate;
 class QNetworkReply;
 class QHostInfo;
 
-class UPNPQT_EXPORT UpnpControlAbstractService : public UpnpAbstractService
+class UPNPLIBQT_EXPORT UpnpControlAbstractService : public UpnpAbstractService
 {
     Q_OBJECT
 

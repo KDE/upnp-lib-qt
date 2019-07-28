@@ -20,7 +20,7 @@
 #ifndef UPNPDISCOVERYRESULT_H
 #define UPNPDISCOVERYRESULT_H
 
-#include "upnpQt_export.h"
+#include "upnplibqt_export.h"
 
 #include <QtCore/QObject>
 #include <QtCore/QString>
@@ -38,7 +38,7 @@ enum class NotificationSubType
 
 class UpnpDiscoveryResultPrivate;
 
-class UPNPQT_EXPORT UpnpDiscoveryResult : public QObject
+class UPNPLIBQT_EXPORT UpnpDiscoveryResult : public QObject
 {
     Q_OBJECT
 

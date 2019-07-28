@@ -20,22 +20,25 @@
 #ifndef UPNPBASICTYPES_H
 #define UPNPBASICTYPES_H
 
-#include "upnpQt_export.h"
+#include "upnplibqt_export.h"
 
 #include <QtCore/QtGlobal>
 #include <QtCore/QString>
 #include <QtCore/QList>
 #include <QtCore/QVariant>
 
-typedef quint32 A_ARG_TYPE_InstanceID;
+/**
+ * A_ARG_TYPE_InstanceID argument type for UPnP method calls matching an unsigned int 32 bits
+ */
+using A_ARG_TYPE_InstanceID = quint32;
 
-typedef QString AVTransportURI;
+using AVTransportURI = QString;
 
-typedef QString AVTransportURIMetaData;
+using AVTransportURIMetaData = QString;
 
-typedef QString A_ARG_TYPE_SeekMode;
+using A_ARG_TYPE_SeekMode = QString;
 
-typedef QString A_ARG_TYPE_SeekTarget;
+using A_ARG_TYPE_SeekTarget = QString;
 
 #endif // UPNPBASICTYPES_H
 

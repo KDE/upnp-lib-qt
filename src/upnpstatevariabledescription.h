@@ -20,7 +20,7 @@
 #ifndef UPNPSTATEVARIABLEDESCRIPTION_H
 #define UPNPSTATEVARIABLEDESCRIPTION_H
 
-#include "upnpQt_export.h"
+#include "upnplibqt_export.h"
 
 #include <QtCore/QString>
 #include <QtCore/QByteArray>
@@ -29,7 +29,7 @@
 
 class QObject;
 
-class UPNPQT_EXPORT UpnpStateVariableDescription
+class UPNPLIBQT_EXPORT UpnpStateVariableDescription
 {
 public:
 

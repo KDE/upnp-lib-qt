@@ -20,7 +20,7 @@
 #ifndef UPNPDEVICEDESCRIPTIONPARSER_H
 #define UPNPDEVICEDESCRIPTIONPARSER_H
 
-#include "upnpQt_export.h"
+#include "upnplibqt_export.h"
 
 #include <QtCore/QObject>
 #include <QtCore/QUrl>
@@ -37,7 +37,7 @@ class UpnpDeviceDescription;
 
 class UpnpDeviceDescriptionParserPrivate;
 
-class UPNPQT_EXPORT UpnpDeviceDescriptionParser : public QObject
+class UPNPLIBQT_EXPORT UpnpDeviceDescriptionParser : public QObject
 {
     Q_OBJECT
 

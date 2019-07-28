@@ -20,7 +20,7 @@
 #ifndef UPNPABSTRACTSERVICE_H
 #define UPNPABSTRACTSERVICE_H
 
-#include "upnpQt_export.h"
+#include "upnplibqt_export.h"
 
 #include <QtCore/QObject>
 #include <QtCore/QString>
@@ -38,7 +38,7 @@ class UpnpEventSubscriber;
 class QIODevice;
 class UpnpServiceDescription;
 
-class UPNPQT_EXPORT UpnpAbstractService : public QObject
+class UPNPLIBQT_EXPORT UpnpAbstractService : public QObject
 {
     Q_OBJECT
 

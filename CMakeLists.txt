@@ -1,57 +1,86 @@
 cmake_minimum_required(VERSION 3.3)
 
-project(upnp-qt)
-
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_STANDARD 14)
 
-find_package(ECM 5.15.0 REQUIRED NO_MODULE)
+set(KF5_VERSION "5.59.0") # handled by release scripts
+project(UpnpLibQt VERSION ${KF5_VERSION})
+
+include(FeatureSummary)
+find_package(ECM 5.59.0  NO_MODULE)
+set_package_properties(ECM PROPERTIES TYPE REQUIRED DESCRIPTION "Extra CMake Modules." URL "https://projects.kde.org/projects/kdesupport/extra-cmake-modules")
+feature_summary(WHAT REQUIRED_PACKAGES_NOT_FOUND FATAL_ON_MISSING_REQUIRED_PACKAGES)
+
+
 set(CMAKE_MODULE_PATH ${ECM_MODULE_PATH} ${ECM_KDE_MODULE_DIR})
 
 include(KDEInstallDirs)
-include(KDEFrameworkCompilerSettings)
+include(KDEFrameworkCompilerSettings NO_POLICY_SCOPE)
 include(KDECMakeSettings)
 
-set(REQUIRED_QT_VERSION "5.4.0")
-find_package(Qt5 ${REQUIRED_QT_VERSION} CONFIG REQUIRED Core Network Xml Qml WebSockets)
-find_package(Qt5 ${REQUIRED_QT_VERSION} CONFIG OPTIONAL_COMPONENTS Quick Widgets Test)
+
+include(GenerateExportHeader)
+
+set(REQUIRED_QT_VERSION 5.11.0)
+find_package(Qt5 ${REQUIRED_QT_VERSION} CONFIG REQUIRED Core Network Xml)
+find_package(Qt5 ${REQUIRED_QT_VERSION} CONFIG OPTIONAL_COMPONENTS Qml Quick Widgets Test)
 
 find_package(KDSoap CONFIG REQUIRED)
 
-include(FeatureSummary)
-include(GenerateExportHeader)
 include(ECMSetupVersion)
 include(ECMGenerateHeaders)
-include(CMakePackageConfigHelpers)
+include(ECMQtDeclareLoggingCategory)
+include(ECMAddQch)
 
-ecm_setup_version(0.1.0 VARIABLE_PREFIX UPNP_QT
-                        VERSION_HEADER "${CMAKE_CURRENT_BINARY_DIR}/upnpQt_version.h"
-                        PACKAGE_VERSION_FILE "${CMAKE_CURRENT_BINARY_DIR}/UPNPQTConfigVersion.cmake")
+option(BUILD_QCH "Build API documentation in QCH format (for e.g. Qt Assistant, Qt Creator & KDevelop)" OFF)
+add_feature_info(QCH ${BUILD_QCH} "API documentation in QCH format (for e.g. Qt Assistant, Qt Creator & KDevelop)")
 
-if (CMAKE_SYSTEM_NAME STREQUAL Android)
-    set(QT_QMAKE_EXECUTABLE "$ENV{Qt5_android}/bin/qmake")
-    # workaround until this fix is in released ECM
-    if(ECM_VERSION VERSION_LESS "5.15.0")
-        add_definitions(-DANDROID)
-    endif()
-endif()
+ecm_setup_version(PROJECT
+    VARIABLE_PREFIX KARCHIVE
+    VERSION_HEADER "${CMAKE_CURRENT_BINARY_DIR}/upnplibqt_version.h"
+    PACKAGE_VERSION_FILE "${CMAKE_CURRENT_BINARY_DIR}/UpnpLibQtConfigVersion.cmake"
+    SOVERSION 5)
+add_definitions(-DQT_NO_FOREACH)
 
 add_subdirectory(src)
-add_subdirectory(autotests)
+if (BUILD_TESTING)
+    add_subdirectory(autotests)
+endif()
 
-set(CMAKECONFIG_INSTALL_DIR "${KDE_INSTALL_CMAKEPACKAGEDIR}/UPNPQT")
-configure_package_config_file("${CMAKE_CURRENT_SOURCE_DIR}/UPNPQTConfig.cmake.in"
-                              "${CMAKE_CURRENT_BINARY_DIR}/UPNPQTConfig.cmake"
-                              INSTALL_DESTINATION  ${CMAKECONFIG_INSTALL_DIR}
-                              )
+# create a Config.cmake and a ConfigVersion.cmake file and install them
+set(CMAKECONFIG_INSTALL_DIR "${KDE_INSTALL_CMAKEPACKAGEDIR}/UpnpLibQt")
 
-install(FILES  "${CMAKE_CURRENT_BINARY_DIR}/UPNPQTConfig.cmake"
-               "${CMAKE_CURRENT_BINARY_DIR}/UPNPQTConfigVersion.cmake"
+if (BUILD_QCH)
+    ecm_install_qch_export(
+        TARGETS UpnpLibQt_QCH
+        FILE UpnpLibQtQchTargets.cmake
         DESTINATION "${CMAKECONFIG_INSTALL_DIR}"
-        COMPONENT Devel )
+        COMPONENT Devel
+    )
+    set(PACKAGE_INCLUDE_QCHTARGETS "include(\"\${CMAKE_CURRENT_LIST_DIR}/UpnpLibQtQchTargets.cmake\")")
+endif()
 
-install(EXPORT UPNPQTTargets DESTINATION "${CMAKECONFIG_INSTALL_DIR}"
-        FILE UPNPQTTargets.cmake NAMESPACE UPNP:: COMPONENT Devel)
+include(CMakePackageConfigHelpers)
+
+configure_package_config_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/UpnpLibQtConfig.cmake.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/UpnpLibQtConfig.cmake"
+    INSTALL_DESTINATION ${CMAKECONFIG_INSTALL_DIR}
+)
+
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/upnplibqt_version.h
+        DESTINATION ${KDE_INSTALL_INCLUDEDIR_KF5}
+        COMPONENT Devel)
+
+install(FILES
+            "${CMAKE_CURRENT_BINARY_DIR}/UpnpLibQtConfig.cmake"
+            "${CMAKE_CURRENT_BINARY_DIR}/UpnpLibQtConfigVersion.cmake"
+        DESTINATION "${CMAKECONFIG_INSTALL_DIR}"
+        COMPONENT Devel)
+
+install(EXPORT UpnpLibQtTargets
+        DESTINATION "${CMAKECONFIG_INSTALL_DIR}"
+        FILE UpnpLibQtTargets.cmake
+        NAMESPACE UPNP::)
 
 feature_summary(WHAT ALL FATAL_ON_MISSING_REQUIRED_PACKAGES)
-

@@ -1,6 +1,4 @@
-add_definitions(-std=c++11)
-
-set(upnpQt_SOURCES
+set(upnpLibQt_SRCS
     upnpssdpengine.cpp
     upnpcontrolabstractservice.cpp
     upnpcontrolabstractservicereply.cpp
@@ -22,9 +20,22 @@ set(upnpQt_SOURCES
     upnpstatevariabledescription.cpp
 )
 
-ecm_generate_headers(
-  upnpQt_CamelCase_HEADERS
-  HEADER_NAMES
+add_library(UpnpLibQt ${upnpLibQt_SRCS})
+generate_export_header(UpnpLibQt BASE_NAME UpnpLibQt)
+add_library(UPNP::UpnpLibQt ALIAS UpnpLibQt)
+
+target_include_directories(UpnpLibQt
+    INTERFACE "$<INSTALL_INTERFACE:${KDE_INSTALL_INCLUDEDIR_KF5}/UpnpLibQt>"
+)
+
+set_target_properties(UpnpLibQt PROPERTIES
+    VERSION     ${UPNPLIBQT_VERSION_STRING}
+    SOVERSION   ${UPNPLIBQT_SOVERSION}
+    EXPORT_NAME "UpnpLibQt"
+)
+
+ecm_generate_headers(UpnpLibQt_HEADERS
+    HEADER_NAMES
     UpnpBasicTypes
     UpnpAbstractDevice
     UpnpAbstractService
@@ -44,17 +55,47 @@ ecm_generate_headers(
     UpnpServiceDescription
     UpnpStateVariableDescription
 
-  PREFIX upnpQt
-  REQUIRED_HEADERS upnpQt_HEADERS
+    REQUIRED_HEADERS UpnpLibQt_HEADERS
 )
 
-add_library(upnpQt SHARED ${upnpQt_SOURCES})
+install(TARGETS UpnpLibQt
+        EXPORT UpnpLibQtTargets
+        ${KF5_INSTALL_TARGETS_DEFAULT_ARGS})
 
-generate_export_header(upnpQt BASE_NAME upnpQt
-  EXPORT_FILE_NAME ${CMAKE_CURRENT_BINARY_DIR}/upnpQt_export.h
-)
+install(FILES
+            ${CMAKE_CURRENT_BINARY_DIR}/upnplibqt_export.h
+            ${UpnpLibQt_HEADERS}
+        DESTINATION ${KDE_INSTALL_INCLUDEDIR_KF5}/UpnpLibQt
+        COMPONENT Devel)
 
-target_link_libraries(upnpQt
+if(BUILD_QCH)
+    ecm_add_qch(
+        UpnpLibQt_QCH
+        NAME UpnpLibQt
+        BASE_NAME UpnpLibQt
+        VERSION ${KF5_VERSION}
+        ORG_DOMAIN org.kde
+        SOURCES # using only public headers, to cover only public API
+            ${UpnpLibQt_HEADERS}
+        MD_MAINPAGE "${CMAKE_SOURCE_DIR}/README.md"
+        LINK_QCHS
+            Qt5Core_QCH
+        BLANK_MACROS
+            UPNPLIBQT_EXPORT
+        TAGFILE_INSTALL_DESTINATION ${KDE_INSTALL_QTQCHDIR}
+        QCH_INSTALL_DESTINATION ${KDE_INSTALL_QTQCHDIR}
+        COMPONENT Devel
+    )
+endif()
+
+include(ECMGeneratePriFile)
+ecm_generate_pri_file(BASE_NAME UpnpLibQt LIB_NAME UpnpLibQt DEPS "core" FILENAME_VAR PRI_FILENAME INCLUDE_INSTALL_DIR ${KDE_INSTALL_INCLUDEDIR_KF5}/UpnpLibQt)
+install(FILES ${PRI_FILENAME}
+        DESTINATION ${ECM_MKSPECS_INSTALL_DIR})
+
+target_link_libraries(UpnpLibQt
+    LINK_PUBLIC
+        Qt5::Core
     LINK_PRIVATE
         Qt5::Network
         Qt5::Xml
@@ -62,28 +103,4 @@ target_link_libraries(upnpQt
         KDSoap::kdsoap-server
 )
 
-target_link_libraries(upnpQt
-    LINK_PUBLIC
-        Qt5::Core
-)
-
-target_include_directories(upnpQt PUBLIC ${KDSoap_INCLUDE_DIRS})
-
-target_include_directories(upnpQt PUBLIC "$<BUILD_INTERFACE:${upnpQt_INCLUDE_DIRS}>")
-
-target_include_directories(upnpQt INTERFACE "$<INSTALL_INTERFACE:${INCLUDE_INSTALL_DIR}/KF5/UPNPQT/upnpQt>")
-
-target_include_directories(upnpQt PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/..>")
-
-set_target_properties(upnpQt PROPERTIES VERSION ${UPNP_QT_VERSION_STRING}
-                                               SOVERSION ${UPNP_QT_SOVERSION}
-                                               LINK_FLAGS "-Wl,--no-undefined")
-
-install(TARGETS upnpQt EXPORT UPNPQTTargets ${KF5_INSTALL_TARGETS_DEFAULT_ARGS})
-install(FILES ${upnpQt_CamelCase_HEADERS} DESTINATION ${KDE_INSTALL_INCLUDEDIR_KF5}/UPNPQT/UPNPQT COMPONENT Devel)
-
-install(FILES
-  ${CMAKE_CURRENT_BINARY_DIR}/upnpQt_export.h
-  ${upnpQt_HEADERS}
-  DESTINATION  ${KDE_INSTALL_INCLUDEDIR_KF5}/UPNPQT/upnpQt COMPONENT Devel
-)
+target_include_directories(UpnpLibQt PUBLIC ${KDSoap_INCLUDE_DIRS})

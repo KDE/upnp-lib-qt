@@ -67,8 +67,8 @@ public:
 
         mHttpClientSocket.bind(QHostAddress::AnyIPv4, 8200);
 
-        bool result = mAnnounceSocket.bind(QHostAddress::AnyIPv4);
-        qDebug() << "bind" << QHostAddress::AnyIPv4 << (result ? "true" : "false");
+        auto result = mAnnounceSocket.bind(QHostAddress(QStringLiteral("239.255.255.250")), 1900, QAbstractSocket::ShareAddress);
+        //qDebug() << "bind" << QHostAddress::AnyIPv4 << (result ? "true" : "false");
         result = mAnnounceSocket.joinMulticastGroup(QHostAddress(QStringLiteral("239.255.255.250")));
         qDebug() << "joinMulticastGroup" << (result ? "true" : "false") << mAnnounceSocket.errorString();
 

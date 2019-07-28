@@ -20,7 +20,7 @@
 #ifndef UPNPDEVICESOAPSERVER_H
 #define UPNPDEVICESOAPSERVER_H
 
-#include "upnpQt_export.h"
+#include "upnplibqt_export.h"
 
 #include <KDSoapServer/KDSoapServer.h>
 
@@ -31,7 +31,7 @@
 class UpnpAbstractDevice;
 class UpnpDeviceSoapServerPrivate;
 
-class UPNPQT_EXPORT UpnpDeviceSoapServer : public KDSoapServer
+class UPNPLIBQT_EXPORT UpnpDeviceSoapServer : public KDSoapServer
 {
     Q_OBJECT
 public:

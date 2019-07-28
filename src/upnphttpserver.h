@@ -20,7 +20,7 @@
 #ifndef UPNPHTTPSERVER_H
 #define UPNPHTTPSERVER_H
 
-#include "upnpQt_export.h"
+#include "upnplibqt_export.h"
 
 #include <KDSoapServer/KDSoapServer.h>
 

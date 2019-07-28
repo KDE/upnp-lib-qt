@@ -20,7 +20,7 @@
 #ifndef UPNPEVENTSUBSCRIBER_H
 #define UPNPEVENTSUBSCRIBER_H
 
-#include "upnpQt_export.h"
+#include "upnplibqt_export.h"
 
 #include <QtNetwork/QNetworkReply>
 

@@ -20,7 +20,7 @@
 #ifndef UPNPACTIONDESCRIPTION_H
 #define UPNPACTIONDESCRIPTION_H
 
-#include "upnpQt_export.h"
+#include "upnplibqt_export.h"
 
 #include <QtCore/QString>
 #include <QtCore/QVector>
@@ -32,7 +32,7 @@ enum class UpnpArgumentDirection
     Invalid,
 };
 
-class UPNPQT_EXPORT UpnpActionArgumentDescription
+class UPNPLIBQT_EXPORT UpnpActionArgumentDescription
 {
 public:
 
@@ -49,7 +49,7 @@ public:
     QString mRelatedStateVariable;
 };
 
-class UPNPQT_EXPORT UpnpActionDescription
+class UPNPLIBQT_EXPORT UpnpActionDescription
 {
 public:
 

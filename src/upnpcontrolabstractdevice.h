@@ -20,7 +20,7 @@
 #ifndef UPNPDEVICEDISCOVERY_H
 #define UPNPDEVICEDISCOVERY_H
 
-#include "upnpQt_export.h"
+#include "upnplibqt_export.h"
 
 #include "upnpabstractdevice.h"
 
@@ -32,7 +32,7 @@ class UpnpControlAbstractDevicePrivate;
 class QNetworkReply;
 class UpnpControlAbstractService;
 
-class UPNPQT_EXPORT UpnpControlAbstractDevice : public UpnpAbstractDevice
+class UPNPLIBQT_EXPORT UpnpControlAbstractDevice : public UpnpAbstractDevice
 {
 
     Q_OBJECT
