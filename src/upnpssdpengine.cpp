@@ -19,6 +19,8 @@
 
 #include "upnpssdpengine.h"
 
+#include "upnpdiscoveryresult.h"
+
 #include "upnpabstractdevice.h"
 #include "upnpabstractservice.h"
 
@@ -55,7 +57,7 @@ public:
 
     bool mCanExportServices;
 
-    QHash<QString, QSharedPointer<UpnpDiscoveryResult> > mDiscoveryResults;
+    QHash<QString, UpnpDiscoveryResult> mDiscoveryResults;
 
     QList<QPointer<QUdpSocket>> mSsdpQuerySocket;
 
@@ -67,6 +69,8 @@ public:
 
     QString mActiveConfiguration;
 
+    QTimer mTimeoutTimer;
+
 };
 
 UpnpSsdpEngine::UpnpSsdpEngine(QObject *parent)
@@ -77,6 +81,11 @@ UpnpSsdpEngine::UpnpSsdpEngine(QObject *parent)
     connect(&d->mNetworkManager, &QNetworkConfigurationManager::configurationChanged, this, &UpnpSsdpEngine::networkConfigurationChanged);
     connect(&d->mNetworkManager, &QNetworkConfigurationManager::onlineStateChanged, this, &UpnpSsdpEngine::networkOnlineStateChanged);
     connect(&d->mNetworkManager, &QNetworkConfigurationManager::updateCompleted, this, &UpnpSsdpEngine::networkUpdateCompleted);
+
+
+    connect(&d->mTimeoutTimer, &QTimer::timeout, this, &UpnpSsdpEngine::discoveryResultTimeout);
+    d->mTimeoutTimer.setSingleShot(false);
+    d->mTimeoutTimer.start(1000);
 }
 
 void UpnpSsdpEngine::initialize()
@@ -337,6 +346,7 @@ void UpnpSsdpEngine::publishDevice(UpnpAbstractDevice *device)
 
 void UpnpSsdpEngine::standardReceivedData()
 {
+    qDebug() << "UpnpSsdpEngine::standardReceivedData";
     QUdpSocket *receiverSocket = qobject_cast<QUdpSocket*>(sender());
 
     while (receiverSocket->hasPendingDatagrams()) {
@@ -354,6 +364,7 @@ void UpnpSsdpEngine::standardReceivedData()
 
 void UpnpSsdpEngine::queryReceivedData()
 {
+    qDebug() << "UpnpSsdpEngine::queryReceivedData";
     QUdpSocket *receiverSocket = qobject_cast<QUdpSocket*>(sender());
 
     while (receiverSocket->hasPendingDatagrams()) {
@@ -369,13 +380,17 @@ void UpnpSsdpEngine::queryReceivedData()
     }
 }
 
-void UpnpSsdpEngine::discoveryResultTimeout(const QString &usn)
+void UpnpSsdpEngine::discoveryResultTimeout()
 {
-    auto itDiscovery = d->mDiscoveryResults.find(usn);
-    if (itDiscovery != d->mDiscoveryResults.end()) {
-        Q_EMIT removedService(*itDiscovery);
+    auto now = QDateTime::currentDateTime();
 
-        d->mDiscoveryResults.erase(itDiscovery);
+    for(const auto &itDiscovery : d->mDiscoveryResults) {
+        if (now > itDiscovery.validityTimestamp()) {
+            qDebug() << "remove service due to timeout" << itDiscovery;
+            Q_EMIT removedService(itDiscovery);
+
+            //d->mDiscoveryResults.erase(itDiscovery);
+        }
     }
 }
 
@@ -480,115 +495,117 @@ void UpnpSsdpEngine::parseSsdpQueryDatagram(const QByteArray &datagram, const QL
 
 void UpnpSsdpEngine::parseSsdpAnnounceDatagram(const QByteArray &datagram, const QList<QByteArray> &headers, SsdpMessageType messageType)
 {
-    QSharedPointer<UpnpDiscoveryResult> newDiscovery(new UpnpDiscoveryResult);
-    newDiscovery->setNTS(NotificationSubType::Invalid);
+    UpnpDiscoveryResult newDiscovery;
+    newDiscovery.setNTS(NotificationSubType::Invalid);
 
     for (const auto & header : headers) {
         if (header.startsWith("LOCATION")) {
             if ((header)[9] == ' ') {
-                newDiscovery->setLocation(QString::fromLatin1(header.mid(10, header.length() - 11)));
+                newDiscovery.setLocation(QString::fromLatin1(header.mid(10, header.length() - 11)));
             } else {
-                newDiscovery->setLocation(QString::fromLatin1(header.mid(9, header.length() - 10)));
+                newDiscovery.setLocation(QString::fromLatin1(header.mid(9, header.length() - 10)));
             }
         }
         if (header.startsWith("Location")) {
             if ((header)[9] == ' ') {
-                newDiscovery->setLocation(QString::fromLatin1(header.mid(10, header.length() - 11)));
+                newDiscovery.setLocation(QString::fromLatin1(header.mid(10, header.length() - 11)));
             } else {
-                newDiscovery->setLocation(QString::fromLatin1(header.mid(9, header.length() - 10)));
+                newDiscovery.setLocation(QString::fromLatin1(header.mid(9, header.length() - 10)));
             }
         }
         if (header.startsWith("HOST") || header.startsWith("Host")) {
             if ((header)[4] == ' ') {
-                newDiscovery->setLocation(QString::fromLatin1(header.mid(7, header.length() - 8)));
+                newDiscovery.setLocation(QString::fromLatin1(header.mid(7, header.length() - 8)));
             } else {
-                newDiscovery->setLocation(QString::fromLatin1(header.mid(6, header.length() - 7)));
+                newDiscovery.setLocation(QString::fromLatin1(header.mid(6, header.length() - 7)));
             }
         }
         if (header.startsWith("USN")) {
             if ((header)[4] == ' ') {
-                newDiscovery->setUSN(QString::fromLatin1(header.mid(5, header.length() - 6)));
+                newDiscovery.setUSN(QString::fromLatin1(header.mid(5, header.length() - 6)));
             } else {
-                newDiscovery->setUSN(QString::fromLatin1(header.mid(4, header.length() - 5)));
+                newDiscovery.setUSN(QString::fromLatin1(header.mid(4, header.length() - 5)));
             }
         }
         if (messageType == SsdpMessageType::queryAnswer && header.startsWith("ST")) {
             if ((header)[3] == ' ') {
-                newDiscovery->setNT(QString::fromLatin1(header.mid(4, header.length() - 5)));
+                newDiscovery.setNT(QString::fromLatin1(header.mid(4, header.length() - 5)));
             } else {
-                newDiscovery->setNT(QString::fromLatin1(header.mid(3, header.length() - 4)));
+                newDiscovery.setNT(QString::fromLatin1(header.mid(3, header.length() - 4)));
             }
         }
         if (messageType == SsdpMessageType::announce && header.startsWith("NT:")) {
             if ((header)[3] == ' ') {
-                newDiscovery->setNT(QString::fromLatin1(header.mid(4, header.length() - 5)));
+                newDiscovery.setNT(QString::fromLatin1(header.mid(4, header.length() - 5)));
             } else {
-                newDiscovery->setNT(QString::fromLatin1(header.mid(3, header.length() - 4)));
+                newDiscovery.setNT(QString::fromLatin1(header.mid(3, header.length() - 4)));
             }
         }
         if (messageType == SsdpMessageType::announce && header.startsWith("NTS")) {
             if (header.endsWith("ssdp:alive\r")) {
-                newDiscovery->setNTS(NotificationSubType::Alive);
+                newDiscovery.setNTS(NotificationSubType::Alive);
             }
             if (header.endsWith("ssdp:byebye\r")) {
-                newDiscovery->setNTS(NotificationSubType::ByeBye);
+                newDiscovery.setNTS(NotificationSubType::ByeBye);
             }
             if (header.endsWith("ssdp:discover\r")) {
-                newDiscovery->setNTS(NotificationSubType::Discover);
+                newDiscovery.setNTS(NotificationSubType::Discover);
             }
         }
         if (header.startsWith("DATE")) {
             if ((header)[5] == ' ') {
-                newDiscovery->setAnnounceDate(QString::fromLatin1(header.mid(6, header.length() - 7)));
+                newDiscovery.setAnnounceDate(QString::fromLatin1(header.mid(6, header.length() - 7)));
             } else {
-                newDiscovery->setAnnounceDate(QString::fromLatin1(header.mid(5, header.length() - 6)));
+                newDiscovery.setAnnounceDate(QString::fromLatin1(header.mid(5, header.length() - 6)));
             }
         }
         if (header.startsWith("CACHE-CONTROL")) {
             if ((header)[14] == ' ') {
                 const QList<QByteArray> &splittedLine = header.mid(15, header.length() - 16).split('=');
                 if (splittedLine.size() == 2) {
-                    newDiscovery->setCacheDuration(splittedLine.last().toInt());
+                    newDiscovery.setCacheDuration(splittedLine.last().toInt());
                 }
             } else {
                 const QList<QByteArray> &splittedLine = header.mid(14, header.length() - 15).split('=');
                 if (splittedLine.size() == 2) {
-                    newDiscovery->setCacheDuration(splittedLine.last().toInt());
+                    newDiscovery.setCacheDuration(splittedLine.last().toInt());
                 }
             }
         }
     }
 
-    if (newDiscovery->location().isEmpty() || newDiscovery->usn().isEmpty() ||
-            newDiscovery->nt().isEmpty() ||
-            (messageType == SsdpMessageType::announce && newDiscovery->nts() == NotificationSubType::Invalid)) {
+    if (newDiscovery.location().isEmpty() || newDiscovery.usn().isEmpty() ||
+            newDiscovery.nt().isEmpty() ||
+            (messageType == SsdpMessageType::announce && newDiscovery.nts() == NotificationSubType::Invalid)) {
         qDebug() << "not decoded" << datagram;
         return;
     }
 
-    if (newDiscovery->nts() == NotificationSubType::Alive || messageType == SsdpMessageType::queryAnswer) {
-        auto itDiscovery = d->mDiscoveryResults.find(newDiscovery->usn());
+    if (newDiscovery.nts() == NotificationSubType::Alive || messageType == SsdpMessageType::queryAnswer) {
+        qDebug() << "valid service announce";
+        auto itDiscovery = d->mDiscoveryResults.find(newDiscovery.usn());
 
-        if (itDiscovery == d->mDiscoveryResults.end()) {
-            d->mDiscoveryResults[newDiscovery->usn()] = newDiscovery;
-            itDiscovery = d->mDiscoveryResults.find(newDiscovery->usn());
+        if (itDiscovery != d->mDiscoveryResults.end()) {
+            qDebug() << "refresh existing service";
+            *itDiscovery = newDiscovery;
+        } else {
+            d->mDiscoveryResults[newDiscovery.usn()] = newDiscovery;
+            itDiscovery = d->mDiscoveryResults.find(newDiscovery.usn());
 
-            connect(newDiscovery.data(), &UpnpDiscoveryResult::timeout, this, &UpnpSsdpEngine::discoveryResultTimeout);
+            qDebug() << "new service" << newDiscovery;
 
             Q_EMIT newService(newDiscovery);
-        } else {
-            (*itDiscovery)->discoveryIsAlive();
         }
 
 #if 0
         qDebug() << datagram;
-        qDebug() << "AnnounceDate" << newDiscovery->mAnnounceDate;
-        qDebug() << "CacheDuration" << newDiscovery->mCacheDuration;
+        qDebug() << "AnnounceDate" << newDiscovery.mAnnounceDate;
+        qDebug() << "CacheDuration" << newDiscovery.mCacheDuration;
 
         qDebug() << "new service";
-        qDebug() << "DeviceId:" << newDiscovery->mUSN;
-        qDebug() << "DeviceType:" << newDiscovery->mNT;
-        qDebug() << "Location:" << newDiscovery->mLocation;
+        qDebug() << "DeviceId:" << newDiscovery.mUSN;
+        qDebug() << "DeviceType:" << newDiscovery.mNT;
+        qDebug() << "Location:" << newDiscovery.mLocation;
         qDebug() << "new service";
         qDebug() << "DeviceId:" << searchResult->DeviceId;
         qDebug() << "DeviceType:" << searchResult->DeviceType;
@@ -604,8 +621,8 @@ void UpnpSsdpEngine::parseSsdpAnnounceDatagram(const QByteArray &datagram, const
 
     }
 
-    if (newDiscovery->nts() == NotificationSubType::ByeBye) {
-        auto itDiscovery = d->mDiscoveryResults.find(newDiscovery->usn());
+    if (newDiscovery.nts() == NotificationSubType::ByeBye) {
+        auto itDiscovery = d->mDiscoveryResults.find(newDiscovery.usn());
         if (itDiscovery != d->mDiscoveryResults.end()) {
             Q_EMIT removedService(newDiscovery);
 
@@ -616,6 +633,7 @@ void UpnpSsdpEngine::parseSsdpAnnounceDatagram(const QByteArray &datagram, const
 
 void UpnpSsdpEngine::parseSsdpDatagram(const QByteArray &datagram)
 {
+    qDebug() << "UpnpSsdpEngine::parseSsdpDatagram" << datagram;
     const QList<QByteArray> &headers(datagram.split('\n'));
 
     if (!headers.last().isEmpty()) {

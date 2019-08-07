@@ -22,8 +22,6 @@
 
 #include "upnplibqt_export.h"
 
-#include "upnpdiscoveryresult.h"
-
 #include <QtNetwork/QHostAddress>
 #include <QtNetwork/QNetworkConfiguration>
 
@@ -78,6 +76,7 @@ struct UpnpSearchQuery
 };
 
 class UpnpAbstractDevice;
+class UpnpDiscoveryResult;
 class UpnpSsdpEnginePrivate;
 
 class UPNPLIBQT_EXPORT UpnpSsdpEngine : public QObject
@@ -96,6 +95,16 @@ class UPNPLIBQT_EXPORT UpnpSsdpEngine : public QObject
                NOTIFY canExportServicesChanged)
 
 public:
+
+    enum class NotificationSubType
+    {
+        Invalid,
+        Alive,
+        ByeBye,
+        Discover,
+    };
+
+    Q_ENUM(NotificationSubType)
 
     enum SEARCH_TYPE
     {
@@ -126,9 +135,9 @@ Q_SIGNALS:
 
     void newSearchQuery(UpnpSsdpEngine *engine, const UpnpSearchQuery &searchQuery);
 
-    void newService(QSharedPointer<UpnpDiscoveryResult> serviceDiscovery);
+    void newService(const UpnpDiscoveryResult &serviceDiscovery);
 
-    void removedService(QSharedPointer<UpnpDiscoveryResult> serviceDiscovery);
+    void removedService(const UpnpDiscoveryResult &serviceDiscovery);
 
     void portChanged();
 
@@ -176,7 +185,7 @@ private Q_SLOTS:
 
     void queryReceivedData();
 
-    void discoveryResultTimeout(const QString &usn);
+    void discoveryResultTimeout();
 
     void networkConfigurationAdded(const QNetworkConfiguration &config);
 

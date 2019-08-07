@@ -22,64 +22,37 @@
 
 #include "upnplibqt_export.h"
 
-#include <QtCore/QObject>
-#include <QtCore/QString>
-#include <QtCore/QTimer>
+#include "upnpssdpengine.h"
+
+#include <QString>
+#include <QTimer>
+#include <QDateTime>
 
 #include <memory>
 
-enum class NotificationSubType
-{
-    Invalid,
-    Alive,
-    ByeBye,
-    Discover,
-};
-
 class UpnpDiscoveryResultPrivate;
+class QDebug;
 
-class UPNPLIBQT_EXPORT UpnpDiscoveryResult : public QObject
+class UPNPLIBQT_EXPORT UpnpDiscoveryResult
 {
-    Q_OBJECT
-
-    Q_PROPERTY(QString nt
-               READ nt
-               WRITE setNT
-               NOTIFY ntChanged)
-
-    Q_PROPERTY(QString usn
-               READ usn
-               WRITE setUSN
-               NOTIFY usnChanged)
-
-    Q_PROPERTY(QString location
-               READ location
-               WRITE setLocation
-               NOTIFY locationChanged)
-
-    Q_PROPERTY(NotificationSubType nts
-               READ nts
-               WRITE setNTS
-               NOTIFY ntsChanged)
-
-    Q_PROPERTY(QString announceDate
-               READ announceDate
-               WRITE setAnnounceDate
-               NOTIFY announceDateChanged)
-
-    Q_PROPERTY(int cacheDuration
-               READ cacheDuration
-               WRITE setCacheDuration
-               NOTIFY cacheDurationChanged)
 
 public:
 
-    explicit UpnpDiscoveryResult(QObject *parent = nullptr);
+    UpnpDiscoveryResult();
 
     UpnpDiscoveryResult(const QString &aNT, const QString &aUSN, const QString &aLocation,
-                        NotificationSubType aNTS, const QString &aAnnounceDate, int aCacheDuration, QObject *parent = nullptr);
+                        UpnpSsdpEngine::NotificationSubType aNTS, const QString &aAnnounceDate,
+                        int aCacheDuration);
 
-    ~UpnpDiscoveryResult() override;
+    UpnpDiscoveryResult(const UpnpDiscoveryResult &other);
+
+    UpnpDiscoveryResult(UpnpDiscoveryResult &&other);
+
+    ~UpnpDiscoveryResult();
+
+    UpnpDiscoveryResult& operator=(const UpnpDiscoveryResult &other);
+
+    UpnpDiscoveryResult& operator=(UpnpDiscoveryResult &&other);
 
     void setNT(const QString &value);
 
@@ -93,9 +66,9 @@ public:
 
     const QString &location() const;
 
-    void setNTS(NotificationSubType value);
+    void setNTS(UpnpSsdpEngine::NotificationSubType value);
 
-    NotificationSubType nts() const;
+    UpnpSsdpEngine::NotificationSubType nts() const;
 
     void setAnnounceDate(const QString &value);
 
@@ -105,33 +78,21 @@ public:
 
     int cacheDuration() const;
 
-    void discoveryIsAlive();
+    void setValidityTimestamp(QDateTime value);
 
-Q_SIGNALS:
-
-    void timeout(const QString &usn);
-
-    void ntChanged();
-
-    void usnChanged();
-
-    void locationChanged();
-
-    void ntsChanged();
-
-    void announceDateChanged();
-
-    void cacheDurationChanged();
-
-public Q_SLOTS:
-
-    void validityTimeout();
+    QDateTime validityTimestamp() const;
 
 private:
 
     std::unique_ptr<UpnpDiscoveryResultPrivate> d;
 
 };
+
+UPNPLIBQT_EXPORT QDebug operator<<(QDebug stream, const UpnpDiscoveryResult &data);
+
+Q_DECLARE_TYPEINFO(UpnpDiscoveryResult, Q_MOVABLE_TYPE);
+
+Q_DECLARE_METATYPE(UpnpDiscoveryResult)
 
 #endif // UPNPDISCOVERYRESULT_H
 

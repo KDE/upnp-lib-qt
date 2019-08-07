@@ -19,6 +19,8 @@
 
 #include "upnpdiscoveryresult.h"
 
+#include <QDebug>
+
 class UpnpDiscoveryResultPrivate
 {
 
@@ -27,7 +29,7 @@ public:
     UpnpDiscoveryResultPrivate() = default;
 
     UpnpDiscoveryResultPrivate(const QString &aNT, const QString &aUSN, const QString &aLocation,
-                               NotificationSubType aNTS, const QString &aAnnounceDate, int aCacheDuration)
+                               UpnpSsdpEngine::NotificationSubType aNTS, const QString &aAnnounceDate, int aCacheDuration)
         : mNT(aNT), mUSN(aUSN), mLocation(aLocation), mNTS(aNTS), mAnnounceDate(aAnnounceDate), mCacheDuration(aCacheDuration)
     {
     }
@@ -47,7 +49,7 @@ public:
     /**
      * @brief mNTS contains the header NTS (i.e. notification sub type) sent in an ssdp message
      */
-    NotificationSubType mNTS;
+    UpnpSsdpEngine::NotificationSubType mNTS;
 
     /**
      * @brief mAnnounceDate contains the date sent in the SSDP message by the other side
@@ -55,35 +57,65 @@ public:
     QString mAnnounceDate;
 
     /**
-     * @brief mCacheDuration duration of validity of the announce
+     * @brief mCacheDuration duration of validity of the announce in seconds
      */
     int mCacheDuration;
 
-    QTimer mValidityTimer;
-
+    /**
+     * @brief mTimestamp contains the date and time at which the result will expire
+     */
+    QDateTime mValidityTimestamp;
 };
 
-UpnpDiscoveryResult::UpnpDiscoveryResult(QObject *parent)
-    : QObject(parent), d(new UpnpDiscoveryResultPrivate)
+UpnpDiscoveryResult::UpnpDiscoveryResult()
+    : d(new UpnpDiscoveryResultPrivate)
 {
-    connect(&d->mValidityTimer, &QTimer::timeout, this, &UpnpDiscoveryResult::validityTimeout);
 }
 
 UpnpDiscoveryResult::UpnpDiscoveryResult(const QString &aNT, const QString &aUSN, const QString &aLocation,
-                    NotificationSubType aNTS, const QString &aAnnounceDate, int aCacheDuration, QObject *parent)
-    : QObject(parent), d(new UpnpDiscoveryResultPrivate(aNT, aUSN, aLocation, aNTS, aAnnounceDate, aCacheDuration))
+                                         UpnpSsdpEngine::NotificationSubType aNTS, const QString &aAnnounceDate,
+                                         int aCacheDuration)
+    : d(new UpnpDiscoveryResultPrivate(aNT, aUSN, aLocation, aNTS, aAnnounceDate, aCacheDuration))
 {
-    connect(&d->mValidityTimer, &QTimer::timeout, this, &UpnpDiscoveryResult::validityTimeout);
+    d->mValidityTimestamp = QDateTime::fromString(d->mAnnounceDate, QStringLiteral("ddd., d MMM. yy hh:mm:ss G\u007F"));
+    if (!d->mValidityTimestamp.isValid()) {
+        d->mValidityTimestamp = QDateTime::currentDateTime();
+    }
 }
 
-UpnpDiscoveryResult::~UpnpDiscoveryResult()
+UpnpDiscoveryResult::UpnpDiscoveryResult(const UpnpDiscoveryResult &other)
+    : d(new UpnpDiscoveryResultPrivate(*other.d))
 {
 }
+
+UpnpDiscoveryResult::UpnpDiscoveryResult(UpnpDiscoveryResult &&other)
+    : d(other.d.release())
+{
+}
+
+UpnpDiscoveryResult &UpnpDiscoveryResult::operator=(const UpnpDiscoveryResult &other)
+{
+    if (&other != this) {
+        d.reset(new UpnpDiscoveryResultPrivate(*other.d));
+    }
+
+    return *this;
+}
+
+UpnpDiscoveryResult &UpnpDiscoveryResult::operator=(UpnpDiscoveryResult &&other)
+{
+    if (&other != this) {
+        d.reset(other.d.release());
+    }
+
+    return *this;
+}
+
+UpnpDiscoveryResult::~UpnpDiscoveryResult() = default;
 
 void UpnpDiscoveryResult::setNT(const QString &value)
 {
     d->mNT = value;
-    Q_EMIT ntChanged();
 }
 
 const QString &UpnpDiscoveryResult::nt() const
@@ -94,7 +126,6 @@ const QString &UpnpDiscoveryResult::nt() const
 void UpnpDiscoveryResult::setUSN(const QString &value)
 {
     d->mUSN = value;
-    Q_EMIT usnChanged();
 }
 
 const QString &UpnpDiscoveryResult::usn() const
@@ -105,7 +136,6 @@ const QString &UpnpDiscoveryResult::usn() const
 void UpnpDiscoveryResult::setLocation(const QString &value)
 {
     d->mLocation = value;
-    Q_EMIT locationChanged();
 }
 
 const QString &UpnpDiscoveryResult::location() const
@@ -113,13 +143,12 @@ const QString &UpnpDiscoveryResult::location() const
     return d->mLocation;
 }
 
-void UpnpDiscoveryResult::setNTS(NotificationSubType value)
+void UpnpDiscoveryResult::setNTS(UpnpSsdpEngine::NotificationSubType value)
 {
     d->mNTS = value;
-    Q_EMIT ntsChanged();
 }
 
-NotificationSubType UpnpDiscoveryResult::nts() const
+UpnpSsdpEngine::NotificationSubType UpnpDiscoveryResult::nts() const
 {
     return d->mNTS;
 }
@@ -127,7 +156,6 @@ NotificationSubType UpnpDiscoveryResult::nts() const
 void UpnpDiscoveryResult::setAnnounceDate(const QString &value)
 {
     d->mAnnounceDate = value;
-    Q_EMIT announceDateChanged();
 }
 
 const QString &UpnpDiscoveryResult::announceDate() const
@@ -138,10 +166,13 @@ const QString &UpnpDiscoveryResult::announceDate() const
 void UpnpDiscoveryResult::setCacheDuration(int value)
 {
     d->mCacheDuration = value;
-    Q_EMIT cacheDurationChanged();
 
-    d->mValidityTimer.setSingleShot(false);
-    d->mValidityTimer.start(d->mCacheDuration * 1000);
+    d->mValidityTimestamp = QDateTime::fromString(d->mAnnounceDate, QStringLiteral("ddd., d MMM. yy hh:mm:ss G\u007F"));
+    if (!d->mValidityTimestamp.isValid()) {
+        d->mValidityTimestamp = QDateTime::currentDateTime();
+    }
+
+    d->mValidityTimestamp = d->mValidityTimestamp.addSecs(d->mCacheDuration);
 }
 
 int UpnpDiscoveryResult::cacheDuration() const
@@ -149,15 +180,20 @@ int UpnpDiscoveryResult::cacheDuration() const
     return d->mCacheDuration;
 }
 
-void UpnpDiscoveryResult::discoveryIsAlive()
+void UpnpDiscoveryResult::setValidityTimestamp(QDateTime value)
 {
-
-    d->mValidityTimer.start(d->mCacheDuration * 1000);
+    d->mValidityTimestamp = value;
 }
 
-void UpnpDiscoveryResult::validityTimeout()
+QDateTime UpnpDiscoveryResult::validityTimestamp() const
 {
-    Q_EMIT timeout(d->mUSN);
+    return d->mValidityTimestamp;
+}
+
+UPNPLIBQT_EXPORT QDebug operator<<(QDebug stream, const UpnpDiscoveryResult &data)
+{
+    stream << data.location() << "usn" << data.usn() << "nt" << data.nt() << "nts" << data.nts() << "announce date" << data.announceDate() << "cache" << data.cacheDuration() << "valid until" << data.validityTimestamp();
+    return stream;
 }
 
 

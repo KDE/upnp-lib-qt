@@ -18,7 +18,8 @@
  */
 
 #include "upnpssdpengine.h"
-//#include "upnpdevicemodel.h"
+
+#include "upnpdiscoveryresult.h"
 
 #include <QtCore/QScopedPointer>
 #include <QtCore/QStringList>
@@ -167,7 +168,7 @@ private Q_SLOTS:
         QTest::addColumn<QString>("searchCriteria");
         QTest::addColumn<QByteArray>("ssdpRequest");
         QTest::addColumn<QStringList>("ssdpAnswers");
-        QTest::addColumn<QList<QPointer<UpnpDiscoveryResult> > >("results");
+        QTest::addColumn<QList<UpnpDiscoveryResult>>("results");
 
         QTest::newRow("all devices") << UpnpSsdpEngine::AllDevices
                                      << QString()
@@ -222,34 +223,34 @@ private Q_SLOTS:
                                                      "LOCATION: http://127.0.0.1:8200/rootDesc.xml\r\n"
                                                      "Content-Length: 0\r\n\r\n")
                                                     })
-                                     << QList<QPointer<UpnpDiscoveryResult> >({new UpnpDiscoveryResult(QStringLiteral("uuid:4d696e69-444c-164e-9d41-ecf4bb9c317e"),
+                                     << QList<UpnpDiscoveryResult>({UpnpDiscoveryResult(QStringLiteral("uuid:4d696e69-444c-164e-9d41-ecf4bb9c317e"),
                                                                     QStringLiteral("uuid:4d696e69-444c-164e-9d41-ecf4bb9c317e"),
                                                                     QStringLiteral("http://127.0.0.1:8200/rootDesc.xml"),
-                                                                    NotificationSubType::Invalid,
+                                                                    UpnpSsdpEngine::NotificationSubType::Invalid,
                                                                     QStringLiteral("mar., 27 oct. 2015 21:03:35 G\x7F"),
                                                                     1800),
-                                                                    new UpnpDiscoveryResult(QStringLiteral("upnp:rootdevice"),
+                                                                    UpnpDiscoveryResult(QStringLiteral("upnp:rootdevice"),
                                                                     QStringLiteral("uuid:4d696e69-444c-164e-9d41-ecf4bb9c317e::upnp:rootdevice"),
                                                                     QStringLiteral("http://127.0.0.1:8200/rootDesc.xml"),
-                                                                    NotificationSubType::Invalid,
+                                                                    UpnpSsdpEngine::NotificationSubType::Invalid,
                                                                     QStringLiteral("mar., 27 oct. 2015 21:03:35 G\x7F"),
                                                                     1800),
-                                                                    new UpnpDiscoveryResult(QStringLiteral("urn:schemas-upnp-org:device:MediaServer:1"),
+                                                                    UpnpDiscoveryResult(QStringLiteral("urn:schemas-upnp-org:device:MediaServer:1"),
                                                                     QStringLiteral("uuid:4d696e69-444c-164e-9d41-ecf4bb9c317e::urn:schemas-upnp-org:device:MediaServer:1"),
                                                                     QStringLiteral("http://127.0.0.1:8200/rootDesc.xml"),
-                                                                    NotificationSubType::Invalid,
+                                                                    UpnpSsdpEngine::NotificationSubType::Invalid,
                                                                     QStringLiteral("mar., 27 oct. 2015 21:03:35 G\x7F"),
                                                                     1800),
-                                                                    new UpnpDiscoveryResult(QStringLiteral("urn:schemas-upnp-org:service:ContentDirectory:1"),
+                                                                    UpnpDiscoveryResult(QStringLiteral("urn:schemas-upnp-org:service:ContentDirectory:1"),
                                                                     QStringLiteral("uuid:4d696e69-444c-164e-9d41-ecf4bb9c317e::urn:schemas-upnp-org:service:ContentDirectory:1"),
                                                                     QStringLiteral("http://127.0.0.1:8200/rootDesc.xml"),
-                                                                    NotificationSubType::Invalid,
+                                                                    UpnpSsdpEngine::NotificationSubType::Invalid,
                                                                     QStringLiteral("mar., 27 oct. 2015 21:03:35 G\x7F"),
                                                                     1800),
-                                                                    new UpnpDiscoveryResult(QStringLiteral("urn:schemas-upnp-org:service:ConnectionManager:1"),
+                                                                    UpnpDiscoveryResult(QStringLiteral("urn:schemas-upnp-org:service:ConnectionManager:1"),
                                                                     QStringLiteral("uuid:4d696e69-444c-164e-9d41-ecf4bb9c317e::urn:schemas-upnp-org:service:ConnectionManager:1"),
                                                                     QStringLiteral("http://127.0.0.1:8200/rootDesc.xml"),
-                                                                    NotificationSubType::Invalid,
+                                                                    UpnpSsdpEngine::NotificationSubType::Invalid,
                                                                     QStringLiteral("mar., 27 oct. 2015 21:03:35 G\x7F"),
                                                                     1800)});
 
@@ -270,10 +271,10 @@ private Q_SLOTS:
                                                      "LOCATION: http://127.0.0.1:8200/rootDesc.xml\r\n"
                                                      "Content-Length: 0\r\n\r\n")
                                                     })
-                                     << QList<QPointer<UpnpDiscoveryResult> >({new UpnpDiscoveryResult(QStringLiteral("upnp:rootdevice"),
+                                     << QList<UpnpDiscoveryResult>({UpnpDiscoveryResult(QStringLiteral("upnp:rootdevice"),
                                                                     QStringLiteral("uuid:4d696e69-444c-164e-9d41-ecf4bb9c317e::upnp:rootdevice"),
                                                                     QStringLiteral("http://127.0.0.1:8200/rootDesc.xml"),
-                                                                    NotificationSubType::Invalid,
+                                                                    UpnpSsdpEngine::NotificationSubType::Invalid,
                                                                     QStringLiteral("mar., 27 oct. 2015 21:03:35 G\x7F"),
                                                                     1800)});
 
@@ -294,10 +295,10 @@ private Q_SLOTS:
                                                         "LOCATION: http://127.0.0.1:8200/rootDesc.xml\r\n"
                                                         "Content-Length: 0\r\n\r\n"),
                                                        })
-                                        << QList<QPointer<UpnpDiscoveryResult> >({new UpnpDiscoveryResult(QStringLiteral("uuid:4d696e69-444c-164e-9d41-ecf4bb9c317e"),
+                                        << QList<UpnpDiscoveryResult>({UpnpDiscoveryResult(QStringLiteral("uuid:4d696e69-444c-164e-9d41-ecf4bb9c317e"),
                                                                        QStringLiteral("uuid:4d696e69-444c-164e-9d41-ecf4bb9c317e"),
                                                                        QStringLiteral("http://127.0.0.1:8200/rootDesc.xml"),
-                                                                       NotificationSubType::Invalid,
+                                                                       UpnpSsdpEngine::NotificationSubType::Invalid,
                                                                        QStringLiteral("mar., 27 oct. 2015 21:03:35 G\x7F"),
                                                                        1800),
                                                                       });
@@ -319,10 +320,10 @@ private Q_SLOTS:
                                                         "LOCATION: http://127.0.0.1:8200/rootDesc.xml\r\n"
                                                         "Content-Length: 0\r\n\r\n"),
                                                        })
-                                        << QList<QPointer<UpnpDiscoveryResult> >({new UpnpDiscoveryResult(QStringLiteral("urn:schemas-upnp-org:device:MediaServer:1"),
+                                        << QList<UpnpDiscoveryResult>({UpnpDiscoveryResult(QStringLiteral("urn:schemas-upnp-org:device:MediaServer:1"),
                                                                        QStringLiteral("uuid:4d696e69-444c-164e-9d41-ecf4bb9c317e::urn:schemas-upnp-org:device:MediaServer:1"),
                                                                        QStringLiteral("http://127.0.0.1:8200/rootDesc.xml"),
-                                                                       NotificationSubType::Invalid,
+                                                                       UpnpSsdpEngine::NotificationSubType::Invalid,
                                                                        QStringLiteral("mar., 27 oct. 2015 21:03:35 G\x7F"),
                                                                        1800),
                                                                       });
@@ -344,10 +345,10 @@ private Q_SLOTS:
                                                "LOCATION: http://127.0.0.1:8200/rootDesc.xml\r\n"
                                                "Content-Length: 0\r\n\r\n")
                                               })
-                                        << QList<QPointer<UpnpDiscoveryResult> >({new UpnpDiscoveryResult(QStringLiteral("urn:schemas-upnp-org:service:ConnectionManager:1"),
+                                        << QList<UpnpDiscoveryResult>({UpnpDiscoveryResult(QStringLiteral("urn:schemas-upnp-org:service:ConnectionManager:1"),
                                                                        QStringLiteral("uuid:4d696e69-444c-164e-9d41-ecf4bb9c317e::urn:schemas-upnp-org:service:ConnectionManager:1"),
                                                                        QStringLiteral("http://127.0.0.1:8200/rootDesc.xml"),
-                                                                       NotificationSubType::Invalid,
+                                                                       UpnpSsdpEngine::NotificationSubType::Invalid,
                                                                        QStringLiteral("mar., 27 oct. 2015 21:03:35 G\x7F"),
                                                                        1800),
                                                                       });
@@ -359,32 +360,31 @@ private Q_SLOTS:
         QFETCH(QString, searchCriteria);
         QFETCH(QByteArray, ssdpRequest);
         QFETCH(QStringList, ssdpAnswers);
-        QFETCH(QList<QPointer<UpnpDiscoveryResult> >, results);
+        QFETCH(QList<UpnpDiscoveryResult>, results);
 
         QScopedPointer<MockSsdpClient> newClient(new MockSsdpClient(11900, ssdpRequest, ssdpAnswers, false));
         newClient->listen();
 
-        QScopedPointer<UpnpSsdpEngine> newEngine(new UpnpSsdpEngine);
-        newEngine->setPort(11900);
-        newEngine->initialize();
+        UpnpSsdpEngine newEngine;
+        newEngine.setPort(11900);
+        newEngine.initialize();
 
-        QSignalSpy newServiceSignal(newEngine.data(), &UpnpSsdpEngine::newService);
+        QSignalSpy newServiceSignal(&newEngine, &UpnpSsdpEngine::newService);
 
-        newEngine->searchUpnp(searchType, searchCriteria, 2);
+        newEngine.searchUpnp(searchType, searchCriteria, 2);
 
-        QTest::qSleep(2000);
-        newServiceSignal.wait();
+        newServiceSignal.wait(20000);
 
-        QVERIFY(newServiceSignal.size() == results.size());
+        QCOMPARE(newServiceSignal.size(), results.size());
 
         for (int i = 0; i < results.size(); ++i) {
-            auto firstService = newServiceSignal[i][0].value<QSharedPointer<UpnpDiscoveryResult> >();
-            QVERIFY(firstService->announceDate() == results[i]->announceDate());
-            QVERIFY(firstService->cacheDuration() == results[i]->cacheDuration());
-            QVERIFY(firstService->location() == results[i]->location());
-            QVERIFY(firstService->nt() == results[i]->nt());
-            QVERIFY(firstService->nts() == results[i]->nts());
-            QVERIFY(firstService->usn() == results[i]->usn());
+            auto firstService = newServiceSignal[i][0].value<UpnpDiscoveryResult>();
+            QCOMPARE(firstService.announceDate(), results[i].announceDate());
+            QCOMPARE(firstService.cacheDuration(), results[i].cacheDuration());
+            QCOMPARE(firstService.location(), results[i].location());
+            QCOMPARE(firstService.nt(), results[i].nt());
+            QCOMPARE(firstService.nts(), results[i].nts());
+            QCOMPARE(firstService.usn(), results[i].usn());
         }
     }
 
@@ -394,7 +394,7 @@ private Q_SLOTS:
         QTest::addColumn<QString>("searchCriteria");
         QTest::addColumn<QByteArray>("ssdpRequest");
         QTest::addColumn<QStringList>("ssdpAnswers");
-        QTest::addColumn<QList<QPointer<UpnpDiscoveryResult> > >("results");
+        QTest::addColumn<QList<UpnpDiscoveryResult>>("results");
 
         QTest::newRow("root device") << UpnpSsdpEngine::RootDevices
                                      << QString()
@@ -413,10 +413,10 @@ private Q_SLOTS:
                                                      "LOCATION: http://127.0.0.1:8200/rootDesc.xml\r\n"
                                                      "Content-Length: 0\r\n\r\n")
                                                     })
-                                     << QList<QPointer<UpnpDiscoveryResult> >({new UpnpDiscoveryResult(QStringLiteral("upnp:rootdevice"),
+                                     << QList<UpnpDiscoveryResult>({UpnpDiscoveryResult(QStringLiteral("upnp:rootdevice"),
                                                                     QStringLiteral("uuid:4d696e69-444c-164e-9d41-ecf4bb9c317e::upnp:rootdevice"),
                                                                     QStringLiteral("http://127.0.0.1:8200/rootDesc.xml"),
-                                                                    NotificationSubType::Invalid,
+                                                                    UpnpSsdpEngine::NotificationSubType::Invalid,
                                                                     QStringLiteral("mar., 27 oct. 2015 21:03:35 G\x7F"),
                                                                     3)});
     }
@@ -427,7 +427,7 @@ private Q_SLOTS:
         QFETCH(QString, searchCriteria);
         QFETCH(QByteArray, ssdpRequest);
         QFETCH(QStringList, ssdpAnswers);
-        QFETCH(QList<QPointer<UpnpDiscoveryResult> >, results);
+        QFETCH(QList<UpnpDiscoveryResult>, results);
 
         QScopedPointer<MockSsdpClient> newClient(new MockSsdpClient(11900, ssdpRequest, ssdpAnswers, false));
         newClient->listen();
@@ -441,19 +441,18 @@ private Q_SLOTS:
 
         newEngine->searchUpnp(searchType, searchCriteria, 2);
 
-        QTest::qSleep(2000);
-        newServiceSignal.wait();
+        newServiceSignal.wait(20000);
 
-        QVERIFY(newServiceSignal.size() == results.size());
+        QCOMPARE(newServiceSignal.size(), results.size());
 
         for (int i = 0; i < results.size(); ++i) {
-            auto firstService = newServiceSignal[i][0].value<QSharedPointer<UpnpDiscoveryResult> >();
-            QVERIFY(firstService->announceDate() == results[i]->announceDate());
-            QVERIFY(firstService->cacheDuration() == results[i]->cacheDuration());
-            QVERIFY(firstService->location() == results[i]->location());
-            QVERIFY(firstService->nt() == results[i]->nt());
-            QVERIFY(firstService->nts() == results[i]->nts());
-            QVERIFY(firstService->usn() == results[i]->usn());
+            auto firstService = newServiceSignal[i][0].value<UpnpDiscoveryResult>();
+            QCOMPARE(firstService.announceDate(), results[i].announceDate());
+            QCOMPARE(firstService.cacheDuration(), results[i].cacheDuration());
+            QCOMPARE(firstService.location(), results[i].location());
+            QCOMPARE(firstService.nt(), results[i].nt());
+            QCOMPARE(firstService.nts(), results[i].nts());
+            QCOMPARE(firstService.usn(), results[i].usn());
         }
 
         removedServiceSignal.wait();
@@ -467,7 +466,7 @@ private Q_SLOTS:
         QTest::addColumn<QString>("searchCriteria");
         QTest::addColumn<QByteArray>("ssdpRequest");
         QTest::addColumn<QStringList>("ssdpAnswers");
-        QTest::addColumn<QList<QPointer<UpnpDiscoveryResult> > >("results");
+        QTest::addColumn<QList<UpnpDiscoveryResult>>("results");
         QTest::addColumn<bool>("needAutoRefresh");
         QTest::addColumn<int>("refreshPeriod");
         QTest::addColumn<QStringList>("refreshMessages");
@@ -489,10 +488,10 @@ private Q_SLOTS:
                                                      "LOCATION: http://127.0.0.1:8200/rootDesc.xml\r\n"
                                                      "Content-Length: 0\r\n\r\n")
                                                     })
-                                     << QList<QPointer<UpnpDiscoveryResult> >({new UpnpDiscoveryResult(QStringLiteral("upnp:rootdevice"),
+                                     << QList<UpnpDiscoveryResult>({UpnpDiscoveryResult(QStringLiteral("upnp:rootdevice"),
                                                                     QStringLiteral("uuid:4d696e69-444c-164e-9d41-ecf4bb9c317e::upnp:rootdevice"),
                                                                     QStringLiteral("http://127.0.0.1:8200/rootDesc.xml"),
-                                                                    NotificationSubType::Invalid,
+                                                                    UpnpSsdpEngine::NotificationSubType::Invalid,
                                                                     QStringLiteral("mar., 27 oct. 2015 21:03:35 G\x7F"),
                                                                     4)})
                                      << true
@@ -525,10 +524,10 @@ private Q_SLOTS:
                                                      "LOCATION: http://127.0.0.1:8200/rootDesc.xml\r\n"
                                                      "Content-Length: 0\r\n\r\n")
                                                     })
-                                     << QList<QPointer<UpnpDiscoveryResult> >({new UpnpDiscoveryResult(QStringLiteral("upnp:rootdevice"),
+                                     << QList<UpnpDiscoveryResult>({UpnpDiscoveryResult(QStringLiteral("upnp:rootdevice"),
                                                                     QStringLiteral("uuid:4d696e69-444c-164e-9d41-ecf4bb9c317e::upnp:rootdevice"),
                                                                     QStringLiteral("http://127.0.0.1:8200/rootDesc.xml"),
-                                                                    NotificationSubType::Invalid,
+                                                                    UpnpSsdpEngine::NotificationSubType::Invalid,
                                                                     QStringLiteral("mar., 27 oct. 2015 21:03:35 G\x7F"),
                                                                     4)})
                                      << false
@@ -542,56 +541,58 @@ private Q_SLOTS:
         QFETCH(QString, searchCriteria);
         QFETCH(QByteArray, ssdpRequest);
         QFETCH(QStringList, ssdpAnswers);
-        QFETCH(QList<QPointer<UpnpDiscoveryResult> >, results);
+        QFETCH(QList<UpnpDiscoveryResult>, results);
         QFETCH(bool, needAutoRefresh);
         QFETCH(int, refreshPeriod);
         QFETCH(QStringList, refreshMessages);
 
-        QScopedPointer<MockSsdpClient> newClient(new MockSsdpClient(11900, ssdpRequest, ssdpAnswers, needAutoRefresh, refreshPeriod, refreshMessages));
-        newClient->listen();
+        MockSsdpClient newClient(11900, ssdpRequest, ssdpAnswers, needAutoRefresh, refreshPeriod, refreshMessages);
+        newClient.listen();
 
-        QScopedPointer<UpnpSsdpEngine> newEngine(new UpnpSsdpEngine);
-        newEngine->setPort(11900);
-        newEngine->initialize();
+        UpnpSsdpEngine newEngine;
+        newEngine.setPort(11900);
+        newEngine.initialize();
 
-        QSignalSpy newServiceSignal(newEngine.data(), &UpnpSsdpEngine::newService);
-        QSignalSpy removedServiceSignal(newEngine.data(), &UpnpSsdpEngine::removedService);
+        QSignalSpy newServiceSignal(&newEngine, &UpnpSsdpEngine::newService);
+        QSignalSpy removedServiceSignal(&newEngine, &UpnpSsdpEngine::removedService);
 
-        newEngine->searchUpnp(searchType, searchCriteria, 2);
+        newEngine.searchUpnp(searchType, searchCriteria, 2);
 
-        QTest::qSleep(2000);
-        newServiceSignal.wait();
+        newServiceSignal.wait(20000);
 
-        QVERIFY(newServiceSignal.size() == results.size());
+        QCOMPARE(newServiceSignal.size(), results.size());
 
         for (int i = 0; i < results.size(); ++i) {
-            auto firstService = newServiceSignal[i][0].value<QSharedPointer<UpnpDiscoveryResult> >();
-            QVERIFY(firstService->announceDate() == results[i]->announceDate());
-            QVERIFY(firstService->cacheDuration() == results[i]->cacheDuration());
-            QVERIFY(firstService->location() == results[i]->location());
-            QVERIFY(firstService->nt() == results[i]->nt());
-            QVERIFY(firstService->nts() == results[i]->nts());
-            QVERIFY(firstService->usn() == results[i]->usn());
+            auto firstService = newServiceSignal[i][0].value<UpnpDiscoveryResult>();
+            QCOMPARE(firstService.announceDate(), results[i].announceDate());
+            QCOMPARE(firstService.cacheDuration(), results[i].cacheDuration());
+            QCOMPARE(firstService.location(), results[i].location());
+            QCOMPARE(firstService.nt(), results[i].nt());
+            QCOMPARE(firstService.nts(), results[i].nts());
+            QCOMPARE(firstService.usn(), results[i].usn());
         }
 
         removedServiceSignal.wait(10000);
 
-        QVERIFY((needAutoRefresh && removedServiceSignal.count() == 0) ||
-                (!needAutoRefresh && removedServiceSignal.count() > 0));
+        if (needAutoRefresh) {
+            QCOMPARE(removedServiceSignal.count(), 0);
+        } else {
+            QVERIFY(removedServiceSignal.count() > 0);
+        }
     }
 
     void listenNotify_data()
     {
-        QTest::addColumn<QList<QPointer<UpnpDiscoveryResult> > >("results");
+        QTest::addColumn<QList<UpnpDiscoveryResult>>("results");
         QTest::addColumn<int>("refreshPeriod");
         QTest::addColumn<QStringList>("refreshMessages");
 
 
         QTest::newRow("root device with notify")
-                                     << QList<QPointer<UpnpDiscoveryResult> >({new UpnpDiscoveryResult(QStringLiteral("upnp:rootdevice"),
+                                     << QList<UpnpDiscoveryResult>({UpnpDiscoveryResult(QStringLiteral("upnp:rootdevice"),
                                                                     QStringLiteral("uuid:4d696e69-444c-164e-9d41-ecf4bb9c317e::upnp:rootdevice"),
                                                                     QStringLiteral("http://127.0.0.1:8200/rootDesc.xml"),
-                                                                    NotificationSubType::Alive,
+                                                                    UpnpSsdpEngine::NotificationSubType::Alive,
                                                                     QStringLiteral("mar., 27 oct. 2015 21:03:35 G\x7F"),
                                                                     4)})
                                      << 3
@@ -609,7 +610,7 @@ private Q_SLOTS:
 
     void listenNotify()
     {
-        QFETCH(QList<QPointer<UpnpDiscoveryResult> >, results);
+        QFETCH(QList<UpnpDiscoveryResult>, results);
         QFETCH(int, refreshPeriod);
         QFETCH(QStringList, refreshMessages);
 
@@ -628,17 +629,17 @@ private Q_SLOTS:
         QVERIFY(newServiceSignal.size() == results.size());
 
         for (int i = 0; i < results.size(); ++i) {
-            auto firstService = newServiceSignal[i][0].value<QSharedPointer<UpnpDiscoveryResult> >();
-            QVERIFY(firstService->cacheDuration() == results[i]->cacheDuration());
-            QVERIFY(firstService->location() == results[i]->location());
-            QVERIFY(firstService->nt() == results[i]->nt());
-            QVERIFY(firstService->nts() == results[i]->nts());
-            QVERIFY(firstService->usn() == results[i]->usn());
+            auto firstService = newServiceSignal[i][0].value<UpnpDiscoveryResult>();
+            QVERIFY(firstService.cacheDuration() == results[i].cacheDuration());
+            QVERIFY(firstService.location() == results[i].location());
+            QVERIFY(firstService.nt() == results[i].nt());
+            QVERIFY(firstService.nts() == results[i].nts());
+            QVERIFY(firstService.usn() == results[i].usn());
         }
 
         removedServiceSignal.wait(10000);
 
-        QVERIFY(removedServiceSignal.count() == 0);
+        QCOMPARE(removedServiceSignal.count(), 0);
     }
 };
 
