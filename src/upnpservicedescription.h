@@ -76,7 +76,7 @@ class UPNPLIBQT_EXPORT UpnpServiceDescription : public QObject
                WRITE setMaximumSubscriptionDuration
                NOTIFY maximumSubscriptionDurationChanged)
 
-    Q_PROPERTY(UpnpDeviceDescription* deviceDescription
+    Q_PROPERTY(UpnpDeviceDescription deviceDescription
                READ deviceDescription
                WRITE setDeviceDescription
                NOTIFY deviceDescriptionChanged)
@@ -130,11 +130,11 @@ public:
 
     const QMap<QString, UpnpStateVariableDescription>& stateVariables() const;
 
-    UpnpDeviceDescription* deviceDescription() const;
+    const UpnpDeviceDescription &deviceDescription() const;
 
 public Q_SLOTS:
 
-    void setDeviceDescription(UpnpDeviceDescription* deviceDescription);
+    void setDeviceDescription(UpnpDeviceDescription deviceDescription);
 
 Q_SIGNALS:
 

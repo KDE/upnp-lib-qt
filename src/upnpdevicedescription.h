@@ -25,91 +25,27 @@
 #include <QtCore/QPointer>
 #include <QtCore/QVector>
 
-#include <QtCore/QObject>
+#include <memory>
 
 class UpnpServiceDescription;
 class UpnpDeviceDescriptionPrivate;
 
-class UPNPLIBQT_EXPORT UpnpDeviceDescription : public QObject
+class UPNPLIBQT_EXPORT UpnpDeviceDescription
 {
-
-    Q_OBJECT
-
-    Q_PROPERTY(QString UDN
-               READ UDN
-               WRITE setUDN
-               NOTIFY UDNChanged)
-
-    Q_PROPERTY(QString UPC
-               READ UPC
-               WRITE setUPC
-               NOTIFY UDNChanged)
-
-    Q_PROPERTY(QString deviceType
-               READ deviceType
-               WRITE setDeviceType
-               NOTIFY deviceTypeChanged)
-
-    Q_PROPERTY(QString friendlyName
-               READ friendlyName
-               WRITE setFriendlyName
-               NOTIFY friendlyNameChanged)
-
-    Q_PROPERTY(QString manufacturer
-               READ manufacturer
-               WRITE setManufacturer
-               NOTIFY manufacturerChanged)
-
-    Q_PROPERTY(QUrl manufacturerURL
-               READ manufacturerURL
-               WRITE setManufacturerURL
-               NOTIFY manufacturerURLChanged)
-
-    Q_PROPERTY(QString modelDescription
-               READ modelDescription
-               WRITE setModelDescription
-               NOTIFY modelDescriptionChanged)
-
-    Q_PROPERTY(QString modelName
-               READ modelName
-               WRITE setModelName
-               NOTIFY modelNameChanged)
-
-    Q_PROPERTY(QString modelNumber
-               READ modelNumber
-               WRITE setModelNumber
-               NOTIFY modelNumberChanged)
-
-    Q_PROPERTY(QUrl modelURL
-               READ modelURL
-               WRITE setModelURL
-               NOTIFY modelURLChanged)
-
-    Q_PROPERTY(QString serialNumber
-               READ serialNumber
-               WRITE setSerialNumber
-               NOTIFY serialNumberChanged)
-
-    Q_PROPERTY(QString URLBase
-               READ URLBase
-               WRITE setURLBase
-               NOTIFY URLBaseChanged)
-
-    Q_PROPERTY(int cacheControl
-               READ cacheControl
-               WRITE setCacheControl
-               NOTIFY cacheControlChanged)
-
-    Q_PROPERTY(QUrl locationUrl
-               READ locationUrl
-               WRITE setLocationUrl
-               NOTIFY locationUrlChanged)
 
 public:
 
-    explicit UpnpDeviceDescription(QObject *parent = nullptr);
+    UpnpDeviceDescription();
 
-    ~UpnpDeviceDescription() override;
+    UpnpDeviceDescription(const UpnpDeviceDescription &other);
+
+    UpnpDeviceDescription(UpnpDeviceDescription &&other);
+
+    ~UpnpDeviceDescription();
+
+    UpnpDeviceDescription& operator=(const UpnpDeviceDescription &other);
+
+    UpnpDeviceDescription& operator=(UpnpDeviceDescription &&other);
 
     const QSharedPointer<UpnpServiceDescription> serviceById(const QString &serviceId) const;
 
@@ -213,39 +149,9 @@ public:
 
     int addService(const QSharedPointer<UpnpServiceDescription> &newService);
 
-Q_SIGNALS:
-
-    void UDNChanged(const QString &UDN);
-
-    void UPCChanged(const QString &UDN);
-
-    void deviceTypeChanged(const QString &UDN);
-
-    void friendlyNameChanged(const QString &UDN);
-
-    void manufacturerChanged(const QString &UDN);
-
-    void manufacturerURLChanged(const QString &UDN);
-
-    void modelDescriptionChanged(const QString &UDN);
-
-    void modelNameChanged(const QString &UDN);
-
-    void modelNumberChanged(const QString &UDN);
-
-    void modelURLChanged(const QString &UDN);
-
-    void serialNumberChanged(const QString &UDN);
-
-    void URLBaseChanged(const QString &UDN);
-
-    void cacheControlChanged(const QString &UDN);
-
-    void locationUrlChanged(const QString &UDN);
-
 private:
 
-    UpnpDeviceDescriptionPrivate *d;
+    std::unique_ptr<UpnpDeviceDescriptionPrivate> d;
 
 };
 

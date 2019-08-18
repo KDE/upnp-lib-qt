@@ -20,6 +20,7 @@
 #include "upnpservicedescription.h"
 #include "upnpactiondescription.h"
 #include "upnpstatevariabledescription.h"
+#include "upnpdevicedescription.h"
 
 #include <QtCore/QPointer>
 #include <QtCore/QBuffer>
@@ -64,7 +65,7 @@ public:
 
     int mMaximumSubscriptionDuration;
 
-    UpnpDeviceDescription* mDeviceDescription = nullptr;
+    UpnpDeviceDescription mDeviceDescription;
 
 };
 
@@ -187,18 +188,15 @@ const QMap<QString, UpnpStateVariableDescription> &UpnpServiceDescription::state
     return d->mStateVariables;
 }
 
-UpnpDeviceDescription *UpnpServiceDescription::deviceDescription() const
+const UpnpDeviceDescription& UpnpServiceDescription::deviceDescription() const
 {
     return d->mDeviceDescription;
 }
 
-void UpnpServiceDescription::setDeviceDescription(UpnpDeviceDescription *deviceDescription)
+void UpnpServiceDescription::setDeviceDescription(UpnpDeviceDescription deviceDescription)
 {
-    if (d->mDeviceDescription == deviceDescription)
-        return;
-
     d->mDeviceDescription = deviceDescription;
-    emit deviceDescriptionChanged(deviceDescription);
+    emit deviceDescriptionChanged(&deviceDescription);
 }
 
 

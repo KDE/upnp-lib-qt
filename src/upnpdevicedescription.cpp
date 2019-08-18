@@ -69,13 +69,29 @@ public:
     QUrl mLocationUrl;
 };
 
-UpnpDeviceDescription::UpnpDeviceDescription(QObject *parent) : QObject(parent), d(new UpnpDeviceDescriptionPrivate)
+UpnpDeviceDescription::UpnpDeviceDescription() : d(std::make_unique<UpnpDeviceDescriptionPrivate>())
 {
 }
 
-UpnpDeviceDescription::~UpnpDeviceDescription()
+UpnpDeviceDescription::UpnpDeviceDescription(const UpnpDeviceDescription &other) : d(std::make_unique<UpnpDeviceDescriptionPrivate>(*other.d))
 {
-    delete d;
+}
+
+UpnpDeviceDescription::UpnpDeviceDescription(UpnpDeviceDescription &&other) : d()
+{
+    other.d.swap(d);
+}
+
+UpnpDeviceDescription::~UpnpDeviceDescription() = default;
+
+UpnpDeviceDescription& UpnpDeviceDescription::operator=(const UpnpDeviceDescription &other)
+{
+    return *this;
+}
+
+UpnpDeviceDescription& UpnpDeviceDescription::operator=(UpnpDeviceDescription &&other)
+{
+    return *this;
 }
 
 const QSharedPointer<UpnpServiceDescription> UpnpDeviceDescription::serviceById(const QString &serviceId) const
@@ -119,8 +135,6 @@ void UpnpDeviceDescription::setUDN(const QString &value)
 {
     d->mDeviceUUID = value.mid(5);
     d->mUDN = value;
-
-    Q_EMIT UDNChanged(d->mDeviceUUID);
 }
 
 const QString &UpnpDeviceDescription::UDN() const
@@ -131,8 +145,6 @@ const QString &UpnpDeviceDescription::UDN() const
 void UpnpDeviceDescription::setUPC(const QString &value)
 {
     d->mUPC = value;
-
-    Q_EMIT UPCChanged(d->mDeviceUUID);
 }
 
 const QString &UpnpDeviceDescription::UPC() const
@@ -143,8 +155,6 @@ const QString &UpnpDeviceDescription::UPC() const
 void UpnpDeviceDescription::setDeviceType(const QString &value)
 {
     d->mDeviceType = value;
-
-    Q_EMIT deviceTypeChanged(d->mDeviceUUID);
 }
 
 const QString &UpnpDeviceDescription::deviceType() const
@@ -155,8 +165,6 @@ const QString &UpnpDeviceDescription::deviceType() const
 void UpnpDeviceDescription::setFriendlyName(const QString &value)
 {
     d->mFriendlyName = value;
-
-    Q_EMIT friendlyNameChanged(d->mDeviceUUID);
 }
 
 const QString &UpnpDeviceDescription::friendlyName() const
@@ -167,8 +175,6 @@ const QString &UpnpDeviceDescription::friendlyName() const
 void UpnpDeviceDescription::setManufacturer(const QString &value)
 {
     d->mManufacturer = value;
-
-    Q_EMIT manufacturerChanged(d->mDeviceUUID);
 }
 
 const QString &UpnpDeviceDescription::manufacturer() const
@@ -179,8 +185,6 @@ const QString &UpnpDeviceDescription::manufacturer() const
 void UpnpDeviceDescription::setManufacturerURL(const QUrl &value)
 {
     d->mManufacturerURL = value;
-
-    Q_EMIT manufacturerURLChanged(d->mDeviceUUID);
 }
 
 const QUrl &UpnpDeviceDescription::manufacturerURL() const
@@ -191,8 +195,6 @@ const QUrl &UpnpDeviceDescription::manufacturerURL() const
 void UpnpDeviceDescription::setModelDescription(const QString &value)
 {
     d->mModelDescription = value;
-
-    Q_EMIT modelDescriptionChanged(d->mDeviceUUID);
 }
 
 const QString &UpnpDeviceDescription::modelDescription() const
@@ -203,8 +205,6 @@ const QString &UpnpDeviceDescription::modelDescription() const
 void UpnpDeviceDescription::setModelName(const QString &value)
 {
     d->mModelName = value;
-
-    Q_EMIT modelNameChanged(d->mDeviceUUID);
 }
 
 const QString &UpnpDeviceDescription::modelName() const
@@ -215,8 +215,6 @@ const QString &UpnpDeviceDescription::modelName() const
 void UpnpDeviceDescription::setModelNumber(const QString &value)
 {
     d->mModelNumber = value;
-
-    Q_EMIT modelNumberChanged(d->mDeviceUUID);
 }
 
 const QString &UpnpDeviceDescription::modelNumber() const
@@ -227,8 +225,6 @@ const QString &UpnpDeviceDescription::modelNumber() const
 void UpnpDeviceDescription::setModelURL(const QUrl &value)
 {
     d->mModelURL = value;
-
-    Q_EMIT modelURLChanged(d->mDeviceUUID);
 }
 
 const QUrl &UpnpDeviceDescription::modelURL() const
@@ -239,8 +235,6 @@ const QUrl &UpnpDeviceDescription::modelURL() const
 void UpnpDeviceDescription::setSerialNumber(const QString &value)
 {
     d->mSerialNumber = value;
-
-    Q_EMIT serialNumberChanged(d->mDeviceUUID);
 }
 
 const QString &UpnpDeviceDescription::serialNumber() const
@@ -251,8 +245,6 @@ const QString &UpnpDeviceDescription::serialNumber() const
 void UpnpDeviceDescription::setURLBase(const QString &value)
 {
     d->mURLBase = value;
-
-    Q_EMIT URLBaseChanged(d->mDeviceUUID);
 }
 
 const QString &UpnpDeviceDescription::URLBase() const
@@ -263,8 +255,6 @@ const QString &UpnpDeviceDescription::URLBase() const
 void UpnpDeviceDescription::setCacheControl(int value)
 {
     d->mCacheControl = value;
-
-    Q_EMIT cacheControlChanged(d->mDeviceUUID);
 }
 
 int UpnpDeviceDescription::cacheControl() const
@@ -275,8 +265,6 @@ int UpnpDeviceDescription::cacheControl() const
 void UpnpDeviceDescription::setLocationUrl(const QUrl &value)
 {
     d->mLocationUrl = value;
-
-    Q_EMIT locationUrlChanged(d->mDeviceUUID);
 }
 
 const QUrl &UpnpDeviceDescription::locationUrl() const
@@ -289,5 +277,3 @@ int UpnpDeviceDescription::addService(const QSharedPointer<UpnpServiceDescriptio
     d->mServices.push_back(newService);
     return d->mServices.count() - 1;
 }
-
-#include "moc_upnpdevicedescription.cpp"

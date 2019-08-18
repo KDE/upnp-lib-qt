@@ -34,22 +34,22 @@ class UpnpDeviceDescriptionParserPrivate
 {
 public:
 
-    UpnpDeviceDescriptionParserPrivate(QNetworkAccessManager *aNetworkAccess, QSharedPointer<UpnpDeviceDescription> deviceDescription)
+    UpnpDeviceDescriptionParserPrivate(QNetworkAccessManager *aNetworkAccess, UpnpDeviceDescription &&deviceDescription)
         : mNetworkAccess(aNetworkAccess), mDeviceDescription(std::move(deviceDescription)), mDeviceURL()
     {
     }
 
     QNetworkAccessManager *mNetworkAccess;
 
-    QSharedPointer<UpnpDeviceDescription> mDeviceDescription;
+    UpnpDeviceDescription mDeviceDescription;
 
     QMap<QString, QSharedPointer<UpnpServiceDescriptionParser> > mServiceDescriptionParsers;
 
     QUrl mDeviceURL;
 };
 
-UpnpDeviceDescriptionParser::UpnpDeviceDescriptionParser(QNetworkAccessManager *aNetworkAccess, QSharedPointer<UpnpDeviceDescription> deviceDescription, QObject *parent)
-    : QObject(parent), d(new UpnpDeviceDescriptionParserPrivate(aNetworkAccess, deviceDescription))
+UpnpDeviceDescriptionParser::UpnpDeviceDescriptionParser(QNetworkAccessManager *aNetworkAccess, UpnpDeviceDescription deviceDescription, QObject *parent)
+    : QObject(parent), d(new UpnpDeviceDescriptionParserPrivate(aNetworkAccess, std::move(deviceDescription)))
 {
 }
 
@@ -65,10 +65,12 @@ void UpnpDeviceDescriptionParser::downloadDeviceDescription(const QUrl &deviceUr
 
 void UpnpDeviceDescriptionParser::serviceDescriptionParsed(const QString &upnpServiceId)
 {
+    qDebug() << "UpnpDeviceDescriptionParser::serviceDescriptionParsed" << upnpServiceId;
+
     d->mServiceDescriptionParsers.remove(upnpServiceId);
 
     if (d->mServiceDescriptionParsers.isEmpty()) {
-        Q_EMIT descriptionParsed(d->mDeviceDescription->UDN());
+        Q_EMIT descriptionParsed(d->mDeviceDescription.UDN());
     }
 }
 
@@ -78,7 +80,7 @@ void UpnpDeviceDescriptionParser::finishedDownload(QNetworkReply *reply)
         if (reply->isFinished() && reply->error() == QNetworkReply::NoError) {
             parseDeviceDescription(reply, reply->url().adjusted(QUrl::RemovePath).toString());
         } else if (reply->isFinished()) {
-            Q_EMIT deviceDescriptionInError(d->mDeviceDescription->UDN());
+            Q_EMIT deviceDescriptionInError(d->mDeviceDescription.UDN());
         }
     }
 }
@@ -110,22 +112,22 @@ void UpnpDeviceDescriptionParser::parseDeviceDescription(QIODevice *deviceDescri
         currentChild = currentChild.nextSibling();
     }
 
-    d->mDeviceDescription->setUDN(deviceDescription[QStringLiteral("UDN")].toString());
-    d->mDeviceDescription->setUPC(deviceDescription[QStringLiteral("UPC")].toString());
-    d->mDeviceDescription->setDeviceType(deviceDescription[QStringLiteral("deviceType")].toString());
-    d->mDeviceDescription->setFriendlyName(deviceDescription[QStringLiteral("friendlyName")].toString());
-    d->mDeviceDescription->setManufacturer(deviceDescription[QStringLiteral("manufacturer")].toString());
-    d->mDeviceDescription->setManufacturerURL(deviceDescription[QStringLiteral("manufacturerURL")].toUrl());
-    d->mDeviceDescription->setModelDescription(deviceDescription[QStringLiteral("modelDescription")].toString());
-    d->mDeviceDescription->setModelName(deviceDescription[QStringLiteral("modelName")].toString());
-    d->mDeviceDescription->setModelNumber(deviceDescription[QStringLiteral("modelNumber")].toString());
-    d->mDeviceDescription->setModelURL(deviceDescription[QStringLiteral("modelURL")].toUrl());
-    d->mDeviceDescription->setSerialNumber(deviceDescription[QStringLiteral("serialNumber")].toString());
+    d->mDeviceDescription.setUDN(deviceDescription[QStringLiteral("UDN")].toString());
+    d->mDeviceDescription.setUPC(deviceDescription[QStringLiteral("UPC")].toString());
+    d->mDeviceDescription.setDeviceType(deviceDescription[QStringLiteral("deviceType")].toString());
+    d->mDeviceDescription.setFriendlyName(deviceDescription[QStringLiteral("friendlyName")].toString());
+    d->mDeviceDescription.setManufacturer(deviceDescription[QStringLiteral("manufacturer")].toString());
+    d->mDeviceDescription.setManufacturerURL(deviceDescription[QStringLiteral("manufacturerURL")].toUrl());
+    d->mDeviceDescription.setModelDescription(deviceDescription[QStringLiteral("modelDescription")].toString());
+    d->mDeviceDescription.setModelName(deviceDescription[QStringLiteral("modelName")].toString());
+    d->mDeviceDescription.setModelNumber(deviceDescription[QStringLiteral("modelNumber")].toString());
+    d->mDeviceDescription.setModelURL(deviceDescription[QStringLiteral("modelURL")].toUrl());
+    d->mDeviceDescription.setSerialNumber(deviceDescription[QStringLiteral("serialNumber")].toString());
 
     if (deviceDescription[QStringLiteral("URLBase")].isValid() && !deviceDescription[QStringLiteral("URLBase")].toString().isEmpty()) {
-        d->mDeviceDescription->setURLBase(deviceDescription[QStringLiteral("URLBase")].toString());
+        d->mDeviceDescription.setURLBase(deviceDescription[QStringLiteral("URLBase")].toString());
     } else {
-        d->mDeviceDescription->setURLBase(fallBackURLBase);
+        d->mDeviceDescription.setURLBase(fallBackURLBase);
     }
 
     auto serviceList = deviceDescriptionDocument.elementsByTagName(QStringLiteral("service"));
@@ -133,7 +135,7 @@ void UpnpDeviceDescriptionParser::parseDeviceDescription(QIODevice *deviceDescri
         const QDomNode &serviceNode(serviceList.at(serviceIndex));
         if (!serviceNode.isNull()) {
             QSharedPointer<UpnpServiceDescription> newService(new UpnpServiceDescription);
-            newService->setDeviceDescription(d->mDeviceDescription.data());
+            newService->setDeviceDescription(d->mDeviceDescription);
 
             const QDomNode &serviceTypeNode = serviceNode.firstChildElement(QStringLiteral("serviceType"));
 #if 0
@@ -156,7 +158,7 @@ void UpnpDeviceDescriptionParser::parseDeviceDescription(QIODevice *deviceDescri
             }
 #endif
 
-            newService->setBaseURL(d->mDeviceDescription->URLBase());
+            newService->setBaseURL(d->mDeviceDescription.URLBase());
             if (!serviceTypeNode.isNull()) {
                 newService->setServiceType(serviceTypeNode.toElement().text());
             }
@@ -175,7 +177,7 @@ void UpnpDeviceDescriptionParser::parseDeviceDescription(QIODevice *deviceDescri
             if (!controlURLNode.isNull()) {
                 QUrl controlUrl(controlURLNode.toElement().text());
                 if (!controlUrl.isValid() || controlUrl.scheme().isEmpty()) {
-                    controlUrl = QUrl(d->mDeviceDescription->URLBase());
+                    controlUrl = QUrl(d->mDeviceDescription.URLBase());
                     controlUrl.setPath(controlURLNode.toElement().text());
                 }
                 newService->setControlURL(controlUrl);
@@ -185,7 +187,7 @@ void UpnpDeviceDescriptionParser::parseDeviceDescription(QIODevice *deviceDescri
             if (!eventSubURLNode.isNull()) {
                 QUrl eventUrl(eventSubURLNode.toElement().text());
                 if (!eventUrl.isValid() || eventUrl.scheme().isEmpty()) {
-                    eventUrl = QUrl(d->mDeviceDescription->URLBase());
+                    eventUrl = QUrl(d->mDeviceDescription.URLBase());
                     eventUrl.setPath(eventSubURLNode.toElement().text());
                 }
                 newService->setEventURL(eventUrl);
@@ -193,13 +195,13 @@ void UpnpDeviceDescriptionParser::parseDeviceDescription(QIODevice *deviceDescri
 
             QUrl serviceUrl(newService->SCPDURL().toString());
             if (!serviceUrl.isValid() || serviceUrl.scheme().isEmpty()) {
-                serviceUrl.setUrl(d->mDeviceDescription->URLBase());
+                serviceUrl.setUrl(d->mDeviceDescription.URLBase());
                 serviceUrl.setPath(newService->SCPDURL().toString());
             }
 
-            d->mDeviceDescription->addService(newService);
+            d->mDeviceDescription.addService(newService);
 
-            d->mServiceDescriptionParsers[newService->serviceId()].reset(new UpnpServiceDescriptionParser(d->mNetworkAccess, d->mDeviceDescription->serviceByIndex(serviceIndex)));
+            d->mServiceDescriptionParsers[newService->serviceId()].reset(new UpnpServiceDescriptionParser(d->mNetworkAccess, d->mDeviceDescription.serviceByIndex(serviceIndex)));
 
             connect(d->mServiceDescriptionParsers[newService->serviceId()].data(), &UpnpServiceDescriptionParser::descriptionParsed,
                     this, &UpnpDeviceDescriptionParser::serviceDescriptionParsed);
