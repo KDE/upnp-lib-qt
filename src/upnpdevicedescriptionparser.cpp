@@ -34,22 +34,22 @@ class UpnpDeviceDescriptionParserPrivate
 {
 public:
 
-    UpnpDeviceDescriptionParserPrivate(QNetworkAccessManager *aNetworkAccess, UpnpDeviceDescription &&deviceDescription)
-        : mNetworkAccess(aNetworkAccess), mDeviceDescription(std::move(deviceDescription)), mDeviceURL()
+    UpnpDeviceDescriptionParserPrivate(QNetworkAccessManager *aNetworkAccess, UpnpDeviceDescription &deviceDescription)
+        : mNetworkAccess(aNetworkAccess), mDeviceDescription(deviceDescription), mDeviceURL()
     {
     }
 
     QNetworkAccessManager *mNetworkAccess;
 
-    UpnpDeviceDescription mDeviceDescription;
+    UpnpDeviceDescription &mDeviceDescription;
 
     QMap<QString, QSharedPointer<UpnpServiceDescriptionParser> > mServiceDescriptionParsers;
 
     QUrl mDeviceURL;
 };
 
-UpnpDeviceDescriptionParser::UpnpDeviceDescriptionParser(QNetworkAccessManager *aNetworkAccess, UpnpDeviceDescription deviceDescription, QObject *parent)
-    : QObject(parent), d(new UpnpDeviceDescriptionParserPrivate(aNetworkAccess, std::move(deviceDescription)))
+UpnpDeviceDescriptionParser::UpnpDeviceDescriptionParser(QNetworkAccessManager *aNetworkAccess, UpnpDeviceDescription &deviceDescription, QObject *parent)
+    : QObject(parent), d(new UpnpDeviceDescriptionParserPrivate(aNetworkAccess, deviceDescription))
 {
 }
 

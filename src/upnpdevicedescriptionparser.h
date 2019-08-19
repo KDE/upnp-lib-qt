@@ -43,7 +43,7 @@ class UPNPLIBQT_EXPORT UpnpDeviceDescriptionParser : public QObject
 
 public:
 
-    explicit UpnpDeviceDescriptionParser(QNetworkAccessManager *aNetworkAccess, UpnpDeviceDescription deviceDescription, QObject *parent = nullptr);
+    explicit UpnpDeviceDescriptionParser(QNetworkAccessManager *aNetworkAccess, UpnpDeviceDescription &deviceDescription, QObject *parent = nullptr);
 
     ~UpnpDeviceDescriptionParser() override;
 
