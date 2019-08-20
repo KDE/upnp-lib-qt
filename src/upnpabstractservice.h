@@ -42,7 +42,7 @@ class UPNPLIBQT_EXPORT UpnpAbstractService : public QObject
 {
     Q_OBJECT
 
-    Q_PROPERTY(UpnpServiceDescription* description
+    Q_PROPERTY(UpnpServiceDescription description
                READ description
                WRITE setDescription
                NOTIFY descriptionChanged)
@@ -72,11 +72,11 @@ public:
 
     virtual QVector<QPair<QString, QVariant> > invokeAction(const QString &actionName, const QVector<QVariant> &arguments, bool &isInError);
 
-    void setDescription(UpnpServiceDescription *value);
+    void setDescription(UpnpServiceDescription value);
 
-    UpnpServiceDescription* description();
+    UpnpServiceDescription& description();
 
-    const UpnpServiceDescription* description() const;
+    const UpnpServiceDescription& description() const;
 
 Q_SIGNALS:
 

@@ -115,10 +115,10 @@ void UpnpDeviceSoapServerObject::processRequestWithPath(const KDSoapMessage &req
         response.setFault(true);
         return;
     }
-    UpnpServiceDescription *currentService = currentDevice->serviceDescriptionByIndex(serviceIndex);
+    auto currentService = currentDevice->serviceDescriptionByIndex(serviceIndex);
 
     const QList<QByteArray> &soapActionParts = soapAction.split('#');
-    if (soapActionParts.size() != 2 || soapActionParts.first() != currentService->serviceType().toLatin1()) {
+    if (soapActionParts.size() != 2 || soapActionParts.first() != currentService.serviceType().toLatin1()) {
         response.setFault(true);
         return;
     }
@@ -126,10 +126,10 @@ void UpnpDeviceSoapServerObject::processRequestWithPath(const KDSoapMessage &req
     const QByteArray &actionName = soapActionParts.last();
     const QString &actionNameString = QString::fromLatin1(actionName);
 
-    response = KDSoapValue(actionNameString + QStringLiteral("Response"), QVariant(), currentService->serviceType());
+    response = KDSoapValue(actionNameString + QStringLiteral("Response"), QVariant(), currentService.serviceType());
 
     const KDSoapValueList &allArguments(request.arguments());
-    const UpnpActionDescription &currentAction = currentService->action(actionNameString);
+    const UpnpActionDescription &currentAction = currentService.action(actionNameString);
     qDebug() << "allArguments" << allArguments << "action arguments" << currentAction.mNumberInArgument;
 
     QVector<QVariant> checkedArguments;
@@ -171,7 +171,7 @@ void UpnpDeviceSoapServerObject::processRequestWithPath(const KDSoapMessage &req
     } else {
         bool actionCallIsInError = false;
 
-        //const QList<QPair<QString, QVariant> > &returnedValues(currentService->invokeAction(actionNameString, checkedArguments, actionCallIsInError));
+        //const QList<QPair<QString, QVariant> > &returnedValues(currentService.invokeAction(actionNameString, checkedArguments, actionCallIsInError));
 
         if (actionCallIsInError) {
             response.setFault(true);
@@ -180,7 +180,7 @@ void UpnpDeviceSoapServerObject::processRequestWithPath(const KDSoapMessage &req
             response.setFault(false);
         }
 
-        response.setType(currentService->serviceType(), actionNameString + QStringLiteral("Response"));
+        response.setType(currentService.serviceType(), actionNameString + QStringLiteral("Response"));
         /*for (const QPair<QString, QVariant> &oneValue : returnedValues) {
             response.addArgument(oneValue.first, oneValue.second);
         }*/

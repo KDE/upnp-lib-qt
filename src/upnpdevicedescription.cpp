@@ -31,7 +31,7 @@ class UpnpDeviceDescriptionPrivate
 {
 public:
 
-    QVector<QSharedPointer<UpnpServiceDescription> > mServices;
+    QList<UpnpServiceDescription> mServices;
 
     QString mDeviceUUID;
 
@@ -94,38 +94,43 @@ UpnpDeviceDescription& UpnpDeviceDescription::operator=(UpnpDeviceDescription &&
     return *this;
 }
 
-const QSharedPointer<UpnpServiceDescription> UpnpDeviceDescription::serviceById(const QString &serviceId) const
+UpnpServiceDescription UpnpDeviceDescription::serviceById(const QString &serviceId) const
 {
     for (const auto &oneService : const_cast<const decltype(d->mServices) &>(d->mServices)) {
-        if (oneService->serviceId() == serviceId) {
+        if (oneService.serviceId() == serviceId) {
             return oneService;
         }
     }
 
-    return {};
+    return UpnpServiceDescription{};
 }
 
-const QSharedPointer<UpnpServiceDescription> UpnpDeviceDescription::serviceByIndex(int serviceIndex) const
+const UpnpServiceDescription& UpnpDeviceDescription::serviceByIndex(int serviceIndex) const
 {
     return d->mServices[serviceIndex];
 }
 
-const QVector<QSharedPointer<UpnpServiceDescription> >& UpnpDeviceDescription::services() const
+UpnpServiceDescription &UpnpDeviceDescription::serviceByIndex(int serviceIndex)
+{
+    return d->mServices[serviceIndex];
+}
+
+const QList<UpnpServiceDescription>& UpnpDeviceDescription::services() const
 {
     return d->mServices;
 }
 
-QVector<QSharedPointer<UpnpServiceDescription> >& UpnpDeviceDescription::services()
+QList<UpnpServiceDescription>& UpnpDeviceDescription::services()
 {
     return d->mServices;
 }
 
-QVector<QString> UpnpDeviceDescription::servicesName() const
+QList<QString> UpnpDeviceDescription::servicesName() const
 {
-    QVector<QString> result;
+    QList<QString> result;
 
     for (const auto &itService: const_cast<const decltype(d->mServices) &>(d->mServices)) {
-        result.push_back(itService->serviceType());
+        result.push_back(itService.serviceType());
     }
 
     return result;
@@ -272,7 +277,7 @@ const QUrl &UpnpDeviceDescription::locationUrl() const
     return d->mLocationUrl;
 }
 
-int UpnpDeviceDescription::addService(const QSharedPointer<UpnpServiceDescription> &newService)
+int UpnpDeviceDescription::addService(const UpnpServiceDescription &newService)
 {
     d->mServices.push_back(newService);
     return d->mServices.count() - 1;

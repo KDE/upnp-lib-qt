@@ -134,8 +134,8 @@ void UpnpDeviceDescriptionParser::parseDeviceDescription(QIODevice *deviceDescri
     for (int serviceIndex = 0; serviceIndex < serviceList.length(); ++serviceIndex) {
         const QDomNode &serviceNode(serviceList.at(serviceIndex));
         if (!serviceNode.isNull()) {
-            QSharedPointer<UpnpServiceDescription> newService(new UpnpServiceDescription);
-            newService->setDeviceDescription(d->mDeviceDescription);
+            auto newService = UpnpServiceDescription{};
+            newService.setDeviceDescription(d->mDeviceDescription);
 
             const QDomNode &serviceTypeNode = serviceNode.firstChildElement(QStringLiteral("serviceType"));
 #if 0
@@ -158,19 +158,19 @@ void UpnpDeviceDescriptionParser::parseDeviceDescription(QIODevice *deviceDescri
             }
 #endif
 
-            newService->setBaseURL(d->mDeviceDescription.URLBase());
+            newService.setBaseURL(d->mDeviceDescription.URLBase());
             if (!serviceTypeNode.isNull()) {
-                newService->setServiceType(serviceTypeNode.toElement().text());
+                newService.setServiceType(serviceTypeNode.toElement().text());
             }
 
             const QDomNode &serviceIdNode = serviceNode.firstChildElement(QStringLiteral("serviceId"));
             if (!serviceIdNode.isNull()) {
-                newService->setServiceId(serviceIdNode.toElement().text());
+                newService.setServiceId(serviceIdNode.toElement().text());
             }
 
             const QDomNode &SCPDURLNode = serviceNode.firstChildElement(QStringLiteral("SCPDURL"));
             if (!SCPDURLNode.isNull()) {
-                newService->setSCPDURL(QUrl(SCPDURLNode.toElement().text()));
+                newService.setSCPDURL(QUrl(SCPDURLNode.toElement().text()));
             }
 
             const QDomNode &controlURLNode = serviceNode.firstChildElement(QStringLiteral("controlURL"));
@@ -180,7 +180,7 @@ void UpnpDeviceDescriptionParser::parseDeviceDescription(QIODevice *deviceDescri
                     controlUrl = QUrl(d->mDeviceDescription.URLBase());
                     controlUrl.setPath(controlURLNode.toElement().text());
                 }
-                newService->setControlURL(controlUrl);
+                newService.setControlURL(controlUrl);
             }
 
             const QDomNode &eventSubURLNode = serviceNode.firstChildElement(QStringLiteral("eventSubURL"));
@@ -190,25 +190,25 @@ void UpnpDeviceDescriptionParser::parseDeviceDescription(QIODevice *deviceDescri
                     eventUrl = QUrl(d->mDeviceDescription.URLBase());
                     eventUrl.setPath(eventSubURLNode.toElement().text());
                 }
-                newService->setEventURL(eventUrl);
+                newService.setEventURL(eventUrl);
             }
 
-            QUrl serviceUrl(newService->SCPDURL().toString());
+            QUrl serviceUrl(newService.SCPDURL().toString());
             if (!serviceUrl.isValid() || serviceUrl.scheme().isEmpty()) {
                 serviceUrl.setUrl(d->mDeviceDescription.URLBase());
-                serviceUrl.setPath(newService->SCPDURL().toString());
+                serviceUrl.setPath(newService.SCPDURL().toString());
             }
 
             d->mDeviceDescription.addService(newService);
 
-            d->mServiceDescriptionParsers[newService->serviceId()].reset(new UpnpServiceDescriptionParser(d->mNetworkAccess, d->mDeviceDescription.serviceByIndex(serviceIndex)));
+            d->mServiceDescriptionParsers[newService.serviceId()].reset(new UpnpServiceDescriptionParser(d->mNetworkAccess, d->mDeviceDescription.serviceByIndex(serviceIndex)));
 
-            connect(d->mServiceDescriptionParsers[newService->serviceId()].data(), &UpnpServiceDescriptionParser::descriptionParsed,
+            connect(d->mServiceDescriptionParsers[newService.serviceId()].data(), &UpnpServiceDescriptionParser::descriptionParsed,
                     this, &UpnpDeviceDescriptionParser::serviceDescriptionParsed);
             connect(d->mNetworkAccess, &QNetworkAccessManager::finished,
-                    d->mServiceDescriptionParsers[newService->serviceId()].data(), &UpnpServiceDescriptionParser::finishedDownload);
+                    d->mServiceDescriptionParsers[newService.serviceId()].data(), &UpnpServiceDescriptionParser::finishedDownload);
 
-            d->mServiceDescriptionParsers[newService->serviceId()]->downloadServiceDescription(serviceUrl);
+            d->mServiceDescriptionParsers[newService.serviceId()]->downloadServiceDescription(serviceUrl);
         }
     }
 }

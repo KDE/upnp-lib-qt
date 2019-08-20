@@ -56,7 +56,7 @@ private Q_SLOTS:
 
 protected:
 
-    UpnpControlAbstractService* serviceFromDescription(UpnpServiceDescription *description) const;
+    UpnpControlAbstractService* serviceFromDescription(UpnpServiceDescription description) const;
 
 private:
 

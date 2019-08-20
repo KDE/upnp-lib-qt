@@ -28,7 +28,7 @@
 #include <QtCore/QList>
 #include <QtCore/QPair>
 
-#include <QtCore/QObject>
+#include <memory>
 
 class UpnpServiceDescriptionPrivate;
 class UpnpActionDescription;
@@ -36,55 +36,22 @@ class UpnpStateVariableDescription;
 class UpnpEventSubscriber;
 class UpnpDeviceDescription;
 
-class UPNPLIBQT_EXPORT UpnpServiceDescription : public QObject
+class UPNPLIBQT_EXPORT UpnpServiceDescription
 {
 
-    Q_OBJECT
-
-    Q_PROPERTY(QString serviceType
-               READ serviceType
-               WRITE setServiceType
-               NOTIFY serviceTypeChanged)
-
-    Q_PROPERTY(QString serviceId
-               READ serviceId
-               WRITE setServiceId
-               NOTIFY serviceIdChanged)
-
-    Q_PROPERTY(QString baseURL
-               READ baseURL
-               WRITE setBaseURL
-               NOTIFY baseURLChanged)
-
-    Q_PROPERTY(QUrl SCPDURL
-               READ SCPDURL
-               WRITE setSCPDURL
-               NOTIFY SCPDURLChanged)
-
-    Q_PROPERTY(QUrl controlURL
-               READ controlURL
-               WRITE setControlURL
-               NOTIFY controlURLChanged)
-
-    Q_PROPERTY(QUrl eventURL
-               READ eventURL
-               WRITE setEventURL
-               NOTIFY eventURLChanged)
-
-    Q_PROPERTY(int maximumSubscriptionDuration
-               READ maximumSubscriptionDuration
-               WRITE setMaximumSubscriptionDuration
-               NOTIFY maximumSubscriptionDurationChanged)
-
-    Q_PROPERTY(UpnpDeviceDescription deviceDescription
-               READ deviceDescription
-               WRITE setDeviceDescription
-               NOTIFY deviceDescriptionChanged)
-
 public:
-    explicit UpnpServiceDescription(QObject *parent = nullptr);
 
-    ~UpnpServiceDescription() override;
+    explicit UpnpServiceDescription();
+
+    UpnpServiceDescription(const UpnpServiceDescription &other);
+
+    UpnpServiceDescription(UpnpServiceDescription &&other);
+
+    ~UpnpServiceDescription();
+
+    UpnpServiceDescription& operator=(const UpnpServiceDescription &other);
+
+    UpnpServiceDescription& operator=(UpnpServiceDescription &&other);
 
     void setBaseURL(const QString &newBaseURL);
 
@@ -132,31 +99,11 @@ public:
 
     const UpnpDeviceDescription &deviceDescription() const;
 
-public Q_SLOTS:
-
     void setDeviceDescription(UpnpDeviceDescription deviceDescription);
-
-Q_SIGNALS:
-
-    void serviceTypeChanged(const QString &serviceId);
-
-    void serviceIdChanged(const QString &serviceId);
-
-    void baseURLChanged(const QString &serviceId);
-
-    void SCPDURLChanged(const QString &serviceId);
-
-    void controlURLChanged(const QString &serviceId);
-
-    void eventURLChanged(const QString &serviceId);
-
-    void maximumSubscriptionDurationChanged(const QString &serviceId);
-
-    void deviceDescriptionChanged(UpnpDeviceDescription* deviceDescription);
 
 private:
 
-    UpnpServiceDescriptionPrivate *d;
+    std::unique_ptr<UpnpServiceDescriptionPrivate> d;
 
 };
 

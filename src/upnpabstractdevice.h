@@ -51,11 +51,11 @@ public:
 
     ~UpnpAbstractDevice() override;
 
-    UpnpServiceDescription* serviceDescriptionById(const QString &serviceId) const;
+    UpnpServiceDescription serviceDescriptionById(const QString &serviceId) const;
 
-    UpnpServiceDescription* serviceDescriptionByIndex(int serviceIndex) const;
+    UpnpServiceDescription serviceDescriptionByIndex(int serviceIndex) const;
 
-    const QVector<QSharedPointer<UpnpServiceDescription> > &services() const;
+    const QList<UpnpServiceDescription> &services() const;
 
     QVector<QString> servicesName() const;
 
@@ -79,7 +79,7 @@ public Q_SLOTS:
 
 protected:
 
-    int addService(QSharedPointer<UpnpServiceDescription> newService);
+    int addService(UpnpServiceDescription newService);
 
 private:
 

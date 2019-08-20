@@ -22,13 +22,13 @@
 #include "upnpstatevariabledescription.h"
 #include "upnpdevicedescription.h"
 
-#include <QtCore/QPointer>
-#include <QtCore/QBuffer>
-#include <QtCore/QIODevice>
-#include <QtCore/QXmlStreamWriter>
-#include <QtCore/QTimer>
-#include <QtCore/QMetaObject>
-#include <QtCore/QMetaProperty>
+#include <QPointer>
+#include <QBuffer>
+#include <QIODevice>
+#include <QXmlStreamWriter>
+#include <QTimer>
+#include <QMetaObject>
+#include <QMetaProperty>
 
 #include <QtCore/QDebug>
 
@@ -69,13 +69,38 @@ public:
 
 };
 
-UpnpServiceDescription::UpnpServiceDescription(QObject *parent) : QObject(parent), d(new UpnpServiceDescriptionPrivate)
+UpnpServiceDescription::UpnpServiceDescription() : d(std::make_unique<UpnpServiceDescriptionPrivate>())
 {
 }
 
-UpnpServiceDescription::~UpnpServiceDescription()
+UpnpServiceDescription::UpnpServiceDescription(const UpnpServiceDescription &other) : d(std::make_unique<UpnpServiceDescriptionPrivate>(*other.d))
 {
-    delete d;
+}
+
+UpnpServiceDescription::UpnpServiceDescription(UpnpServiceDescription &&other) : d()
+{
+    d.swap(other.d);
+}
+
+UpnpServiceDescription::~UpnpServiceDescription() = default;
+
+UpnpServiceDescription &UpnpServiceDescription::operator=(const UpnpServiceDescription &other)
+{
+    if (this != &other) {
+        *d = *other.d;
+    }
+
+    return *this;
+}
+
+UpnpServiceDescription &UpnpServiceDescription::operator=(UpnpServiceDescription &&other)
+{
+    if (this != &other) {
+        d.reset();
+        d.swap(other.d);
+    }
+
+    return *this;
 }
 
 void UpnpServiceDescription::setBaseURL(const QString &newBaseURL)
@@ -196,8 +221,4 @@ const UpnpDeviceDescription& UpnpServiceDescription::deviceDescription() const
 void UpnpServiceDescription::setDeviceDescription(UpnpDeviceDescription deviceDescription)
 {
     d->mDeviceDescription = deviceDescription;
-    emit deviceDescriptionChanged(&deviceDescription);
 }
-
-
-#include "moc_upnpservicedescription.cpp"

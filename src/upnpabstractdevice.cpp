@@ -54,29 +54,30 @@ UpnpAbstractDevice::~UpnpAbstractDevice()
 {
 }
 
-UpnpServiceDescription* UpnpAbstractDevice::serviceDescriptionById(const QString &serviceId) const
+UpnpServiceDescription UpnpAbstractDevice::serviceDescriptionById(const QString &serviceId) const
 {
-    UpnpServiceDescription *result = nullptr;
+    auto result = UpnpServiceDescription{};
     const auto &allServices = d->mDevice->services();
 
     for (const auto &service : allServices) {
-        if (service->serviceId() == serviceId) {
-            return service.data();
+        if (service.serviceId() == serviceId) {
+            result = service;
+            return result;
         }
     }
     return result;
 }
 
-UpnpServiceDescription *UpnpAbstractDevice::serviceDescriptionByIndex(int serviceIndex) const
+UpnpServiceDescription UpnpAbstractDevice::serviceDescriptionByIndex(int serviceIndex) const
 {
     if (serviceIndex < 0 || serviceIndex > d->mDevice->services().size() - 1) {
-        return nullptr;
+        return UpnpServiceDescription{};
     }
 
-    return d->mDevice->services()[serviceIndex].data();
+    return d->mDevice->services()[serviceIndex];
 }
 
-const QVector<QSharedPointer<UpnpServiceDescription> >& UpnpAbstractDevice::services() const
+const QList<UpnpServiceDescription>& UpnpAbstractDevice::services() const
 {
     return d->mDevice->services();
 }
@@ -87,7 +88,7 @@ QVector<QString> UpnpAbstractDevice::servicesName() const
     const auto &allServices = d->mDevice->services();
 
     for (const auto &itService : allServices) {
-        result.push_back(itService->serviceType());
+        result.push_back(itService.serviceType());
     }
 
     return result;
@@ -146,11 +147,11 @@ QIODevice* UpnpAbstractDevice::buildAndGetXmlDescription()
 
             for (const auto &itService : allServices) {
                 insertStream.writeStartElement(QStringLiteral("service"));
-                insertStream.writeTextElement(QStringLiteral("serviceType"), itService->serviceType());
-                insertStream.writeTextElement(QStringLiteral("serviceId"), itService->serviceId());
-                insertStream.writeTextElement(QStringLiteral("SCPDURL"), itService->SCPDURL().toString());
-                insertStream.writeTextElement(QStringLiteral("controlURL"), itService->controlURL().toString());
-                insertStream.writeTextElement(QStringLiteral("eventSubURL"), itService->eventURL().toString());
+                insertStream.writeTextElement(QStringLiteral("serviceType"), itService.serviceType());
+                insertStream.writeTextElement(QStringLiteral("serviceId"), itService.serviceId());
+                insertStream.writeTextElement(QStringLiteral("SCPDURL"), itService.SCPDURL().toString());
+                insertStream.writeTextElement(QStringLiteral("controlURL"), itService.controlURL().toString());
+                insertStream.writeTextElement(QStringLiteral("eventSubURL"), itService.eventURL().toString());
                 insertStream.writeEndElement();
             }
             insertStream.writeEndElement();
@@ -188,7 +189,7 @@ void UpnpAbstractDevice::newSearchQuery(UpnpSsdpEngine *engine, const UpnpSearch
     }
 }
 
-int UpnpAbstractDevice::addService(QSharedPointer<UpnpServiceDescription> newService)
+int UpnpAbstractDevice::addService(UpnpServiceDescription newService)
 {
     d->mDevice->services().push_back(newService);
     return d->mDevice->services().count() - 1;

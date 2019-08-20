@@ -34,19 +34,19 @@ class UpnpServiceDescriptionParserPrivate
 {
 public:
 
-    UpnpServiceDescriptionParserPrivate(QNetworkAccessManager *aNetworkAccess, QSharedPointer<UpnpServiceDescription> deviceDescription)
-        : mNetworkAccess(aNetworkAccess), mServiceDescription(std::move(deviceDescription)), mServiceURL()
+    UpnpServiceDescriptionParserPrivate(QNetworkAccessManager *aNetworkAccess, UpnpServiceDescription &deviceDescription)
+        : mNetworkAccess(aNetworkAccess), mServiceDescription(deviceDescription), mServiceURL()
     {
     }
 
     QNetworkAccessManager *mNetworkAccess;
 
-    QSharedPointer<UpnpServiceDescription> mServiceDescription;
+    UpnpServiceDescription &mServiceDescription;
 
     QUrl mServiceURL;
 };
 
-UpnpServiceDescriptionParser::UpnpServiceDescriptionParser(QNetworkAccessManager *aNetworkAccess, QSharedPointer<UpnpServiceDescription> deviceDescription, QObject *parent)
+UpnpServiceDescriptionParser::UpnpServiceDescriptionParser(QNetworkAccessManager *aNetworkAccess, UpnpServiceDescription &deviceDescription, QObject *parent)
     : QObject(parent), d(new UpnpServiceDescriptionParserPrivate(aNetworkAccess, deviceDescription))
 {
 }
@@ -109,7 +109,7 @@ void UpnpServiceDescriptionParser::parseServiceDescription(QIODevice *serviceDes
 
             newAction.mArguments.push_back(newArgument);
 
-            d->mServiceDescription->addAction(newAction);
+            d->mServiceDescription.addAction(newAction);
 
             argumentNode = argumentNode.nextSibling();
         }
@@ -130,7 +130,7 @@ void UpnpServiceDescriptionParser::parseServiceDescription(QIODevice *serviceDes
     }
 #endif
 
-    Q_EMIT descriptionParsed(d->mServiceDescription->serviceId());
+    Q_EMIT descriptionParsed(d->mServiceDescription.serviceId());
 }
 
 

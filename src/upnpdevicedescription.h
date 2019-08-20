@@ -47,15 +47,17 @@ public:
 
     UpnpDeviceDescription& operator=(UpnpDeviceDescription &&other);
 
-    const QSharedPointer<UpnpServiceDescription> serviceById(const QString &serviceId) const;
+    UpnpServiceDescription serviceById(const QString &serviceId) const;
 
-    const QSharedPointer<UpnpServiceDescription> serviceByIndex(int serviceIndex) const;
+    const UpnpServiceDescription& serviceByIndex(int serviceIndex) const;
 
-    const QVector<QSharedPointer<UpnpServiceDescription> >& services() const;
+    UpnpServiceDescription& serviceByIndex(int serviceIndex);
 
-    QVector<QSharedPointer<UpnpServiceDescription> >& services();
+    const QList<UpnpServiceDescription>& services() const;
 
-    QVector<QString> servicesName() const;
+    QList<UpnpServiceDescription>& services();
+
+    QList<QString> servicesName() const;
 
     /**
      * @brief setUDN will set the UDN (i.e. Unique Device Name) of this device
@@ -147,7 +149,7 @@ public:
 
     const QUrl& locationUrl() const;
 
-    int addService(const QSharedPointer<UpnpServiceDescription> &newService);
+    int addService(const UpnpServiceDescription &newService);
 
 private:
 

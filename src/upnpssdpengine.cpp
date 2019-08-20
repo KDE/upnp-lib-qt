@@ -333,8 +333,8 @@ void UpnpSsdpEngine::publishDevice(UpnpAbstractDevice *device)
     const auto &servicesList = device->description()->services();
     for (const auto &oneService : servicesList) {
         QByteArray deviceMessage(allDiscoveryMessageCommonContent);
-        deviceMessage += "NT: " + (oneService)->serviceType().toLatin1() + "\r\n";
-        deviceMessage += "USN: uuid:" + device->description()->UDN().toLatin1() + "::" + (oneService)->serviceType().toLatin1() + "\r\n";
+        deviceMessage += "NT: " + oneService.serviceType().toLatin1() + "\r\n";
+        deviceMessage += "USN: uuid:" + device->description()->UDN().toLatin1() + "::" + oneService.serviceType().toLatin1() + "\r\n";
         deviceMessage += "LOCATION: "+ device->description()->locationUrl().toString().toLatin1() + "\r\n";
         deviceMessage += "\r\n";
 
