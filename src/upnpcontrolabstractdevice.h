@@ -17,8 +17,8 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#ifndef UPNPDEVICEDISCOVERY_H
-#define UPNPDEVICEDISCOVERY_H
+#ifndef UPNPCONTROLABSTRACTDEVICE_H
+#define UPNPCONTROLABSTRACTDEVICE_H
 
 #include "upnplibqt_export.h"
 

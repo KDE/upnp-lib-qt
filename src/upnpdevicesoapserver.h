@@ -35,7 +35,8 @@ class UPNPLIBQT_EXPORT UpnpDeviceSoapServer : public KDSoapServer
 {
     Q_OBJECT
 public:
-    UpnpDeviceSoapServer(QObject * parent = nullptr);
+
+    explicit UpnpDeviceSoapServer(QObject * parent = nullptr);
 
     ~UpnpDeviceSoapServer() override;
 

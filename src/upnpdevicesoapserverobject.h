@@ -40,7 +40,8 @@ class UpnpDeviceSoapServerObject : public QObject, public KDSoapServerObjectInte
     Q_INTERFACES(KDSoapServerObjectInterface KDSoapServerCustomVerbRequestInterface)
 
 public:
-    UpnpDeviceSoapServerObject(QList<UpnpAbstractDevice *> &devices, QObject *parent = nullptr);
+
+    explicit UpnpDeviceSoapServerObject(QList<UpnpAbstractDevice *> &devices, QObject *parent = nullptr);
 
     ~UpnpDeviceSoapServerObject() override;
 

@@ -29,7 +29,6 @@
 #include "upnpservicedescription.h"
 
 #include "KDSoapClient/KDSoapValue.h"
-#include "KDSoapClient/KDSoapValue.h"
 
 #include <QDebug>
 #include <QList>

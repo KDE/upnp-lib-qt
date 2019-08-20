@@ -39,7 +39,7 @@ class UpnpEventSubscriber : public QObject
 
 public:
 
-    UpnpEventSubscriber(QObject *parent = nullptr);
+    explicit UpnpEventSubscriber(QObject *parent = nullptr);
 
     ~UpnpEventSubscriber() override;
 

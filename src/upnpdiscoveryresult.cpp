@@ -35,7 +35,7 @@ public:
     }
 
     /**
-     * @brief mNT contains the header ST (i.e. search target) or NT (i.e. notification type) sent in an ssdp message. This is usefull to know the type of the discovered service.
+     * @brief mNT contains the header ST (i.e. search target) or NT (i.e. notification type) sent in an ssdp message. This is useful to know the type of the discovered service.
      */
     QString mNT;
 
