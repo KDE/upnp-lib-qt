@@ -62,7 +62,7 @@ UpnpControlAbstractService *UpnpControlAbstractDevice::serviceByIndex(int servic
     return serviceFromDescription(serviceDescription);
 }
 
-UpnpControlAbstractService* UpnpControlAbstractDevice::serviceFromDescription(UpnpServiceDescription description) const
+UpnpControlAbstractService* UpnpControlAbstractDevice::serviceFromDescription(const UpnpServiceDescription &description) const
 {
     UpnpControlAbstractService *newService = nullptr;
 

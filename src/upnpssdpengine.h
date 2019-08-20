@@ -148,7 +148,7 @@ public Q_SLOTS:
     /**
      * @brief searchUpnpDevice will trigger a search for upnp device depending on the parameters
      */
-    bool searchUpnp(SEARCH_TYPE searchType, const QString &searchCriteria, int maxDelay = 1);
+    bool searchUpnp(UpnpSsdpEngine::SEARCH_TYPE searchType, const QString &searchCriteria, int maxDelay = 1);
 
     /**
      * @brief searchAllUpnpDevice will trigger a search for all upnp device

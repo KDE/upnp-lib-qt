@@ -189,7 +189,7 @@ void UpnpAbstractDevice::newSearchQuery(UpnpSsdpEngine *engine, const UpnpSearch
     }
 }
 
-int UpnpAbstractDevice::addService(UpnpServiceDescription newService)
+int UpnpAbstractDevice::addService(const UpnpServiceDescription &newService)
 {
     d->mDevice->services().push_back(newService);
     return d->mDevice->services().count() - 1;

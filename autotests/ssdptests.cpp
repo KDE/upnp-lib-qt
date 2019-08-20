@@ -155,6 +155,12 @@ class SsdpTests: public QObject
 {
     Q_OBJECT
 
+public:
+
+    SsdpTests(QObject *parent = nullptr) : QObject(parent)
+    {
+    }
+
 private Q_SLOTS:
 
     void initTestCase()

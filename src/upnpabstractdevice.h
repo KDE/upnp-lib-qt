@@ -79,7 +79,7 @@ public Q_SLOTS:
 
 protected:
 
-    int addService(UpnpServiceDescription newService);
+    int addService(const UpnpServiceDescription &newService);
 
 private:
 

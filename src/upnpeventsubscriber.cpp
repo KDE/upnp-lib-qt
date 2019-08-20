@@ -141,7 +141,7 @@ void UpnpEventSubscriber::sendEventNotification()
 
     QNetworkReply *replyHandler = d->mNetworkAccess.sendCustomRequest(newRequest, "NOTIFY", requestBody.data());
     connect(replyHandler, &QNetworkReply::finished, this, &UpnpEventSubscriber::eventingFinished);
-    connect(replyHandler, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(eventingInErrorFinished(QNetworkReply::NetworkError)));
+    connect(replyHandler, static_cast<void (QNetworkReply::*)(QNetworkReply::NetworkError)>(&QNetworkReply::error), this, &UpnpEventSubscriber::eventingInErrorFinished);
 
     d->mSentBuffer = requestBody;
 }

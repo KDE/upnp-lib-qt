@@ -99,7 +99,7 @@ public:
 
     const UpnpDeviceDescription &deviceDescription() const;
 
-    void setDeviceDescription(UpnpDeviceDescription deviceDescription);
+    void setDeviceDescription(const UpnpDeviceDescription &deviceDescription);
 
 private:
 

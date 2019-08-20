@@ -237,7 +237,7 @@ QVector<QPair<QString, QVariant> > UpnpAbstractService::invokeAction(const QStri
     return {};
 }
 
-void UpnpAbstractService::setDescription(UpnpServiceDescription value)
+void UpnpAbstractService::setDescription(const UpnpServiceDescription &value)
 {
     d->mService = value;
     Q_EMIT descriptionChanged();
@@ -254,7 +254,7 @@ const UpnpServiceDescription &UpnpAbstractService::description() const
 }
 void UpnpAbstractService::sendEventNotification(const QPointer<UpnpEventSubscriber> &currentSubscriber)
 {
-    QTimer::singleShot(0, currentSubscriber.data(), SLOT(sendEventNotification()));
+    QTimer::singleShot(0, currentSubscriber.data(), &UpnpEventSubscriber::sendEventNotification);
 }
 
 #include "moc_upnpabstractservice.cpp"

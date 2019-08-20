@@ -384,7 +384,7 @@ void UpnpSsdpEngine::discoveryResultTimeout()
 {
     auto now = QDateTime::currentDateTime();
 
-    for(const auto &itDiscovery : d->mDiscoveryResults) {
+    for(const auto &itDiscovery : qAsConst(d->mDiscoveryResults)) {
         if (now > itDiscovery.validityTimestamp()) {
             qDebug() << "remove service due to timeout" << itDiscovery;
             Q_EMIT removedService(itDiscovery);

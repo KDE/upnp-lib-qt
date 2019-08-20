@@ -218,7 +218,7 @@ const UpnpDeviceDescription& UpnpServiceDescription::deviceDescription() const
     return d->mDeviceDescription;
 }
 
-void UpnpServiceDescription::setDeviceDescription(UpnpDeviceDescription deviceDescription)
+void UpnpServiceDescription::setDeviceDescription(const UpnpDeviceDescription &deviceDescription)
 {
     d->mDeviceDescription = deviceDescription;
 }

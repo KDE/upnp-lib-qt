@@ -72,7 +72,7 @@ public:
 
     virtual QVector<QPair<QString, QVariant> > invokeAction(const QString &actionName, const QVector<QVariant> &arguments, bool &isInError);
 
-    void setDescription(UpnpServiceDescription value);
+    void setDescription(const UpnpServiceDescription &value);
 
     UpnpServiceDescription& description();
 

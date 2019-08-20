@@ -78,7 +78,7 @@ public:
 
     int cacheDuration() const;
 
-    void setValidityTimestamp(QDateTime value);
+    void setValidityTimestamp(const QDateTime &value);
 
     QDateTime validityTimestamp() const;
 

@@ -180,7 +180,7 @@ int UpnpDiscoveryResult::cacheDuration() const
     return d->mCacheDuration;
 }
 
-void UpnpDiscoveryResult::setValidityTimestamp(QDateTime value)
+void UpnpDiscoveryResult::setValidityTimestamp(const QDateTime &value)
 {
     d->mValidityTimestamp = value;
 }
@@ -195,6 +195,3 @@ UPNPLIBQT_EXPORT QDebug operator<<(QDebug stream, const UpnpDiscoveryResult &dat
     stream << data.location() << "usn" << data.usn() << "nt" << data.nt() << "nts" << data.nts() << "announce date" << data.announceDate() << "cache" << data.cacheDuration() << "valid until" << data.validityTimestamp();
     return stream;
 }
-
-
-#include "moc_upnpdiscoveryresult.cpp"
