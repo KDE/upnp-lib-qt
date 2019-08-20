@@ -23,13 +23,13 @@
 
 #include "upnpstatevariabledescription.h"
 
-#include <QtCore/QPointer>
-#include <QtCore/QBuffer>
-#include <QtCore/QXmlStreamWriter>
-#include <QtCore/QUuid>
+#include <QPointer>
+#include <QBuffer>
+#include <QXmlStreamWriter>
+#include <QUuid>
 
-#include <QtNetwork/QNetworkRequest>
-#include <QtNetwork/QNetworkReply>
+#include <QNetworkRequest>
+#include <QNetworkReply>
 
 class UpnpEventSubscriberPrivate
 {

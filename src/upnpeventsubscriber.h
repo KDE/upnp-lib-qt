@@ -22,11 +22,11 @@
 
 #include "upnplibqt_export.h"
 
-#include <QtNetwork/QNetworkReply>
+#include <QNetworkReply>
 
-#include <QtCore/QObject>
-#include <QtCore/QUrl>
-#include <QtCore/QString>
+#include <QObject>
+#include <QUrl>
+#include <QString>
 
 #include <memory>
 

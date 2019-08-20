@@ -24,7 +24,7 @@
 
 #include "upnpabstractdevice.h"
 
-#include <QtCore/QObject>
+#include <QObject>
 
 #include <memory>
 

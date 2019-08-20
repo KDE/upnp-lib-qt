@@ -21,7 +21,7 @@
 
 #include "upnpcontrolabstractservice.h"
 
-#include <QtCore/QDebug>
+#include <QDebug>
 
 class UpnpServerEventObjectPrivate
 {

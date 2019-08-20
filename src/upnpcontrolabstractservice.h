@@ -25,11 +25,11 @@
 #include "upnpabstractservice.h"
 #include "upnpcontrolabstractservicereply.h"
 
-#include <QtCore/QObject>
-#include <QtCore/QString>
-#include <QtCore/QVariant>
-#include <QtCore/QVariantList>
-#include <QtCore/QUrl>
+#include <QObject>
+#include <QString>
+#include <QVariant>
+#include <QVariantList>
+#include <QUrl>
 
 #include <memory>
 

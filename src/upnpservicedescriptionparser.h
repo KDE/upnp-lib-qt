@@ -20,10 +20,10 @@
 #ifndef UPNPSERVICEDESCRIPTIONPARSER_H
 #define UPNPSERVICEDESCRIPTIONPARSER_H
 
-#include <QtCore/QObject>
-#include <QtCore/QUrl>
-#include <QtCore/QString>
-#include <QtCore/QSharedPointer>
+#include <QObject>
+#include <QUrl>
+#include <QString>
+#include <QSharedPointer>
 
 #include <memory>
 

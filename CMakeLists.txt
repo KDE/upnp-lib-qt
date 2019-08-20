@@ -1,10 +1,11 @@
-cmake_minimum_required(VERSION 3.3)
+cmake_minimum_required(VERSION 3.8)
 
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_STANDARD 14)
 
+project(UpnpLibQt VERSION 0.1)
+
 set(KF5_VERSION "5.59.0") # handled by release scripts
-project(UpnpLibQt VERSION ${KF5_VERSION})
 
 include(FeatureSummary)
 find_package(ECM 5.59.0  NO_MODULE)

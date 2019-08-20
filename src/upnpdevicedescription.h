@@ -22,8 +22,8 @@
 
 #include "upnplibqt_export.h"
 
-#include <QtCore/QPointer>
-#include <QtCore/QVector>
+#include <QPointer>
+#include <QVector>
 
 #include <memory>
 

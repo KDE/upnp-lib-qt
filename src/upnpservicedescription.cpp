@@ -30,7 +30,7 @@
 #include <QMetaObject>
 #include <QMetaProperty>
 
-#include <QtCore/QDebug>
+#include <QDebug>
 
 class UpnpServiceDescriptionPrivate
 {

@@ -22,8 +22,8 @@
 
 #include "upnplibqt_export.h"
 
-#include <QtCore/QObject>
-#include <QtCore/QVariantMap>
+#include <QObject>
+#include <QVariantMap>
 
 #include <memory>
 

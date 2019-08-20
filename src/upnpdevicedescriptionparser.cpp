@@ -24,11 +24,11 @@
 
 #include "upnpservicedescriptionparser.h"
 
-#include <QtNetwork/QNetworkAccessManager>
-#include <QtNetwork/QNetworkRequest>
-#include <QtNetwork/QNetworkReply>
+#include <QNetworkAccessManager>
+#include <QNetworkRequest>
+#include <QNetworkReply>
 
-#include <QtXml/QDomDocument>
+#include <QDomDocument>
 
 class UpnpDeviceDescriptionParserPrivate
 {

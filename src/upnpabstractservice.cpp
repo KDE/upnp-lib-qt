@@ -25,15 +25,15 @@
 #include "upnpstatevariabledescription.h"
 #include "upnpservicedescription.h"
 
-#include <QtCore/QPointer>
-#include <QtCore/QBuffer>
-#include <QtCore/QIODevice>
-#include <QtCore/QXmlStreamWriter>
-#include <QtCore/QTimer>
-#include <QtCore/QMetaObject>
-#include <QtCore/QMetaProperty>
+#include <QPointer>
+#include <QBuffer>
+#include <QIODevice>
+#include <QXmlStreamWriter>
+#include <QTimer>
+#include <QMetaObject>
+#include <QMetaProperty>
 
-#include <QtCore/QDebug>
+#include <QDebug>
 
 class UpnpAbstractServicePrivate
 {

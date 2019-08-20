@@ -22,9 +22,9 @@
 
 #include "upnplibqt_export.h"
 
-#include <QtCore/QObject>
-#include <QtCore/QPointer>
-#include <QtCore/QList>
+#include <QObject>
+#include <QPointer>
+#include <QList>
 
 #include <memory>
 

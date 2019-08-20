@@ -22,10 +22,10 @@
 
 #include "upnplibqt_export.h"
 
-#include <QtCore/QObject>
-#include <QtCore/QUrl>
-#include <QtCore/QString>
-#include <QtCore/QSharedPointer>
+#include <QObject>
+#include <QUrl>
+#include <QString>
+#include <QSharedPointer>
 
 #include <memory>
 

@@ -22,10 +22,10 @@
 
 #include "upnplibqt_export.h"
 
-#include <QtCore/QString>
-#include <QtCore/QByteArray>
-#include <QtCore/QVariant>
-#include <QtCore/QVector>
+#include <QString>
+#include <QByteArray>
+#include <QVariant>
+#include <QVector>
 
 class QObject;
 

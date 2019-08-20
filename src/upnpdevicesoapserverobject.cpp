@@ -31,13 +31,13 @@
 #include "KDSoapClient/KDSoapValue.h"
 #include "KDSoapClient/KDSoapValue.h"
 
-#include <QtCore/QDebug>
-#include <QtCore/QList>
-#include <QtCore/QVariant>
-#include <QtCore/QString>
-#include <QtCore/QDateTime>
-#include <QtCore/QSysInfo>
-#include <QtCore/QPair>
+#include <QDebug>
+#include <QList>
+#include <QVariant>
+#include <QString>
+#include <QDateTime>
+#include <QSysInfo>
+#include <QPair>
 
 class UpnpDeviceSoapServerObjectPrivate
 {

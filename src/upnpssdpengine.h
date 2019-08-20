@@ -22,11 +22,11 @@
 
 #include "upnplibqt_export.h"
 
-#include <QtNetwork/QHostAddress>
-#include <QtNetwork/QNetworkConfiguration>
+#include <QHostAddress>
+#include <QNetworkConfiguration>
 
-#include <QtCore/QObject>
-#include <QtCore/QString>
+#include <QObject>
+#include <QString>
 
 #include <memory>
 

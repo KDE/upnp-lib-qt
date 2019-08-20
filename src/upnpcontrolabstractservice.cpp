@@ -28,18 +28,18 @@
 #include <KDSoapClient/KDSoapClientInterface.h>
 #include <KDSoapClient/KDSoapMessage.h>
 
-#include <QtNetwork/QNetworkAccessManager>
-#include <QtNetwork/QNetworkReply>
-#include <QtNetwork/QHostInfo>
-#include <QtNetwork/QDnsLookup>
-#include <QtNetwork/QNetworkInterface>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
+#include <QHostInfo>
+#include <QDnsLookup>
+#include <QNetworkInterface>
 
-#include <QtXml/QDomDocument>
+#include <QDomDocument>
 
-#include <QtCore/QTimer>
-#include <QtCore/QPointer>
-#include <QtCore/QBuffer>
-#include <QtCore/QTextStream>
+#include <QTimer>
+#include <QPointer>
+#include <QBuffer>
+#include <QTextStream>
 
 class UpnpAbstractServiceDescriptionPrivate
 {

@@ -27,18 +27,18 @@
 #include "upnpdevicedescription.h"
 #include "upnpservicedescription.h"
 
-#include <QtNetwork/QHostAddress>
-#include <QtNetwork/QUdpSocket>
-#include <QtNetwork/QNetworkConfigurationManager>
-#include <QtNetwork/QNetworkInterface>
-#include <QtNetwork/QNetworkConfiguration>
+#include <QHostAddress>
+#include <QUdpSocket>
+#include <QNetworkConfigurationManager>
+#include <QNetworkInterface>
+#include <QNetworkConfiguration>
 
-#include <QtCore/QHash>
-#include <QtCore/QDebug>
-#include <QtCore/QSet>
-#include <QtCore/QUrl>
-#include <QtCore/QSharedPointer>
-#include <QtCore/QSysInfo>
+#include <QHash>
+#include <QDebug>
+#include <QSet>
+#include <QUrl>
+#include <QSharedPointer>
+#include <QSysInfo>
 
 #include <sys/types.h>
 #include <sys/socket.h>

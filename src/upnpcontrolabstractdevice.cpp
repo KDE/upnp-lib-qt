@@ -24,11 +24,11 @@
 #include "upnpdevicedescription.h"
 #include "upnpservicedescription.h"
 
-#include <QtCore/QDebug>
-#include <QtCore/QList>
-#include <QtCore/QMap>
-#include <QtCore/QPointer>
-#include <QtCore/QVariantMap>
+#include <QDebug>
+#include <QList>
+#include <QMap>
+#include <QPointer>
+#include <QVariantMap>
 
 class UpnpControlAbstractDevicePrivate
 {

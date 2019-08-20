@@ -24,7 +24,7 @@
 
 #include <KDSoapServer/KDSoapServer.h>
 
-#include <QtCore/QObject>
+#include <QObject>
 
 #include <memory>
 

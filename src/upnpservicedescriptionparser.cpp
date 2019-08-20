@@ -22,13 +22,13 @@
 #include "upnpservicedescription.h"
 #include "upnpactiondescription.h"
 
-#include <QtNetwork/QNetworkAccessManager>
-#include <QtNetwork/QNetworkRequest>
-#include <QtNetwork/QNetworkReply>
+#include <QNetworkAccessManager>
+#include <QNetworkRequest>
+#include <QNetworkReply>
 
-#include <QtXml/QDomDocument>
+#include <QDomDocument>
 
-#include <QtCore/QDebug>
+#include <QDebug>
 
 class UpnpServiceDescriptionParserPrivate
 {

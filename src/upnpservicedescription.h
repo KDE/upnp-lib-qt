@@ -22,11 +22,11 @@
 
 #include "upnplibqt_export.h"
 
-#include <QtCore/QString>
-#include <QtCore/QVariant>
-#include <QtCore/QUrl>
-#include <QtCore/QList>
-#include <QtCore/QPair>
+#include <QString>
+#include <QVariant>
+#include <QUrl>
+#include <QList>
+#include <QPair>
 
 #include <memory>
 

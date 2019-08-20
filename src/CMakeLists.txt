@@ -29,8 +29,8 @@ target_include_directories(UpnpLibQt
 )
 
 set_target_properties(UpnpLibQt PROPERTIES
-    VERSION     ${UPNPLIBQT_VERSION_STRING}
-    SOVERSION   ${UPNPLIBQT_SOVERSION}
+    VERSION     0.1
+    SOVERSION   0
     EXPORT_NAME "UpnpLibQt"
 )
 

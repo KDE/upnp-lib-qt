@@ -21,10 +21,10 @@
 #include "upnpabstractdevice.h"
 #include "upnpdevicesoapserverobject.h"
 
-#include <QtCore/QList>
-#include <QtCore/QUrl>
+#include <QList>
+#include <QUrl>
 
-#include <QtNetwork/QNetworkInterface>
+#include <QNetworkInterface>
 
 class UpnpDeviceSoapServerPrivate
 {

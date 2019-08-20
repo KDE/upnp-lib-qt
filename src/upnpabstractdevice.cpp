@@ -24,13 +24,13 @@
 #include "upnpdevicedescription.h"
 #include "upnpservicedescription.h"
 
-#include <QtCore/QBuffer>
-#include <QtCore/QIODevice>
-#include <QtCore/QPointer>
-#include <QtCore/QSharedPointer>
-#include <QtCore/QXmlStreamWriter>
+#include <QBuffer>
+#include <QIODevice>
+#include <QPointer>
+#include <QSharedPointer>
+#include <QXmlStreamWriter>
 
-#include <QtCore/QDebug>
+#include <QDebug>
 
 class UpnpAbstractDevicePrivate
 {

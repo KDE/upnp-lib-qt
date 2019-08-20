@@ -22,8 +22,8 @@
 
 #include "upnplibqt_export.h"
 
-#include <QtCore/QString>
-#include <QtCore/QVector>
+#include <QString>
+#include <QVector>
 
 enum class UpnpArgumentDirection
 {

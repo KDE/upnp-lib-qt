@@ -20,12 +20,12 @@
 #include "upnpdevicedescription.h"
 #include "upnpservicedescription.h"
 
-#include <QtCore/QBuffer>
-#include <QtCore/QIODevice>
-#include <QtCore/QPointer>
-#include <QtCore/QXmlStreamWriter>
+#include <QBuffer>
+#include <QIODevice>
+#include <QPointer>
+#include <QXmlStreamWriter>
 
-#include <QtCore/QDebug>
+#include <QDebug>
 
 class UpnpDeviceDescriptionPrivate
 {
@@ -86,11 +86,18 @@ UpnpDeviceDescription::~UpnpDeviceDescription() = default;
 
 UpnpDeviceDescription& UpnpDeviceDescription::operator=(const UpnpDeviceDescription &other)
 {
+    if (this != &other) {
+        *d = *other.d;
+    }
     return *this;
 }
 
 UpnpDeviceDescription& UpnpDeviceDescription::operator=(UpnpDeviceDescription &&other)
 {
+    if (this != &other) {
+        d.reset();
+        d.swap(other.d);
+    }
     return *this;
 }
 

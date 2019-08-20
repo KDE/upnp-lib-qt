@@ -22,10 +22,10 @@
 
 #include "upnplibqt_export.h"
 
-#include <QtCore/QtGlobal>
-#include <QtCore/QString>
-#include <QtCore/QList>
-#include <QtCore/QVariant>
+#include <QtGlobal>
+#include <QString>
+#include <QList>
+#include <QVariant>
 
 /**
  * A_ARG_TYPE_InstanceID argument type for UPnP method calls matching an unsigned int 32 bits
