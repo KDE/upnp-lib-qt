@@ -19,6 +19,8 @@
 
 #include "upnpservicedescriptionparser.h"
 
+#include "upnplogging.h"
+
 #include "upnpservicedescription.h"
 #include "upnpactiondescription.h"
 
@@ -28,7 +30,7 @@
 
 #include <QDomDocument>
 
-#include <QDebug>
+#include <QLoggingCategory>
 
 class UpnpServiceDescriptionParserPrivate
 {
@@ -67,7 +69,7 @@ void UpnpServiceDescriptionParser::finishedDownload(QNetworkReply *reply)
         if (reply->isFinished() && reply->error() == QNetworkReply::NoError) {
             parseServiceDescription(reply);
         } else if (reply->isFinished()) {
-            qDebug() << "UpnpAbstractServiceDescription::finishedDownload" << "error";
+            qCDebug(orgKdeUpnpLibQtUpnp()) << "UpnpAbstractServiceDescription::finishedDownload" << "error";
         }
     }
 }
@@ -123,7 +125,7 @@ void UpnpServiceDescriptionParser::parseServiceDescription(QIODevice *serviceDes
     while (!currentChild.isNull()) {
         const QDomNode &nameNode = currentChild.firstChildElement(QStringLiteral("name"));
         if (!nameNode.isNull()) {
-            qDebug() << "state variable name" << nameNode.toElement().text();
+            qCDebug(orgKdeUpnpLibQtUpnp()) << "state variable name" << nameNode.toElement().text();
         }
 
         currentChild = currentChild.nextSibling();

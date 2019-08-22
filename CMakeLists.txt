@@ -84,4 +84,6 @@ install(EXPORT UpnpLibQtTargets
         FILE UpnpLibQtTargets.cmake
         NAMESPACE UPNP::)
 
+install(FILES upnplibqt.categories DESTINATION  ${KDE_INSTALL_LOGGINGCATEGORIESDIR})
+
 feature_summary(WHAT ALL FATAL_ON_MISSING_REQUIRED_PACKAGES)

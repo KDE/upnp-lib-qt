@@ -18,6 +18,9 @@
  */
 
 #include "upnpeventsubscriber.h"
+
+#include "upnplogging.h"
+
 #include "upnpabstractservice.h"
 #include "upnpbasictypes.h"
 
@@ -30,6 +33,8 @@
 
 #include <QNetworkRequest>
 #include <QNetworkReply>
+
+#include <QLoggingCategory>
 
 class UpnpEventSubscriberPrivate
 {
@@ -193,7 +198,7 @@ void UpnpEventSubscriber::notifyPropertyChange(const QString &serviceId, const Q
 
     d->mSentBuffer = requestBody;
     d->mSentBuffer->seek(0);
-    qDebug() << "UpnpEventSubscriber::notifyPropertyChange" << d->mSentBuffer->data();
+    qCDebug(orgKdeUpnpLibQtUpnp()) << "UpnpEventSubscriber::notifyPropertyChange" << d->mSentBuffer->data();
 }
 
 void UpnpEventSubscriber::eventingFinished()

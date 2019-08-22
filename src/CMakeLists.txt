@@ -20,6 +20,20 @@ set(upnpLibQt_SRCS
     upnpstatevariabledescription.cpp
 )
 
+ecm_qt_declare_logging_category(upnpLibQt_SRCS
+    HEADER "ssdplogging.h"
+    IDENTIFIER "orgKdeUpnpLibQtSsdp"
+    CATEGORY_NAME "org.kde.upnplibqt.ssdp"
+    DEFAULT_SEVERITY Info
+    )
+
+ecm_qt_declare_logging_category(upnpLibQt_SRCS
+    HEADER "upnplogging.h"
+    IDENTIFIER "orgKdeUpnpLibQtUpnp"
+    CATEGORY_NAME "org.kde.upnplibqt.upnp"
+    DEFAULT_SEVERITY Info
+    )
+
 add_library(UpnpLibQt ${upnpLibQt_SRCS})
 generate_export_header(UpnpLibQt BASE_NAME UpnpLibQt)
 add_library(UPNP::UpnpLibQt ALIAS UpnpLibQt)

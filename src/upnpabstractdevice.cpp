@@ -18,6 +18,9 @@
  */
 
 #include "upnpabstractdevice.h"
+
+#include "upnplogging.h"
+
 #include "upnpabstractservice.h"
 #include "upnpssdpengine.h"
 
@@ -30,7 +33,7 @@
 #include <QSharedPointer>
 #include <QXmlStreamWriter>
 
-#include <QDebug>
+#include <QLoggingCategory>
 
 class UpnpAbstractDevicePrivate
 {
@@ -171,11 +174,11 @@ QIODevice* UpnpAbstractDevice::buildAndGetXmlDescription()
 
 void UpnpAbstractDevice::newSearchQuery(UpnpSsdpEngine *engine, const UpnpSearchQuery &searchQuery)
 {
-    qDebug() << "UpnpAbstractDevice::newSearchQuery" << "search for" << searchQuery.mSearchTarget;
+    qCDebug(orgKdeUpnpLibQtUpnp()) << "UpnpAbstractDevice::newSearchQuery" << "search for" << searchQuery.mSearchTarget;
     switch(searchQuery.mSearchTargetType)
     {
     case SearchTargetType::All:
-        qDebug() << "UpnpAbstractDevice::newSearchQuery" << "publish";
+        qCDebug(orgKdeUpnpLibQtUpnp()) << "UpnpAbstractDevice::newSearchQuery" << "publish";
         engine->publishDevice(this);
         break;
     case SearchTargetType::RootDevice:

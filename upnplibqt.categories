@@ -1,0 +1,2 @@
+org.kde.upnplibqt.ssdp upnplibqt (SSDP) DEFAULT_SEVERITY [INFO] IDENTIFIER [orgKdeUpnpLibQtSsdp]
+org.kde.upnplibqt.upnp upnplibqt (UPNP) DEFAULT_SEVERITY [INFO] IDENTIFIER [orgKdeUpnpLibQtUpnp]

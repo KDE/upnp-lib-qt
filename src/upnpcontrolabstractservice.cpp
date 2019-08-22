@@ -18,6 +18,9 @@
  */
 
 #include "upnpcontrolabstractservice.h"
+
+#include "upnplogging.h"
+
 #include "upnphttpserver.h"
 #include "upnpservereventobject.h"
 #include "upnpbasictypes.h"
@@ -40,6 +43,8 @@
 #include <QPointer>
 #include <QBuffer>
 #include <QTextStream>
+
+#include <QLoggingCategory>
 
 class UpnpAbstractServiceDescriptionPrivate
 {
@@ -185,7 +190,7 @@ void UpnpControlAbstractService::finishedDownload(QNetworkReply *reply)
             parseServiceDescription(reply);
         }
     } else if (reply->isFinished()) {
-        qDebug() << "UpnpAbstractServiceDescription::finishedDownload" << "error";
+        qCDebug(orgKdeUpnpLibQtUpnp()) << "UpnpAbstractServiceDescription::finishedDownload" << "error";
     }
 }
 
@@ -245,7 +250,7 @@ void UpnpControlAbstractService::parseServiceDescription(QIODevice *serviceDescr
     while (!currentChild.isNull()) {
         const QDomNode &nameNode = currentChild.firstChildElement(QStringLiteral("name"));
         if (!nameNode.isNull()) {
-            qDebug() << "state variable name" << nameNode.toElement().text();
+            qCDebug(orgKdeUpnpLibQtUpnp()) << "state variable name" << nameNode.toElement().text();
         }
 
         currentChild = currentChild.nextSibling();

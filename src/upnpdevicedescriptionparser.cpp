@@ -19,6 +19,8 @@
 
 #include "upnpdevicedescriptionparser.h"
 
+#include "upnplogging.h"
+
 #include "upnpdevicedescription.h"
 #include "upnpservicedescription.h"
 
@@ -29,6 +31,8 @@
 #include <QNetworkReply>
 
 #include <QDomDocument>
+
+#include <QLoggingCategory>
 
 class UpnpDeviceDescriptionParserPrivate
 {
@@ -65,7 +69,7 @@ void UpnpDeviceDescriptionParser::downloadDeviceDescription(const QUrl &deviceUr
 
 void UpnpDeviceDescriptionParser::serviceDescriptionParsed(const QString &upnpServiceId)
 {
-    qDebug() << "UpnpDeviceDescriptionParser::serviceDescriptionParsed" << upnpServiceId;
+    qCDebug(orgKdeUpnpLibQtUpnp()) << "UpnpDeviceDescriptionParser::serviceDescriptionParsed" << upnpServiceId;
 
     d->mServiceDescriptionParsers.remove(upnpServiceId);
 

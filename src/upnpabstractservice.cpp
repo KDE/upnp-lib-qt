@@ -18,6 +18,9 @@
  */
 
 #include "upnpabstractservice.h"
+
+#include "upnplogging.h"
+
 #include "upnpbasictypes.h"
 #include "upnpeventsubscriber.h"
 
@@ -33,7 +36,7 @@
 #include <QMetaObject>
 #include <QMetaProperty>
 
-#include <QDebug>
+#include <QLoggingCategory>
 
 class UpnpAbstractServicePrivate
 {
@@ -195,7 +198,7 @@ void UpnpAbstractService::unsubscribeToEvents(const QByteArray &requestData, con
 {
     Q_UNUSED(headers);
 
-    qDebug() << "UpnpAbstractService::unsubscribeToEvents" << requestData;
+    qCDebug(orgKdeUpnpLibQtUpnp()) << "UpnpAbstractService::unsubscribeToEvents" << requestData;
 }
 
 void UpnpAbstractService::addAction(const UpnpActionDescription &newAction)

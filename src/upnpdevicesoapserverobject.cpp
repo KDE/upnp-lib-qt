@@ -19,6 +19,8 @@
 
 #include "upnpdevicesoapserverobject.h"
 
+#include "upnplogging.h"
+
 #include "upnpabstractdevice.h"
 #include "upnpabstractservice.h"
 #include "upnpeventsubscriber.h"
@@ -30,7 +32,7 @@
 
 #include "KDSoapClient/KDSoapValue.h"
 
-#include <QDebug>
+#include <QLoggingCategory>
 #include <QList>
 #include <QVariant>
 #include <QString>
@@ -65,7 +67,7 @@ void UpnpDeviceSoapServerObject::processRequest(const KDSoapMessage &request, KD
     Q_UNUSED(request);
     Q_UNUSED(soapAction);
 
-    qDebug() << "UpnpDeviceSoapServerObject::processRequest" << request.name();
+    qCDebug(orgKdeUpnpLibQtUpnp()) << "UpnpDeviceSoapServerObject::processRequest" << request.name();
 }
 
 QIODevice *UpnpDeviceSoapServerObject::processFileRequest(const QString &path, QByteArray &contentType)
@@ -93,7 +95,7 @@ void UpnpDeviceSoapServerObject::processRequestWithPath(const KDSoapMessage &req
     Q_UNUSED(response);
     Q_UNUSED(soapAction);
 
-    qDebug() << "UpnpDeviceSoapServerObject::processRequestWithPath" << path << request.name();
+    qCDebug(orgKdeUpnpLibQtUpnp()) << "UpnpDeviceSoapServerObject::processRequestWithPath" << path << request.name();
 
     const QList<QString> &pathParts = path.split(QStringLiteral("/"));
     if (pathParts.count() != 4 || pathParts.last() != QStringLiteral("control")) {
@@ -129,7 +131,7 @@ void UpnpDeviceSoapServerObject::processRequestWithPath(const KDSoapMessage &req
 
     const KDSoapValueList &allArguments(request.arguments());
     const UpnpActionDescription &currentAction = currentService.action(actionNameString);
-    qDebug() << "allArguments" << allArguments << "action arguments" << currentAction.mNumberInArgument;
+    qCDebug(orgKdeUpnpLibQtUpnp()) << "allArguments" << allArguments << "action arguments" << currentAction.mNumberInArgument;
 
     QVector<QVariant> checkedArguments;
     bool argumentError = false;
@@ -146,7 +148,7 @@ void UpnpDeviceSoapServerObject::processRequestWithPath(const KDSoapMessage &req
             if (allArguments[argumentIndexMessage].name() == currentAction.mArguments[argumentIndexMessage].mName) {
                 checkedArguments.push_back(allArguments[argumentIndexMessage].value());
             } else {
-                qDebug() << "invalid argument";
+                qCDebug(orgKdeUpnpLibQtUpnp()) << "invalid argument";
                 argumentError = true;
             }
         } else {
@@ -155,7 +157,7 @@ void UpnpDeviceSoapServerObject::processRequestWithPath(const KDSoapMessage &req
             }
 
             if (argumentIndexMessage < currentAction.mNumberInArgument) {
-                qDebug() << "missing arguments";
+                qCDebug(orgKdeUpnpLibQtUpnp()) << "missing arguments";
             }
             argumentError = true;
         }
@@ -164,7 +166,7 @@ void UpnpDeviceSoapServerObject::processRequestWithPath(const KDSoapMessage &req
     }
 
     if (argumentError) {
-        qDebug() << "error about arguments";
+        qCDebug(orgKdeUpnpLibQtUpnp()) << "error about arguments";
         response.setFault(true);
         return;
     } else {
@@ -234,7 +236,7 @@ bool UpnpDeviceSoapServerObject::processCustomVerbRequest(const QByteArray &requ
             }
         }
     } else {
-        qDebug() << "UpnpDeviceSoapServerObject::processCustomVerbRequest" << requestData << httpHeaders;
+        qCDebug(orgKdeUpnpLibQtUpnp()) << "UpnpDeviceSoapServerObject::processCustomVerbRequest" << requestData << httpHeaders;
     }
 
     return false;
@@ -242,7 +244,7 @@ bool UpnpDeviceSoapServerObject::processCustomVerbRequest(const QByteArray &requ
 
 QIODevice *UpnpDeviceSoapServerObject::downloadDeviceXmlDescription(UpnpAbstractDevice *device, QByteArray &contentType)
 {
-    qDebug() << "UpnpDeviceSoapServerObject::downloadDeviceXmlDescription" << device->description()->UDN();
+    qCDebug(orgKdeUpnpLibQtUpnp()) << "UpnpDeviceSoapServerObject::downloadDeviceXmlDescription" << device->description()->UDN();
 
     contentType = "text/xml";
 
@@ -251,7 +253,7 @@ QIODevice *UpnpDeviceSoapServerObject::downloadDeviceXmlDescription(UpnpAbstract
 
 QIODevice *UpnpDeviceSoapServerObject::downloadServiceXmlDescription(UpnpAbstractDevice *device, const int serviceIndex, QByteArray &contentType)
 {
-    qDebug() << "UpnpDeviceSoapServerObject::downloadServiceXmlDescription" << device->description()->UDN() << serviceIndex;
+    qCDebug(orgKdeUpnpLibQtUpnp()) << "UpnpDeviceSoapServerObject::downloadServiceXmlDescription" << device->description()->UDN() << serviceIndex;
 
     contentType = "text/xml";
 
