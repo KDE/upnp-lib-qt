@@ -19,8 +19,6 @@
 
 #include "upnpdiscoveryresult.h"
 
-#include <QDebug>
-
 class UpnpDiscoveryResultPrivate
 {
 
@@ -49,7 +47,7 @@ public:
     /**
      * @brief mNTS contains the header NTS (i.e. notification sub type) sent in an ssdp message
      */
-    UpnpSsdpEngine::NotificationSubType mNTS;
+    UpnpSsdpEngine::NotificationSubType mNTS = UpnpSsdpEngine::NotificationSubType::Invalid;
 
     /**
      * @brief mAnnounceDate contains the date sent in the SSDP message by the other side
@@ -59,7 +57,7 @@ public:
     /**
      * @brief mCacheDuration duration of validity of the announce in seconds
      */
-    int mCacheDuration;
+    int mCacheDuration = 1800;
 
     /**
      * @brief mTimestamp contains the date and time at which the result will expire
@@ -81,6 +79,8 @@ UpnpDiscoveryResult::UpnpDiscoveryResult(const QString &aNT, const QString &aUSN
     if (!d->mValidityTimestamp.isValid()) {
         d->mValidityTimestamp = QDateTime::currentDateTime();
     }
+
+    d->mValidityTimestamp = d->mValidityTimestamp.addSecs(d->mCacheDuration);
 }
 
 UpnpDiscoveryResult::UpnpDiscoveryResult(const UpnpDiscoveryResult &other)
@@ -156,6 +156,13 @@ UpnpSsdpEngine::NotificationSubType UpnpDiscoveryResult::nts() const
 void UpnpDiscoveryResult::setAnnounceDate(const QString &value)
 {
     d->mAnnounceDate = value;
+
+    d->mValidityTimestamp = QDateTime::fromString(d->mAnnounceDate, QStringLiteral("ddd., d MMM. yy hh:mm:ss G\u007F"));
+    if (!d->mValidityTimestamp.isValid()) {
+        d->mValidityTimestamp = QDateTime::currentDateTime();
+    }
+
+    d->mValidityTimestamp = d->mValidityTimestamp.addSecs(d->mCacheDuration);
 }
 
 const QString &UpnpDiscoveryResult::announceDate() const

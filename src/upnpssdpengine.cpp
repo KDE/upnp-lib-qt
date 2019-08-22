@@ -386,12 +386,21 @@ void UpnpSsdpEngine::discoveryResultTimeout()
 {
     auto now = QDateTime::currentDateTime();
 
+    auto timedOutDiscoveryResults = QList<QString>();
+
     for(const auto &itDiscovery : qAsConst(d->mDiscoveryResults)) {
         if (now > itDiscovery.validityTimestamp()) {
             qCDebug(orgKdeUpnpLibQtSsdp()) << "remove service due to timeout" << itDiscovery;
             Q_EMIT removedService(itDiscovery);
 
-            //d->mDiscoveryResults.erase(itDiscovery);
+            timedOutDiscoveryResults.push_back(itDiscovery.usn());
+        }
+    }
+
+    for (const auto &removedUsn : timedOutDiscoveryResults) {
+        auto itDiscovery = d->mDiscoveryResults.find(removedUsn);
+        if (itDiscovery != d->mDiscoveryResults.end()) {
+            d->mDiscoveryResults.erase(itDiscovery);
         }
     }
 }
@@ -575,17 +584,10 @@ void UpnpSsdpEngine::parseSsdpAnnounceDatagram(const QByteArray &datagram, const
                 newDiscovery.setAnnounceDate(QString::fromLatin1(header.mid(5, header.length() - 6)));
             }
         }
-        if (header.startsWith("CACHE-CONTROL")) {
-            if ((header)[14] == ' ') {
-                const QList<QByteArray> &splittedLine = header.mid(15, header.length() - 16).split('=');
-                if (splittedLine.size() == 2) {
-                    newDiscovery.setCacheDuration(splittedLine.last().toInt());
-                }
-            } else {
-                const QList<QByteArray> &splittedLine = header.mid(14, header.length() - 15).split('=');
-                if (splittedLine.size() == 2) {
-                    newDiscovery.setCacheDuration(splittedLine.last().toInt());
-                }
+        if (header.startsWith("Cache-Control: max-age") || header.startsWith("CACHE-CONTROL: max-age")) {
+            const QList<QByteArray> &splittedLine = header.mid(22, header.length() - 23).split('=');
+            if (splittedLine.size() == 2) {
+                newDiscovery.setCacheDuration(splittedLine.last().toInt());
             }
         }
     }
@@ -613,28 +615,25 @@ void UpnpSsdpEngine::parseSsdpAnnounceDatagram(const QByteArray &datagram, const
             Q_EMIT newService(newDiscovery);
         }
 
-#if 0
-        qCDebug(orgKdeUpnpLibQtSsdp()) << datagram;
-        qCDebug(orgKdeUpnpLibQtSsdp()) << "AnnounceDate" << newDiscovery.mAnnounceDate;
-        qCDebug(orgKdeUpnpLibQtSsdp()) << "CacheDuration" << newDiscovery.mCacheDuration;
+//        qCInfo(orgKdeUpnpLibQtSsdp()) << datagram;
+//        qCInfo(orgKdeUpnpLibQtSsdp()) << "AnnounceDate" << newDiscovery.announceDate();
+//        qCInfo(orgKdeUpnpLibQtSsdp()) << "CacheDuration" << newDiscovery.cacheDuration();
 
-        qCDebug(orgKdeUpnpLibQtSsdp()) << "new service";
-        qCDebug(orgKdeUpnpLibQtSsdp()) << "DeviceId:" << newDiscovery.mUSN;
-        qCDebug(orgKdeUpnpLibQtSsdp()) << "DeviceType:" << newDiscovery.mNT;
-        qCDebug(orgKdeUpnpLibQtSsdp()) << "Location:" << newDiscovery.mLocation;
-        qCDebug(orgKdeUpnpLibQtSsdp()) << "new service";
-        qCDebug(orgKdeUpnpLibQtSsdp()) << "DeviceId:" << searchResult->DeviceId;
-        qCDebug(orgKdeUpnpLibQtSsdp()) << "DeviceType:" << searchResult->DeviceType;
-        qCDebug(orgKdeUpnpLibQtSsdp()) << "ServiceType:" << searchResult->ServiceType;
-        qCDebug(orgKdeUpnpLibQtSsdp()) << "ServiceVer:" << searchResult->ServiceVer;
-        qCDebug(orgKdeUpnpLibQtSsdp()) << "Os:" << searchResult->Os;
-        qCDebug(orgKdeUpnpLibQtSsdp()) << "Date:" << searchResult->Date;
-        qCDebug(orgKdeUpnpLibQtSsdp()) << "Ext:" << searchResult->Ext;
-        qCDebug(orgKdeUpnpLibQtSsdp()) << "ErrCode:" << searchResult->ErrCode;
-        qCDebug(orgKdeUpnpLibQtSsdp()) << "Expires:" << searchResult->Expires;
-        qCDebug(orgKdeUpnpLibQtSsdp()) << "DestAddr:" << QHostAddress(reinterpret_cast<const sockaddr *>(&searchResult->DestAddr));
-#endif
-
+//        qCInfo(orgKdeUpnpLibQtSsdp()) << "new service";
+//        qCInfo(orgKdeUpnpLibQtSsdp()) << "DeviceId:" << newDiscovery.usn();
+//        qCInfo(orgKdeUpnpLibQtSsdp()) << "DeviceType:" << newDiscovery.nt();
+//        qCInfo(orgKdeUpnpLibQtSsdp()) << "Location:" << newDiscovery.location();
+//        qCInfo(orgKdeUpnpLibQtSsdp()) << "new service";
+//        qCInfo(orgKdeUpnpLibQtSsdp()) << "DeviceId:" << searchResult->DeviceId;
+//        qCInfo(orgKdeUpnpLibQtSsdp()) << "DeviceType:" << searchResult->DeviceType;
+//        qCInfo(orgKdeUpnpLibQtSsdp()) << "ServiceType:" << searchResult->ServiceType;
+//        qCInfo(orgKdeUpnpLibQtSsdp()) << "ServiceVer:" << searchResult->ServiceVer;
+//        qCInfo(orgKdeUpnpLibQtSsdp()) << "Os:" << searchResult->Os;
+//        qCInfo(orgKdeUpnpLibQtSsdp()) << "Date:" << searchResult->Date;
+//        qCInfo(orgKdeUpnpLibQtSsdp()) << "Ext:" << searchResult->Ext;
+//        qCInfo(orgKdeUpnpLibQtSsdp()) << "ErrCode:" << searchResult->ErrCode;
+//        qCInfo(orgKdeUpnpLibQtSsdp()) << "Expires:" << searchResult->Expires;
+//        qCInfo(orgKdeUpnpLibQtSsdp()) << "DestAddr:" << QHostAddress(reinterpret_cast<const sockaddr *>(&searchResult->DestAddr));
     }
 
     if (newDiscovery.nts() == NotificationSubType::ByeBye) {
