@@ -415,6 +415,8 @@ void UpnpSsdpEngine::networkConfigurationAdded(const QNetworkConfiguration &conf
             d->mActiveConfiguration = config.name();
         }
     }
+
+    Q_EMIT networkChanged();
 }
 
 void UpnpSsdpEngine::networkConfigurationRemoved(const QNetworkConfiguration &config)
@@ -427,6 +429,8 @@ void UpnpSsdpEngine::networkConfigurationRemoved(const QNetworkConfiguration &co
             d->mActiveConfiguration = config.name();
         }
     }
+
+    Q_EMIT networkChanged();
 }
 
 void UpnpSsdpEngine::networkConfigurationChanged(const QNetworkConfiguration &config)
@@ -439,6 +443,8 @@ void UpnpSsdpEngine::networkConfigurationChanged(const QNetworkConfiguration &co
             d->mActiveConfiguration = config.name();
         }
     }
+
+    Q_EMIT networkChanged();
 }
 
 void UpnpSsdpEngine::networkOnlineStateChanged(bool isOnline)

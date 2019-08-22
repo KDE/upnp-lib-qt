@@ -143,6 +143,8 @@ Q_SIGNALS:
 
     void canExportServicesChanged();
 
+    void networkChanged();
+
 public Q_SLOTS:
 
     /**
