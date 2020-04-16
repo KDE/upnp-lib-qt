@@ -80,12 +80,16 @@ void UpnpDeviceDescriptionParser::serviceDescriptionParsed(const QString &upnpSe
 
 void UpnpDeviceDescriptionParser::finishedDownload(QNetworkReply *reply)
 {
+    qCDebug(orgKdeUpnpLibQtUpnp()) << "UpnpDeviceDescriptionParser::finishedDownload";
     if (reply->url() == d->mDeviceURL) {
         if (reply->isFinished() && reply->error() == QNetworkReply::NoError) {
             parseDeviceDescription(reply, reply->url().adjusted(QUrl::RemovePath).toString());
         } else if (reply->isFinished()) {
+            qCDebug(orgKdeUpnpLibQtUpnp()) << "UpnpDeviceDescriptionParser::finishedDownload" << "error when downloading device description";
             Q_EMIT deviceDescriptionInError(d->mDeviceDescription.UDN());
         }
+    } else {
+        qCDebug(orgKdeUpnpLibQtUpnp()) << "UpnpDeviceDescriptionParser::finishedDownload" << "unexpected reply for another device url";
     }
 }
 

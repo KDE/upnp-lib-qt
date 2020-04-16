@@ -129,6 +129,8 @@ public:
 
     void setCanExportServices(bool value);
 
+    QList<UpnpDiscoveryResult> existingServices() const;
+
     Q_INVOKABLE void initialize();
 
 Q_SIGNALS:

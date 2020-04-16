@@ -49,16 +49,6 @@ class UpnpSsdpEnginePrivate
 {
 public:
 
-    UpnpSsdpEnginePrivate()
-        : mPortNumber(1900), mCanExportServices(true), mDiscoveryResults(),
-          mSsdpQuerySocket(), mSsdpStandardSocket(), mServerInformation()
-    {
-    }
-
-    quint16 mPortNumber;
-
-    bool mCanExportServices;
-
     QHash<QString, UpnpDiscoveryResult> mDiscoveryResults;
 
     QList<QPointer<QUdpSocket>> mSsdpQuerySocket;
@@ -72,6 +62,10 @@ public:
     QString mActiveConfiguration;
 
     QTimer mTimeoutTimer;
+
+    quint16 mPortNumber = 1900;
+
+    bool mCanExportServices = true;
 
 };
 
@@ -92,57 +86,7 @@ UpnpSsdpEngine::UpnpSsdpEngine(QObject *parent)
 
 void UpnpSsdpEngine::initialize()
 {
-    const auto &allInterfaces = QNetworkInterface::allInterfaces();
-    for (const auto &oneInterface : allInterfaces) {
-        const auto &allAddresses = oneInterface.addressEntries();
-        for (const auto &oneAddress : allAddresses) {
-
-            if (oneAddress.ip().protocol() != QAbstractSocket::IPv4Protocol) {
-                continue;
-            }
-
-            qCDebug(orgKdeUpnpLibQtSsdp()) << "I have one address:" << oneInterface;
-
-            if (oneInterface.addressEntries().isEmpty()) {
-                continue;
-            }
-
-            qCDebug(orgKdeUpnpLibQtSsdp()) << "try to open sockets";
-            d->mSsdpQuerySocket.push_back({new QUdpSocket});
-            d->mSsdpStandardSocket.push_back({new QUdpSocket});
-
-            auto &newQuerySocket = d->mSsdpQuerySocket.last();
-
-            connect(newQuerySocket.data(), &QUdpSocket::readyRead, this, &UpnpSsdpEngine::queryReceivedData);
-
-            newQuerySocket->setSocketOption(QAbstractSocket::MulticastLoopbackOption, 1);
-            newQuerySocket->setSocketOption(QAbstractSocket::MulticastTtlOption, 4);
-
-            if (oneInterface.addressEntries().isEmpty()) {
-                continue;
-            }
-
-            auto result = newQuerySocket->bind(oneAddress.ip());
-            qCDebug(orgKdeUpnpLibQtSsdp()) << "bind" << (result ? "true" : "false");
-            result = newQuerySocket->joinMulticastGroup(QHostAddress(QStringLiteral("239.255.255.250")), oneInterface);
-            qCDebug(orgKdeUpnpLibQtSsdp()) << "joinMulticastGroup" << (result ? "true" : "false") << newQuerySocket->errorString();
-        }
-    }
-    {
-        auto &newStandardSocket = d->mSsdpStandardSocket.last();
-
-        connect(newStandardSocket.data(), &QUdpSocket::readyRead, this, &UpnpSsdpEngine::standardReceivedData);
-
-        newStandardSocket->setSocketOption(QAbstractSocket::MulticastLoopbackOption, 1);
-        newStandardSocket->setSocketOption(QAbstractSocket::MulticastTtlOption, 4);
-
-        auto result = newStandardSocket->bind(QHostAddress(QStringLiteral("239.255.255.250")), d->mPortNumber, QAbstractSocket::ShareAddress);
-        qCDebug(orgKdeUpnpLibQtSsdp()) << "bind" << (result ? "true" : "false");
-        result = newStandardSocket->joinMulticastGroup(QHostAddress(QStringLiteral("239.255.255.250")));
-        qCDebug(orgKdeUpnpLibQtSsdp()) << "joinMulticastGroup" << (result ? "true" : "false") << newStandardSocket->errorString();
-    }
-
-    d->mServerInformation = QSysInfo::kernelType() + QStringLiteral(" ") + QSysInfo::kernelVersion()  + QStringLiteral(" UPnP/1.0 ");
+    reconfigureNetwork();
 }
 
 UpnpSsdpEngine::~UpnpSsdpEngine()
@@ -169,6 +113,17 @@ void UpnpSsdpEngine::setCanExportServices(bool value)
 {
     d->mCanExportServices = value;
     Q_EMIT canExportServicesChanged();
+}
+
+QList<UpnpDiscoveryResult> UpnpSsdpEngine::existingServices() const
+{
+    auto result = QList<UpnpDiscoveryResult>();
+
+    for (const auto &oneService : d->mDiscoveryResults) {
+        result.push_back(oneService);
+    }
+
+    return result;
 }
 
 bool UpnpSsdpEngine::searchUpnp(SEARCH_TYPE searchType, const QString &searchCriteria, int maxDelay)
@@ -384,6 +339,7 @@ void UpnpSsdpEngine::queryReceivedData()
 
 void UpnpSsdpEngine::discoveryResultTimeout()
 {
+    return;
     auto now = QDateTime::currentDateTime();
 
     auto timedOutDiscoveryResults = QList<QString>();
@@ -407,7 +363,7 @@ void UpnpSsdpEngine::discoveryResultTimeout()
 
 void UpnpSsdpEngine::networkConfigurationAdded(const QNetworkConfiguration &config)
 {
-    qCDebug(orgKdeUpnpLibQtSsdp()) << "UpnpSsdpEngine::networkConfigurationAdded" << config.name();
+    qCInfo(orgKdeUpnpLibQtSsdp()) << "UpnpSsdpEngine::networkConfigurationAdded" << config.name();
 
     if (config.isValid() && config.state().testFlag(QNetworkConfiguration::Active)) {
         if (d->mActiveConfiguration != config.name()) {
@@ -421,7 +377,7 @@ void UpnpSsdpEngine::networkConfigurationAdded(const QNetworkConfiguration &conf
 
 void UpnpSsdpEngine::networkConfigurationRemoved(const QNetworkConfiguration &config)
 {
-    qCDebug(orgKdeUpnpLibQtSsdp()) << "UpnpSsdpEngine::networkConfigurationRemoved" << config.name();
+    qCInfo(orgKdeUpnpLibQtSsdp()) << "UpnpSsdpEngine::networkConfigurationRemoved" << config.name();
 
     if (config.isValid() && config.state().testFlag(QNetworkConfiguration::Active)) {
         if (d->mActiveConfiguration != config.name()) {
@@ -435,7 +391,7 @@ void UpnpSsdpEngine::networkConfigurationRemoved(const QNetworkConfiguration &co
 
 void UpnpSsdpEngine::networkConfigurationChanged(const QNetworkConfiguration &config)
 {
-    qCDebug(orgKdeUpnpLibQtSsdp()) << "UpnpSsdpEngine::networkConfigurationChanged" << config.name();
+    qCInfo(orgKdeUpnpLibQtSsdp()) << "UpnpSsdpEngine::networkConfigurationChanged" << config.name();
 
     if (config.isValid() && config.state().testFlag(QNetworkConfiguration::Active)) {
         if (d->mActiveConfiguration != config.name()) {
@@ -459,11 +415,62 @@ void UpnpSsdpEngine::networkUpdateCompleted()
 
 void UpnpSsdpEngine::reconfigureNetwork()
 {
+    const auto &allInterfaces = QNetworkInterface::allInterfaces();
+    for (const auto &oneInterface : allInterfaces) {
+        const auto &allAddresses = oneInterface.addressEntries();
+        for (const auto &oneAddress : allAddresses) {
 
+            if (oneAddress.ip().protocol() != QAbstractSocket::IPv4Protocol) {
+                continue;
+            }
+
+            qCDebug(orgKdeUpnpLibQtSsdp()) << "I have one address:" << oneInterface;
+
+            if (oneInterface.addressEntries().isEmpty()) {
+                continue;
+            }
+
+            qCDebug(orgKdeUpnpLibQtSsdp()) << "try to open sockets";
+            d->mSsdpQuerySocket.push_back({new QUdpSocket});
+            d->mSsdpStandardSocket.push_back({new QUdpSocket});
+
+            auto &newQuerySocket = d->mSsdpQuerySocket.last();
+
+            connect(newQuerySocket.data(), &QUdpSocket::readyRead, this, &UpnpSsdpEngine::queryReceivedData);
+
+            newQuerySocket->setSocketOption(QAbstractSocket::MulticastLoopbackOption, 1);
+            newQuerySocket->setSocketOption(QAbstractSocket::MulticastTtlOption, 4);
+
+            if (oneInterface.addressEntries().isEmpty()) {
+                continue;
+            }
+
+            auto result = newQuerySocket->bind(oneAddress.ip());
+            qCDebug(orgKdeUpnpLibQtSsdp()) << "bind" << (result ? "true" : "false");
+            result = newQuerySocket->joinMulticastGroup(QHostAddress(QStringLiteral("239.255.255.250")), oneInterface);
+            qCDebug(orgKdeUpnpLibQtSsdp()) << "joinMulticastGroup" << (result ? "true" : "false") << newQuerySocket->errorString();
+        }
+    }
+    {
+        auto &newStandardSocket = d->mSsdpStandardSocket.last();
+
+        connect(newStandardSocket.data(), &QUdpSocket::readyRead, this, &UpnpSsdpEngine::standardReceivedData);
+
+        newStandardSocket->setSocketOption(QAbstractSocket::MulticastLoopbackOption, 1);
+        newStandardSocket->setSocketOption(QAbstractSocket::MulticastTtlOption, 4);
+
+        auto result = newStandardSocket->bind(QHostAddress(QStringLiteral("239.255.255.250")), d->mPortNumber, QAbstractSocket::ShareAddress);
+        qCDebug(orgKdeUpnpLibQtSsdp()) << "bind" << (result ? "true" : "false");
+        result = newStandardSocket->joinMulticastGroup(QHostAddress(QStringLiteral("239.255.255.250")));
+        qCDebug(orgKdeUpnpLibQtSsdp()) << "joinMulticastGroup" << (result ? "true" : "false") << newStandardSocket->errorString();
+    }
+
+    d->mServerInformation = QSysInfo::kernelType() + QStringLiteral(" ") + QSysInfo::kernelVersion()  + QStringLiteral(" UPnP/1.0 ");
 }
 
 void UpnpSsdpEngine::parseSsdpQueryDatagram(const QByteArray &datagram, const QList<QByteArray> &headers)
 {
+    qCDebug(orgKdeUpnpLibQtSsdp()) << "UpnpSsdpEngine::parseSsdpQueryDatagram" << headers;
     UpnpSearchQuery newSearch;
     bool hasAddress = false;
     bool hasAnswerDelay = false;
@@ -526,6 +533,7 @@ void UpnpSsdpEngine::parseSsdpQueryDatagram(const QByteArray &datagram, const QL
 
 void UpnpSsdpEngine::parseSsdpAnnounceDatagram(const QByteArray &datagram, const QList<QByteArray> &headers, SsdpMessageType messageType)
 {
+    qCDebug(orgKdeUpnpLibQtSsdp()) << "UpnpSsdpEngine::parseSsdpAnnounceDatagram" << headers;
     UpnpDiscoveryResult newDiscovery;
     newDiscovery.setNTS(NotificationSubType::Invalid);
 
@@ -621,15 +629,15 @@ void UpnpSsdpEngine::parseSsdpAnnounceDatagram(const QByteArray &datagram, const
             Q_EMIT newService(newDiscovery);
         }
 
-//        qCInfo(orgKdeUpnpLibQtSsdp()) << datagram;
-//        qCInfo(orgKdeUpnpLibQtSsdp()) << "AnnounceDate" << newDiscovery.announceDate();
-//        qCInfo(orgKdeUpnpLibQtSsdp()) << "CacheDuration" << newDiscovery.cacheDuration();
+        qCDebug(orgKdeUpnpLibQtSsdp()) << datagram;
+        qCDebug(orgKdeUpnpLibQtSsdp()) << "AnnounceDate" << newDiscovery.announceDate();
+        qCDebug(orgKdeUpnpLibQtSsdp()) << "CacheDuration" << newDiscovery.cacheDuration();
 
-//        qCInfo(orgKdeUpnpLibQtSsdp()) << "new service";
-//        qCInfo(orgKdeUpnpLibQtSsdp()) << "DeviceId:" << newDiscovery.usn();
-//        qCInfo(orgKdeUpnpLibQtSsdp()) << "DeviceType:" << newDiscovery.nt();
-//        qCInfo(orgKdeUpnpLibQtSsdp()) << "Location:" << newDiscovery.location();
-//        qCInfo(orgKdeUpnpLibQtSsdp()) << "new service";
+        qCDebug(orgKdeUpnpLibQtSsdp()) << "new service";
+        qCDebug(orgKdeUpnpLibQtSsdp()) << "DeviceId:" << newDiscovery.usn();
+        qCDebug(orgKdeUpnpLibQtSsdp()) << "DeviceType:" << newDiscovery.nt();
+        qCDebug(orgKdeUpnpLibQtSsdp()) << "Location:" << newDiscovery.location();
+        qCDebug(orgKdeUpnpLibQtSsdp()) << "new service";
 //        qCInfo(orgKdeUpnpLibQtSsdp()) << "DeviceId:" << searchResult->DeviceId;
 //        qCInfo(orgKdeUpnpLibQtSsdp()) << "DeviceType:" << searchResult->DeviceType;
 //        qCInfo(orgKdeUpnpLibQtSsdp()) << "ServiceType:" << searchResult->ServiceType;
@@ -640,11 +648,11 @@ void UpnpSsdpEngine::parseSsdpAnnounceDatagram(const QByteArray &datagram, const
 //        qCInfo(orgKdeUpnpLibQtSsdp()) << "ErrCode:" << searchResult->ErrCode;
 //        qCInfo(orgKdeUpnpLibQtSsdp()) << "Expires:" << searchResult->Expires;
 //        qCInfo(orgKdeUpnpLibQtSsdp()) << "DestAddr:" << QHostAddress(reinterpret_cast<const sockaddr *>(&searchResult->DestAddr));
-    }
-
-    if (newDiscovery.nts() == NotificationSubType::ByeBye) {
+    } else if (newDiscovery.nts() == NotificationSubType::ByeBye) {
+        qCDebug(orgKdeUpnpLibQtSsdp()) << "ByeBye" << newDiscovery << d->mDiscoveryResults.keys();
         auto itDiscovery = d->mDiscoveryResults.find(newDiscovery.usn());
         if (itDiscovery != d->mDiscoveryResults.end()) {
+            qCDebug(orgKdeUpnpLibQtSsdp()) << "removed device found";
             Q_EMIT removedService(newDiscovery);
 
             d->mDiscoveryResults.erase(itDiscovery);
@@ -658,6 +666,7 @@ void UpnpSsdpEngine::parseSsdpDatagram(const QByteArray &datagram)
     const QList<QByteArray> &headers(datagram.split('\n'));
 
     if (!headers.last().isEmpty()) {
+        qCDebug(orgKdeUpnpLibQtSsdp()) << "UpnpSsdpEngine::parseSsdpDatagram" << "out";
         return;
     }
 
