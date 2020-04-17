@@ -22,9 +22,9 @@
 
 #include "upnplibqt_export.h"
 
+#include <QList>
 #include <QObject>
 #include <QPointer>
-#include <QList>
 
 #include <memory>
 
@@ -40,13 +40,12 @@ class UPNPLIBQT_EXPORT UpnpAbstractDevice : public QObject
 {
     Q_OBJECT
 
-    Q_PROPERTY(UpnpDeviceDescription* description
-               READ description
-               WRITE setDescription
-               NOTIFY descriptionChanged)
+    Q_PROPERTY(UpnpDeviceDescription *description
+            READ description
+                WRITE setDescription
+                    NOTIFY descriptionChanged)
 
 public:
-
     explicit UpnpAbstractDevice(QObject *parent = nullptr);
 
     ~UpnpAbstractDevice() override;
@@ -61,13 +60,13 @@ public:
 
     void setDescription(UpnpDeviceDescription *value);
 
-    UpnpDeviceDescription* description();
+    UpnpDeviceDescription *description();
 
-    const UpnpDeviceDescription* description() const;
+    const UpnpDeviceDescription *description() const;
 
     int cacheControl() const;
 
-    QIODevice* buildAndGetXmlDescription();
+    QIODevice *buildAndGetXmlDescription();
 
 Q_SIGNALS:
 
@@ -78,13 +77,10 @@ public Q_SLOTS:
     void newSearchQuery(UpnpSsdpEngine *engine, const UpnpSearchQuery &searchQuery);
 
 protected:
-
     int addService(const UpnpServiceDescription &newService);
 
 private:
-
     std::unique_ptr<UpnpAbstractDevicePrivate> d;
-
 };
 
 #endif // UPNPABSTRACTDEVICE_H

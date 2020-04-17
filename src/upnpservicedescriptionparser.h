@@ -21,9 +21,9 @@
 #define UPNPSERVICEDESCRIPTIONPARSER_H
 
 #include <QObject>
-#include <QUrl>
-#include <QString>
 #include <QSharedPointer>
+#include <QString>
+#include <QUrl>
 
 #include <memory>
 
@@ -40,7 +40,6 @@ class UpnpServiceDescriptionParser : public QObject
     Q_OBJECT
 
 public:
-
     explicit UpnpServiceDescriptionParser(QNetworkAccessManager *aNetworkAccess, UpnpServiceDescription &serviceDescription, QObject *parent = nullptr);
 
     ~UpnpServiceDescriptionParser() override;
@@ -58,11 +57,9 @@ public Q_SLOTS:
     void downloadServiceDescription(const QUrl &serviceUrl);
 
 private:
-
     void parseServiceDescription(QIODevice *serviceDescriptionContent);
 
     std::unique_ptr<UpnpServiceDescriptionParserPrivate> d;
-
 };
 
 #endif // UPNPSERVICEDESCRIPTIONPARSER_H

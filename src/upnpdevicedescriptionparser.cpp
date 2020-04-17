@@ -27,8 +27,8 @@
 #include "upnpservicedescriptionparser.h"
 
 #include <QNetworkAccessManager>
-#include <QNetworkRequest>
 #include <QNetworkReply>
+#include <QNetworkRequest>
 
 #include <QDomDocument>
 
@@ -37,9 +37,10 @@
 class UpnpDeviceDescriptionParserPrivate
 {
 public:
-
     UpnpDeviceDescriptionParserPrivate(QNetworkAccessManager *aNetworkAccess, UpnpDeviceDescription &deviceDescription)
-        : mNetworkAccess(aNetworkAccess), mDeviceDescription(deviceDescription), mDeviceURL()
+        : mNetworkAccess(aNetworkAccess)
+        , mDeviceDescription(deviceDescription)
+        , mDeviceURL()
     {
     }
 
@@ -47,13 +48,14 @@ public:
 
     UpnpDeviceDescription &mDeviceDescription;
 
-    QMap<QString, QSharedPointer<UpnpServiceDescriptionParser> > mServiceDescriptionParsers;
+    QMap<QString, QSharedPointer<UpnpServiceDescriptionParser>> mServiceDescriptionParsers;
 
     QUrl mDeviceURL;
 };
 
 UpnpDeviceDescriptionParser::UpnpDeviceDescriptionParser(QNetworkAccessManager *aNetworkAccess, UpnpDeviceDescription &deviceDescription, QObject *parent)
-    : QObject(parent), d(new UpnpDeviceDescriptionParserPrivate(aNetworkAccess, deviceDescription))
+    : QObject(parent)
+    , d(new UpnpDeviceDescriptionParserPrivate(aNetworkAccess, deviceDescription))
 {
 }
 
@@ -85,11 +87,13 @@ void UpnpDeviceDescriptionParser::finishedDownload(QNetworkReply *reply)
         if (reply->isFinished() && reply->error() == QNetworkReply::NoError) {
             parseDeviceDescription(reply, reply->url().adjusted(QUrl::RemovePath).toString());
         } else if (reply->isFinished()) {
-            qCDebug(orgKdeUpnpLibQtUpnp()) << "UpnpDeviceDescriptionParser::finishedDownload" << "error when downloading device description";
+            qCDebug(orgKdeUpnpLibQtUpnp()) << "UpnpDeviceDescriptionParser::finishedDownload"
+                                           << "error when downloading device description";
             Q_EMIT deviceDescriptionInError(d->mDeviceDescription.UDN());
         }
     } else {
-        qCDebug(orgKdeUpnpLibQtUpnp()) << "UpnpDeviceDescriptionParser::finishedDownload" << "unexpected reply for another device url";
+        qCDebug(orgKdeUpnpLibQtUpnp()) << "UpnpDeviceDescriptionParser::finishedDownload"
+                                       << "unexpected reply for another device url";
     }
 }
 
@@ -142,7 +146,7 @@ void UpnpDeviceDescriptionParser::parseDeviceDescription(QIODevice *deviceDescri
     for (int serviceIndex = 0; serviceIndex < serviceList.length(); ++serviceIndex) {
         const QDomNode &serviceNode(serviceList.at(serviceIndex));
         if (!serviceNode.isNull()) {
-            auto newService = UpnpServiceDescription{};
+            auto newService = UpnpServiceDescription {};
             newService.setDeviceDescription(d->mDeviceDescription);
 
             const QDomNode &serviceTypeNode = serviceNode.firstChildElement(QStringLiteral("serviceType"));
@@ -212,14 +216,13 @@ void UpnpDeviceDescriptionParser::parseDeviceDescription(QIODevice *deviceDescri
             d->mServiceDescriptionParsers[newService.serviceId()].reset(new UpnpServiceDescriptionParser(d->mNetworkAccess, d->mDeviceDescription.serviceByIndex(serviceIndex)));
 
             connect(d->mServiceDescriptionParsers[newService.serviceId()].data(), &UpnpServiceDescriptionParser::descriptionParsed,
-                    this, &UpnpDeviceDescriptionParser::serviceDescriptionParsed);
+                this, &UpnpDeviceDescriptionParser::serviceDescriptionParsed);
             connect(d->mNetworkAccess, &QNetworkAccessManager::finished,
-                    d->mServiceDescriptionParsers[newService.serviceId()].data(), &UpnpServiceDescriptionParser::finishedDownload);
+                d->mServiceDescriptionParsers[newService.serviceId()].data(), &UpnpServiceDescriptionParser::finishedDownload);
 
             d->mServiceDescriptionParsers[newService.serviceId()]->downloadServiceDescription(serviceUrl);
         }
     }
 }
-
 
 #include "moc_upnpdevicedescriptionparser.cpp"

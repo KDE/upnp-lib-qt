@@ -30,25 +30,24 @@
 #include "upnpservicedescription.h"
 
 #include <QHostAddress>
-#include <QUdpSocket>
+#include <QNetworkConfiguration>
 #include <QNetworkConfigurationManager>
 #include <QNetworkInterface>
-#include <QNetworkConfiguration>
+#include <QUdpSocket>
 
 #include <QHash>
 #include <QLoggingCategory>
 #include <QSet>
-#include <QUrl>
 #include <QSharedPointer>
 #include <QSysInfo>
+#include <QUrl>
 
-#include <sys/types.h>
 #include <sys/socket.h>
+#include <sys/types.h>
 
 class UpnpSsdpEnginePrivate
 {
 public:
-
     QHash<QString, UpnpDiscoveryResult> mDiscoveryResults;
 
     QList<QPointer<QUdpSocket>> mSsdpQuerySocket;
@@ -66,18 +65,17 @@ public:
     quint16 mPortNumber = 1900;
 
     bool mCanExportServices = true;
-
 };
 
 UpnpSsdpEngine::UpnpSsdpEngine(QObject *parent)
-    : QObject(parent), d(new UpnpSsdpEnginePrivate)
+    : QObject(parent)
+    , d(new UpnpSsdpEnginePrivate)
 {
     connect(&d->mNetworkManager, &QNetworkConfigurationManager::configurationAdded, this, &UpnpSsdpEngine::networkConfigurationAdded);
     connect(&d->mNetworkManager, &QNetworkConfigurationManager::configurationRemoved, this, &UpnpSsdpEngine::networkConfigurationRemoved);
     connect(&d->mNetworkManager, &QNetworkConfigurationManager::configurationChanged, this, &UpnpSsdpEngine::networkConfigurationChanged);
     connect(&d->mNetworkManager, &QNetworkConfigurationManager::onlineStateChanged, this, &UpnpSsdpEngine::networkOnlineStateChanged);
     connect(&d->mNetworkManager, &QNetworkConfigurationManager::updateCompleted, this, &UpnpSsdpEngine::networkUpdateCompleted);
-
 
     connect(&d->mTimeoutTimer, &QTimer::timeout, this, &UpnpSsdpEngine::discoveryResultTimeout);
     d->mTimeoutTimer.setSingleShot(false);
@@ -128,8 +126,7 @@ QList<UpnpDiscoveryResult> UpnpSsdpEngine::existingServices() const
 
 bool UpnpSsdpEngine::searchUpnp(SEARCH_TYPE searchType, const QString &searchCriteria, int maxDelay)
 {
-    switch (searchType)
-    {
+    switch (searchType) {
     case AllDevices:
         return searchAllUpnpDevice(maxDelay);
     case RootDevices:
@@ -260,7 +257,7 @@ void UpnpSsdpEngine::publishDevice(UpnpAbstractDevice *device)
     QByteArray rootDeviceMessage(allDiscoveryMessageCommonContent);
     rootDeviceMessage += "NT: upnp:rootdevice\r\n";
     rootDeviceMessage += "USN: uuid:" + device->description()->UDN().toLatin1() + "::upnp:rootdevice\r\n";
-    rootDeviceMessage += "LOCATION: "+ device->description()->locationUrl().toString().toLatin1() + "\r\n";
+    rootDeviceMessage += "LOCATION: " + device->description()->locationUrl().toString().toLatin1() + "\r\n";
     rootDeviceMessage += "\r\n";
 
     for (auto &oneSocket : d->mSsdpQuerySocket) {
@@ -270,7 +267,7 @@ void UpnpSsdpEngine::publishDevice(UpnpAbstractDevice *device)
     QByteArray uuidDeviceMessage(allDiscoveryMessageCommonContent);
     uuidDeviceMessage += "NT: uuid:" + device->description()->UDN().toLatin1() + "\r\n";
     uuidDeviceMessage += "USN: uuid:" + device->description()->UDN().toLatin1() + "\r\n";
-    uuidDeviceMessage += "LOCATION: "+ device->description()->locationUrl().toString().toLatin1() + "\r\n";
+    uuidDeviceMessage += "LOCATION: " + device->description()->locationUrl().toString().toLatin1() + "\r\n";
     uuidDeviceMessage += "\r\n";
 
     for (auto &oneSocket : d->mSsdpQuerySocket) {
@@ -280,7 +277,7 @@ void UpnpSsdpEngine::publishDevice(UpnpAbstractDevice *device)
     QByteArray deviceMessage(allDiscoveryMessageCommonContent);
     deviceMessage += "NT: " + device->description()->deviceType().toLatin1() + "\r\n";
     deviceMessage += "USN: uuid:" + device->description()->UDN().toLatin1() + "::" + device->description()->deviceType().toLatin1() + "\r\n";
-    deviceMessage += "LOCATION: "+ device->description()->locationUrl().toString().toLatin1() + "\r\n";
+    deviceMessage += "LOCATION: " + device->description()->locationUrl().toString().toLatin1() + "\r\n";
     deviceMessage += "\r\n";
 
     for (auto &oneSocket : d->mSsdpQuerySocket) {
@@ -292,7 +289,7 @@ void UpnpSsdpEngine::publishDevice(UpnpAbstractDevice *device)
         QByteArray deviceMessage(allDiscoveryMessageCommonContent);
         deviceMessage += "NT: " + oneService.serviceType().toLatin1() + "\r\n";
         deviceMessage += "USN: uuid:" + device->description()->UDN().toLatin1() + "::" + oneService.serviceType().toLatin1() + "\r\n";
-        deviceMessage += "LOCATION: "+ device->description()->locationUrl().toString().toLatin1() + "\r\n";
+        deviceMessage += "LOCATION: " + device->description()->locationUrl().toString().toLatin1() + "\r\n";
         deviceMessage += "\r\n";
 
         for (auto &oneSocket : d->mSsdpQuerySocket) {
@@ -304,7 +301,7 @@ void UpnpSsdpEngine::publishDevice(UpnpAbstractDevice *device)
 void UpnpSsdpEngine::standardReceivedData()
 {
     qCDebug(orgKdeUpnpLibQtSsdp()) << "UpnpSsdpEngine::standardReceivedData";
-    QUdpSocket *receiverSocket = qobject_cast<QUdpSocket*>(sender());
+    QUdpSocket *receiverSocket = qobject_cast<QUdpSocket *>(sender());
 
     while (receiverSocket->hasPendingDatagrams()) {
         QByteArray datagram;
@@ -313,7 +310,7 @@ void UpnpSsdpEngine::standardReceivedData()
         quint16 senderPort;
 
         receiverSocket->readDatagram(datagram.data(), datagram.size(),
-                                     &sender, &senderPort);
+            &sender, &senderPort);
 
         parseSsdpDatagram(datagram);
     }
@@ -322,7 +319,7 @@ void UpnpSsdpEngine::standardReceivedData()
 void UpnpSsdpEngine::queryReceivedData()
 {
     qCDebug(orgKdeUpnpLibQtSsdp()) << "UpnpSsdpEngine::queryReceivedData";
-    QUdpSocket *receiverSocket = qobject_cast<QUdpSocket*>(sender());
+    QUdpSocket *receiverSocket = qobject_cast<QUdpSocket *>(sender());
 
     while (receiverSocket->hasPendingDatagrams()) {
         QByteArray datagram;
@@ -331,7 +328,7 @@ void UpnpSsdpEngine::queryReceivedData()
         quint16 senderPort;
 
         receiverSocket->readDatagram(datagram.data(), datagram.size(),
-                                     &sender, &senderPort);
+            &sender, &senderPort);
 
         parseSsdpDatagram(datagram);
     }
@@ -344,7 +341,7 @@ void UpnpSsdpEngine::discoveryResultTimeout()
 
     auto timedOutDiscoveryResults = QList<QString>();
 
-    for(const auto &itDiscovery : qAsConst(d->mDiscoveryResults)) {
+    for (const auto &itDiscovery : qAsConst(d->mDiscoveryResults)) {
         if (now > itDiscovery.validityTimestamp()) {
             qCDebug(orgKdeUpnpLibQtSsdp()) << "remove service due to timeout" << itDiscovery;
             Q_EMIT removedService(itDiscovery);
@@ -436,8 +433,8 @@ void UpnpSsdpEngine::reconfigureNetwork()
             }
 
             qCDebug(orgKdeUpnpLibQtSsdp()) << "try to open sockets";
-            d->mSsdpQuerySocket.push_back({new QUdpSocket});
-            d->mSsdpStandardSocket.push_back({new QUdpSocket});
+            d->mSsdpQuerySocket.push_back({ new QUdpSocket });
+            d->mSsdpStandardSocket.push_back({ new QUdpSocket });
 
             auto &newQuerySocket = d->mSsdpQuerySocket.last();
 
@@ -470,7 +467,7 @@ void UpnpSsdpEngine::reconfigureNetwork()
         qCDebug(orgKdeUpnpLibQtSsdp()) << "joinMulticastGroup" << (result ? "true" : "false") << newStandardSocket->errorString();
     }
 
-    d->mServerInformation = QSysInfo::kernelType() + QStringLiteral(" ") + QSysInfo::kernelVersion()  + QStringLiteral(" UPnP/1.0 ");
+    d->mServerInformation = QSysInfo::kernelType() + QStringLiteral(" ") + QSysInfo::kernelVersion() + QStringLiteral(" UPnP/1.0 ");
 }
 
 void UpnpSsdpEngine::parseSsdpQueryDatagram(const QByteArray &datagram, const QList<QByteArray> &headers)
@@ -481,7 +478,7 @@ void UpnpSsdpEngine::parseSsdpQueryDatagram(const QByteArray &datagram, const QL
     bool hasAnswerDelay = false;
     bool hasSearchTarget = false;
 
-    for (const auto & header : headers) {
+    for (const auto &header : headers) {
         if (header.startsWith("HOST")) {
             QString hostName;
             if ((header)[4] == ' ') {
@@ -542,7 +539,7 @@ void UpnpSsdpEngine::parseSsdpAnnounceDatagram(const QByteArray &datagram, const
     UpnpDiscoveryResult newDiscovery;
     newDiscovery.setNTS(NotificationSubType::Invalid);
 
-    for (const auto & header : headers) {
+    for (const auto &header : headers) {
         if (header.startsWith("LOCATION")) {
             if ((header)[9] == ' ') {
                 newDiscovery.setLocation(QString::fromLatin1(header.mid(10, header.length() - 11)));
@@ -611,9 +608,7 @@ void UpnpSsdpEngine::parseSsdpAnnounceDatagram(const QByteArray &datagram, const
         }
     }
 
-    if (newDiscovery.location().isEmpty() || newDiscovery.usn().isEmpty() ||
-            newDiscovery.nt().isEmpty() ||
-            (messageType == SsdpMessageType::announce && newDiscovery.nts() == NotificationSubType::Invalid)) {
+    if (newDiscovery.location().isEmpty() || newDiscovery.usn().isEmpty() || newDiscovery.nt().isEmpty() || (messageType == SsdpMessageType::announce && newDiscovery.nts() == NotificationSubType::Invalid)) {
         qCDebug(orgKdeUpnpLibQtSsdp()) << "not decoded" << datagram;
         return;
     }
@@ -643,16 +638,16 @@ void UpnpSsdpEngine::parseSsdpAnnounceDatagram(const QByteArray &datagram, const
         qCDebug(orgKdeUpnpLibQtSsdp()) << "DeviceType:" << newDiscovery.nt();
         qCDebug(orgKdeUpnpLibQtSsdp()) << "Location:" << newDiscovery.location();
         qCDebug(orgKdeUpnpLibQtSsdp()) << "new service";
-//        qCInfo(orgKdeUpnpLibQtSsdp()) << "DeviceId:" << searchResult->DeviceId;
-//        qCInfo(orgKdeUpnpLibQtSsdp()) << "DeviceType:" << searchResult->DeviceType;
-//        qCInfo(orgKdeUpnpLibQtSsdp()) << "ServiceType:" << searchResult->ServiceType;
-//        qCInfo(orgKdeUpnpLibQtSsdp()) << "ServiceVer:" << searchResult->ServiceVer;
-//        qCInfo(orgKdeUpnpLibQtSsdp()) << "Os:" << searchResult->Os;
-//        qCInfo(orgKdeUpnpLibQtSsdp()) << "Date:" << searchResult->Date;
-//        qCInfo(orgKdeUpnpLibQtSsdp()) << "Ext:" << searchResult->Ext;
-//        qCInfo(orgKdeUpnpLibQtSsdp()) << "ErrCode:" << searchResult->ErrCode;
-//        qCInfo(orgKdeUpnpLibQtSsdp()) << "Expires:" << searchResult->Expires;
-//        qCInfo(orgKdeUpnpLibQtSsdp()) << "DestAddr:" << QHostAddress(reinterpret_cast<const sockaddr *>(&searchResult->DestAddr));
+        //        qCInfo(orgKdeUpnpLibQtSsdp()) << "DeviceId:" << searchResult->DeviceId;
+        //        qCInfo(orgKdeUpnpLibQtSsdp()) << "DeviceType:" << searchResult->DeviceType;
+        //        qCInfo(orgKdeUpnpLibQtSsdp()) << "ServiceType:" << searchResult->ServiceType;
+        //        qCInfo(orgKdeUpnpLibQtSsdp()) << "ServiceVer:" << searchResult->ServiceVer;
+        //        qCInfo(orgKdeUpnpLibQtSsdp()) << "Os:" << searchResult->Os;
+        //        qCInfo(orgKdeUpnpLibQtSsdp()) << "Date:" << searchResult->Date;
+        //        qCInfo(orgKdeUpnpLibQtSsdp()) << "Ext:" << searchResult->Ext;
+        //        qCInfo(orgKdeUpnpLibQtSsdp()) << "ErrCode:" << searchResult->ErrCode;
+        //        qCInfo(orgKdeUpnpLibQtSsdp()) << "Expires:" << searchResult->Expires;
+        //        qCInfo(orgKdeUpnpLibQtSsdp()) << "DestAddr:" << QHostAddress(reinterpret_cast<const sockaddr *>(&searchResult->DestAddr));
     } else if (newDiscovery.nts() == NotificationSubType::ByeBye) {
         qCDebug(orgKdeUpnpLibQtSsdp()) << "ByeBye" << newDiscovery << d->mDiscoveryResults.keys();
         auto itDiscovery = d->mDiscoveryResults.find(newDiscovery.usn());
@@ -671,7 +666,8 @@ void UpnpSsdpEngine::parseSsdpDatagram(const QByteArray &datagram)
     const QList<QByteArray> &headers(datagram.split('\n'));
 
     if (!headers.last().isEmpty()) {
-        qCDebug(orgKdeUpnpLibQtSsdp()) << "UpnpSsdpEngine::parseSsdpDatagram" << "out";
+        qCDebug(orgKdeUpnpLibQtSsdp()) << "UpnpSsdpEngine::parseSsdpDatagram"
+                                       << "out";
         return;
     }
 

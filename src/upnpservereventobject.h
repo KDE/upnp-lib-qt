@@ -22,8 +22,8 @@
 
 #include "upnplibqt_export.h"
 
-#include <KDSoapServer/KDSoapServerObjectInterface.h>
 #include <KDSoapServer/KDSoapServerCustomVerbRequestInterface.h>
+#include <KDSoapServer/KDSoapServerObjectInterface.h>
 
 #include <QObject>
 
@@ -39,7 +39,6 @@ class UpnpServerEventObject : public QObject, public KDSoapServerCustomVerbReque
     Q_INTERFACES(KDSoapServerCustomVerbRequestInterface)
 
 public:
-
     explicit UpnpServerEventObject(QObject *parent = nullptr);
 
     ~UpnpServerEventObject() override;
@@ -53,12 +52,11 @@ public:
      * @return true if the request has been handled and if customAnswer is valid and will be sent back to the client.
      */
     bool processCustomVerbRequest(const QByteArray &requestType, const QByteArray &requestData,
-                                  const QMap<QByteArray, QByteArray> &httpHeaders, QByteArray &customAnswer) override;
+        const QMap<QByteArray, QByteArray> &httpHeaders, QByteArray &customAnswer) override;
 
     void setService(UpnpControlAbstractService *service);
 
 private:
-
     std::unique_ptr<UpnpServerEventObjectPrivate> d;
 };
 

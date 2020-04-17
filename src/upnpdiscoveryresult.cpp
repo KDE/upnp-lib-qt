@@ -23,12 +23,16 @@ class UpnpDiscoveryResultPrivate
 {
 
 public:
-
     UpnpDiscoveryResultPrivate() = default;
 
     UpnpDiscoveryResultPrivate(const QString &aNT, const QString &aUSN, const QString &aLocation,
-                               UpnpSsdpEngine::NotificationSubType aNTS, const QString &aAnnounceDate, int aCacheDuration)
-        : mNT(aNT), mUSN(aUSN), mLocation(aLocation), mNTS(aNTS), mAnnounceDate(aAnnounceDate), mCacheDuration(aCacheDuration)
+        UpnpSsdpEngine::NotificationSubType aNTS, const QString &aAnnounceDate, int aCacheDuration)
+        : mNT(aNT)
+        , mUSN(aUSN)
+        , mLocation(aLocation)
+        , mNTS(aNTS)
+        , mAnnounceDate(aAnnounceDate)
+        , mCacheDuration(aCacheDuration)
     {
     }
 
@@ -71,8 +75,8 @@ UpnpDiscoveryResult::UpnpDiscoveryResult()
 }
 
 UpnpDiscoveryResult::UpnpDiscoveryResult(const QString &aNT, const QString &aUSN, const QString &aLocation,
-                                         UpnpSsdpEngine::NotificationSubType aNTS, const QString &aAnnounceDate,
-                                         int aCacheDuration)
+    UpnpSsdpEngine::NotificationSubType aNTS, const QString &aAnnounceDate,
+    int aCacheDuration)
     : d(new UpnpDiscoveryResultPrivate(aNT, aUSN, aLocation, aNTS, aAnnounceDate, aCacheDuration))
 {
     d->mValidityTimestamp = QDateTime::fromString(d->mAnnounceDate, QStringLiteral("ddd., d MMM. yy hh:mm:ss G\u007F"));

@@ -21,12 +21,12 @@
 
 #include "upnplogging.h"
 
-#include "upnpservicedescription.h"
 #include "upnpactiondescription.h"
+#include "upnpservicedescription.h"
 
 #include <QNetworkAccessManager>
-#include <QNetworkRequest>
 #include <QNetworkReply>
+#include <QNetworkRequest>
 
 #include <QDomDocument>
 
@@ -35,9 +35,10 @@
 class UpnpServiceDescriptionParserPrivate
 {
 public:
-
     UpnpServiceDescriptionParserPrivate(QNetworkAccessManager *aNetworkAccess, UpnpServiceDescription &deviceDescription)
-        : mNetworkAccess(aNetworkAccess), mServiceDescription(deviceDescription), mServiceURL()
+        : mNetworkAccess(aNetworkAccess)
+        , mServiceDescription(deviceDescription)
+        , mServiceURL()
     {
     }
 
@@ -49,7 +50,8 @@ public:
 };
 
 UpnpServiceDescriptionParser::UpnpServiceDescriptionParser(QNetworkAccessManager *aNetworkAccess, UpnpServiceDescription &deviceDescription, QObject *parent)
-    : QObject(parent), d(new UpnpServiceDescriptionParserPrivate(aNetworkAccess, deviceDescription))
+    : QObject(parent)
+    , d(new UpnpServiceDescriptionParserPrivate(aNetworkAccess, deviceDescription))
 {
 }
 
@@ -69,7 +71,8 @@ void UpnpServiceDescriptionParser::finishedDownload(QNetworkReply *reply)
         if (reply->isFinished() && reply->error() == QNetworkReply::NoError) {
             parseServiceDescription(reply);
         } else if (reply->isFinished()) {
-            qCDebug(orgKdeUpnpLibQtUpnp()) << "UpnpAbstractServiceDescription::finishedDownload" << "error";
+            qCDebug(orgKdeUpnpLibQtUpnp()) << "UpnpAbstractServiceDescription::finishedDownload"
+                                           << "error";
         }
     }
 }
@@ -134,6 +137,5 @@ void UpnpServiceDescriptionParser::parseServiceDescription(QIODevice *serviceDes
 
     Q_EMIT descriptionParsed(d->mServiceDescription.serviceId());
 }
-
 
 #include "moc_upnpservicedescriptionparser.cpp"

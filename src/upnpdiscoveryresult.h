@@ -24,9 +24,9 @@
 
 #include "upnpssdpengine.h"
 
+#include <QDateTime>
 #include <QString>
 #include <QTimer>
-#include <QDateTime>
 
 #include <memory>
 
@@ -37,12 +37,11 @@ class UPNPLIBQT_EXPORT UpnpDiscoveryResult
 {
 
 public:
-
     UpnpDiscoveryResult();
 
     UpnpDiscoveryResult(const QString &aNT, const QString &aUSN, const QString &aLocation,
-                        UpnpSsdpEngine::NotificationSubType aNTS, const QString &aAnnounceDate,
-                        int aCacheDuration);
+        UpnpSsdpEngine::NotificationSubType aNTS, const QString &aAnnounceDate,
+        int aCacheDuration);
 
     UpnpDiscoveryResult(const UpnpDiscoveryResult &other);
 
@@ -50,9 +49,9 @@ public:
 
     ~UpnpDiscoveryResult();
 
-    UpnpDiscoveryResult& operator=(const UpnpDiscoveryResult &other);
+    UpnpDiscoveryResult &operator=(const UpnpDiscoveryResult &other);
 
-    UpnpDiscoveryResult& operator=(UpnpDiscoveryResult &&other);
+    UpnpDiscoveryResult &operator=(UpnpDiscoveryResult &&other);
 
     void setNT(const QString &value);
 
@@ -83,9 +82,7 @@ public:
     QDateTime validityTimestamp() const;
 
 private:
-
     std::unique_ptr<UpnpDiscoveryResultPrivate> d;
-
 };
 
 UPNPLIBQT_EXPORT QDebug operator<<(QDebug stream, const UpnpDiscoveryResult &data);
@@ -95,4 +92,3 @@ Q_DECLARE_TYPEINFO(UpnpDiscoveryResult, Q_MOVABLE_TYPE);
 Q_DECLARE_METATYPE(UpnpDiscoveryResult)
 
 #endif // UPNPDISCOVERYRESULT_H
-

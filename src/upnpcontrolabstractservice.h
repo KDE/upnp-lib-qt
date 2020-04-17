@@ -27,9 +27,9 @@
 
 #include <QObject>
 #include <QString>
+#include <QUrl>
 #include <QVariant>
 #include <QVariantList>
-#include <QUrl>
 
 #include <memory>
 
@@ -42,7 +42,6 @@ class UPNPLIBQT_EXPORT UpnpControlAbstractService : public UpnpAbstractService
     Q_OBJECT
 
 public:
-
     explicit UpnpControlAbstractService(QObject *parent = nullptr);
 
     ~UpnpControlAbstractService() override;
@@ -66,13 +65,11 @@ private Q_SLOTS:
     void eventSubscriptionTimeout();
 
 protected:
-
     virtual void parseServiceDescription(QIODevice *serviceDescriptionContent);
 
     virtual void parseEventNotification(const QString &eventName, const QString &eventValue);
 
 private:
-
     std::unique_ptr<UpnpAbstractServiceDescriptionPrivate> d;
 };
 

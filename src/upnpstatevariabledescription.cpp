@@ -19,9 +19,18 @@
 
 #include "upnpstatevariabledescription.h"
 
-
 UpnpStateVariableDescription::UpnpStateVariableDescription()
-    : mIsValid(false), mUpnpName(), mObject(nullptr), mPropertyName(), mPropertyIndex(-1), mEvented(false), mDataType(),
-      mDefaultValue(), mMinimumValue(), mMaximumValue(), mStep(), mValueList()
+    : mIsValid(false)
+    , mUpnpName()
+    , mObject(nullptr)
+    , mPropertyName()
+    , mPropertyIndex(-1)
+    , mEvented(false)
+    , mDataType()
+    , mDefaultValue()
+    , mMinimumValue()
+    , mMaximumValue()
+    , mStep()
+    , mValueList()
 {
 }

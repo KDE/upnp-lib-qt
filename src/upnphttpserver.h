@@ -35,17 +35,15 @@ class UpnpHttpServer : public KDSoapServer
 {
     Q_OBJECT
 public:
-
-    explicit UpnpHttpServer(QObject * parent = nullptr);
+    explicit UpnpHttpServer(QObject *parent = nullptr);
 
     ~UpnpHttpServer() override;
 
-    QObject* createServerObject() Q_DECL_OVERRIDE;
+    QObject *createServerObject() Q_DECL_OVERRIDE;
 
     void setService(UpnpControlAbstractService *service);
 
 private:
-
     std::unique_ptr<UpnpHttpServerPrivate> d;
 };
 

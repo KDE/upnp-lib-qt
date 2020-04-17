@@ -25,8 +25,9 @@
 class UpnpControlAbstractServiceReplyPrivate
 {
 public:
-
-    explicit UpnpControlAbstractServiceReplyPrivate(const KDSoapPendingCall &soapAnswer) : mAnswer(soapAnswer), mWatcher(mAnswer)
+    explicit UpnpControlAbstractServiceReplyPrivate(const KDSoapPendingCall &soapAnswer)
+        : mAnswer(soapAnswer)
+        , mWatcher(mAnswer)
     {
     }
 
@@ -35,11 +36,11 @@ public:
     KDSoapPendingCallWatcher mWatcher;
 
     QVariantMap mResult;
-
 };
 
 UpnpControlAbstractServiceReply::UpnpControlAbstractServiceReply(const KDSoapPendingCall &soapAnswer, QObject *parent)
-    : QObject(parent), d(new UpnpControlAbstractServiceReplyPrivate(soapAnswer))
+    : QObject(parent)
+    , d(new UpnpControlAbstractServiceReplyPrivate(soapAnswer))
 {
     connect(&d->mWatcher, &KDSoapPendingCallWatcher::finished, this, &UpnpControlAbstractServiceReply::callFinished);
 }
@@ -77,6 +78,5 @@ void UpnpControlAbstractServiceReply::parseAnswer()
         d->mResult[oneValue.name()] = oneValue.value();
     }
 }
-
 
 #include "moc_upnpcontrolabstractservicereply.cpp"

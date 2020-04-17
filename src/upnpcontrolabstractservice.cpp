@@ -21,9 +21,9 @@
 
 #include "upnplogging.h"
 
+#include "upnpbasictypes.h"
 #include "upnphttpserver.h"
 #include "upnpservereventobject.h"
-#include "upnpbasictypes.h"
 
 #include "upnpactiondescription.h"
 #include "upnpservicedescription.h"
@@ -31,28 +31,31 @@
 #include <KDSoapClient/KDSoapClientInterface.h>
 #include <KDSoapClient/KDSoapMessage.h>
 
-#include <QNetworkAccessManager>
-#include <QNetworkReply>
-#include <QHostInfo>
 #include <QDnsLookup>
+#include <QHostInfo>
+#include <QNetworkAccessManager>
 #include <QNetworkInterface>
+#include <QNetworkReply>
 
 #include <QDomDocument>
 
-#include <QTimer>
-#include <QPointer>
 #include <QBuffer>
+#include <QPointer>
 #include <QTextStream>
+#include <QTimer>
 
 #include <QLoggingCategory>
 
 class UpnpAbstractServiceDescriptionPrivate
 {
 public:
-
     UpnpAbstractServiceDescriptionPrivate()
-        : mNetworkAccess(), mInterface(nullptr), mEventServer(),
-          mPublicAddress(), mRealEventSubscriptionTimeout(0), mEventSubscriptionTimer(nullptr)
+        : mNetworkAccess()
+        , mInterface(nullptr)
+        , mEventServer()
+        , mPublicAddress()
+        , mRealEventSubscriptionTimeout(0)
+        , mEventSubscriptionTimer(nullptr)
     {
     }
 
@@ -70,7 +73,8 @@ public:
 };
 
 UpnpControlAbstractService::UpnpControlAbstractService(QObject *parent)
-    : UpnpAbstractService(parent), d(new UpnpAbstractServiceDescriptionPrivate)
+    : UpnpAbstractService(parent)
+    , d(new UpnpAbstractServiceDescriptionPrivate)
 {
     connect(&d->mNetworkAccess, &QNetworkAccessManager::finished, this, &UpnpControlAbstractService::finishedDownload);
 
@@ -94,7 +98,7 @@ UpnpControlAbstractService::~UpnpControlAbstractService()
     delete d->mInterface;
 }
 
-UpnpControlAbstractServiceReply* UpnpControlAbstractService::callAction(const QString &actionName, const QVector<QVariant> &arguments)
+UpnpControlAbstractServiceReply *UpnpControlAbstractService::callAction(const QString &actionName, const QVector<QVariant> &arguments)
 {
     KDSoapMessage message;
 
@@ -190,7 +194,8 @@ void UpnpControlAbstractService::finishedDownload(QNetworkReply *reply)
             parseServiceDescription(reply);
         }
     } else if (reply->isFinished()) {
-        qCDebug(orgKdeUpnpLibQtUpnp()) << "UpnpAbstractServiceDescription::finishedDownload" << "error";
+        qCDebug(orgKdeUpnpLibQtUpnp()) << "UpnpAbstractServiceDescription::finishedDownload"
+                                       << "error";
     }
 }
 

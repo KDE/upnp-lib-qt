@@ -23,9 +23,9 @@
 #include "upnplibqt_export.h"
 
 #include <QObject>
-#include <QUrl>
-#include <QString>
 #include <QSharedPointer>
+#include <QString>
+#include <QUrl>
 
 #include <memory>
 
@@ -42,7 +42,6 @@ class UPNPLIBQT_EXPORT UpnpDeviceDescriptionParser : public QObject
     Q_OBJECT
 
 public:
-
     explicit UpnpDeviceDescriptionParser(QNetworkAccessManager *aNetworkAccess, UpnpDeviceDescription &deviceDescription, QObject *parent = nullptr);
 
     ~UpnpDeviceDescriptionParser() override;
@@ -64,11 +63,9 @@ private Q_SLOTS:
     void serviceDescriptionParsed(const QString &upnpServiceId);
 
 private:
-
     void parseDeviceDescription(QIODevice *deviceDescriptionContent, const QString &fallBackURLBase);
 
     std::unique_ptr<UpnpDeviceDescriptionParserPrivate> d;
-
 };
 
 #endif // UPNPDEVICEDESCRIPTIONPARSER_H

@@ -26,11 +26,13 @@
 class UpnpServerEventObjectPrivate
 {
 public:
-
     UpnpControlAbstractService *mService;
 };
 
-UpnpServerEventObject::UpnpServerEventObject(QObject *parent) : QObject(parent), KDSoapServerCustomVerbRequestInterface(), d(new UpnpServerEventObjectPrivate)
+UpnpServerEventObject::UpnpServerEventObject(QObject *parent)
+    : QObject(parent)
+    , KDSoapServerCustomVerbRequestInterface()
+    , d(new UpnpServerEventObjectPrivate)
 {
     d->mService = nullptr;
 }
@@ -40,7 +42,7 @@ UpnpServerEventObject::~UpnpServerEventObject()
 }
 
 bool UpnpServerEventObject::processCustomVerbRequest(const QByteArray &requestType, const QByteArray &requestData,
-                                                     const QMap<QByteArray, QByteArray> &httpHeaders, QByteArray &customAnswer)
+    const QMap<QByteArray, QByteArray> &httpHeaders, QByteArray &customAnswer)
 {
     Q_UNUSED(requestType);
 

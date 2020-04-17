@@ -22,8 +22,8 @@
 
 #include "upnplibqt_export.h"
 
-#include <QString>
 #include <QByteArray>
+#include <QString>
 #include <QVariant>
 #include <QVector>
 
@@ -32,7 +32,6 @@ class QObject;
 class UPNPLIBQT_EXPORT UpnpStateVariableDescription
 {
 public:
-
     UpnpStateVariableDescription();
 
     bool mIsValid;
@@ -61,4 +60,3 @@ public:
 };
 
 #endif // UPNPSTATEVARIABLEDESCRIPTION_H
-

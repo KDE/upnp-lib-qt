@@ -36,7 +36,6 @@ class UPNPLIBQT_EXPORT UpnpControlAbstractServiceReply : public QObject
     Q_OBJECT
 
 public:
-
     explicit UpnpControlAbstractServiceReply(const KDSoapPendingCall &soapAnswer, QObject *parent = nullptr);
 
     ~UpnpControlAbstractServiceReply() override;
@@ -54,15 +53,10 @@ public Q_SLOTS:
     void callFinished();
 
 protected:
-
     virtual void parseAnswer();
 
 private:
-
     std::unique_ptr<UpnpControlAbstractServiceReplyPrivate> d;
-
 };
-
-
 
 #endif // UPNPCONTROLABSTRACTSERVICEREPLY_H

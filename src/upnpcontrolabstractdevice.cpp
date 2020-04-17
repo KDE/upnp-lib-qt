@@ -33,7 +33,6 @@
 class UpnpControlAbstractDevicePrivate
 {
 public:
-
     UpnpControlAbstractDevicePrivate()
         : mDescription(nullptr)
     {
@@ -42,7 +41,9 @@ public:
     UpnpDeviceDescription *mDescription;
 };
 
-UpnpControlAbstractDevice::UpnpControlAbstractDevice(QObject *parent) : UpnpAbstractDevice(parent), d(new UpnpControlAbstractDevicePrivate)
+UpnpControlAbstractDevice::UpnpControlAbstractDevice(QObject *parent)
+    : UpnpAbstractDevice(parent)
+    , d(new UpnpControlAbstractDevicePrivate)
 {
 }
 
@@ -50,7 +51,7 @@ UpnpControlAbstractDevice::~UpnpControlAbstractDevice()
 {
 }
 
-UpnpControlAbstractService* UpnpControlAbstractDevice::serviceById(const QString &serviceId) const
+UpnpControlAbstractService *UpnpControlAbstractDevice::serviceById(const QString &serviceId) const
 {
     auto serviceDescription = serviceDescriptionById(serviceId);
     return serviceFromDescription(serviceDescription);
@@ -62,7 +63,7 @@ UpnpControlAbstractService *UpnpControlAbstractDevice::serviceByIndex(int servic
     return serviceFromDescription(serviceDescription);
 }
 
-UpnpControlAbstractService* UpnpControlAbstractDevice::serviceFromDescription(const UpnpServiceDescription &description) const
+UpnpControlAbstractService *UpnpControlAbstractDevice::serviceFromDescription(const UpnpServiceDescription &description) const
 {
     UpnpControlAbstractService *newService = nullptr;
 

@@ -19,27 +19,34 @@
 
 #include "upnpservicedescription.h"
 #include "upnpactiondescription.h"
-#include "upnpstatevariabledescription.h"
 #include "upnpdevicedescription.h"
+#include "upnpstatevariabledescription.h"
 
-#include <QPointer>
 #include <QBuffer>
 #include <QIODevice>
-#include <QXmlStreamWriter>
-#include <QTimer>
 #include <QMetaObject>
 #include <QMetaProperty>
+#include <QPointer>
+#include <QTimer>
+#include <QXmlStreamWriter>
 
 #include <QDebug>
 
 class UpnpServiceDescriptionPrivate
 {
 public:
-
     UpnpServiceDescriptionPrivate()
-        : mBaseURL(), mServiceType(), mServiceId(), mSCPDURL(), mControlURL(),
-          mEventURL(), mXmlDescription(), mActions(), mStateVariables(),
-          mSubscribers(), mMaximumSubscriptionDuration(3600)
+        : mBaseURL()
+        , mServiceType()
+        , mServiceId()
+        , mSCPDURL()
+        , mControlURL()
+        , mEventURL()
+        , mXmlDescription()
+        , mActions()
+        , mStateVariables()
+        , mSubscribers()
+        , mMaximumSubscriptionDuration(3600)
     {
     }
 
@@ -61,23 +68,25 @@ public:
 
     QMap<QString, UpnpStateVariableDescription> mStateVariables;
 
-    QVector<QPointer<UpnpEventSubscriber> > mSubscribers;
+    QVector<QPointer<UpnpEventSubscriber>> mSubscribers;
 
     int mMaximumSubscriptionDuration;
 
     UpnpDeviceDescription mDeviceDescription;
-
 };
 
-UpnpServiceDescription::UpnpServiceDescription() : d(std::make_unique<UpnpServiceDescriptionPrivate>())
+UpnpServiceDescription::UpnpServiceDescription()
+    : d(std::make_unique<UpnpServiceDescriptionPrivate>())
 {
 }
 
-UpnpServiceDescription::UpnpServiceDescription(const UpnpServiceDescription &other) : d(std::make_unique<UpnpServiceDescriptionPrivate>(*other.d))
+UpnpServiceDescription::UpnpServiceDescription(const UpnpServiceDescription &other)
+    : d(std::make_unique<UpnpServiceDescriptionPrivate>(*other.d))
 {
 }
 
-UpnpServiceDescription::UpnpServiceDescription(UpnpServiceDescription &&other) : d()
+UpnpServiceDescription::UpnpServiceDescription(UpnpServiceDescription &&other)
+    : d()
 {
     d.swap(other.d);
 }
@@ -183,12 +192,12 @@ const UpnpActionDescription &UpnpServiceDescription::action(const QString &name)
     return d->mActions[name];
 }
 
-QMap<QString, UpnpActionDescription>& UpnpServiceDescription::actions()
+QMap<QString, UpnpActionDescription> &UpnpServiceDescription::actions()
 {
     return d->mActions;
 }
 
-const QMap<QString, UpnpActionDescription>& UpnpServiceDescription::actions() const
+const QMap<QString, UpnpActionDescription> &UpnpServiceDescription::actions() const
 {
     return d->mActions;
 }
@@ -213,7 +222,7 @@ const QMap<QString, UpnpStateVariableDescription> &UpnpServiceDescription::state
     return d->mStateVariables;
 }
 
-const UpnpDeviceDescription& UpnpServiceDescription::deviceDescription() const
+const UpnpDeviceDescription &UpnpServiceDescription::deviceDescription() const
 {
     return d->mDeviceDescription;
 }

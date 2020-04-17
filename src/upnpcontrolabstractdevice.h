@@ -42,9 +42,9 @@ public:
 
     ~UpnpControlAbstractDevice() override;
 
-    Q_INVOKABLE UpnpControlAbstractService* serviceById(const QString &serviceId) const;
+    Q_INVOKABLE UpnpControlAbstractService *serviceById(const QString &serviceId) const;
 
-    Q_INVOKABLE UpnpControlAbstractService* serviceByIndex(int serviceIndex) const;
+    Q_INVOKABLE UpnpControlAbstractService *serviceByIndex(int serviceIndex) const;
 
 Q_SIGNALS:
 
@@ -55,13 +55,10 @@ public Q_SLOTS:
 private Q_SLOTS:
 
 protected:
-
-    UpnpControlAbstractService* serviceFromDescription(const UpnpServiceDescription &description) const;
+    UpnpControlAbstractService *serviceFromDescription(const UpnpServiceDescription &description) const;
 
 private:
-
     std::unique_ptr<UpnpControlAbstractDevicePrivate> d;
-
 };
 
 #endif // UPNPDEVICEDISCOVERY_H

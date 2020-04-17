@@ -25,8 +25,8 @@
 #include <QNetworkReply>
 
 #include <QObject>
-#include <QUrl>
 #include <QString>
+#include <QUrl>
 
 #include <memory>
 
@@ -38,7 +38,6 @@ class UpnpEventSubscriber : public QObject
     Q_OBJECT
 
 public:
-
     explicit UpnpEventSubscriber(QObject *parent = nullptr);
 
     ~UpnpEventSubscriber() override;
@@ -49,9 +48,9 @@ public:
 
     void setCallback(const QUrl &callbackAddress);
 
-    const QUrl& callback() const;
+    const QUrl &callback() const;
 
-    const QString& uuid() const;
+    const QString &uuid() const;
 
     void setUpnpService(UpnpAbstractService *service);
 
@@ -68,9 +67,7 @@ private Q_SLOTS:
     void eventingInErrorFinished(QNetworkReply::NetworkError code);
 
 private:
-
     std::unique_ptr<UpnpEventSubscriberPrivate> d;
-
 };
 
 #endif // UPNPEVENTSUBSCRIBER_H

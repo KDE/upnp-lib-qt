@@ -29,18 +29,18 @@
 class UpnpDeviceSoapServerPrivate
 {
 public:
-
-    QList<UpnpAbstractDevice*> mDevices;
+    QList<UpnpAbstractDevice *> mDevices;
 };
 
-UpnpDeviceSoapServer::UpnpDeviceSoapServer(QObject *parent) : KDSoapServer(parent), d(new UpnpDeviceSoapServerPrivate)
+UpnpDeviceSoapServer::UpnpDeviceSoapServer(QObject *parent)
+    : KDSoapServer(parent)
+    , d(new UpnpDeviceSoapServerPrivate)
 {
     listen();
 }
 
 UpnpDeviceSoapServer::~UpnpDeviceSoapServer()
 {
-
 }
 
 int UpnpDeviceSoapServer::addDevice(UpnpAbstractDevice *device)

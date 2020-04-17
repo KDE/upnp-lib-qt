@@ -22,12 +22,12 @@
 
 #include "upnplibqt_export.h"
 
-#include <QObject>
-#include <QString>
-#include <QVariant>
-#include <QUrl>
 #include <QList>
+#include <QObject>
 #include <QPair>
+#include <QString>
+#include <QUrl>
+#include <QVariant>
 
 #include <memory>
 
@@ -43,16 +43,16 @@ class UPNPLIBQT_EXPORT UpnpAbstractService : public QObject
     Q_OBJECT
 
     Q_PROPERTY(UpnpServiceDescription description
-               READ description
-               WRITE setDescription
-               NOTIFY descriptionChanged)
+            READ description
+                WRITE setDescription
+                    NOTIFY descriptionChanged)
 
 public:
     explicit UpnpAbstractService(QObject *parent = nullptr);
 
     ~UpnpAbstractService() override;
 
-    QIODevice* buildAndGetXmlDescription();
+    QIODevice *buildAndGetXmlDescription();
 
     QPointer<UpnpEventSubscriber> subscribeToEvents(const QByteArray &requestData, const QMap<QByteArray, QByteArray> &headers);
 
@@ -60,23 +60,23 @@ public:
 
     void addAction(const UpnpActionDescription &newAction);
 
-    Q_INVOKABLE const UpnpActionDescription& action(const QString &name) const;
+    Q_INVOKABLE const UpnpActionDescription &action(const QString &name) const;
 
     QList<QString> actions() const;
 
     void addStateVariable(const UpnpStateVariableDescription &newVariable);
 
-    Q_INVOKABLE const UpnpStateVariableDescription& stateVariable(const QString &name) const;
+    Q_INVOKABLE const UpnpStateVariableDescription &stateVariable(const QString &name) const;
 
     QList<QString> stateVariables() const;
 
-    virtual QVector<QPair<QString, QVariant> > invokeAction(const QString &actionName, const QVector<QVariant> &arguments, bool &isInError);
+    virtual QVector<QPair<QString, QVariant>> invokeAction(const QString &actionName, const QVector<QVariant> &arguments, bool &isInError);
 
     void setDescription(const UpnpServiceDescription &value);
 
-    UpnpServiceDescription& description();
+    UpnpServiceDescription &description();
 
-    const UpnpServiceDescription& description() const;
+    const UpnpServiceDescription &description() const;
 
 Q_SIGNALS:
 
@@ -85,11 +85,9 @@ Q_SIGNALS:
 public Q_SLOTS:
 
 private:
-
     void sendEventNotification(const QPointer<UpnpEventSubscriber> &currentSubscriber);
 
     std::unique_ptr<UpnpAbstractServicePrivate> d;
-
 };
 
 #endif // UPNPABSTRACTSERVICE_H

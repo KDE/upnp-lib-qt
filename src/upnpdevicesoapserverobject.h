@@ -25,8 +25,8 @@
 #include <KDSoapServer/KDSoapServerCustomVerbRequestInterface.h>
 #include <KDSoapServer/KDSoapServerObjectInterface.h>
 
-#include <QObject>
 #include <QList>
+#include <QObject>
 
 #include <memory>
 
@@ -40,14 +40,13 @@ class UpnpDeviceSoapServerObject : public QObject, public KDSoapServerObjectInte
     Q_INTERFACES(KDSoapServerObjectInterface KDSoapServerCustomVerbRequestInterface)
 
 public:
-
     explicit UpnpDeviceSoapServerObject(QList<UpnpAbstractDevice *> &devices, QObject *parent = nullptr);
 
     ~UpnpDeviceSoapServerObject() override;
 
     void processRequest(const KDSoapMessage &request, KDSoapMessage &response, const QByteArray &soapAction) override;
 
-    QIODevice* processFileRequest(const QString &path, QByteArray &contentType) override;
+    QIODevice *processFileRequest(const QString &path, QByteArray &contentType) override;
 
     void processRequestWithPath(const KDSoapMessage &request, KDSoapMessage &response, const QByteArray &soapAction, const QString &path) override;
 
@@ -60,16 +59,14 @@ public:
      * @return true if the request has been handled and if customAnswer is valid and will be sent back to the client.
      */
     bool processCustomVerbRequest(const QByteArray &requestType, const QByteArray &requestData,
-                                  const QMap<QByteArray, QByteArray> &httpHeaders, QByteArray &customAnswer) override;
+        const QMap<QByteArray, QByteArray> &httpHeaders, QByteArray &customAnswer) override;
 
 private:
+    QIODevice *downloadDeviceXmlDescription(UpnpAbstractDevice *device, QByteArray &contentType);
 
-    QIODevice* downloadDeviceXmlDescription(UpnpAbstractDevice *device, QByteArray &contentType);
-
-    QIODevice* downloadServiceXmlDescription(UpnpAbstractDevice *device, const int serviceIndex, QByteArray &contentType);
+    QIODevice *downloadServiceXmlDescription(UpnpAbstractDevice *device, const int serviceIndex, QByteArray &contentType);
 
     std::unique_ptr<UpnpDeviceSoapServerObjectPrivate> d;
 };
 
 #endif // UPNPDEVICESOAPSERVEROBJECT_H
-

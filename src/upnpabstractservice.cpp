@@ -25,25 +25,26 @@
 #include "upnpeventsubscriber.h"
 
 #include "upnpactiondescription.h"
-#include "upnpstatevariabledescription.h"
 #include "upnpservicedescription.h"
+#include "upnpstatevariabledescription.h"
 
-#include <QPointer>
 #include <QBuffer>
 #include <QIODevice>
-#include <QXmlStreamWriter>
-#include <QTimer>
 #include <QMetaObject>
 #include <QMetaProperty>
+#include <QPointer>
+#include <QTimer>
+#include <QXmlStreamWriter>
 
 #include <QLoggingCategory>
 
 class UpnpAbstractServicePrivate
 {
 public:
-
     UpnpAbstractServicePrivate()
-        : mService(), mXmlDescription(), mSubscribers()
+        : mService()
+        , mXmlDescription()
+        , mSubscribers()
     {
     }
 
@@ -51,12 +52,12 @@ public:
 
     QPointer<QIODevice> mXmlDescription;
 
-    QVector<QPointer<UpnpEventSubscriber> > mSubscribers;
-
+    QVector<QPointer<UpnpEventSubscriber>> mSubscribers;
 };
 
-UpnpAbstractService::UpnpAbstractService(QObject *parent) :
-    QObject(parent), d(new UpnpAbstractServicePrivate)
+UpnpAbstractService::UpnpAbstractService(QObject *parent)
+    : QObject(parent)
+    , d(new UpnpAbstractServicePrivate)
 {
 }
 
@@ -64,7 +65,7 @@ UpnpAbstractService::~UpnpAbstractService()
 {
 }
 
-QIODevice* UpnpAbstractService::buildAndGetXmlDescription()
+QIODevice *UpnpAbstractService::buildAndGetXmlDescription()
 {
     if (!d->mXmlDescription) {
         QPointer<QBuffer> newDescription(new QBuffer);
@@ -231,7 +232,7 @@ QList<QString> UpnpAbstractService::stateVariables() const
     return description().stateVariables().keys();
 }
 
-QVector<QPair<QString, QVariant> > UpnpAbstractService::invokeAction(const QString &actionName, const QVector<QVariant> &arguments, bool &isInError)
+QVector<QPair<QString, QVariant>> UpnpAbstractService::invokeAction(const QString &actionName, const QVector<QVariant> &arguments, bool &isInError)
 {
     Q_UNUSED(actionName);
     Q_UNUSED(arguments);

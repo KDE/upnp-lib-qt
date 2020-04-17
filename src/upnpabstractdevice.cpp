@@ -38,8 +38,9 @@
 class UpnpAbstractDevicePrivate
 {
 public:
-
-    UpnpAbstractDevicePrivate() : mDevice(new UpnpDeviceDescription), mXmlDescription()
+    UpnpAbstractDevicePrivate()
+        : mDevice(new UpnpDeviceDescription)
+        , mXmlDescription()
     {
     }
 
@@ -48,8 +49,9 @@ public:
     QPointer<QIODevice> mXmlDescription;
 };
 
-UpnpAbstractDevice::UpnpAbstractDevice(QObject *parent) :
-    QObject(parent), d(new UpnpAbstractDevicePrivate)
+UpnpAbstractDevice::UpnpAbstractDevice(QObject *parent)
+    : QObject(parent)
+    , d(new UpnpAbstractDevicePrivate)
 {
 }
 
@@ -59,7 +61,7 @@ UpnpAbstractDevice::~UpnpAbstractDevice()
 
 UpnpServiceDescription UpnpAbstractDevice::serviceDescriptionById(const QString &serviceId) const
 {
-    auto result = UpnpServiceDescription{};
+    auto result = UpnpServiceDescription {};
     const auto &allServices = d->mDevice->services();
 
     for (const auto &service : allServices) {
@@ -74,13 +76,13 @@ UpnpServiceDescription UpnpAbstractDevice::serviceDescriptionById(const QString 
 UpnpServiceDescription UpnpAbstractDevice::serviceDescriptionByIndex(int serviceIndex) const
 {
     if (serviceIndex < 0 || serviceIndex > d->mDevice->services().size() - 1) {
-        return UpnpServiceDescription{};
+        return UpnpServiceDescription {};
     }
 
     return d->mDevice->services()[serviceIndex];
 }
 
-const QList<UpnpServiceDescription>& UpnpAbstractDevice::services() const
+const QList<UpnpServiceDescription> &UpnpAbstractDevice::services() const
 {
     return d->mDevice->services();
 }
@@ -113,7 +115,7 @@ const UpnpDeviceDescription *UpnpAbstractDevice::description() const
     return d->mDevice.data();
 }
 
-QIODevice* UpnpAbstractDevice::buildAndGetXmlDescription()
+QIODevice *UpnpAbstractDevice::buildAndGetXmlDescription()
 {
     if (!d->mXmlDescription) {
         QPointer<QBuffer> newDescription(new QBuffer);
@@ -174,11 +176,12 @@ QIODevice* UpnpAbstractDevice::buildAndGetXmlDescription()
 
 void UpnpAbstractDevice::newSearchQuery(UpnpSsdpEngine *engine, const UpnpSearchQuery &searchQuery)
 {
-    qCDebug(orgKdeUpnpLibQtUpnp()) << "UpnpAbstractDevice::newSearchQuery" << "search for" << searchQuery.mSearchTarget;
-    switch(searchQuery.mSearchTargetType)
-    {
+    qCDebug(orgKdeUpnpLibQtUpnp()) << "UpnpAbstractDevice::newSearchQuery"
+                                   << "search for" << searchQuery.mSearchTarget;
+    switch (searchQuery.mSearchTargetType) {
     case SearchTargetType::All:
-        qCDebug(orgKdeUpnpLibQtUpnp()) << "UpnpAbstractDevice::newSearchQuery" << "publish";
+        qCDebug(orgKdeUpnpLibQtUpnp()) << "UpnpAbstractDevice::newSearchQuery"
+                                       << "publish";
         engine->publishDevice(this);
         break;
     case SearchTargetType::RootDevice:

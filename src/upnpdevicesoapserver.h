@@ -35,8 +35,7 @@ class UPNPLIBQT_EXPORT UpnpDeviceSoapServer : public KDSoapServer
 {
     Q_OBJECT
 public:
-
-    explicit UpnpDeviceSoapServer(QObject * parent = nullptr);
+    explicit UpnpDeviceSoapServer(QObject *parent = nullptr);
 
     ~UpnpDeviceSoapServer() override;
 
@@ -44,12 +43,11 @@ public:
 
     void removeDevice(int index);
 
-    QObject* createServerObject() Q_DECL_OVERRIDE;
+    QObject *createServerObject() Q_DECL_OVERRIDE;
 
     QUrl urlPrefix() const;
 
 private:
-
     std::unique_ptr<UpnpDeviceSoapServerPrivate> d;
 };
 

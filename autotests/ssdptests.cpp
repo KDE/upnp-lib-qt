@@ -21,16 +21,16 @@
 
 #include "upnpdiscoveryresult.h"
 
+#include <QtCore/QDebug>
 #include <QtCore/QScopedPointer>
 #include <QtCore/QStringList>
-#include <QtCore/QDebug>
 
 #include <QtNetwork/QUdpSocket>
 
 #include <QtTest/QtTest>
 
-#include <sys/types.h>
 #include <sys/socket.h>
+#include <sys/types.h>
 
 class MockSsdpClient : public QObject
 {
@@ -38,14 +38,22 @@ class MockSsdpClient : public QObject
     Q_OBJECT
 
 public:
-
     explicit MockSsdpClient(quint16 aPortNumber, const QByteArray &aExpectedQuery, const QStringList &aAnswerData,
-                            bool aAutoRefresh, int aRefreshPeriod = 1000,
-                            const QStringList &aAnnounceData = {},
-                            QObject *parent = nullptr)
-        : QObject(parent), mPortNumber(aPortNumber), mClientSocket(), mAnswerData(aAnswerData), mExpectedQuery(aExpectedQuery),
-          mHttpClientSocket(), mAutoRefresh(aAutoRefresh), mRefreshPeriod(aRefreshPeriod),
-          mAnnounceData(aAnnounceData), mAutoRefreshTimer(), mSender(), mSenderPort(12345)
+        bool aAutoRefresh, int aRefreshPeriod = 1000,
+        const QStringList &aAnnounceData = {},
+        QObject *parent = nullptr)
+        : QObject(parent)
+        , mPortNumber(aPortNumber)
+        , mClientSocket()
+        , mAnswerData(aAnswerData)
+        , mExpectedQuery(aExpectedQuery)
+        , mHttpClientSocket()
+        , mAutoRefresh(aAutoRefresh)
+        , mRefreshPeriod(aRefreshPeriod)
+        , mAnnounceData(aAnnounceData)
+        , mAutoRefreshTimer()
+        , mSender()
+        , mSenderPort(12345)
     {
         connect(&mAutoRefreshTimer, &QTimer::timeout, this, &MockSsdpClient::refreshAnnounce);
 
@@ -73,9 +81,8 @@ public:
         result = mAnnounceSocket.joinMulticastGroup(QHostAddress(QStringLiteral("239.255.255.250")));
         qDebug() << "joinMulticastGroup" << (result ? "true" : "false") << mAnnounceSocket.errorString();
 
-        mAnnounceSocket.setSocketOption(QAbstractSocket::MulticastLoopbackOption, {1});
-        mAnnounceSocket.setSocketOption(QAbstractSocket::MulticastTtlOption, {4});
-
+        mAnnounceSocket.setSocketOption(QAbstractSocket::MulticastLoopbackOption, { 1 });
+        mAnnounceSocket.setSocketOption(QAbstractSocket::MulticastTtlOption, { 4 });
     }
 
 public Q_SLOTS:
@@ -87,7 +94,7 @@ public Q_SLOTS:
             datagram.resize(mClientSocket.pendingDatagramSize());
 
             mClientSocket.readDatagram(datagram.data(), datagram.size(),
-                                       &mSender, &mSenderPort);
+                &mSender, &mSenderPort);
 
             QVERIFY(mExpectedQuery.isEmpty() || datagram == mExpectedQuery);
 
@@ -109,7 +116,7 @@ public Q_SLOTS:
             quint16 senderPort;
 
             mClientSocket.readDatagram(datagram.data(), datagram.size(),
-                                       &sender, &senderPort);
+                &sender, &senderPort);
 
             qDebug() << "httpDataReceived" << datagram;
         }
@@ -124,7 +131,6 @@ public Q_SLOTS:
     }
 
 private:
-
     quint16 mPortNumber;
 
     QUdpSocket mClientSocket;
@@ -148,16 +154,15 @@ private:
     QHostAddress mSender;
 
     quint16 mSenderPort;
-
 };
 
-class SsdpTests: public QObject
+class SsdpTests : public QObject
 {
     Q_OBJECT
 
 public:
-
-    SsdpTests(QObject *parent = nullptr) : QObject(parent)
+    SsdpTests(QObject *parent = nullptr)
+        : QObject(parent)
     {
     }
 
@@ -183,82 +188,81 @@ private Q_SLOTS:
                                                    "MAN: \"ssdp:discover\"\r\n"
                                                    "MX: 2\r\n"
                                                    "ST: ssdp:all\r\n\r\n")
-                                     << QStringList({QStringLiteral("HTTP/1.1 200 OK\r\n"
-                                                     "CACHE-CONTROL: max-age=1800\r\n"
-                                                     "DATE: mar., 27 oct. 2015 21:03:35 G\x7F\r\n"
-                                                     "ST: uuid:4d696e69-444c-164e-9d41-ecf4bb9c317e\r\n"
-                                                     "USN: uuid:4d696e69-444c-164e-9d41-ecf4bb9c317e\r\n"
-                                                     "EXT:\r\n"
-                                                     "SERVER: Debian DLNADOC/1.50 UPnP/1.0 MiniDLNA/1.1.4\r\n"
-                                                     "LOCATION: http://127.0.0.1:8200/rootDesc.xml\r\n"
-                                                     "Content-Length: 0\r\n\r\n"),
-                                                     QStringLiteral("HTTP/1.1 200 OK\r\n"
-                                                     "CACHE-CONTROL: max-age=1800\r\n"
-                                                     "DATE: mar., 27 oct. 2015 21:03:35 G\x7F\r\n"
-                                                     "ST: upnp:rootdevice\r\n"
-                                                     "USN: uuid:4d696e69-444c-164e-9d41-ecf4bb9c317e::upnp:rootdevice\r\n"
-                                                     "EXT:\r\n"
-                                                     "SERVER: Debian DLNADOC/1.50 UPnP/1.0 MiniDLNA/1.1.4\r\n"
-                                                     "LOCATION: http://127.0.0.1:8200/rootDesc.xml\r\n"
-                                                     "Content-Length: 0\r\n\r\n"),
-                                                     QStringLiteral("HTTP/1.1 200 OK\r\n"
-                                                     "CACHE-CONTROL: max-age=1800\r\n"
-                                                     "DATE: mar., 27 oct. 2015 21:03:35 G\x7F\r\n"
-                                                     "ST: urn:schemas-upnp-org:device:MediaServer:1\r\n"
-                                                     "USN: uuid:4d696e69-444c-164e-9d41-ecf4bb9c317e::urn:schemas-upnp-org:device:MediaServer:1\r\n"
-                                                     "EXT:\r\n"
-                                                     "SERVER: Debian DLNADOC/1.50 UPnP/1.0 MiniDLNA/1.1.4\r\n"
-                                                     "LOCATION: http://127.0.0.1:8200/rootDesc.xml\r\n"
-                                                     "Content-Length: 0\r\n\r\n"),
-                                                     QStringLiteral("HTTP/1.1 200 OK\r\n"
-                                                     "CACHE-CONTROL: max-age=1800\r\n"
-                                                     "DATE: mar., 27 oct. 2015 21:03:35 G\x7F\r\n"
-                                                     "ST: urn:schemas-upnp-org:service:ContentDirectory:1\r\n"
-                                                     "USN: uuid:4d696e69-444c-164e-9d41-ecf4bb9c317e::urn:schemas-upnp-org:service:ContentDirectory:1\r\n"
-                                                     "EXT:\r\n"
-                                                     "SERVER: Debian DLNADOC/1.50 UPnP/1.0 MiniDLNA/1.1.4\r\n"
-                                                     "LOCATION: http://127.0.0.1:8200/rootDesc.xml\r\n"
-                                                     "Content-Length: 0\r\n\r\n"),
-                                                     QStringLiteral("HTTP/1.1 200 OK\r\n"
-                                                     "CACHE-CONTROL: max-age=1800\r\n"
-                                                     "DATE: mar., 27 oct. 2015 21:03:35 G\x7F\r\n"
-                                                     "ST: urn:schemas-upnp-org:service:ConnectionManager:1\r\n"
-                                                     "USN: uuid:4d696e69-444c-164e-9d41-ecf4bb9c317e::urn:schemas-upnp-org:service:ConnectionManager:1\r\n"
-                                                     "EXT:\r\n"
-                                                     "SERVER: Debian DLNADOC/1.50 UPnP/1.0 MiniDLNA/1.1.4\r\n"
-                                                     "LOCATION: http://127.0.0.1:8200/rootDesc.xml\r\n"
-                                                     "Content-Length: 0\r\n\r\n")
-                                                    })
-                                     << QList<UpnpDiscoveryResult>({UpnpDiscoveryResult(QStringLiteral("uuid:4d696e69-444c-164e-9d41-ecf4bb9c317e"),
-                                                                    QStringLiteral("uuid:4d696e69-444c-164e-9d41-ecf4bb9c317e"),
-                                                                    QStringLiteral("http://127.0.0.1:8200/rootDesc.xml"),
-                                                                    UpnpSsdpEngine::NotificationSubType::Invalid,
-                                                                    QStringLiteral("mar., 27 oct. 2015 21:03:35 G\x7F"),
-                                                                    1800),
-                                                                    UpnpDiscoveryResult(QStringLiteral("upnp:rootdevice"),
-                                                                    QStringLiteral("uuid:4d696e69-444c-164e-9d41-ecf4bb9c317e::upnp:rootdevice"),
-                                                                    QStringLiteral("http://127.0.0.1:8200/rootDesc.xml"),
-                                                                    UpnpSsdpEngine::NotificationSubType::Invalid,
-                                                                    QStringLiteral("mar., 27 oct. 2015 21:03:35 G\x7F"),
-                                                                    1800),
-                                                                    UpnpDiscoveryResult(QStringLiteral("urn:schemas-upnp-org:device:MediaServer:1"),
-                                                                    QStringLiteral("uuid:4d696e69-444c-164e-9d41-ecf4bb9c317e::urn:schemas-upnp-org:device:MediaServer:1"),
-                                                                    QStringLiteral("http://127.0.0.1:8200/rootDesc.xml"),
-                                                                    UpnpSsdpEngine::NotificationSubType::Invalid,
-                                                                    QStringLiteral("mar., 27 oct. 2015 21:03:35 G\x7F"),
-                                                                    1800),
-                                                                    UpnpDiscoveryResult(QStringLiteral("urn:schemas-upnp-org:service:ContentDirectory:1"),
-                                                                    QStringLiteral("uuid:4d696e69-444c-164e-9d41-ecf4bb9c317e::urn:schemas-upnp-org:service:ContentDirectory:1"),
-                                                                    QStringLiteral("http://127.0.0.1:8200/rootDesc.xml"),
-                                                                    UpnpSsdpEngine::NotificationSubType::Invalid,
-                                                                    QStringLiteral("mar., 27 oct. 2015 21:03:35 G\x7F"),
-                                                                    1800),
-                                                                    UpnpDiscoveryResult(QStringLiteral("urn:schemas-upnp-org:service:ConnectionManager:1"),
-                                                                    QStringLiteral("uuid:4d696e69-444c-164e-9d41-ecf4bb9c317e::urn:schemas-upnp-org:service:ConnectionManager:1"),
-                                                                    QStringLiteral("http://127.0.0.1:8200/rootDesc.xml"),
-                                                                    UpnpSsdpEngine::NotificationSubType::Invalid,
-                                                                    QStringLiteral("mar., 27 oct. 2015 21:03:35 G\x7F"),
-                                                                    1800)});
+                                     << QStringList({ QStringLiteral("HTTP/1.1 200 OK\r\n"
+                                                                     "CACHE-CONTROL: max-age=1800\r\n"
+                                                                     "DATE: mar., 27 oct. 2015 21:03:35 G\x7F\r\n"
+                                                                     "ST: uuid:4d696e69-444c-164e-9d41-ecf4bb9c317e\r\n"
+                                                                     "USN: uuid:4d696e69-444c-164e-9d41-ecf4bb9c317e\r\n"
+                                                                     "EXT:\r\n"
+                                                                     "SERVER: Debian DLNADOC/1.50 UPnP/1.0 MiniDLNA/1.1.4\r\n"
+                                                                     "LOCATION: http://127.0.0.1:8200/rootDesc.xml\r\n"
+                                                                     "Content-Length: 0\r\n\r\n"),
+                                            QStringLiteral("HTTP/1.1 200 OK\r\n"
+                                                           "CACHE-CONTROL: max-age=1800\r\n"
+                                                           "DATE: mar., 27 oct. 2015 21:03:35 G\x7F\r\n"
+                                                           "ST: upnp:rootdevice\r\n"
+                                                           "USN: uuid:4d696e69-444c-164e-9d41-ecf4bb9c317e::upnp:rootdevice\r\n"
+                                                           "EXT:\r\n"
+                                                           "SERVER: Debian DLNADOC/1.50 UPnP/1.0 MiniDLNA/1.1.4\r\n"
+                                                           "LOCATION: http://127.0.0.1:8200/rootDesc.xml\r\n"
+                                                           "Content-Length: 0\r\n\r\n"),
+                                            QStringLiteral("HTTP/1.1 200 OK\r\n"
+                                                           "CACHE-CONTROL: max-age=1800\r\n"
+                                                           "DATE: mar., 27 oct. 2015 21:03:35 G\x7F\r\n"
+                                                           "ST: urn:schemas-upnp-org:device:MediaServer:1\r\n"
+                                                           "USN: uuid:4d696e69-444c-164e-9d41-ecf4bb9c317e::urn:schemas-upnp-org:device:MediaServer:1\r\n"
+                                                           "EXT:\r\n"
+                                                           "SERVER: Debian DLNADOC/1.50 UPnP/1.0 MiniDLNA/1.1.4\r\n"
+                                                           "LOCATION: http://127.0.0.1:8200/rootDesc.xml\r\n"
+                                                           "Content-Length: 0\r\n\r\n"),
+                                            QStringLiteral("HTTP/1.1 200 OK\r\n"
+                                                           "CACHE-CONTROL: max-age=1800\r\n"
+                                                           "DATE: mar., 27 oct. 2015 21:03:35 G\x7F\r\n"
+                                                           "ST: urn:schemas-upnp-org:service:ContentDirectory:1\r\n"
+                                                           "USN: uuid:4d696e69-444c-164e-9d41-ecf4bb9c317e::urn:schemas-upnp-org:service:ContentDirectory:1\r\n"
+                                                           "EXT:\r\n"
+                                                           "SERVER: Debian DLNADOC/1.50 UPnP/1.0 MiniDLNA/1.1.4\r\n"
+                                                           "LOCATION: http://127.0.0.1:8200/rootDesc.xml\r\n"
+                                                           "Content-Length: 0\r\n\r\n"),
+                                            QStringLiteral("HTTP/1.1 200 OK\r\n"
+                                                           "CACHE-CONTROL: max-age=1800\r\n"
+                                                           "DATE: mar., 27 oct. 2015 21:03:35 G\x7F\r\n"
+                                                           "ST: urn:schemas-upnp-org:service:ConnectionManager:1\r\n"
+                                                           "USN: uuid:4d696e69-444c-164e-9d41-ecf4bb9c317e::urn:schemas-upnp-org:service:ConnectionManager:1\r\n"
+                                                           "EXT:\r\n"
+                                                           "SERVER: Debian DLNADOC/1.50 UPnP/1.0 MiniDLNA/1.1.4\r\n"
+                                                           "LOCATION: http://127.0.0.1:8200/rootDesc.xml\r\n"
+                                                           "Content-Length: 0\r\n\r\n") })
+                                     << QList<UpnpDiscoveryResult>({ UpnpDiscoveryResult(QStringLiteral("uuid:4d696e69-444c-164e-9d41-ecf4bb9c317e"),
+                                                                         QStringLiteral("uuid:4d696e69-444c-164e-9d41-ecf4bb9c317e"),
+                                                                         QStringLiteral("http://127.0.0.1:8200/rootDesc.xml"),
+                                                                         UpnpSsdpEngine::NotificationSubType::Invalid,
+                                                                         QStringLiteral("mar., 27 oct. 2015 21:03:35 G\x7F"),
+                                                                         1800),
+                                            UpnpDiscoveryResult(QStringLiteral("upnp:rootdevice"),
+                                                QStringLiteral("uuid:4d696e69-444c-164e-9d41-ecf4bb9c317e::upnp:rootdevice"),
+                                                QStringLiteral("http://127.0.0.1:8200/rootDesc.xml"),
+                                                UpnpSsdpEngine::NotificationSubType::Invalid,
+                                                QStringLiteral("mar., 27 oct. 2015 21:03:35 G\x7F"),
+                                                1800),
+                                            UpnpDiscoveryResult(QStringLiteral("urn:schemas-upnp-org:device:MediaServer:1"),
+                                                QStringLiteral("uuid:4d696e69-444c-164e-9d41-ecf4bb9c317e::urn:schemas-upnp-org:device:MediaServer:1"),
+                                                QStringLiteral("http://127.0.0.1:8200/rootDesc.xml"),
+                                                UpnpSsdpEngine::NotificationSubType::Invalid,
+                                                QStringLiteral("mar., 27 oct. 2015 21:03:35 G\x7F"),
+                                                1800),
+                                            UpnpDiscoveryResult(QStringLiteral("urn:schemas-upnp-org:service:ContentDirectory:1"),
+                                                QStringLiteral("uuid:4d696e69-444c-164e-9d41-ecf4bb9c317e::urn:schemas-upnp-org:service:ContentDirectory:1"),
+                                                QStringLiteral("http://127.0.0.1:8200/rootDesc.xml"),
+                                                UpnpSsdpEngine::NotificationSubType::Invalid,
+                                                QStringLiteral("mar., 27 oct. 2015 21:03:35 G\x7F"),
+                                                1800),
+                                            UpnpDiscoveryResult(QStringLiteral("urn:schemas-upnp-org:service:ConnectionManager:1"),
+                                                QStringLiteral("uuid:4d696e69-444c-164e-9d41-ecf4bb9c317e::urn:schemas-upnp-org:service:ConnectionManager:1"),
+                                                QStringLiteral("http://127.0.0.1:8200/rootDesc.xml"),
+                                                UpnpSsdpEngine::NotificationSubType::Invalid,
+                                                QStringLiteral("mar., 27 oct. 2015 21:03:35 G\x7F"),
+                                                1800) });
 
         QTest::newRow("root device") << UpnpSsdpEngine::RootDevices
                                      << QString()
@@ -267,22 +271,21 @@ private Q_SLOTS:
                                                    "MAN: \"ssdp:discover\"\r\n"
                                                    "MX: 2\r\n"
                                                    "ST: upnp:rootdevice\r\n\r\n")
-                                     << QStringList({QStringLiteral("HTTP/1.1 200 OK\r\n"
-                                                     "CACHE-CONTROL: max-age=1800\r\n"
-                                                     "DATE: mar., 27 oct. 2015 21:03:35 G\x7F\r\n"
-                                                     "ST: upnp:rootdevice\r\n"
-                                                     "USN: uuid:4d696e69-444c-164e-9d41-ecf4bb9c317e::upnp:rootdevice\r\n"
-                                                     "EXT:\r\n"
-                                                     "SERVER: Debian DLNADOC/1.50 UPnP/1.0 MiniDLNA/1.1.4\r\n"
-                                                     "LOCATION: http://127.0.0.1:8200/rootDesc.xml\r\n"
-                                                     "Content-Length: 0\r\n\r\n")
-                                                    })
-                                     << QList<UpnpDiscoveryResult>({UpnpDiscoveryResult(QStringLiteral("upnp:rootdevice"),
-                                                                    QStringLiteral("uuid:4d696e69-444c-164e-9d41-ecf4bb9c317e::upnp:rootdevice"),
-                                                                    QStringLiteral("http://127.0.0.1:8200/rootDesc.xml"),
-                                                                    UpnpSsdpEngine::NotificationSubType::Invalid,
-                                                                    QStringLiteral("mar., 27 oct. 2015 21:03:35 G\x7F"),
-                                                                    1800)});
+                                     << QStringList({ QStringLiteral("HTTP/1.1 200 OK\r\n"
+                                                                     "CACHE-CONTROL: max-age=1800\r\n"
+                                                                     "DATE: mar., 27 oct. 2015 21:03:35 G\x7F\r\n"
+                                                                     "ST: upnp:rootdevice\r\n"
+                                                                     "USN: uuid:4d696e69-444c-164e-9d41-ecf4bb9c317e::upnp:rootdevice\r\n"
+                                                                     "EXT:\r\n"
+                                                                     "SERVER: Debian DLNADOC/1.50 UPnP/1.0 MiniDLNA/1.1.4\r\n"
+                                                                     "LOCATION: http://127.0.0.1:8200/rootDesc.xml\r\n"
+                                                                     "Content-Length: 0\r\n\r\n") })
+                                     << QList<UpnpDiscoveryResult>({ UpnpDiscoveryResult(QStringLiteral("upnp:rootdevice"),
+                                            QStringLiteral("uuid:4d696e69-444c-164e-9d41-ecf4bb9c317e::upnp:rootdevice"),
+                                            QStringLiteral("http://127.0.0.1:8200/rootDesc.xml"),
+                                            UpnpSsdpEngine::NotificationSubType::Invalid,
+                                            QStringLiteral("mar., 27 oct. 2015 21:03:35 G\x7F"),
+                                            1800) });
 
         QTest::newRow("device by uuid") << UpnpSsdpEngine::DeviceByUUID
                                         << QStringLiteral("4d696e69-444c-164e-9d41-ecf4bb9c317e")
@@ -291,23 +294,25 @@ private Q_SLOTS:
                                                       "MAN: \"ssdp:discover\"\r\n"
                                                       "MX: 2\r\n"
                                                       "ST: uuid:4d696e69-444c-164e-9d41-ecf4bb9c317e\r\n\r\n")
-                                        << QStringList({QStringLiteral("HTTP/1.1 200 OK\r\n"
-                                                        "CACHE-CONTROL: max-age=1800\r\n"
-                                                        "DATE: mar., 27 oct. 2015 21:03:35 G\x7F\r\n"
-                                                        "ST: uuid:4d696e69-444c-164e-9d41-ecf4bb9c317e\r\n"
-                                                        "USN: uuid:4d696e69-444c-164e-9d41-ecf4bb9c317e\r\n"
-                                                        "EXT:\r\n"
-                                                        "SERVER: Debian DLNADOC/1.50 UPnP/1.0 MiniDLNA/1.1.4\r\n"
-                                                        "LOCATION: http://127.0.0.1:8200/rootDesc.xml\r\n"
-                                                        "Content-Length: 0\r\n\r\n"),
-                                                       })
-                                        << QList<UpnpDiscoveryResult>({UpnpDiscoveryResult(QStringLiteral("uuid:4d696e69-444c-164e-9d41-ecf4bb9c317e"),
-                                                                       QStringLiteral("uuid:4d696e69-444c-164e-9d41-ecf4bb9c317e"),
-                                                                       QStringLiteral("http://127.0.0.1:8200/rootDesc.xml"),
-                                                                       UpnpSsdpEngine::NotificationSubType::Invalid,
-                                                                       QStringLiteral("mar., 27 oct. 2015 21:03:35 G\x7F"),
-                                                                       1800),
-                                                                      });
+                                        << QStringList({
+                                               QStringLiteral("HTTP/1.1 200 OK\r\n"
+                                                              "CACHE-CONTROL: max-age=1800\r\n"
+                                                              "DATE: mar., 27 oct. 2015 21:03:35 G\x7F\r\n"
+                                                              "ST: uuid:4d696e69-444c-164e-9d41-ecf4bb9c317e\r\n"
+                                                              "USN: uuid:4d696e69-444c-164e-9d41-ecf4bb9c317e\r\n"
+                                                              "EXT:\r\n"
+                                                              "SERVER: Debian DLNADOC/1.50 UPnP/1.0 MiniDLNA/1.1.4\r\n"
+                                                              "LOCATION: http://127.0.0.1:8200/rootDesc.xml\r\n"
+                                                              "Content-Length: 0\r\n\r\n"),
+                                           })
+                                        << QList<UpnpDiscoveryResult>({
+                                               UpnpDiscoveryResult(QStringLiteral("uuid:4d696e69-444c-164e-9d41-ecf4bb9c317e"),
+                                                   QStringLiteral("uuid:4d696e69-444c-164e-9d41-ecf4bb9c317e"),
+                                                   QStringLiteral("http://127.0.0.1:8200/rootDesc.xml"),
+                                                   UpnpSsdpEngine::NotificationSubType::Invalid,
+                                                   QStringLiteral("mar., 27 oct. 2015 21:03:35 G\x7F"),
+                                                   1800),
+                                           });
 
         QTest::newRow("device by type") << UpnpSsdpEngine::DeviceByType
                                         << QStringLiteral("schemas-upnp-org:device:MediaServer:1")
@@ -316,48 +321,50 @@ private Q_SLOTS:
                                                       "MAN: \"ssdp:discover\"\r\n"
                                                       "MX: 2\r\n"
                                                       "ST: urn:schemas-upnp-org:device:MediaServer:1\r\n\r\n")
-                                        << QStringList({QStringLiteral("HTTP/1.1 200 OK\r\n"
-                                                        "CACHE-CONTROL: max-age=1800\r\n"
-                                                        "DATE: mar., 27 oct. 2015 21:03:35 G\x7F\r\n"
-                                                        "ST: urn:schemas-upnp-org:device:MediaServer:1\r\n"
-                                                        "USN: uuid:4d696e69-444c-164e-9d41-ecf4bb9c317e::urn:schemas-upnp-org:device:MediaServer:1\r\n"
-                                                        "EXT:\r\n"
-                                                        "SERVER: Debian DLNADOC/1.50 UPnP/1.0 MiniDLNA/1.1.4\r\n"
-                                                        "LOCATION: http://127.0.0.1:8200/rootDesc.xml\r\n"
-                                                        "Content-Length: 0\r\n\r\n"),
-                                                       })
-                                        << QList<UpnpDiscoveryResult>({UpnpDiscoveryResult(QStringLiteral("urn:schemas-upnp-org:device:MediaServer:1"),
-                                                                       QStringLiteral("uuid:4d696e69-444c-164e-9d41-ecf4bb9c317e::urn:schemas-upnp-org:device:MediaServer:1"),
-                                                                       QStringLiteral("http://127.0.0.1:8200/rootDesc.xml"),
-                                                                       UpnpSsdpEngine::NotificationSubType::Invalid,
-                                                                       QStringLiteral("mar., 27 oct. 2015 21:03:35 G\x7F"),
-                                                                       1800),
-                                                                      });
+                                        << QStringList({
+                                               QStringLiteral("HTTP/1.1 200 OK\r\n"
+                                                              "CACHE-CONTROL: max-age=1800\r\n"
+                                                              "DATE: mar., 27 oct. 2015 21:03:35 G\x7F\r\n"
+                                                              "ST: urn:schemas-upnp-org:device:MediaServer:1\r\n"
+                                                              "USN: uuid:4d696e69-444c-164e-9d41-ecf4bb9c317e::urn:schemas-upnp-org:device:MediaServer:1\r\n"
+                                                              "EXT:\r\n"
+                                                              "SERVER: Debian DLNADOC/1.50 UPnP/1.0 MiniDLNA/1.1.4\r\n"
+                                                              "LOCATION: http://127.0.0.1:8200/rootDesc.xml\r\n"
+                                                              "Content-Length: 0\r\n\r\n"),
+                                           })
+                                        << QList<UpnpDiscoveryResult>({
+                                               UpnpDiscoveryResult(QStringLiteral("urn:schemas-upnp-org:device:MediaServer:1"),
+                                                   QStringLiteral("uuid:4d696e69-444c-164e-9d41-ecf4bb9c317e::urn:schemas-upnp-org:device:MediaServer:1"),
+                                                   QStringLiteral("http://127.0.0.1:8200/rootDesc.xml"),
+                                                   UpnpSsdpEngine::NotificationSubType::Invalid,
+                                                   QStringLiteral("mar., 27 oct. 2015 21:03:35 G\x7F"),
+                                                   1800),
+                                           });
 
         QTest::newRow("service by type") << UpnpSsdpEngine::ServiceByType
-                                        << QStringLiteral("schemas-upnp-org:service:ConnectionManager:1")
-                                        << QByteArray("M-SEARCH * HTTP/1.1\r\n"
-                                                      "HOST: 239.255.255.250:11900\r\n"
-                                                      "MAN: \"ssdp:discover\"\r\n"
-                                                      "MX: 2\r\n"
-                                                      "ST: urn:schemas-upnp-org:service:ConnectionManager:1\r\n\r\n")
-                                        << QStringList({QStringLiteral("HTTP/1.1 200 OK\r\n"
-                                               "CACHE-CONTROL: max-age=1800\r\n"
-                                               "DATE: mar., 27 oct. 2015 21:03:35 G\x7F\r\n"
-                                               "ST: urn:schemas-upnp-org:service:ConnectionManager:1\r\n"
-                                               "USN: uuid:4d696e69-444c-164e-9d41-ecf4bb9c317e::urn:schemas-upnp-org:service:ConnectionManager:1\r\n"
-                                               "EXT:\r\n"
-                                               "SERVER: Debian DLNADOC/1.50 UPnP/1.0 MiniDLNA/1.1.4\r\n"
-                                               "LOCATION: http://127.0.0.1:8200/rootDesc.xml\r\n"
-                                               "Content-Length: 0\r\n\r\n")
-                                              })
-                                        << QList<UpnpDiscoveryResult>({UpnpDiscoveryResult(QStringLiteral("urn:schemas-upnp-org:service:ConnectionManager:1"),
-                                                                       QStringLiteral("uuid:4d696e69-444c-164e-9d41-ecf4bb9c317e::urn:schemas-upnp-org:service:ConnectionManager:1"),
-                                                                       QStringLiteral("http://127.0.0.1:8200/rootDesc.xml"),
-                                                                       UpnpSsdpEngine::NotificationSubType::Invalid,
-                                                                       QStringLiteral("mar., 27 oct. 2015 21:03:35 G\x7F"),
-                                                                       1800),
-                                                                      });
+                                         << QStringLiteral("schemas-upnp-org:service:ConnectionManager:1")
+                                         << QByteArray("M-SEARCH * HTTP/1.1\r\n"
+                                                       "HOST: 239.255.255.250:11900\r\n"
+                                                       "MAN: \"ssdp:discover\"\r\n"
+                                                       "MX: 2\r\n"
+                                                       "ST: urn:schemas-upnp-org:service:ConnectionManager:1\r\n\r\n")
+                                         << QStringList({ QStringLiteral("HTTP/1.1 200 OK\r\n"
+                                                                         "CACHE-CONTROL: max-age=1800\r\n"
+                                                                         "DATE: mar., 27 oct. 2015 21:03:35 G\x7F\r\n"
+                                                                         "ST: urn:schemas-upnp-org:service:ConnectionManager:1\r\n"
+                                                                         "USN: uuid:4d696e69-444c-164e-9d41-ecf4bb9c317e::urn:schemas-upnp-org:service:ConnectionManager:1\r\n"
+                                                                         "EXT:\r\n"
+                                                                         "SERVER: Debian DLNADOC/1.50 UPnP/1.0 MiniDLNA/1.1.4\r\n"
+                                                                         "LOCATION: http://127.0.0.1:8200/rootDesc.xml\r\n"
+                                                                         "Content-Length: 0\r\n\r\n") })
+                                         << QList<UpnpDiscoveryResult>({
+                                                UpnpDiscoveryResult(QStringLiteral("urn:schemas-upnp-org:service:ConnectionManager:1"),
+                                                    QStringLiteral("uuid:4d696e69-444c-164e-9d41-ecf4bb9c317e::urn:schemas-upnp-org:service:ConnectionManager:1"),
+                                                    QStringLiteral("http://127.0.0.1:8200/rootDesc.xml"),
+                                                    UpnpSsdpEngine::NotificationSubType::Invalid,
+                                                    QStringLiteral("mar., 27 oct. 2015 21:03:35 G\x7F"),
+                                                    1800),
+                                            });
     }
 
     void searchAll()
@@ -409,22 +416,21 @@ private Q_SLOTS:
                                                    "MAN: \"ssdp:discover\"\r\n"
                                                    "MX: 2\r\n"
                                                    "ST: upnp:rootdevice\r\n\r\n")
-                                     << QStringList({QStringLiteral("HTTP/1.1 200 OK\r\n"
-                                                     "CACHE-CONTROL: max-age=3\r\n"
-                                                     "DATE: mar., 27 oct. 2015 21:03:35 G\x7F\r\n"
-                                                     "ST: upnp:rootdevice\r\n"
-                                                     "USN: uuid:4d696e69-444c-164e-9d41-ecf4bb9c317e::upnp:rootdevice\r\n"
-                                                     "EXT:\r\n"
-                                                     "SERVER: Debian DLNADOC/1.50 UPnP/1.0 MiniDLNA/1.1.4\r\n"
-                                                     "LOCATION: http://127.0.0.1:8200/rootDesc.xml\r\n"
-                                                     "Content-Length: 0\r\n\r\n")
-                                                    })
-                                     << QList<UpnpDiscoveryResult>({UpnpDiscoveryResult(QStringLiteral("upnp:rootdevice"),
-                                                                    QStringLiteral("uuid:4d696e69-444c-164e-9d41-ecf4bb9c317e::upnp:rootdevice"),
-                                                                    QStringLiteral("http://127.0.0.1:8200/rootDesc.xml"),
-                                                                    UpnpSsdpEngine::NotificationSubType::Invalid,
-                                                                    QStringLiteral("mar., 27 oct. 2015 21:03:35 G\x7F"),
-                                                                    3)});
+                                     << QStringList({ QStringLiteral("HTTP/1.1 200 OK\r\n"
+                                                                     "CACHE-CONTROL: max-age=3\r\n"
+                                                                     "DATE: mar., 27 oct. 2015 21:03:35 G\x7F\r\n"
+                                                                     "ST: upnp:rootdevice\r\n"
+                                                                     "USN: uuid:4d696e69-444c-164e-9d41-ecf4bb9c317e::upnp:rootdevice\r\n"
+                                                                     "EXT:\r\n"
+                                                                     "SERVER: Debian DLNADOC/1.50 UPnP/1.0 MiniDLNA/1.1.4\r\n"
+                                                                     "LOCATION: http://127.0.0.1:8200/rootDesc.xml\r\n"
+                                                                     "Content-Length: 0\r\n\r\n") })
+                                     << QList<UpnpDiscoveryResult>({ UpnpDiscoveryResult(QStringLiteral("upnp:rootdevice"),
+                                            QStringLiteral("uuid:4d696e69-444c-164e-9d41-ecf4bb9c317e::upnp:rootdevice"),
+                                            QStringLiteral("http://127.0.0.1:8200/rootDesc.xml"),
+                                            UpnpSsdpEngine::NotificationSubType::Invalid,
+                                            QStringLiteral("mar., 27 oct. 2015 21:03:35 G\x7F"),
+                                            3) });
     }
 
     void searchDeviceWaitTimeout()
@@ -478,67 +484,64 @@ private Q_SLOTS:
         QTest::addColumn<QStringList>("refreshMessages");
 
         QTest::newRow("root device with refresh") << UpnpSsdpEngine::RootDevices
-                                     << QString()
-                                     << QByteArray("M-SEARCH * HTTP/1.1\r\n"
-                                                   "HOST: 239.255.255.250:11900\r\n"
-                                                   "MAN: \"ssdp:discover\"\r\n"
-                                                   "MX: 2\r\n"
-                                                   "ST: upnp:rootdevice\r\n\r\n")
-                                     << QStringList({QStringLiteral("HTTP/1.1 200 OK\r\n"
-                                                     "CACHE-CONTROL: max-age=4\r\n"
-                                                     "DATE: mar., 27 oct. 2015 21:03:35 G\x7F\r\n"
-                                                     "ST: upnp:rootdevice\r\n"
-                                                     "USN: uuid:4d696e69-444c-164e-9d41-ecf4bb9c317e::upnp:rootdevice\r\n"
-                                                     "EXT:\r\n"
-                                                     "SERVER: Debian DLNADOC/1.50 UPnP/1.0 MiniDLNA/1.1.4\r\n"
-                                                     "LOCATION: http://127.0.0.1:8200/rootDesc.xml\r\n"
-                                                     "Content-Length: 0\r\n\r\n")
-                                                    })
-                                     << QList<UpnpDiscoveryResult>({UpnpDiscoveryResult(QStringLiteral("upnp:rootdevice"),
-                                                                    QStringLiteral("uuid:4d696e69-444c-164e-9d41-ecf4bb9c317e::upnp:rootdevice"),
-                                                                    QStringLiteral("http://127.0.0.1:8200/rootDesc.xml"),
-                                                                    UpnpSsdpEngine::NotificationSubType::Invalid,
-                                                                    QStringLiteral("mar., 27 oct. 2015 21:03:35 G\x7F"),
-                                                                    4)})
-                                     << true
-                                     << 3
-                                     << QStringList({QStringLiteral("NOTIFY * HTTP/1.1 200 OK\r\n"
-                                                     "CACHE-CONTROL: max-age=4\r\n"
-                                                     "HOST: 239.255.255.250:1900\r\n"
-                                                     "NT: upnp:rootdevice\r\n"
-                                                     "USN: uuid:4d696e69-444c-164e-9d41-ecf4bb9c317e::upnp:rootdevice\r\n"
-                                                     "NTS: ssdp:alive\r\n"
-                                                     "SERVER: Debian DLNADOC/1.50 UPnP/1.0 MiniDLNA/1.1.4\r\n"
-                                                     "LOCATION: http://127.0.0.1:8200/rootDesc.xml\r\n"
-                                                     "Content-Length: 0\r\n\r\n")
-                                                    });
+                                                  << QString()
+                                                  << QByteArray("M-SEARCH * HTTP/1.1\r\n"
+                                                                "HOST: 239.255.255.250:11900\r\n"
+                                                                "MAN: \"ssdp:discover\"\r\n"
+                                                                "MX: 2\r\n"
+                                                                "ST: upnp:rootdevice\r\n\r\n")
+                                                  << QStringList({ QStringLiteral("HTTP/1.1 200 OK\r\n"
+                                                                                  "CACHE-CONTROL: max-age=4\r\n"
+                                                                                  "DATE: mar., 27 oct. 2015 21:03:35 G\x7F\r\n"
+                                                                                  "ST: upnp:rootdevice\r\n"
+                                                                                  "USN: uuid:4d696e69-444c-164e-9d41-ecf4bb9c317e::upnp:rootdevice\r\n"
+                                                                                  "EXT:\r\n"
+                                                                                  "SERVER: Debian DLNADOC/1.50 UPnP/1.0 MiniDLNA/1.1.4\r\n"
+                                                                                  "LOCATION: http://127.0.0.1:8200/rootDesc.xml\r\n"
+                                                                                  "Content-Length: 0\r\n\r\n") })
+                                                  << QList<UpnpDiscoveryResult>({ UpnpDiscoveryResult(QStringLiteral("upnp:rootdevice"),
+                                                         QStringLiteral("uuid:4d696e69-444c-164e-9d41-ecf4bb9c317e::upnp:rootdevice"),
+                                                         QStringLiteral("http://127.0.0.1:8200/rootDesc.xml"),
+                                                         UpnpSsdpEngine::NotificationSubType::Invalid,
+                                                         QStringLiteral("mar., 27 oct. 2015 21:03:35 G\x7F"),
+                                                         4) })
+                                                  << true
+                                                  << 3
+                                                  << QStringList({ QStringLiteral("NOTIFY * HTTP/1.1 200 OK\r\n"
+                                                                                  "CACHE-CONTROL: max-age=4\r\n"
+                                                                                  "HOST: 239.255.255.250:1900\r\n"
+                                                                                  "NT: upnp:rootdevice\r\n"
+                                                                                  "USN: uuid:4d696e69-444c-164e-9d41-ecf4bb9c317e::upnp:rootdevice\r\n"
+                                                                                  "NTS: ssdp:alive\r\n"
+                                                                                  "SERVER: Debian DLNADOC/1.50 UPnP/1.0 MiniDLNA/1.1.4\r\n"
+                                                                                  "LOCATION: http://127.0.0.1:8200/rootDesc.xml\r\n"
+                                                                                  "Content-Length: 0\r\n\r\n") });
 
         QTest::newRow("root device without refresh") << UpnpSsdpEngine::RootDevices
-                                     << QString()
-                                     << QByteArray("M-SEARCH * HTTP/1.1\r\n"
-                                                   "HOST: 239.255.255.250:11900\r\n"
-                                                   "MAN: \"ssdp:discover\"\r\n"
-                                                   "MX: 2\r\n"
-                                                   "ST: upnp:rootdevice\r\n\r\n")
-                                     << QStringList({QStringLiteral("HTTP/1.1 200 OK\r\n"
-                                                     "CACHE-CONTROL: max-age=4\r\n"
-                                                     "DATE: mar., 27 oct. 2015 21:03:35 G\x7F\r\n"
-                                                     "ST: upnp:rootdevice\r\n"
-                                                     "USN: uuid:4d696e69-444c-164e-9d41-ecf4bb9c317e::upnp:rootdevice\r\n"
-                                                     "EXT:\r\n"
-                                                     "SERVER: Debian DLNADOC/1.50 UPnP/1.0 MiniDLNA/1.1.4\r\n"
-                                                     "LOCATION: http://127.0.0.1:8200/rootDesc.xml\r\n"
-                                                     "Content-Length: 0\r\n\r\n")
-                                                    })
-                                     << QList<UpnpDiscoveryResult>({UpnpDiscoveryResult(QStringLiteral("upnp:rootdevice"),
-                                                                    QStringLiteral("uuid:4d696e69-444c-164e-9d41-ecf4bb9c317e::upnp:rootdevice"),
-                                                                    QStringLiteral("http://127.0.0.1:8200/rootDesc.xml"),
-                                                                    UpnpSsdpEngine::NotificationSubType::Invalid,
-                                                                    QStringLiteral("mar., 27 oct. 2015 21:03:35 G\x7F"),
-                                                                    4)})
-                                     << false
-                                     << 3
-                                     << QStringList({});
+                                                     << QString()
+                                                     << QByteArray("M-SEARCH * HTTP/1.1\r\n"
+                                                                   "HOST: 239.255.255.250:11900\r\n"
+                                                                   "MAN: \"ssdp:discover\"\r\n"
+                                                                   "MX: 2\r\n"
+                                                                   "ST: upnp:rootdevice\r\n\r\n")
+                                                     << QStringList({ QStringLiteral("HTTP/1.1 200 OK\r\n"
+                                                                                     "CACHE-CONTROL: max-age=4\r\n"
+                                                                                     "DATE: mar., 27 oct. 2015 21:03:35 G\x7F\r\n"
+                                                                                     "ST: upnp:rootdevice\r\n"
+                                                                                     "USN: uuid:4d696e69-444c-164e-9d41-ecf4bb9c317e::upnp:rootdevice\r\n"
+                                                                                     "EXT:\r\n"
+                                                                                     "SERVER: Debian DLNADOC/1.50 UPnP/1.0 MiniDLNA/1.1.4\r\n"
+                                                                                     "LOCATION: http://127.0.0.1:8200/rootDesc.xml\r\n"
+                                                                                     "Content-Length: 0\r\n\r\n") })
+                                                     << QList<UpnpDiscoveryResult>({ UpnpDiscoveryResult(QStringLiteral("upnp:rootdevice"),
+                                                            QStringLiteral("uuid:4d696e69-444c-164e-9d41-ecf4bb9c317e::upnp:rootdevice"),
+                                                            QStringLiteral("http://127.0.0.1:8200/rootDesc.xml"),
+                                                            UpnpSsdpEngine::NotificationSubType::Invalid,
+                                                            QStringLiteral("mar., 27 oct. 2015 21:03:35 G\x7F"),
+                                                            4) })
+                                                     << false
+                                                     << 3
+                                                     << QStringList({});
     }
 
     void searchDeviceWaitRefreshBeforeTimeout()
@@ -593,25 +596,23 @@ private Q_SLOTS:
         QTest::addColumn<int>("refreshPeriod");
         QTest::addColumn<QStringList>("refreshMessages");
 
-
         QTest::newRow("root device with notify")
-                                     << QList<UpnpDiscoveryResult>({UpnpDiscoveryResult(QStringLiteral("upnp:rootdevice"),
-                                                                    QStringLiteral("uuid:4d696e69-444c-164e-9d41-ecf4bb9c317e::upnp:rootdevice"),
-                                                                    QStringLiteral("http://127.0.0.1:8200/rootDesc.xml"),
-                                                                    UpnpSsdpEngine::NotificationSubType::Alive,
-                                                                    QStringLiteral("mar., 27 oct. 2015 21:03:35 G\x7F"),
-                                                                    4)})
-                                     << 3
-                                     << QStringList({QStringLiteral("NOTIFY * HTTP/1.1 200 OK\r\n"
-                                                     "CACHE-CONTROL: max-age=4\r\n"
-                                                     "HOST: 239.255.255.250:1900\r\n"
-                                                     "NT: upnp:rootdevice\r\n"
-                                                     "USN: uuid:4d696e69-444c-164e-9d41-ecf4bb9c317e::upnp:rootdevice\r\n"
-                                                     "NTS: ssdp:alive\r\n"
-                                                     "SERVER: Debian DLNADOC/1.50 UPnP/1.0 MiniDLNA/1.1.4\r\n"
-                                                     "LOCATION: http://127.0.0.1:8200/rootDesc.xml\r\n"
-                                                     "Content-Length: 0\r\n\r\n")
-                                                    });
+            << QList<UpnpDiscoveryResult>({ UpnpDiscoveryResult(QStringLiteral("upnp:rootdevice"),
+                   QStringLiteral("uuid:4d696e69-444c-164e-9d41-ecf4bb9c317e::upnp:rootdevice"),
+                   QStringLiteral("http://127.0.0.1:8200/rootDesc.xml"),
+                   UpnpSsdpEngine::NotificationSubType::Alive,
+                   QStringLiteral("mar., 27 oct. 2015 21:03:35 G\x7F"),
+                   4) })
+            << 3
+            << QStringList({ QStringLiteral("NOTIFY * HTTP/1.1 200 OK\r\n"
+                                            "CACHE-CONTROL: max-age=4\r\n"
+                                            "HOST: 239.255.255.250:1900\r\n"
+                                            "NT: upnp:rootdevice\r\n"
+                                            "USN: uuid:4d696e69-444c-164e-9d41-ecf4bb9c317e::upnp:rootdevice\r\n"
+                                            "NTS: ssdp:alive\r\n"
+                                            "SERVER: Debian DLNADOC/1.50 UPnP/1.0 MiniDLNA/1.1.4\r\n"
+                                            "LOCATION: http://127.0.0.1:8200/rootDesc.xml\r\n"
+                                            "Content-Length: 0\r\n\r\n") });
     }
 
     void listenNotify()

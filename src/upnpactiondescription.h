@@ -25,8 +25,7 @@
 #include <QString>
 #include <QVector>
 
-enum class UpnpArgumentDirection
-{
+enum class UpnpArgumentDirection {
     In,
     Out,
     Invalid,
@@ -35,7 +34,6 @@ enum class UpnpArgumentDirection
 class UPNPLIBQT_EXPORT UpnpActionArgumentDescription
 {
 public:
-
     UpnpActionArgumentDescription();
 
     bool mIsValid;
@@ -52,7 +50,6 @@ public:
 class UPNPLIBQT_EXPORT UpnpActionDescription
 {
 public:
-
     UpnpActionDescription();
 
     bool mIsValid;
@@ -67,4 +64,3 @@ public:
 };
 
 #endif // UPNPACTIONDESCRIPTION_H
-

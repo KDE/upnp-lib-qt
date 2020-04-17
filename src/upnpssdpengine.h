@@ -30,8 +30,7 @@
 
 #include <memory>
 
-enum class SearchTargetType
-{
+enum class SearchTargetType {
     All,
     RootDevice,
     DeviceUUID,
@@ -39,8 +38,7 @@ enum class SearchTargetType
     ServiceType,
 };
 
-enum class SsdpMessageType
-{
+enum class SsdpMessageType {
     query,
     queryAnswer,
     announce,
@@ -85,19 +83,17 @@ class UPNPLIBQT_EXPORT UpnpSsdpEngine : public QObject
     Q_OBJECT
 
     Q_PROPERTY(quint16 port
-               READ port
-               WRITE setPort
-               NOTIFY portChanged)
+            READ port
+                WRITE setPort
+                    NOTIFY portChanged)
 
     Q_PROPERTY(bool canExportServices
-               READ canExportServices
-               WRITE setCanExportServices
-               NOTIFY canExportServicesChanged)
+            READ canExportServices
+                WRITE setCanExportServices
+                    NOTIFY canExportServicesChanged)
 
 public:
-
-    enum class NotificationSubType
-    {
+    enum class NotificationSubType {
         Invalid,
         Alive,
         ByeBye,
@@ -106,8 +102,7 @@ public:
 
     Q_ENUM(NotificationSubType)
 
-    enum SEARCH_TYPE
-    {
+    enum SEARCH_TYPE {
         AllDevices,
         RootDevices,
         DeviceByUUID,
@@ -202,7 +197,6 @@ private Q_SLOTS:
     void networkUpdateCompleted();
 
 private:
-
     void reconfigureNetwork();
 
     void parseSsdpDatagram(const QByteArray &datagram);

@@ -30,7 +30,6 @@
 class UpnpDeviceDescriptionPrivate
 {
 public:
-
     QList<UpnpServiceDescription> mServices;
 
     QString mDeviceUUID;
@@ -69,22 +68,25 @@ public:
     QUrl mLocationUrl;
 };
 
-UpnpDeviceDescription::UpnpDeviceDescription() : d(std::make_unique<UpnpDeviceDescriptionPrivate>())
+UpnpDeviceDescription::UpnpDeviceDescription()
+    : d(std::make_unique<UpnpDeviceDescriptionPrivate>())
 {
 }
 
-UpnpDeviceDescription::UpnpDeviceDescription(const UpnpDeviceDescription &other) : d(std::make_unique<UpnpDeviceDescriptionPrivate>(*other.d))
+UpnpDeviceDescription::UpnpDeviceDescription(const UpnpDeviceDescription &other)
+    : d(std::make_unique<UpnpDeviceDescriptionPrivate>(*other.d))
 {
 }
 
-UpnpDeviceDescription::UpnpDeviceDescription(UpnpDeviceDescription &&other) : d()
+UpnpDeviceDescription::UpnpDeviceDescription(UpnpDeviceDescription &&other)
+    : d()
 {
     other.d.swap(d);
 }
 
 UpnpDeviceDescription::~UpnpDeviceDescription() = default;
 
-UpnpDeviceDescription& UpnpDeviceDescription::operator=(const UpnpDeviceDescription &other)
+UpnpDeviceDescription &UpnpDeviceDescription::operator=(const UpnpDeviceDescription &other)
 {
     if (this != &other) {
         *d = *other.d;
@@ -92,7 +94,7 @@ UpnpDeviceDescription& UpnpDeviceDescription::operator=(const UpnpDeviceDescript
     return *this;
 }
 
-UpnpDeviceDescription& UpnpDeviceDescription::operator=(UpnpDeviceDescription &&other)
+UpnpDeviceDescription &UpnpDeviceDescription::operator=(UpnpDeviceDescription &&other)
 {
     if (this != &other) {
         d.reset();
@@ -109,10 +111,10 @@ UpnpServiceDescription UpnpDeviceDescription::serviceById(const QString &service
         }
     }
 
-    return UpnpServiceDescription{};
+    return UpnpServiceDescription {};
 }
 
-const UpnpServiceDescription& UpnpDeviceDescription::serviceByIndex(int serviceIndex) const
+const UpnpServiceDescription &UpnpDeviceDescription::serviceByIndex(int serviceIndex) const
 {
     return d->mServices[serviceIndex];
 }
@@ -122,12 +124,12 @@ UpnpServiceDescription &UpnpDeviceDescription::serviceByIndex(int serviceIndex)
     return d->mServices[serviceIndex];
 }
 
-const QList<UpnpServiceDescription>& UpnpDeviceDescription::services() const
+const QList<UpnpServiceDescription> &UpnpDeviceDescription::services() const
 {
     return d->mServices;
 }
 
-QList<UpnpServiceDescription>& UpnpDeviceDescription::services()
+QList<UpnpServiceDescription> &UpnpDeviceDescription::services()
 {
     return d->mServices;
 }
@@ -136,7 +138,7 @@ QList<QString> UpnpDeviceDescription::servicesName() const
 {
     QList<QString> result;
 
-    for (const auto &itService: const_cast<const decltype(d->mServices) &>(d->mServices)) {
+    for (const auto &itService : const_cast<const decltype(d->mServices) &>(d->mServices)) {
         result.push_back(itService.serviceType());
     }
 
