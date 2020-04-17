@@ -415,6 +415,11 @@ void UpnpSsdpEngine::networkUpdateCompleted()
 
 void UpnpSsdpEngine::reconfigureNetwork()
 {
+    for (const auto &oneDevice : d->mDiscoveryResults) {
+        Q_EMIT removedService(oneDevice);
+    }
+    d->mDiscoveryResults.clear();
+
     const auto &allInterfaces = QNetworkInterface::allInterfaces();
     for (const auto &oneInterface : allInterfaces) {
         const auto &allAddresses = oneInterface.addressEntries();
