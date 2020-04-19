@@ -44,6 +44,8 @@ public:
 
     QVariantMap result() const;
 
+    QString error() const;
+
 Q_SIGNALS:
 
     void finished(UpnpControlAbstractServiceReply *self);

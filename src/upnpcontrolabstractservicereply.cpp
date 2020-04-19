@@ -59,6 +59,11 @@ QVariantMap UpnpControlAbstractServiceReply::result() const
     return d->mResult;
 }
 
+QString UpnpControlAbstractServiceReply::error() const
+{
+    return d->mWatcher.returnMessage().faultAsString();
+}
+
 void UpnpControlAbstractServiceReply::callFinished()
 {
     parseAnswer();
