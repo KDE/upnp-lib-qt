@@ -104,7 +104,7 @@ QList<UpnpDiscoveryResult> UpnpSsdpEngine::existingServices() const
 {
     auto result = QList<UpnpDiscoveryResult>();
 
-    for (const auto &oneService : d->mDiscoveryResults) {
+    for (const auto &oneService : qAsConst(d->mDiscoveryResults)) {
         result.push_back(oneService);
     }
 
@@ -399,7 +399,7 @@ void UpnpSsdpEngine::networkUpdateCompleted()
 
 void UpnpSsdpEngine::reconfigureNetwork()
 {
-    for (const auto &oneDevice : d->mDiscoveryResults) {
+    for (const auto &oneDevice : qAsConst(d->mDiscoveryResults)) {
         Q_EMIT removedService(oneDevice);
     }
     d->mDiscoveryResults.clear();
