@@ -103,15 +103,11 @@ public:
 
     ~UpnpSsdpEngine() override;
 
-    [[nodiscard]] quint16 port() const;
+    [[nodiscard]] auto port() const -> bool;
 
-    void setPort(quint16 value);
+    [[nodiscard]] auto canExportServices() const -> bool;
 
-    [[nodiscard]] bool canExportServices() const;
-
-    void setCanExportServices(bool value);
-
-    [[nodiscard]] QList<UpnpDiscoveryResult> existingServices() const;
+    [[nodiscard]] auto existingServices() const -> QList<UpnpDiscoveryResult>;
 
     void initialize();
 
@@ -130,6 +126,10 @@ Q_SIGNALS:
     void networkChanged();
 
 public Q_SLOTS:
+
+    void setPort(quint16 value);
+
+    void setCanExportServices(bool value);
 
     /**
      * @brief searchUpnpDevice will trigger a search for upnp device depending on the parameters

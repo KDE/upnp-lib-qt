@@ -56,7 +56,7 @@ public:
 
 UpnpSsdpEngine::UpnpSsdpEngine(QObject *parent)
     : QObject(parent)
-    , d(new UpnpSsdpEnginePrivate)
+    , d(std::make_unique<UpnpSsdpEnginePrivate>())
 {
     connect(&d->mNetworkManager, &QNetworkConfigurationManager::configurationAdded, this, &UpnpSsdpEngine::networkConfigurationAdded);
     connect(&d->mNetworkManager, &QNetworkConfigurationManager::configurationRemoved, this, &UpnpSsdpEngine::networkConfigurationRemoved);
@@ -74,33 +74,39 @@ void UpnpSsdpEngine::initialize()
     reconfigureNetwork();
 }
 
-UpnpSsdpEngine::~UpnpSsdpEngine()
-{
-}
+UpnpSsdpEngine::~UpnpSsdpEngine() = default;
 
-quint16 UpnpSsdpEngine::port() const
+auto UpnpSsdpEngine::port() const -> bool
 {
     return d->mPortNumber;
 }
 
 void UpnpSsdpEngine::setPort(quint16 value)
 {
+    if (d->mPortNumber == value) {
+        return;
+    }
+
     d->mPortNumber = value;
     Q_EMIT portChanged();
 }
 
-bool UpnpSsdpEngine::canExportServices() const
+auto UpnpSsdpEngine::canExportServices() const -> bool
 {
     return d->mCanExportServices;
 }
 
 void UpnpSsdpEngine::setCanExportServices(bool value)
 {
+    if (d->mCanExportServices == value) {
+        return;
+    }
+
     d->mCanExportServices = value;
     Q_EMIT canExportServicesChanged();
 }
 
-QList<UpnpDiscoveryResult> UpnpSsdpEngine::existingServices() const
+auto UpnpSsdpEngine::existingServices() const -> QList<UpnpDiscoveryResult>
 {
     auto result = QList<UpnpDiscoveryResult>();
 
@@ -288,11 +294,11 @@ void UpnpSsdpEngine::publishDevice(UpnpAbstractDevice *device)
 void UpnpSsdpEngine::standardReceivedData()
 {
     qCDebug(orgKdeUpnpLibQtSsdp()) << "UpnpSsdpEngine::standardReceivedData";
-    QUdpSocket *receiverSocket = qobject_cast<QUdpSocket *>(sender());
+    auto *receiverSocket = qobject_cast<QUdpSocket *>(sender());
 
     while (receiverSocket->hasPendingDatagrams()) {
         QByteArray datagram;
-        datagram.resize(receiverSocket->pendingDatagramSize());
+        datagram.resize(static_cast<int>(receiverSocket->pendingDatagramSize()));
         QHostAddress sender;
         quint16 senderPort;
 
@@ -306,11 +312,11 @@ void UpnpSsdpEngine::standardReceivedData()
 void UpnpSsdpEngine::queryReceivedData()
 {
     qCDebug(orgKdeUpnpLibQtSsdp()) << "UpnpSsdpEngine::queryReceivedData";
-    QUdpSocket *receiverSocket = qobject_cast<QUdpSocket *>(sender());
+    auto *receiverSocket = qobject_cast<QUdpSocket *>(sender());
 
     while (receiverSocket->hasPendingDatagrams()) {
         QByteArray datagram;
-        datagram.resize(receiverSocket->pendingDatagramSize());
+        datagram.resize(static_cast<int>(receiverSocket->pendingDatagramSize()));
         QHostAddress sender;
         quint16 senderPort;
 
@@ -323,7 +329,6 @@ void UpnpSsdpEngine::queryReceivedData()
 
 void UpnpSsdpEngine::discoveryResultTimeout()
 {
-    return;
     auto now = QDateTime::currentDateTime();
 
     auto timedOutDiscoveryResults = QList<QString>();
@@ -475,7 +480,7 @@ void UpnpSsdpEngine::parseSsdpQueryDatagram(const QByteArray &datagram, const QL
             }
             auto addressParts = hostName.split(QStringLiteral(":"));
             newSearch.mSearchHostAddress.setAddress(addressParts.first());
-            newSearch.mSearchHostPort = addressParts.last().toInt();
+            newSearch.mSearchHostPort = static_cast<uint16_t>(addressParts.last().toInt());
             hasAddress = true;
         }
         if (header.startsWith("MAN")) {
