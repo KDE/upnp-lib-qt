@@ -27,11 +27,11 @@ public:
 
     ~UpnpControlAbstractServiceReply() override;
 
-    bool success() const;
+    [[nodiscard]] bool success() const;
 
-    QVariantMap result() const;
+    [[nodiscard]] QVariantMap result() const;
 
-    QString error() const;
+    [[nodiscard]] QString error() const;
 
 Q_SIGNALS:
 

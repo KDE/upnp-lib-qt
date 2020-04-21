@@ -41,49 +41,49 @@ public:
 
     void setBaseURL(const QString &newBaseURL);
 
-    const QString &baseURL() const;
+    [[nodiscard]] const QString &baseURL() const;
 
     void setServiceType(const QString &newServiceType);
 
-    const QString &serviceType() const;
+    [[nodiscard]] const QString &serviceType() const;
 
     void setServiceId(const QString &newServiceId);
 
-    const QString &serviceId() const;
+    [[nodiscard]] const QString &serviceId() const;
 
     void setSCPDURL(const QUrl &newSCPDURL);
 
-    const QUrl &SCPDURL() const;
+    [[nodiscard]] const QUrl &SCPDURL() const;
 
     void setControlURL(const QUrl &newControlURL);
 
-    const QUrl &controlURL() const;
+    [[nodiscard]] const QUrl &controlURL() const;
 
     void setEventURL(const QUrl &newEventURL);
 
-    const QUrl &eventURL() const;
+    [[nodiscard]] const QUrl &eventURL() const;
 
     void setMaximumSubscriptionDuration(int newValue);
 
-    int maximumSubscriptionDuration() const;
+    [[nodiscard]] int maximumSubscriptionDuration() const;
 
     void addAction(const UpnpActionDescription &newAction);
 
-    const UpnpActionDescription &action(const QString &name) const;
+    [[nodiscard]] const UpnpActionDescription &action(const QString &name) const;
 
-    QMap<QString, UpnpActionDescription> &actions();
+    [[nodiscard]] QMap<QString, UpnpActionDescription> &actions();
 
-    const QMap<QString, UpnpActionDescription> &actions() const;
+    [[nodiscard]] const QMap<QString, UpnpActionDescription> &actions() const;
 
     void addStateVariable(const UpnpStateVariableDescription &newVariable);
 
-    const UpnpStateVariableDescription &stateVariable(const QString &name) const;
+    [[nodiscard]] const UpnpStateVariableDescription &stateVariable(const QString &name) const;
 
-    QMap<QString, UpnpStateVariableDescription> &stateVariables();
+    [[nodiscard]] QMap<QString, UpnpStateVariableDescription> &stateVariables();
 
-    const QMap<QString, UpnpStateVariableDescription> &stateVariables() const;
+    [[nodiscard]] const QMap<QString, UpnpStateVariableDescription> &stateVariables() const;
 
-    const UpnpDeviceDescription &deviceDescription() const;
+    [[nodiscard]] const UpnpDeviceDescription &deviceDescription() const;
 
     void setDeviceDescription(const UpnpDeviceDescription &deviceDescription);
 

@@ -39,31 +39,31 @@ public:
 
     ~UpnpAbstractService() override;
 
-    QIODevice *buildAndGetXmlDescription();
+    [[nodiscard]] QIODevice *buildAndGetXmlDescription();
 
-    QPointer<UpnpEventSubscriber> subscribeToEvents(const QByteArray &requestData, const QMap<QByteArray, QByteArray> &headers);
+    [[nodiscard]] QPointer<UpnpEventSubscriber> subscribeToEvents(const QByteArray &requestData, const QMap<QByteArray, QByteArray> &headers);
 
     void unsubscribeToEvents(const QByteArray &requestData, const QMap<QByteArray, QByteArray> &headers);
 
     void addAction(const UpnpActionDescription &newAction);
 
-    Q_INVOKABLE const UpnpActionDescription &action(const QString &name) const;
+    [[nodiscard]] const UpnpActionDescription &action(const QString &name) const;
 
-    QList<QString> actions() const;
+    [[nodiscard]] QList<QString> actions() const;
 
     void addStateVariable(const UpnpStateVariableDescription &newVariable);
 
-    Q_INVOKABLE const UpnpStateVariableDescription &stateVariable(const QString &name) const;
+    [[nodiscard]] const UpnpStateVariableDescription &stateVariable(const QString &name) const;
 
-    QList<QString> stateVariables() const;
+    [[nodiscard]] QList<QString> stateVariables() const;
 
-    virtual QVector<QPair<QString, QVariant>> invokeAction(const QString &actionName, const QVector<QVariant> &arguments, bool &isInError);
+    [[nodiscard]] virtual QVector<QPair<QString, QVariant>> invokeAction(const QString &actionName, const QVector<QVariant> &arguments, bool &isInError);
 
     void setDescription(const UpnpServiceDescription &value);
 
-    UpnpServiceDescription &description();
+    [[nodiscard]] UpnpServiceDescription &description();
 
-    const UpnpServiceDescription &description() const;
+    [[nodiscard]] const UpnpServiceDescription &description() const;
 
 Q_SIGNALS:
 

@@ -42,31 +42,31 @@ public:
 
     void setNT(const QString &value);
 
-    const QString &nt() const;
+    [[nodiscard]] const QString &nt() const;
 
     void setUSN(const QString &value);
 
-    const QString &usn() const;
+    [[nodiscard]] const QString &usn() const;
 
     void setLocation(const QString &value);
 
-    const QString &location() const;
+    [[nodiscard]] const QString &location() const;
 
     void setNTS(UpnpSsdpEngine::NotificationSubType value);
 
-    UpnpSsdpEngine::NotificationSubType nts() const;
+    [[nodiscard]] UpnpSsdpEngine::NotificationSubType nts() const;
 
     void setAnnounceDate(const QString &value);
 
-    const QString &announceDate() const;
+    [[nodiscard]] const QString &announceDate() const;
 
     void setCacheDuration(int value);
 
-    int cacheDuration() const;
+    [[nodiscard]] int cacheDuration() const;
 
     void setValidityTimestamp(const QDateTime &value);
 
-    QDateTime validityTimestamp() const;
+    [[nodiscard]] QDateTime validityTimestamp() const;
 
 private:
     std::unique_ptr<UpnpDiscoveryResultPrivate> d;

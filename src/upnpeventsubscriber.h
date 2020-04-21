@@ -31,13 +31,13 @@ public:
 
     void setSecondTimeout(int newValue);
 
-    int secondTimeout() const;
+    [[nodiscard]] int secondTimeout() const;
 
     void setCallback(const QUrl &callbackAddress);
 
-    const QUrl &callback() const;
+    [[nodiscard]] const QUrl &callback() const;
 
-    const QString &uuid() const;
+    [[nodiscard]] const QString &uuid() const;
 
     void setUpnpService(UpnpAbstractService *service);
 

@@ -33,9 +33,9 @@ public:
 
     ~UpnpControlAbstractService() override;
 
-    Q_INVOKABLE UpnpControlAbstractServiceReply *callAction(const QString &action, const QVector<QVariant> &arguments);
+    [[nodiscard]] UpnpControlAbstractServiceReply *callAction(const QString &action, const QVector<QVariant> &arguments);
 
-    Q_INVOKABLE void subscribeEvents(int duration);
+    void subscribeEvents(int duration);
 
     void handleEventNotification(const QByteArray &requestData, const QMap<QByteArray, QByteArray> &headers);
 

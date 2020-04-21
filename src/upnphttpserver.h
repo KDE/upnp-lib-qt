@@ -26,7 +26,7 @@ public:
 
     ~UpnpHttpServer() override;
 
-    QObject *createServerObject() Q_DECL_OVERRIDE;
+    QObject *createServerObject() override;
 
     void setService(UpnpControlAbstractService *service);
 

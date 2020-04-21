@@ -30,7 +30,7 @@ public:
 
     void removeDevice(int index);
 
-    QObject *createServerObject() Q_DECL_OVERRIDE;
+    QObject *createServerObject() override;
 
     QUrl urlPrefix() const;
 

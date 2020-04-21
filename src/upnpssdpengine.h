@@ -103,17 +103,17 @@ public:
 
     ~UpnpSsdpEngine() override;
 
-    quint16 port() const;
+    [[nodiscard]] quint16 port() const;
 
     void setPort(quint16 value);
 
-    bool canExportServices() const;
+    [[nodiscard]] bool canExportServices() const;
 
     void setCanExportServices(bool value);
 
-    QList<UpnpDiscoveryResult> existingServices() const;
+    [[nodiscard]] QList<UpnpDiscoveryResult> existingServices() const;
 
-    Q_INVOKABLE void initialize();
+    void initialize();
 
 Q_SIGNALS:
 

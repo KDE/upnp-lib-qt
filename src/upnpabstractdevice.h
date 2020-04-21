@@ -37,23 +37,23 @@ public:
 
     ~UpnpAbstractDevice() override;
 
-    UpnpServiceDescription serviceDescriptionById(const QString &serviceId) const;
+    [[nodiscard]] UpnpServiceDescription serviceDescriptionById(const QString &serviceId) const;
 
-    UpnpServiceDescription serviceDescriptionByIndex(int serviceIndex) const;
+    [[nodiscard]] UpnpServiceDescription serviceDescriptionByIndex(int serviceIndex) const;
 
-    const QList<UpnpServiceDescription> &services() const;
+    [[nodiscard]] const QList<UpnpServiceDescription> &services() const;
 
-    QVector<QString> servicesName() const;
+    [[nodiscard]] QVector<QString> servicesName() const;
 
     void setDescription(UpnpDeviceDescription *value);
 
-    UpnpDeviceDescription *description();
+    [[nodiscard]] UpnpDeviceDescription *description();
 
-    const UpnpDeviceDescription *description() const;
+    [[nodiscard]] const UpnpDeviceDescription *description() const;
 
-    int cacheControl() const;
+    [[nodiscard]] int cacheControl() const;
 
-    QIODevice *buildAndGetXmlDescription();
+    [[nodiscard]] QIODevice *buildAndGetXmlDescription();
 
 Q_SIGNALS:
 
