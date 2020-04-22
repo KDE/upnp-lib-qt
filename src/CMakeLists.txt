@@ -40,7 +40,7 @@ ecm_qt_declare_logging_category(upnpLibQt_SRCS
 
 add_library(UpnpLibQt ${upnpLibQt_SRCS})
 generate_export_header(UpnpLibQt BASE_NAME UpnpLibQt)
-add_library(UPNP::UpnpLibQt ALIAS UpnpLibQt)
+
 
 target_include_directories(UpnpLibQt
     INTERFACE "$<INSTALL_INTERFACE:${KDE_INSTALL_INCLUDEDIR_KF5}/UpnpLibQt>"
