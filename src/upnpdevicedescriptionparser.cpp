@@ -35,7 +35,7 @@ public:
 
     UpnpDeviceDescription &mDeviceDescription;
 
-    QMap<QString, QSharedPointer<UpnpServiceDescriptionParser>> mServiceDescriptionParsers;
+    QMap<QString, QPointer<UpnpServiceDescriptionParser>> mServiceDescriptionParsers;
 
     QUrl mDeviceURL;
 };
@@ -60,7 +60,7 @@ void UpnpDeviceDescriptionParser::serviceDescriptionParsed(const QString &upnpSe
 
     d->mServiceDescriptionParsers.remove(upnpServiceId);
 
-    if (d->mServiceDescriptionParsers.isEmpty()) {
+    if (d->mServiceDescriptionParsers.empty()) {
         Q_EMIT descriptionParsed(d->mDeviceDescription.UDN());
     }
 }
@@ -198,7 +198,8 @@ void UpnpDeviceDescriptionParser::parseDeviceDescription(QIODevice *deviceDescri
 
             d->mDeviceDescription.addService(newService);
 
-            d->mServiceDescriptionParsers[newService.serviceId()].reset(new UpnpServiceDescriptionParser(d->mNetworkAccess, d->mDeviceDescription.serviceByIndex(serviceIndex)));
+            d->mServiceDescriptionParsers[newService.serviceId()] =
+                    new UpnpServiceDescriptionParser{d->mNetworkAccess, d->mDeviceDescription.serviceByIndex(serviceIndex)};
 
             connect(d->mServiceDescriptionParsers[newService.serviceId()].data(), &UpnpServiceDescriptionParser::descriptionParsed,
                 this, &UpnpDeviceDescriptionParser::serviceDescriptionParsed);

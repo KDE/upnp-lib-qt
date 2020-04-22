@@ -50,7 +50,7 @@ public:
 
     QString mURLBase;
 
-    int mCacheControl;
+    int mCacheControl = 0;
 
     QUrl mLocationUrl;
 };
@@ -92,7 +92,7 @@ UpnpDeviceDescription &UpnpDeviceDescription::operator=(UpnpDeviceDescription &&
 
 UpnpServiceDescription UpnpDeviceDescription::serviceById(const QString &serviceId) const
 {
-    for (const auto &oneService : const_cast<const decltype(d->mServices) &>(d->mServices)) {
+    for (const auto &oneService : qAsConst(d->mServices)) {
         if (oneService.serviceId() == serviceId) {
             return oneService;
         }
@@ -125,7 +125,7 @@ QList<QString> UpnpDeviceDescription::servicesName() const
 {
     QList<QString> result;
 
-    for (const auto &itService : const_cast<const decltype(d->mServices) &>(d->mServices)) {
+    for (const auto &itService : qAsConst(d->mServices)) {
         result.push_back(itService.serviceType());
     }
 

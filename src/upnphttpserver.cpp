@@ -25,9 +25,9 @@ UpnpHttpServer::~UpnpHttpServer() = default;
 
 QObject *UpnpHttpServer::createServerObject()
 {
-    auto newObject = new UpnpServerEventObject;
+    auto newObject = std::make_unique<UpnpServerEventObject>();
     newObject->setService(d->mService);
-    return newObject;
+    return newObject.release();
 }
 
 void UpnpHttpServer::setService(UpnpControlAbstractService *service)

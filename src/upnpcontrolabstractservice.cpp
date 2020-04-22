@@ -38,13 +38,13 @@ class UpnpAbstractServiceDescriptionPrivate
 public:
     QNetworkAccessManager mNetworkAccess;
 
-    KDSoapClientInterface *mInterface = nullptr;
+    std::unique_ptr<KDSoapClientInterface> mInterface;
 
     UpnpHttpServer mEventServer;
 
     QHostAddress mPublicAddress;
 
-    QPointer<QTimer> mEventSubscriptionTimer;
+    std::unique_ptr<QTimer> mEventSubscriptionTimer;
 
     int mRealEventSubscriptionTimeout = 0;
 };
@@ -70,10 +70,7 @@ UpnpControlAbstractService::UpnpControlAbstractService(QObject *parent)
     }
 }
 
-UpnpControlAbstractService::~UpnpControlAbstractService()
-{
-    delete d->mInterface;
-}
+UpnpControlAbstractService::~UpnpControlAbstractService() = default;
 
 UpnpControlAbstractServiceReply *UpnpControlAbstractService::callAction(const QString &actionName, const QVector<QVariant> &arguments)
 {
@@ -93,7 +90,7 @@ UpnpControlAbstractServiceReply *UpnpControlAbstractService::callAction(const QS
     }
 
     if (!d->mInterface) {
-        d->mInterface = new KDSoapClientInterface(description().controlURL().toString(), description().serviceType());
+        d->mInterface = std::make_unique<KDSoapClientInterface>(description().controlURL().toString(), description().serviceType());
         d->mInterface->setSoapVersion(KDSoapClientInterface::SOAP1_1);
         d->mInterface->setStyle(KDSoapClientInterface::RPCStyle);
     }
@@ -160,8 +157,8 @@ void UpnpControlAbstractService::finishedDownload(QNetworkReply *reply)
                     d->mRealEventSubscriptionTimeout = reply->rawHeader("TIMEOUT").mid(7).toInt();
 
                     if (!d->mEventSubscriptionTimer) {
-                        d->mEventSubscriptionTimer = new QTimer;
-                        connect(d->mEventSubscriptionTimer.data(), &QTimer::timeout, this, &UpnpControlAbstractService::eventSubscriptionTimeout);
+                        d->mEventSubscriptionTimer = std::make_unique<QTimer>();
+                        connect(d->mEventSubscriptionTimer.get(), &QTimer::timeout, this, &UpnpControlAbstractService::eventSubscriptionTimeout);
                         d->mEventSubscriptionTimer->setInterval(1000 * (d->mRealEventSubscriptionTimeout > 60 ? d->mRealEventSubscriptionTimeout - 60 : d->mRealEventSubscriptionTimeout));
                         d->mEventSubscriptionTimer->start();
                     }
