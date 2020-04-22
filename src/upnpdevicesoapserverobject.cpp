@@ -41,20 +41,18 @@ public:
 UpnpDeviceSoapServerObject::UpnpDeviceSoapServerObject(QList<UpnpAbstractDevice *> &devices, QObject *parent)
     : QObject(parent)
     , KDSoapServerObjectInterface()
-    , d(new UpnpDeviceSoapServerObjectPrivate(devices))
+    , d(std::make_unique<UpnpDeviceSoapServerObjectPrivate>(devices))
 {
 }
 
-UpnpDeviceSoapServerObject::~UpnpDeviceSoapServerObject()
-{
-}
+UpnpDeviceSoapServerObject::~UpnpDeviceSoapServerObject() = default;
 
 void UpnpDeviceSoapServerObject::processRequest(const KDSoapMessage &request, KDSoapMessage &response, const QByteArray &soapAction)
 {
-    Q_UNUSED(request);
-    Q_UNUSED(response);
-    Q_UNUSED(request);
-    Q_UNUSED(soapAction);
+    Q_UNUSED(request)
+    Q_UNUSED(response)
+    Q_UNUSED(request)
+    Q_UNUSED(soapAction)
 
     qCDebug(orgKdeUpnpLibQtUpnp()) << "UpnpDeviceSoapServerObject::processRequest" << request.name();
 }
@@ -80,9 +78,9 @@ QIODevice *UpnpDeviceSoapServerObject::processFileRequest(const QString &path, Q
 
 void UpnpDeviceSoapServerObject::processRequestWithPath(const KDSoapMessage &request, KDSoapMessage &response, const QByteArray &soapAction, const QString &path)
 {
-    Q_UNUSED(request);
-    Q_UNUSED(response);
-    Q_UNUSED(soapAction);
+    Q_UNUSED(request)
+    Q_UNUSED(response)
+    Q_UNUSED(soapAction)
 
     qCDebug(orgKdeUpnpLibQtUpnp()) << "UpnpDeviceSoapServerObject::processRequestWithPath" << path << request.name();
 
@@ -233,7 +231,7 @@ bool UpnpDeviceSoapServerObject::processCustomVerbRequest(const QByteArray &requ
 
 QIODevice *UpnpDeviceSoapServerObject::downloadDeviceXmlDescription(UpnpAbstractDevice *device, QByteArray &contentType)
 {
-    qCDebug(orgKdeUpnpLibQtUpnp()) << "UpnpDeviceSoapServerObject::downloadDeviceXmlDescription" << device->description()->UDN();
+    qCDebug(orgKdeUpnpLibQtUpnp()) << "UpnpDeviceSoapServerObject::downloadDeviceXmlDescription" << device->description().UDN();
 
     contentType = "text/xml";
 
@@ -242,7 +240,7 @@ QIODevice *UpnpDeviceSoapServerObject::downloadDeviceXmlDescription(UpnpAbstract
 
 QIODevice *UpnpDeviceSoapServerObject::downloadServiceXmlDescription(UpnpAbstractDevice *device, const int serviceIndex, QByteArray &contentType)
 {
-    qCDebug(orgKdeUpnpLibQtUpnp()) << "UpnpDeviceSoapServerObject::downloadServiceXmlDescription" << device->description()->UDN() << serviceIndex;
+    qCDebug(orgKdeUpnpLibQtUpnp()) << "UpnpDeviceSoapServerObject::downloadServiceXmlDescription" << device->description().UDN() << serviceIndex;
 
     contentType = "text/xml";
 

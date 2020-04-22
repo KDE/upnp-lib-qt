@@ -19,19 +19,17 @@ public:
 UpnpServerEventObject::UpnpServerEventObject(QObject *parent)
     : QObject(parent)
     , KDSoapServerCustomVerbRequestInterface()
-    , d(new UpnpServerEventObjectPrivate)
+    , d(std::make_unique<UpnpServerEventObjectPrivate>())
 {
     d->mService = nullptr;
 }
 
-UpnpServerEventObject::~UpnpServerEventObject()
-{
-}
+UpnpServerEventObject::~UpnpServerEventObject() = default;
 
 bool UpnpServerEventObject::processCustomVerbRequest(const QByteArray &requestType, const QByteArray &requestData,
     const QMap<QByteArray, QByteArray> &httpHeaders, QByteArray &customAnswer)
 {
-    Q_UNUSED(requestType);
+    Q_UNUSED(requestType)
 
     if (!d->mService) {
         return false;

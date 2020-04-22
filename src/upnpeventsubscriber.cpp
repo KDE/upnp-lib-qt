@@ -26,45 +26,30 @@
 class UpnpEventSubscriberPrivate
 {
 public:
-    UpnpEventSubscriberPrivate()
-        : mSecondTimeout(1800)
-        , mCallback()
-        , mUuid()
-        , mSequenceCounter(0)
-        , mNetworkAccess()
-        , mUpnpService(nullptr)
-        , mSentBuffer()
-    {
-    }
-
-    int mSecondTimeout;
+    int mSecondTimeout = 1800;
 
     QUrl mCallback;
 
     QString mUuid;
 
-    quint32 mSequenceCounter;
+    quint32 mSequenceCounter = 0;
 
     QNetworkAccessManager mNetworkAccess;
 
-    UpnpAbstractService *mUpnpService;
+    UpnpAbstractService *mUpnpService = nullptr;
 
     QPointer<QBuffer> mSentBuffer;
 };
 
 UpnpEventSubscriber::UpnpEventSubscriber(QObject *parent)
     : QObject(parent)
-    , d(new UpnpEventSubscriberPrivate)
+    , d(std::make_unique<UpnpEventSubscriberPrivate>())
 {
-    d->mSequenceCounter = 0;
-
     const QString &uuidString(QUuid::createUuid().toString());
     d->mUuid = uuidString.mid(1, uuidString.length() - 2);
 }
 
-UpnpEventSubscriber::~UpnpEventSubscriber()
-{
-}
+UpnpEventSubscriber::~UpnpEventSubscriber() = default;
 
 void UpnpEventSubscriber::setSecondTimeout(int newValue)
 {
@@ -144,7 +129,7 @@ void UpnpEventSubscriber::sendEventNotification()
 
 void UpnpEventSubscriber::notifyPropertyChange(const QString &serviceId, const QByteArray &propertyName)
 {
-    Q_UNUSED(serviceId);
+    Q_UNUSED(serviceId)
 
     QNetworkRequest newRequest(d->mCallback);
     newRequest.setHeader(QNetworkRequest::ContentTypeHeader, QByteArray("text/xml"));
@@ -199,7 +184,7 @@ void UpnpEventSubscriber::eventingFinished()
 
 void UpnpEventSubscriber::eventingInErrorFinished(QNetworkReply::NetworkError code)
 {
-    Q_UNUSED(code);
+    Q_UNUSED(code)
 
     d->mSentBuffer.clear();
 }

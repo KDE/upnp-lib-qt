@@ -12,13 +12,13 @@ class UpnpDiscoveryResultPrivate
 public:
     UpnpDiscoveryResultPrivate() = default;
 
-    UpnpDiscoveryResultPrivate(const QString &aNT, const QString &aUSN, const QString &aLocation,
-        UpnpSsdpEngine::NotificationSubType aNTS, const QString &aAnnounceDate, int aCacheDuration)
-        : mNT(aNT)
-        , mUSN(aUSN)
-        , mLocation(aLocation)
+    UpnpDiscoveryResultPrivate(QString aNT, QString aUSN, QString aLocation,
+        UpnpSsdpEngine::NotificationSubType aNTS, QString aAnnounceDate, int aCacheDuration)
+        : mNT(std::move(aNT))
+        , mUSN(std::move(aUSN))
+        , mLocation(std::move(aLocation))
+        , mAnnounceDate(std::move(aAnnounceDate))
         , mNTS(aNTS)
-        , mAnnounceDate(aAnnounceDate)
         , mCacheDuration(aCacheDuration)
     {
     }
@@ -36,35 +36,37 @@ public:
     QString mLocation;
 
     /**
-     * @brief mNTS contains the header NTS (i.e. notification sub type) sent in an ssdp message
-     */
-    UpnpSsdpEngine::NotificationSubType mNTS = UpnpSsdpEngine::NotificationSubType::Invalid;
-
-    /**
      * @brief mAnnounceDate contains the date sent in the SSDP message by the other side
      */
     QString mAnnounceDate;
 
     /**
-     * @brief mCacheDuration duration of validity of the announce in seconds
-     */
-    int mCacheDuration = 1800;
-
-    /**
      * @brief mTimestamp contains the date and time at which the result will expire
      */
     QDateTime mValidityTimestamp;
+
+    /**
+     * @brief mNTS contains the header NTS (i.e. notification sub type) sent in an ssdp message
+     */
+    UpnpSsdpEngine::NotificationSubType mNTS = UpnpSsdpEngine::NotificationSubType::Invalid;
+
+    /**
+     * @brief mCacheDuration duration of validity of the announce in seconds
+     */
+    int mCacheDuration = 1800;
 };
 
 UpnpDiscoveryResult::UpnpDiscoveryResult()
-    : d(new UpnpDiscoveryResultPrivate)
+    : d(std::make_unique<UpnpDiscoveryResultPrivate>())
 {
 }
 
-UpnpDiscoveryResult::UpnpDiscoveryResult(const QString &aNT, const QString &aUSN, const QString &aLocation,
-    UpnpSsdpEngine::NotificationSubType aNTS, const QString &aAnnounceDate,
+UpnpDiscoveryResult::UpnpDiscoveryResult(QString aNT, QString aUSN, QString aLocation,
+    UpnpSsdpEngine::NotificationSubType aNTS, QString aAnnounceDate,
     int aCacheDuration)
-    : d(new UpnpDiscoveryResultPrivate(aNT, aUSN, aLocation, aNTS, aAnnounceDate, aCacheDuration))
+    : d(std::make_unique<UpnpDiscoveryResultPrivate>(std::move(aNT), std::move(aUSN),
+                                                     std::move(aLocation), aNTS,
+                                                     std::move(aAnnounceDate), aCacheDuration))
 {
     d->mValidityTimestamp = QDateTime::fromString(d->mAnnounceDate, QStringLiteral("ddd., d MMM. yy hh:mm:ss G\u007F"));
     if (!d->mValidityTimestamp.isValid()) {
@@ -75,7 +77,7 @@ UpnpDiscoveryResult::UpnpDiscoveryResult(const QString &aNT, const QString &aUSN
 }
 
 UpnpDiscoveryResult::UpnpDiscoveryResult(const UpnpDiscoveryResult &other)
-    : d(new UpnpDiscoveryResultPrivate(*other.d))
+    : d(std::make_unique<UpnpDiscoveryResultPrivate>(*other.d))
 {
 }
 
@@ -87,7 +89,7 @@ UpnpDiscoveryResult::UpnpDiscoveryResult(UpnpDiscoveryResult &&other)
 UpnpDiscoveryResult &UpnpDiscoveryResult::operator=(const UpnpDiscoveryResult &other)
 {
     if (&other != this) {
-        d.reset(new UpnpDiscoveryResultPrivate(*other.d));
+        d = std::make_unique<UpnpDiscoveryResultPrivate>(*other.d);
     }
 
     return *this;

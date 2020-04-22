@@ -76,7 +76,7 @@ void UpnpSsdpEngine::initialize()
 
 UpnpSsdpEngine::~UpnpSsdpEngine() = default;
 
-auto UpnpSsdpEngine::port() const -> bool
+bool UpnpSsdpEngine::port() const
 {
     return d->mPortNumber;
 }
@@ -91,7 +91,7 @@ void UpnpSsdpEngine::setPort(quint16 value)
     Q_EMIT portChanged();
 }
 
-auto UpnpSsdpEngine::canExportServices() const -> bool
+bool UpnpSsdpEngine::canExportServices() const
 {
     return d->mCanExportServices;
 }
@@ -106,7 +106,7 @@ void UpnpSsdpEngine::setCanExportServices(bool value)
     Q_EMIT canExportServicesChanged();
 }
 
-auto UpnpSsdpEngine::existingServices() const -> QList<UpnpDiscoveryResult>
+QList<UpnpDiscoveryResult> UpnpSsdpEngine::existingServices() const
 {
     auto result = QList<UpnpDiscoveryResult>();
 
@@ -243,14 +243,14 @@ void UpnpSsdpEngine::publishDevice(UpnpAbstractDevice *device)
 
     allDiscoveryMessageCommonContent += "NOTIFY * HTTP/1.1\r\n";
     allDiscoveryMessageCommonContent += "HOST: 239.255.255.250:" + QByteArray::number(d->mPortNumber) + "\r\n";
-    allDiscoveryMessageCommonContent += "CACHE-CONTROL: max-age=" + QByteArray::number(device->description()->cacheControl()) + "\r\n";
+    allDiscoveryMessageCommonContent += "CACHE-CONTROL: max-age=" + QByteArray::number(device->description().cacheControl()) + "\r\n";
     allDiscoveryMessageCommonContent += "NTS: ssdp:alive\r\n";
-    allDiscoveryMessageCommonContent += "SERVER: " + d->mServerInformation.toLatin1() + " " + device->description()->modelName().toLatin1() + " " + device->description()->modelNumber().toLatin1() + "\r\n";
+    allDiscoveryMessageCommonContent += "SERVER: " + d->mServerInformation.toLatin1() + " " + device->description().modelName().toLatin1() + " " + device->description().modelNumber().toLatin1() + "\r\n";
 
     QByteArray rootDeviceMessage(allDiscoveryMessageCommonContent);
     rootDeviceMessage += "NT: upnp:rootdevice\r\n";
-    rootDeviceMessage += "USN: uuid:" + device->description()->UDN().toLatin1() + "::upnp:rootdevice\r\n";
-    rootDeviceMessage += "LOCATION: " + device->description()->locationUrl().toString().toLatin1() + "\r\n";
+    rootDeviceMessage += "USN: uuid:" + device->description().UDN().toLatin1() + "::upnp:rootdevice\r\n";
+    rootDeviceMessage += "LOCATION: " + device->description().locationUrl().toString().toLatin1() + "\r\n";
     rootDeviceMessage += "\r\n";
 
     for (auto &oneSocket : d->mSsdpQuerySocket) {
@@ -258,9 +258,9 @@ void UpnpSsdpEngine::publishDevice(UpnpAbstractDevice *device)
     }
 
     QByteArray uuidDeviceMessage(allDiscoveryMessageCommonContent);
-    uuidDeviceMessage += "NT: uuid:" + device->description()->UDN().toLatin1() + "\r\n";
-    uuidDeviceMessage += "USN: uuid:" + device->description()->UDN().toLatin1() + "\r\n";
-    uuidDeviceMessage += "LOCATION: " + device->description()->locationUrl().toString().toLatin1() + "\r\n";
+    uuidDeviceMessage += "NT: uuid:" + device->description().UDN().toLatin1() + "\r\n";
+    uuidDeviceMessage += "USN: uuid:" + device->description().UDN().toLatin1() + "\r\n";
+    uuidDeviceMessage += "LOCATION: " + device->description().locationUrl().toString().toLatin1() + "\r\n";
     uuidDeviceMessage += "\r\n";
 
     for (auto &oneSocket : d->mSsdpQuerySocket) {
@@ -268,21 +268,21 @@ void UpnpSsdpEngine::publishDevice(UpnpAbstractDevice *device)
     }
 
     QByteArray deviceMessage(allDiscoveryMessageCommonContent);
-    deviceMessage += "NT: " + device->description()->deviceType().toLatin1() + "\r\n";
-    deviceMessage += "USN: uuid:" + device->description()->UDN().toLatin1() + "::" + device->description()->deviceType().toLatin1() + "\r\n";
-    deviceMessage += "LOCATION: " + device->description()->locationUrl().toString().toLatin1() + "\r\n";
+    deviceMessage += "NT: " + device->description().deviceType().toLatin1() + "\r\n";
+    deviceMessage += "USN: uuid:" + device->description().UDN().toLatin1() + "::" + device->description().deviceType().toLatin1() + "\r\n";
+    deviceMessage += "LOCATION: " + device->description().locationUrl().toString().toLatin1() + "\r\n";
     deviceMessage += "\r\n";
 
     for (auto &oneSocket : d->mSsdpQuerySocket) {
         oneSocket->writeDatagram(deviceMessage, QHostAddress(QStringLiteral("239.255.255.250")), d->mPortNumber);
     }
 
-    const auto &servicesList = device->description()->services();
+    const auto &servicesList = device->description().services();
     for (const auto &oneService : servicesList) {
         QByteArray deviceMessage(allDiscoveryMessageCommonContent);
         deviceMessage += "NT: " + oneService.serviceType().toLatin1() + "\r\n";
-        deviceMessage += "USN: uuid:" + device->description()->UDN().toLatin1() + "::" + oneService.serviceType().toLatin1() + "\r\n";
-        deviceMessage += "LOCATION: " + device->description()->locationUrl().toString().toLatin1() + "\r\n";
+        deviceMessage += "USN: uuid:" + device->description().UDN().toLatin1() + "::" + oneService.serviceType().toLatin1() + "\r\n";
+        deviceMessage += "LOCATION: " + device->description().locationUrl().toString().toLatin1() + "\r\n";
         deviceMessage += "\r\n";
 
         for (auto &oneSocket : d->mSsdpQuerySocket) {

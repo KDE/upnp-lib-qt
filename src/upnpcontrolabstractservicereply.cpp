@@ -27,14 +27,12 @@ public:
 
 UpnpControlAbstractServiceReply::UpnpControlAbstractServiceReply(const KDSoapPendingCall &soapAnswer, QObject *parent)
     : QObject(parent)
-    , d(new UpnpControlAbstractServiceReplyPrivate(soapAnswer))
+    , d(std::make_unique<UpnpControlAbstractServiceReplyPrivate>(soapAnswer))
 {
     connect(&d->mWatcher, &KDSoapPendingCallWatcher::finished, this, &UpnpControlAbstractServiceReply::callFinished);
 }
 
-UpnpControlAbstractServiceReply::~UpnpControlAbstractServiceReply()
-{
-}
+UpnpControlAbstractServiceReply::~UpnpControlAbstractServiceReply() = default;
 
 bool UpnpControlAbstractServiceReply::success() const
 {

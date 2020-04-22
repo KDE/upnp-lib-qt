@@ -42,13 +42,11 @@ public:
 
 UpnpDeviceDescriptionParser::UpnpDeviceDescriptionParser(QNetworkAccessManager *aNetworkAccess, UpnpDeviceDescription &deviceDescription, QObject *parent)
     : QObject(parent)
-    , d(new UpnpDeviceDescriptionParserPrivate(aNetworkAccess, deviceDescription))
+    , d(std::make_unique<UpnpDeviceDescriptionParserPrivate>(aNetworkAccess, deviceDescription))
 {
 }
 
-UpnpDeviceDescriptionParser::~UpnpDeviceDescriptionParser()
-{
-}
+UpnpDeviceDescriptionParser::~UpnpDeviceDescriptionParser() = default;
 
 void UpnpDeviceDescriptionParser::downloadDeviceDescription(const QUrl &deviceUrl)
 {

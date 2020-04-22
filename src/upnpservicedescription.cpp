@@ -22,21 +22,6 @@
 class UpnpServiceDescriptionPrivate
 {
 public:
-    UpnpServiceDescriptionPrivate()
-        : mBaseURL()
-        , mServiceType()
-        , mServiceId()
-        , mSCPDURL()
-        , mControlURL()
-        , mEventURL()
-        , mXmlDescription()
-        , mActions()
-        , mStateVariables()
-        , mSubscribers()
-        , mMaximumSubscriptionDuration(3600)
-    {
-    }
-
     QString mBaseURL;
 
     QString mServiceType;
@@ -57,7 +42,7 @@ public:
 
     QVector<QPointer<UpnpEventSubscriber>> mSubscribers;
 
-    int mMaximumSubscriptionDuration;
+    int mMaximumSubscriptionDuration = 3600;
 
     UpnpDeviceDescription mDeviceDescription;
 };

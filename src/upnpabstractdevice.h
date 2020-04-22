@@ -27,7 +27,7 @@ class UPNPLIBQT_EXPORT UpnpAbstractDevice : public QObject
 {
     Q_OBJECT
 
-    Q_PROPERTY(UpnpDeviceDescription *description
+    Q_PROPERTY(UpnpDeviceDescription description
             READ description
                 WRITE setDescription
                     NOTIFY descriptionChanged)
@@ -45,11 +45,11 @@ public:
 
     [[nodiscard]] QVector<QString> servicesName() const;
 
-    void setDescription(UpnpDeviceDescription *value);
+    void setDescription(UpnpDeviceDescription value);
 
-    [[nodiscard]] UpnpDeviceDescription *description();
+    [[nodiscard]] UpnpDeviceDescription& description();
 
-    [[nodiscard]] const UpnpDeviceDescription *description() const;
+    [[nodiscard]] const UpnpDeviceDescription &description() const;
 
     [[nodiscard]] int cacheControl() const;
 

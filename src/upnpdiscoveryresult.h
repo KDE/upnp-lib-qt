@@ -26,8 +26,8 @@ class UPNPLIBQT_EXPORT UpnpDiscoveryResult
 public:
     UpnpDiscoveryResult();
 
-    UpnpDiscoveryResult(const QString &aNT, const QString &aUSN, const QString &aLocation,
-        UpnpSsdpEngine::NotificationSubType aNTS, const QString &aAnnounceDate,
+    UpnpDiscoveryResult(QString aNT, QString aUSN, QString aLocation,
+        UpnpSsdpEngine::NotificationSubType aNTS, QString aAnnounceDate,
         int aCacheDuration);
 
     UpnpDiscoveryResult(const UpnpDiscoveryResult &other);

@@ -16,14 +16,12 @@ public:
 
 UpnpHttpServer::UpnpHttpServer(QObject *parent)
     : KDSoapServer(parent)
-    , d(new UpnpHttpServerPrivate)
+    , d(std::make_unique<UpnpHttpServerPrivate>())
 {
     d->mService = nullptr;
 }
 
-UpnpHttpServer::~UpnpHttpServer()
-{
-}
+UpnpHttpServer::~UpnpHttpServer() = default;
 
 QObject *UpnpHttpServer::createServerObject()
 {

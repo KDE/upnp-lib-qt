@@ -21,14 +21,12 @@ public:
 
 UpnpDeviceSoapServer::UpnpDeviceSoapServer(QObject *parent)
     : KDSoapServer(parent)
-    , d(new UpnpDeviceSoapServerPrivate)
+    , d(std::make_unique<UpnpDeviceSoapServerPrivate>())
 {
     listen();
 }
 
-UpnpDeviceSoapServer::~UpnpDeviceSoapServer()
-{
-}
+UpnpDeviceSoapServer::~UpnpDeviceSoapServer() = default;
 
 int UpnpDeviceSoapServer::addDevice(UpnpAbstractDevice *device)
 {

@@ -103,11 +103,11 @@ public:
 
     ~UpnpSsdpEngine() override;
 
-    [[nodiscard]] auto port() const -> bool;
+    [[nodiscard]] bool port() const;
 
-    [[nodiscard]] auto canExportServices() const -> bool;
+    [[nodiscard]] bool canExportServices() const;
 
-    [[nodiscard]] auto existingServices() const -> QList<UpnpDiscoveryResult>;
+    [[nodiscard]] QList<UpnpDiscoveryResult> existingServices() const;
 
     void initialize();
 

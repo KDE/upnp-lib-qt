@@ -44,13 +44,11 @@ public:
 
 UpnpAbstractService::UpnpAbstractService(QObject *parent)
     : QObject(parent)
-    , d(new UpnpAbstractServicePrivate)
+    , d(std::make_unique<UpnpAbstractServicePrivate>())
 {
 }
 
-UpnpAbstractService::~UpnpAbstractService()
-{
-}
+UpnpAbstractService::~UpnpAbstractService() = default;
 
 QIODevice *UpnpAbstractService::buildAndGetXmlDescription()
 {
@@ -143,7 +141,7 @@ QIODevice *UpnpAbstractService::buildAndGetXmlDescription()
 
 QPointer<UpnpEventSubscriber> UpnpAbstractService::subscribeToEvents(const QByteArray &requestData, const QMap<QByteArray, QByteArray> &headers)
 {
-    Q_UNUSED(requestData);
+    Q_UNUSED(requestData)
 
     QPointer<UpnpEventSubscriber> newSubscriber(new UpnpEventSubscriber);
 
@@ -221,9 +219,9 @@ QList<QString> UpnpAbstractService::stateVariables() const
 
 QVector<QPair<QString, QVariant>> UpnpAbstractService::invokeAction(const QString &actionName, const QVector<QVariant> &arguments, bool &isInError)
 {
-    Q_UNUSED(actionName);
-    Q_UNUSED(arguments);
-    Q_UNUSED(isInError);
+    Q_UNUSED(actionName)
+    Q_UNUSED(arguments)
+    Q_UNUSED(isInError)
 
     return {};
 }

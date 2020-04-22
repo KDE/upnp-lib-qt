@@ -36,32 +36,22 @@
 class UpnpAbstractServiceDescriptionPrivate
 {
 public:
-    UpnpAbstractServiceDescriptionPrivate()
-        : mNetworkAccess()
-        , mInterface(nullptr)
-        , mEventServer()
-        , mPublicAddress()
-        , mRealEventSubscriptionTimeout(0)
-        , mEventSubscriptionTimer(nullptr)
-    {
-    }
-
     QNetworkAccessManager mNetworkAccess;
 
-    KDSoapClientInterface *mInterface;
+    KDSoapClientInterface *mInterface = nullptr;
 
     UpnpHttpServer mEventServer;
 
     QHostAddress mPublicAddress;
 
-    int mRealEventSubscriptionTimeout;
-
     QPointer<QTimer> mEventSubscriptionTimer;
+
+    int mRealEventSubscriptionTimeout = 0;
 };
 
 UpnpControlAbstractService::UpnpControlAbstractService(QObject *parent)
     : UpnpAbstractService(parent)
-    , d(new UpnpAbstractServiceDescriptionPrivate)
+    , d(std::make_unique<UpnpAbstractServiceDescriptionPrivate>())
 {
     connect(&d->mNetworkAccess, &QNetworkAccessManager::finished, this, &UpnpControlAbstractService::finishedDownload);
 
@@ -252,8 +242,8 @@ void UpnpControlAbstractService::parseServiceDescription(QIODevice *serviceDescr
 
 void UpnpControlAbstractService::parseEventNotification(const QString &eventName, const QString &eventValue)
 {
-    Q_UNUSED(eventName);
-    Q_UNUSED(eventValue);
+    Q_UNUSED(eventName)
+    Q_UNUSED(eventValue)
 }
 
 #include "moc_upnpcontrolabstractservice.cpp"
