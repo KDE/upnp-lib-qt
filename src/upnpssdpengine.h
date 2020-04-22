@@ -109,8 +109,6 @@ public:
 
     [[nodiscard]] QList<UpnpDiscoveryResult> existingServices() const;
 
-    void initialize();
-
 Q_SIGNALS:
 
     void newSearchQuery(UpnpSsdpEngine *engine, const UpnpSearchQuery &searchQuery);
@@ -126,6 +124,8 @@ Q_SIGNALS:
     void networkChanged();
 
 public Q_SLOTS:
+
+    void initialize();
 
     void setPort(quint16 value);
 
