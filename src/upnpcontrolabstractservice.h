@@ -33,7 +33,7 @@ public:
 
     ~UpnpControlAbstractService() override;
 
-    [[nodiscard]] UpnpControlAbstractServiceReply *callAction(const QString &action, const QVector<QVariant> &arguments);
+    [[nodiscard]] UpnpControlAbstractServiceReply *callAction(const QString &action, const QMap<QString, QVariant> &arguments);
 
     void subscribeEvents(int duration);
 

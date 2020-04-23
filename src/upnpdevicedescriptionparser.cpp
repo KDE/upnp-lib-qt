@@ -132,7 +132,6 @@ void UpnpDeviceDescriptionParser::parseDeviceDescription(QIODevice *deviceDescri
         const QDomNode &serviceNode(serviceList.at(serviceIndex));
         if (!serviceNode.isNull()) {
             auto newService = UpnpServiceDescription {};
-            newService.setDeviceDescription(d->mDeviceDescription);
 
             const QDomNode &serviceTypeNode = serviceNode.firstChildElement(QStringLiteral("serviceType"));
 #if 0
@@ -196,17 +195,18 @@ void UpnpDeviceDescriptionParser::parseDeviceDescription(QIODevice *deviceDescri
                 serviceUrl.setPath(newService.SCPDURL().toString());
             }
 
-            d->mDeviceDescription.addService(newService);
+            d->mDeviceDescription.addService(std::move(newService));
 
-            d->mServiceDescriptionParsers[newService.serviceId()] =
+            auto &serviceJustCreated = d->mDeviceDescription.serviceByIndex(serviceIndex);
+            d->mServiceDescriptionParsers[serviceJustCreated.serviceId()] =
                     new UpnpServiceDescriptionParser{d->mNetworkAccess, d->mDeviceDescription.serviceByIndex(serviceIndex)};
 
-            connect(d->mServiceDescriptionParsers[newService.serviceId()].data(), &UpnpServiceDescriptionParser::descriptionParsed,
+            connect(d->mServiceDescriptionParsers[serviceJustCreated.serviceId()].data(), &UpnpServiceDescriptionParser::descriptionParsed,
                 this, &UpnpDeviceDescriptionParser::serviceDescriptionParsed);
             connect(d->mNetworkAccess, &QNetworkAccessManager::finished,
-                d->mServiceDescriptionParsers[newService.serviceId()].data(), &UpnpServiceDescriptionParser::finishedDownload);
+                d->mServiceDescriptionParsers[serviceJustCreated.serviceId()].data(), &UpnpServiceDescriptionParser::finishedDownload);
 
-            d->mServiceDescriptionParsers[newService.serviceId()]->downloadServiceDescription(serviceUrl);
+            d->mServiceDescriptionParsers[serviceJustCreated.serviceId()]->downloadServiceDescription(serviceUrl);
         }
     }
 }

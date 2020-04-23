@@ -6,6 +6,7 @@
 
 #include "upnpdevicedescription.h"
 #include "upnpservicedescription.h"
+#include "upnpactiondescription.h"
 
 #include <QBuffer>
 #include <QIODevice>
@@ -273,8 +274,8 @@ const QUrl &UpnpDeviceDescription::locationUrl() const
     return d->mLocationUrl;
 }
 
-int UpnpDeviceDescription::addService(const UpnpServiceDescription &newService)
+int UpnpDeviceDescription::addService(UpnpServiceDescription newService)
 {
-    d->mServices.push_back(newService);
+    d->mServices.push_back(std::move(newService));
     return d->mServices.count() - 1;
 }

@@ -72,20 +72,17 @@ UpnpControlAbstractService::UpnpControlAbstractService(QObject *parent)
 
 UpnpControlAbstractService::~UpnpControlAbstractService() = default;
 
-UpnpControlAbstractServiceReply *UpnpControlAbstractService::callAction(const QString &actionName, const QVector<QVariant> &arguments)
+UpnpControlAbstractServiceReply *UpnpControlAbstractService::callAction(const QString &actionName, const QMap<QString, QVariant> &arguments)
 {
     KDSoapMessage message;
 
     const UpnpActionDescription &actionDescription(action(actionName));
 
-    auto itArgumentName = actionDescription.mArguments.begin();
-    auto itArgumentValue = arguments.begin();
-    for (; itArgumentName != actionDescription.mArguments.end() && itArgumentValue != arguments.end(); ++itArgumentName) {
-        message.addArgument(itArgumentName->mName, itArgumentValue->toString());
-
-        ++itArgumentValue;
-        if (itArgumentValue == arguments.end()) {
-            break;
+    for (const auto &argumentDescription : actionDescription.mArguments) {
+        if (argumentDescription.mDirection == UpnpArgumentDirection::In &&
+                arguments[argumentDescription.mName].isValid() &&
+                !arguments[argumentDescription.mName].toString().isEmpty()) {
+            message.addArgument(argumentDescription.mName, arguments[argumentDescription.mName]);
         }
     }
 

@@ -43,8 +43,6 @@ public:
     QVector<QPointer<UpnpEventSubscriber>> mSubscribers;
 
     int mMaximumSubscriptionDuration = 3600;
-
-    UpnpDeviceDescription mDeviceDescription;
 };
 
 UpnpServiceDescription::UpnpServiceDescription()
@@ -192,14 +190,4 @@ QMap<QString, UpnpStateVariableDescription> &UpnpServiceDescription::stateVariab
 const QMap<QString, UpnpStateVariableDescription> &UpnpServiceDescription::stateVariables() const
 {
     return d->mStateVariables;
-}
-
-const UpnpDeviceDescription &UpnpServiceDescription::deviceDescription() const
-{
-    return d->mDeviceDescription;
-}
-
-void UpnpServiceDescription::setDeviceDescription(const UpnpDeviceDescription &deviceDescription)
-{
-    d->mDeviceDescription = deviceDescription;
 }

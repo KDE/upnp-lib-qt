@@ -83,15 +83,9 @@ public:
 
     [[nodiscard]] const QMap<QString, UpnpStateVariableDescription> &stateVariables() const;
 
-    [[nodiscard]] const UpnpDeviceDescription &deviceDescription() const;
-
-    void setDeviceDescription(const UpnpDeviceDescription &deviceDescription);
-
 private:
     std::unique_ptr<UpnpServiceDescriptionPrivate> d;
 };
-
-Q_DECLARE_TYPEINFO(UpnpServiceDescription, Q_MOVABLE_TYPE);
 
 Q_DECLARE_METATYPE(UpnpServiceDescription)
 

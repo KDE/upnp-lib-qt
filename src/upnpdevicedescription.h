@@ -135,13 +135,11 @@ public:
 
     [[nodiscard]] const QUrl &locationUrl() const;
 
-    int addService(const UpnpServiceDescription &newService);
+    int addService(UpnpServiceDescription newService);
 
 private:
     std::unique_ptr<UpnpDeviceDescriptionPrivate> d;
 };
-
-Q_DECLARE_TYPEINFO(UpnpDeviceDescription, Q_MOVABLE_TYPE);
 
 Q_DECLARE_METATYPE(UpnpDeviceDescription)
 
