@@ -33,7 +33,7 @@ public:
 
     void processRequest(const KDSoapMessage &request, KDSoapMessage &response, const QByteArray &soapAction) override;
 
-    QIODevice *processFileRequest(const QString &path, QByteArray &contentType) override;
+    QIODevice* processFileRequest(const QString &path, QByteArray &contentType) override;
 
     void processRequestWithPath(const KDSoapMessage &request, KDSoapMessage &response, const QByteArray &soapAction, const QString &path) override;
 
@@ -49,9 +49,9 @@ public:
         const QMap<QByteArray, QByteArray> &httpHeaders, QByteArray &customAnswer) override;
 
 private:
-    QIODevice *downloadDeviceXmlDescription(UpnpAbstractDevice *device, QByteArray &contentType);
+    std::unique_ptr<QIODevice> downloadDeviceXmlDescription(UpnpAbstractDevice *device, QByteArray &contentType);
 
-    QIODevice *downloadServiceXmlDescription(UpnpAbstractDevice *device, const int serviceIndex, QByteArray &contentType);
+    std::unique_ptr<QIODevice> downloadServiceXmlDescription(UpnpAbstractDevice *device, const int serviceIndex, QByteArray &contentType);
 
     std::unique_ptr<UpnpDeviceSoapServerObjectPrivate> d;
 };

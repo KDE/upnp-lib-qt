@@ -31,13 +31,13 @@ public:
 
     UpnpServiceDescription(const UpnpServiceDescription &other);
 
-    UpnpServiceDescription(UpnpServiceDescription &&other);
+    UpnpServiceDescription(UpnpServiceDescription &&other) noexcept;
 
     ~UpnpServiceDescription();
 
     UpnpServiceDescription &operator=(const UpnpServiceDescription &other);
 
-    UpnpServiceDescription &operator=(UpnpServiceDescription &&other);
+    UpnpServiceDescription &operator=(UpnpServiceDescription &&other) noexcept;
 
     void setBaseURL(const QString &newBaseURL);
 
@@ -90,5 +90,9 @@ public:
 private:
     std::unique_ptr<UpnpServiceDescriptionPrivate> d;
 };
+
+Q_DECLARE_TYPEINFO(UpnpServiceDescription, Q_MOVABLE_TYPE);
+
+Q_DECLARE_METATYPE(UpnpServiceDescription)
 
 #endif // UpnpServiceDescription_H

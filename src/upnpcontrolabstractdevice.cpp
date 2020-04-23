@@ -30,25 +30,25 @@ UpnpControlAbstractDevice::UpnpControlAbstractDevice(QObject *parent)
 
 UpnpControlAbstractDevice::~UpnpControlAbstractDevice() = default;
 
-UpnpControlAbstractService *UpnpControlAbstractDevice::serviceById(const QString &serviceId) const
+std::unique_ptr<UpnpControlAbstractService> UpnpControlAbstractDevice::serviceById(const QString &serviceId) const
 {
     auto serviceDescription = serviceDescriptionById(serviceId);
     return serviceFromDescription(serviceDescription);
 }
 
-UpnpControlAbstractService *UpnpControlAbstractDevice::serviceByIndex(int serviceIndex) const
+std::unique_ptr<UpnpControlAbstractService> UpnpControlAbstractDevice::serviceByIndex(int serviceIndex) const
 {
     auto serviceDescription = serviceDescriptionByIndex(serviceIndex);
     return serviceFromDescription(serviceDescription);
 }
 
-UpnpControlAbstractService *UpnpControlAbstractDevice::serviceFromDescription(const UpnpServiceDescription &description) const
+std::unique_ptr<UpnpControlAbstractService> UpnpControlAbstractDevice::serviceFromDescription(const UpnpServiceDescription &description) const
 {
     auto newService = std::make_unique<UpnpControlAbstractService>();
 
     newService->setDescription(description);
 
-    return newService.release();
+    return newService;
 }
 
 #include "moc_upnpcontrolabstractdevice.cpp"

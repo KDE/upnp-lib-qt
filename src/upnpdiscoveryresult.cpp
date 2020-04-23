@@ -81,9 +81,10 @@ UpnpDiscoveryResult::UpnpDiscoveryResult(const UpnpDiscoveryResult &other)
 {
 }
 
-UpnpDiscoveryResult::UpnpDiscoveryResult(UpnpDiscoveryResult &&other)
-    : d(other.d.release())
+UpnpDiscoveryResult::UpnpDiscoveryResult(UpnpDiscoveryResult &&other) noexcept
+    : d()
 {
+    d.swap(other.d);
 }
 
 UpnpDiscoveryResult &UpnpDiscoveryResult::operator=(const UpnpDiscoveryResult &other)
@@ -95,10 +96,11 @@ UpnpDiscoveryResult &UpnpDiscoveryResult::operator=(const UpnpDiscoveryResult &o
     return *this;
 }
 
-UpnpDiscoveryResult &UpnpDiscoveryResult::operator=(UpnpDiscoveryResult &&other)
+UpnpDiscoveryResult &UpnpDiscoveryResult::operator=(UpnpDiscoveryResult &&other) noexcept
 {
     if (&other != this) {
-        d.reset(other.d.release());
+        d.reset();
+        d.swap(other.d);
     }
 
     return *this;

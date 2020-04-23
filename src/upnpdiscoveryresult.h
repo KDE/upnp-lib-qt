@@ -32,13 +32,13 @@ public:
 
     UpnpDiscoveryResult(const UpnpDiscoveryResult &other);
 
-    UpnpDiscoveryResult(UpnpDiscoveryResult &&other);
+    UpnpDiscoveryResult(UpnpDiscoveryResult &&other) noexcept;
 
     ~UpnpDiscoveryResult();
 
     UpnpDiscoveryResult &operator=(const UpnpDiscoveryResult &other);
 
-    UpnpDiscoveryResult &operator=(UpnpDiscoveryResult &&other);
+    UpnpDiscoveryResult &operator=(UpnpDiscoveryResult &&other) noexcept;
 
     void setNT(const QString &value);
 

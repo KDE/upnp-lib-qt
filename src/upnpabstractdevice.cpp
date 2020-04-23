@@ -94,7 +94,7 @@ const UpnpDeviceDescription &UpnpAbstractDevice::description() const
     return d->mDevice;
 }
 
-QIODevice *UpnpAbstractDevice::buildAndGetXmlDescription()
+std::unique_ptr<QIODevice> UpnpAbstractDevice::buildAndGetXmlDescription()
 {
     if (!d->mXmlDescription) {
         QPointer<QBuffer> newDescription(new QBuffer);
@@ -150,7 +150,7 @@ QIODevice *UpnpAbstractDevice::buildAndGetXmlDescription()
 
     d->mXmlDescription->seek(0);
 
-    return d->mXmlDescription.release();
+    return std::move(d->mXmlDescription);
 }
 
 void UpnpAbstractDevice::newSearchQuery(UpnpSsdpEngine *engine, const UpnpSearchQuery &searchQuery)
@@ -164,11 +164,8 @@ void UpnpAbstractDevice::newSearchQuery(UpnpSsdpEngine *engine, const UpnpSearch
         engine->publishDevice(this);
         break;
     case SearchTargetType::RootDevice:
-        break;
     case SearchTargetType::DeviceUUID:
-        break;
     case SearchTargetType::DeviceType:
-        break;
     case SearchTargetType::ServiceType:
         break;
     }

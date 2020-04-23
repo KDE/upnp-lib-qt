@@ -29,9 +29,9 @@ public:
 
     ~UpnpControlAbstractDevice() override;
 
-    [[nodiscard]] UpnpControlAbstractService *serviceById(const QString &serviceId) const;
+    [[nodiscard]] std::unique_ptr<UpnpControlAbstractService> serviceById(const QString &serviceId) const;
 
-    [[nodiscard]] UpnpControlAbstractService *serviceByIndex(int serviceIndex) const;
+    [[nodiscard]] std::unique_ptr<UpnpControlAbstractService> serviceByIndex(int serviceIndex) const;
 
 Q_SIGNALS:
 
@@ -42,7 +42,7 @@ public Q_SLOTS:
 private Q_SLOTS:
 
 protected:
-    [[nodiscard]] UpnpControlAbstractService *serviceFromDescription(const UpnpServiceDescription &description) const;
+    [[nodiscard]] std::unique_ptr<UpnpControlAbstractService> serviceFromDescription(const UpnpServiceDescription &description) const;
 
 private:
     std::unique_ptr<UpnpControlAbstractDevicePrivate> d;

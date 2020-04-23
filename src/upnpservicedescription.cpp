@@ -57,7 +57,7 @@ UpnpServiceDescription::UpnpServiceDescription(const UpnpServiceDescription &oth
 {
 }
 
-UpnpServiceDescription::UpnpServiceDescription(UpnpServiceDescription &&other)
+UpnpServiceDescription::UpnpServiceDescription(UpnpServiceDescription &&other) noexcept
     : d()
 {
     d.swap(other.d);
@@ -74,7 +74,7 @@ UpnpServiceDescription &UpnpServiceDescription::operator=(const UpnpServiceDescr
     return *this;
 }
 
-UpnpServiceDescription &UpnpServiceDescription::operator=(UpnpServiceDescription &&other)
+UpnpServiceDescription &UpnpServiceDescription::operator=(UpnpServiceDescription &&other) noexcept
 {
     if (this != &other) {
         d.reset();

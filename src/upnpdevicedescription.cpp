@@ -65,7 +65,7 @@ UpnpDeviceDescription::UpnpDeviceDescription(const UpnpDeviceDescription &other)
 {
 }
 
-UpnpDeviceDescription::UpnpDeviceDescription(UpnpDeviceDescription &&other)
+UpnpDeviceDescription::UpnpDeviceDescription(UpnpDeviceDescription &&other) noexcept
     : d()
 {
     other.d.swap(d);
@@ -81,7 +81,7 @@ UpnpDeviceDescription &UpnpDeviceDescription::operator=(const UpnpDeviceDescript
     return *this;
 }
 
-UpnpDeviceDescription &UpnpDeviceDescription::operator=(UpnpDeviceDescription &&other)
+UpnpDeviceDescription &UpnpDeviceDescription::operator=(UpnpDeviceDescription &&other) noexcept
 {
     if (this != &other) {
         d.reset();

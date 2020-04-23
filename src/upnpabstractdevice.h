@@ -53,7 +53,7 @@ public:
 
     [[nodiscard]] int cacheControl() const;
 
-    [[nodiscard]] QIODevice *buildAndGetXmlDescription();
+    [[nodiscard]] std::unique_ptr<QIODevice> buildAndGetXmlDescription();
 
 Q_SIGNALS:
 

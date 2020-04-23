@@ -22,9 +22,9 @@
 class UpnpServiceDescriptionParserPrivate
 {
 public:
-    UpnpServiceDescriptionParserPrivate(QNetworkAccessManager *aNetworkAccess, UpnpServiceDescription &deviceDescription)
+    UpnpServiceDescriptionParserPrivate(QNetworkAccessManager *aNetworkAccess, UpnpServiceDescription &serviceDescription)
         : mNetworkAccess(aNetworkAccess)
-        , mServiceDescription(deviceDescription)
+        , mServiceDescription(serviceDescription)
         , mServiceURL()
     {
     }

@@ -63,13 +63,13 @@ QIODevice *UpnpDeviceSoapServerObject::processFileRequest(const QString &path, Q
     if (pathParts.count() == 3 && pathParts.last() == QStringLiteral("device.xml")) {
         const int deviceIndex = pathParts[1].toInt();
         if (deviceIndex >= 0 && deviceIndex < d->mDevices.count()) {
-            return downloadDeviceXmlDescription(d->mDevices[deviceIndex], contentType);
+            return downloadDeviceXmlDescription(d->mDevices[deviceIndex], contentType).release();
         }
     } else if (pathParts.count() == 4 && pathParts.last() == QStringLiteral("service.xml")) {
         const int deviceIndex = pathParts[1].toInt();
         const int serviceIndex = pathParts[2].toInt();
         if (deviceIndex >= 0 && deviceIndex < d->mDevices.count()) {
-            return downloadServiceXmlDescription(d->mDevices[deviceIndex], serviceIndex, contentType);
+            return downloadServiceXmlDescription(d->mDevices[deviceIndex], serviceIndex, contentType).release();
         }
     }
 
@@ -229,7 +229,7 @@ bool UpnpDeviceSoapServerObject::processCustomVerbRequest(const QByteArray &requ
     return false;
 }
 
-QIODevice *UpnpDeviceSoapServerObject::downloadDeviceXmlDescription(UpnpAbstractDevice *device, QByteArray &contentType)
+std::unique_ptr<QIODevice> UpnpDeviceSoapServerObject::downloadDeviceXmlDescription(UpnpAbstractDevice *device, QByteArray &contentType)
 {
     qCDebug(orgKdeUpnpLibQtUpnp()) << "UpnpDeviceSoapServerObject::downloadDeviceXmlDescription" << device->description().UDN();
 
@@ -238,13 +238,13 @@ QIODevice *UpnpDeviceSoapServerObject::downloadDeviceXmlDescription(UpnpAbstract
     return device->buildAndGetXmlDescription();
 }
 
-QIODevice *UpnpDeviceSoapServerObject::downloadServiceXmlDescription(UpnpAbstractDevice *device, const int serviceIndex, QByteArray &contentType)
+std::unique_ptr<QIODevice> UpnpDeviceSoapServerObject::downloadServiceXmlDescription(UpnpAbstractDevice *device, const int serviceIndex, QByteArray &contentType)
 {
     qCDebug(orgKdeUpnpLibQtUpnp()) << "UpnpDeviceSoapServerObject::downloadServiceXmlDescription" << device->description().UDN() << serviceIndex;
 
     contentType = "text/xml";
 
-    return nullptr /*device->serviceByIndex(serviceIndex)->buildAndGetXmlDescription()*/;
+    return {}/*device->serviceByIndex(serviceIndex)->buildAndGetXmlDescription()*/;
 }
 
 #include "moc_upnpdevicesoapserverobject.cpp"

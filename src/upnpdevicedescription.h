@@ -25,13 +25,13 @@ public:
 
     UpnpDeviceDescription(const UpnpDeviceDescription &other);
 
-    UpnpDeviceDescription(UpnpDeviceDescription &&other);
+    UpnpDeviceDescription(UpnpDeviceDescription &&other) noexcept;
 
     ~UpnpDeviceDescription();
 
     UpnpDeviceDescription &operator=(const UpnpDeviceDescription &other);
 
-    UpnpDeviceDescription &operator=(UpnpDeviceDescription &&other);
+    UpnpDeviceDescription &operator=(UpnpDeviceDescription &&other) noexcept;
 
     [[nodiscard]] UpnpServiceDescription serviceById(const QString &serviceId) const;
 
@@ -140,5 +140,9 @@ public:
 private:
     std::unique_ptr<UpnpDeviceDescriptionPrivate> d;
 };
+
+Q_DECLARE_TYPEINFO(UpnpDeviceDescription, Q_MOVABLE_TYPE);
+
+Q_DECLARE_METATYPE(UpnpDeviceDescription)
 
 #endif
