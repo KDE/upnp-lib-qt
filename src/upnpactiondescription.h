@@ -21,15 +21,13 @@ enum class UpnpArgumentDirection {
 class UPNPLIBQT_EXPORT UpnpActionArgumentDescription
 {
 public:
-    UpnpActionArgumentDescription();
-
-    bool mIsValid;
+    bool mIsValid = false;
 
     QString mName;
 
-    UpnpArgumentDirection mDirection;
+    UpnpArgumentDirection mDirection = UpnpArgumentDirection::Invalid;
 
-    bool mIsReturnValue;
+    bool mIsReturnValue = false;
 
     QString mRelatedStateVariable;
 };
@@ -37,17 +35,15 @@ public:
 class UPNPLIBQT_EXPORT UpnpActionDescription
 {
 public:
-    UpnpActionDescription();
-
-    bool mIsValid;
+    bool mIsValid = false;
 
     QString mName;
 
     QVector<UpnpActionArgumentDescription> mArguments;
 
-    int mNumberInArgument;
+    int mNumberInArgument = 0;
 
-    int mNumberOutArgument;
+    int mNumberOutArgument = 0;
 };
 
 #endif // UPNPACTIONDESCRIPTION_H
