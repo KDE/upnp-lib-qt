@@ -5,4 +5,4 @@
 reuse:
   image: fsfe/reuse:0.9.0
   script:
-    - lint
+    - reuse lint
