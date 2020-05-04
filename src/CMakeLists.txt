@@ -114,8 +114,8 @@ install(FILES ${PRI_FILENAME}
 target_link_libraries(UpnpLibQt
     LINK_PUBLIC
         Qt5::Core
-    LINK_PRIVATE
         Qt5::Network
+    LINK_PRIVATE
         Qt5::Xml
         KDSoap::kdsoap
         KDSoap::kdsoap-server
