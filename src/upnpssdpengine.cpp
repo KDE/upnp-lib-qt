@@ -532,49 +532,22 @@ void UpnpSsdpEngine::parseSsdpAnnounceDatagram(const QByteArray &datagram, const
     newDiscovery.setNTS(NotificationSubType::Invalid);
 
     for (const auto &header : headers) {
-        if (header.startsWith("LOCATION")) {
-            if ((header)[9] == ' ') {
-                newDiscovery.setLocation(QString::fromLatin1(header.mid(10, header.length() - 11)));
-            } else {
-                newDiscovery.setLocation(QString::fromLatin1(header.mid(9, header.length() - 10)));
-            }
+        if (header.startsWith("LOCATION") || header.startsWith("Location")) {
+            newDiscovery.setLocation(QString::fromLatin1(header.mid(9, header.length() - 10).trimmed()));
         }
-        if (header.startsWith("Location")) {
-            if ((header)[9] == ' ') {
-                newDiscovery.setLocation(QString::fromLatin1(header.mid(10, header.length() - 11)));
-            } else {
-                newDiscovery.setLocation(QString::fromLatin1(header.mid(9, header.length() - 10)));
-            }
+        if (header.startsWith("HOST:") || header.startsWith("Host:")) {
+            newDiscovery.setLocation(QString::fromLatin1(header.mid(6, header.length() - 7).trimmed()));
         }
-        if (header.startsWith("HOST") || header.startsWith("Host")) {
-            if ((header)[4] == ' ') {
-                newDiscovery.setLocation(QString::fromLatin1(header.mid(7, header.length() - 8)));
-            } else {
-                newDiscovery.setLocation(QString::fromLatin1(header.mid(6, header.length() - 7)));
-            }
-        }
-        if (header.startsWith("USN")) {
-            if ((header)[4] == ' ') {
-                newDiscovery.setUSN(QString::fromLatin1(header.mid(5, header.length() - 6)));
-            } else {
-                newDiscovery.setUSN(QString::fromLatin1(header.mid(4, header.length() - 5)));
-            }
+        if (header.startsWith("USN:")) {
+            newDiscovery.setUSN(QString::fromLatin1(header.mid(4, header.length() - 5).trimmed()));
         }
         if (messageType == SsdpMessageType::queryAnswer && header.startsWith("ST")) {
-            if ((header)[3] == ' ') {
-                newDiscovery.setNT(QString::fromLatin1(header.mid(4, header.length() - 5)));
-            } else {
-                newDiscovery.setNT(QString::fromLatin1(header.mid(3, header.length() - 4)));
-            }
+            newDiscovery.setNT(QString::fromLatin1(header.mid(3, header.length() - 4).trimmed()));
         }
         if (messageType == SsdpMessageType::announce && header.startsWith("NT:")) {
-            if ((header)[3] == ' ') {
-                newDiscovery.setNT(QString::fromLatin1(header.mid(4, header.length() - 5)));
-            } else {
-                newDiscovery.setNT(QString::fromLatin1(header.mid(3, header.length() - 4)));
-            }
+            newDiscovery.setNT(QString::fromLatin1(header.mid(3, header.length() - 4).trimmed()));
         }
-        if (messageType == SsdpMessageType::announce && header.startsWith("NTS")) {
+        if (messageType == SsdpMessageType::announce && header.startsWith("NTS:")) {
             if (header.endsWith("ssdp:alive\r")) {
                 newDiscovery.setNTS(NotificationSubType::Alive);
             }
@@ -585,17 +558,13 @@ void UpnpSsdpEngine::parseSsdpAnnounceDatagram(const QByteArray &datagram, const
                 newDiscovery.setNTS(NotificationSubType::Discover);
             }
         }
-        if (header.startsWith("DATE")) {
-            if ((header)[5] == ' ') {
-                newDiscovery.setAnnounceDate(QString::fromLatin1(header.mid(6, header.length() - 7)));
-            } else {
-                newDiscovery.setAnnounceDate(QString::fromLatin1(header.mid(5, header.length() - 6)));
-            }
+        if (header.startsWith("DATE:")) {
+            newDiscovery.setAnnounceDate(QString::fromLatin1(header.mid(5, header.length() - 6).trimmed()));
         }
-        if (header.startsWith("Cache-Control: max-age") || header.startsWith("CACHE-CONTROL: max-age")) {
-            const QList<QByteArray> &splittedLine = header.mid(22, header.length() - 23).split('=');
+        if (header.startsWith("Cache-Control:") || header.startsWith("CACHE-CONTROL:")) {
+            const QList<QByteArray> &splittedLine = header.mid(14, header.length() - 15).split('=');
             if (splittedLine.size() == 2) {
-                newDiscovery.setCacheDuration(splittedLine.last().toInt());
+                newDiscovery.setCacheDuration(splittedLine.last().trimmed().toInt());
             }
         }
     }
