@@ -35,7 +35,7 @@ public:
 
     UpnpDeviceDescription &mDeviceDescription;
 
-    QMap<QString, QPointer<UpnpServiceDescriptionParser>> mServiceDescriptionParsers;
+    std::map<QString, std::unique_ptr<UpnpServiceDescriptionParser>> mServiceDescriptionParsers;
 
     QUrl mDeviceURL;
 };
@@ -58,7 +58,7 @@ void UpnpDeviceDescriptionParser::serviceDescriptionParsed(const QString &upnpSe
 {
     qCDebug(orgKdeUpnpLibQtUpnp()) << "UpnpDeviceDescriptionParser::serviceDescriptionParsed" << upnpServiceId;
 
-    d->mServiceDescriptionParsers.remove(upnpServiceId);
+    d->mServiceDescriptionParsers.erase(upnpServiceId);
 
     if (d->mServiceDescriptionParsers.empty()) {
         Q_EMIT descriptionParsed(d->mDeviceDescription.UDN());
@@ -198,13 +198,13 @@ void UpnpDeviceDescriptionParser::parseDeviceDescription(QIODevice *deviceDescri
             d->mDeviceDescription.addService(std::move(newService));
 
             auto &serviceJustCreated = d->mDeviceDescription.serviceByIndex(serviceIndex);
-            d->mServiceDescriptionParsers[serviceJustCreated.serviceId()] =
-                    new UpnpServiceDescriptionParser{d->mNetworkAccess, d->mDeviceDescription.serviceByIndex(serviceIndex)};
+            d->mServiceDescriptionParsers[serviceJustCreated.serviceId()]
+                    = std::make_unique<UpnpServiceDescriptionParser>(d->mNetworkAccess, d->mDeviceDescription.serviceByIndex(serviceIndex));
 
-            connect(d->mServiceDescriptionParsers[serviceJustCreated.serviceId()].data(), &UpnpServiceDescriptionParser::descriptionParsed,
+            connect(d->mServiceDescriptionParsers[serviceJustCreated.serviceId()].get(), &UpnpServiceDescriptionParser::descriptionParsed,
                 this, &UpnpDeviceDescriptionParser::serviceDescriptionParsed);
             connect(d->mNetworkAccess, &QNetworkAccessManager::finished,
-                d->mServiceDescriptionParsers[serviceJustCreated.serviceId()].data(), &UpnpServiceDescriptionParser::finishedDownload);
+                d->mServiceDescriptionParsers[serviceJustCreated.serviceId()].get(), &UpnpServiceDescriptionParser::finishedDownload);
 
             d->mServiceDescriptionParsers[serviceJustCreated.serviceId()]->downloadServiceDescription(serviceUrl);
         }
