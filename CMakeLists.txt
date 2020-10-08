@@ -27,7 +27,7 @@ set(REQUIRED_QT_VERSION 5.12.0)
 find_package(Qt5 ${REQUIRED_QT_VERSION} CONFIG REQUIRED Core Network Xml)
 find_package(Qt5 ${REQUIRED_QT_VERSION} CONFIG OPTIONAL_COMPONENTS Qml Quick Widgets Test)
 
-find_package(KDSoap CONFIG REQUIRED)
+find_package(KDSoap 1.5.0 CONFIG REQUIRED)
 
 include(ECMSetupVersion)
 include(ECMGenerateHeaders)
