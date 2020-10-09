@@ -18,6 +18,9 @@
 class UpnpAbstractDevice;
 class UpnpDeviceSoapServerPrivate;
 
+/**
+ * @brief The UpnpDeviceSoapServer class should be used to implement an UPnP device that will be providing services
+ */
 class UPNPLIBQT_EXPORT UpnpDeviceSoapServer : public KDSoapServer
 {
     Q_OBJECT

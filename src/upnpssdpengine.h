@@ -64,6 +64,11 @@ class UpnpAbstractDevice;
 class UpnpDiscoveryResult;
 class UpnpSsdpEnginePrivate;
 
+/**
+ * @brief The UpnpSsdpEngine class implements the SSDP protocol.
+ *
+ * SSDP allows to discover services or devices present on a network. The \class UpnpSsdpEngine allows to perform queries or publish devices or services.
+ */
 class UPNPLIBQT_EXPORT UpnpSsdpEngine : public QObject
 {
 

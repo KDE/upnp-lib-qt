@@ -16,6 +16,11 @@
 
 class QObject;
 
+/**
+ * @brief The UpnpStateVariableDescription class provides tyhe description of a state variable of an UPnP service.
+ *
+ * A service can provides a number of state variables given information about the state of the service. The class \class UpnpStateVariableDescription documents all properties about one state variable.
+ */
 class UPNPLIBQT_EXPORT UpnpStateVariableDescription
 {
 public:

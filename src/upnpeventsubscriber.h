@@ -20,6 +20,11 @@
 class UpnpEventSubscriberPrivate;
 class UpnpAbstractService;
 
+/**
+ * @brief The UpnpEventSubscriber class is used to implement event notifications for services
+ *
+ * A service provides a notification facility for subscribers to know when variable changes. The \class UpnpEventSubscriber provides the mechanism to implement that notification facility.
+ */
 class UpnpEventSubscriber : public QObject
 {
     Q_OBJECT

@@ -17,6 +17,11 @@
 class UpnpServiceDescription;
 class UpnpDeviceDescriptionPrivate;
 
+/**
+ * @brief The UpnpDeviceDescription class includes the full description of an UPnP device
+ *
+ * It provides a way to store all data about a device and to query them.
+ */
 class UPNPLIBQT_EXPORT UpnpDeviceDescription
 {
 

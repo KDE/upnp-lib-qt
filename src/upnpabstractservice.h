@@ -25,6 +25,11 @@ class UpnpEventSubscriber;
 class QIODevice;
 class UpnpServiceDescription;
 
+/**
+ * @brief The UpnpAbstractService is the base class to implement a wrapper around an UPnP service
+ *
+ * It can be derived into a subclass to implement support for a specific service type or can be used directly to interact with a service.
+ */
 class UPNPLIBQT_EXPORT UpnpAbstractService : public QObject
 {
     Q_OBJECT

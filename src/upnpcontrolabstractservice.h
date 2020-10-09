@@ -24,6 +24,9 @@ class UpnpAbstractServiceDescriptionPrivate;
 class QNetworkReply;
 class QHostInfo;
 
+/**
+ * @brief The UpnpControlAbstractService class is the base class with infrastructure needed to call actions on UPnP services (i.e. control of the service)
+ */
 class UPNPLIBQT_EXPORT UpnpControlAbstractService : public UpnpAbstractService
 {
     Q_OBJECT

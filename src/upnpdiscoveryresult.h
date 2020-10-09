@@ -20,6 +20,9 @@
 class UpnpDiscoveryResultPrivate;
 class QDebug;
 
+/**
+ * @brief The UpnpDiscoveryResult class contains the result of the discovery of device or service via the SSDP protocol
+ */
 class UPNPLIBQT_EXPORT UpnpDiscoveryResult
 {
 

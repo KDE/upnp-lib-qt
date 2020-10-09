@@ -24,6 +24,9 @@ class UpnpDeviceDescription;
 
 class UpnpDeviceDescriptionParserPrivate;
 
+/**
+ * @brief The UpnpDeviceDescriptionParser class is a parser for UPnP device descriptions
+ */
 class UPNPLIBQT_EXPORT UpnpDeviceDescriptionParser : public QObject
 {
     Q_OBJECT

@@ -23,6 +23,9 @@ class UpnpStateVariableDescription;
 class UpnpEventSubscriber;
 class UpnpDeviceDescription;
 
+/**
+ * @brief The UpnpServiceDescription class is used to get all data about an UPnP service
+ */
 class UPNPLIBQT_EXPORT UpnpServiceDescription
 {
 

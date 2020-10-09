@@ -17,6 +17,11 @@
 class UpnpControlAbstractServiceReplyPrivate;
 class KDSoapPendingCall;
 
+/**
+ * @brief The UpnpControlAbstractServiceReply class is used to keep track of answers when calling actions from UPnP services
+ *
+ * It allows to know the status of the action call (.e. success or failure) and get the result or the returned error
+ */
 class UPNPLIBQT_EXPORT UpnpControlAbstractServiceReply : public QObject
 {
 

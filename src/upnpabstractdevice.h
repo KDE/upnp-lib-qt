@@ -23,6 +23,11 @@ class UpnpSsdpEngine;
 class UpnpDeviceDescription;
 class UpnpServiceDescription;
 
+/**
+ * @brief The UpnpAbstractDevice is the base class to implement a wrapper around an UPnP device
+ *
+ * It can be derived into a subclass to implement support for a specific device type or can be used directly to interact with a device.
+ */
 class UPNPLIBQT_EXPORT UpnpAbstractDevice : public QObject
 {
     Q_OBJECT

@@ -22,6 +22,10 @@ class UpnpServiceDescription;
 
 class UpnpServiceDescriptionParserPrivate;
 
+/**
+ * @brief The UpnpServiceDescriptionParser class is a parser for UPnP service descriptions
+ */
+
 class UpnpServiceDescriptionParser : public QObject
 {
     Q_OBJECT

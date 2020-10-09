@@ -20,6 +20,9 @@
 class UpnpAbstractDevice;
 class UpnpDeviceSoapServerObjectPrivate;
 
+/**
+ * @brief The UpnpDeviceSoapServerObject class is needed to handle incoming request made to an UPnP device or service
+ */
 class UpnpDeviceSoapServerObject : public QObject, public KDSoapServerObjectInterface, public KDSoapServerCustomVerbRequestInterface
 {
     Q_OBJECT
