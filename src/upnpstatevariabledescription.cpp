@@ -7,12 +7,8 @@
 #include "upnpstatevariabledescription.h"
 
 UpnpStateVariableDescription::UpnpStateVariableDescription()
-    : mIsValid(false)
-    , mUpnpName()
-    , mObject(nullptr)
+    : mUpnpName()
     , mPropertyName()
-    , mPropertyIndex(-1)
-    , mEvented(false)
     , mDataType()
     , mDefaultValue()
     , mMinimumValue()

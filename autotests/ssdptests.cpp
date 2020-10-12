@@ -15,6 +15,8 @@
 #include <QtNetwork/QUdpSocket>
 
 #include <QtTest/QtTest>
+#include <utility>
+
 
 #include <sys/socket.h>
 #include <sys/types.h>
@@ -25,19 +27,19 @@ class MockSsdpClient : public QObject
     Q_OBJECT
 
 public:
-    explicit MockSsdpClient(quint16 aPortNumber, const QByteArray &aExpectedQuery, const QStringList &aAnswerData,
+    explicit MockSsdpClient(quint16 aPortNumber, QByteArray aExpectedQuery, QStringList aAnswerData,
         bool aAutoRefresh, int aRefreshPeriod = 1000,
-        const QStringList &aAnnounceData = {},
+        QStringList aAnnounceData = {},
         QObject *parent = nullptr)
         : QObject(parent)
         , mPortNumber(aPortNumber)
         , mClientSocket()
-        , mAnswerData(aAnswerData)
-        , mExpectedQuery(aExpectedQuery)
+        , mAnswerData(std::move(aAnswerData))
+        , mExpectedQuery(std::move(aExpectedQuery))
         , mHttpClientSocket()
         , mAutoRefresh(aAutoRefresh)
         , mRefreshPeriod(aRefreshPeriod)
-        , mAnnounceData(aAnnounceData)
+        , mAnnounceData(std::move(aAnnounceData))
         , mAutoRefreshTimer()
         , mSender()
         , mSenderPort(12345)

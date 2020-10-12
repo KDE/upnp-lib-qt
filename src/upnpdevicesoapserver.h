@@ -32,7 +32,7 @@ public:
 
     QObject *createServerObject() override;
 
-    QUrl urlPrefix() const;
+    [[nodiscard]] QUrl urlPrefix() const;
 
 private:
     std::unique_ptr<UpnpDeviceSoapServerPrivate> d;

@@ -21,17 +21,17 @@ class UPNPLIBQT_EXPORT UpnpStateVariableDescription
 public:
     UpnpStateVariableDescription();
 
-    bool mIsValid;
+    bool mIsValid{false};
 
     QString mUpnpName;
 
-    QObject *mObject;
+    QObject *mObject{nullptr};
 
     QByteArray mPropertyName;
 
-    int mPropertyIndex;
+    int mPropertyIndex{-1};
 
-    bool mEvented;
+    bool mEvented{false};
 
     QString mDataType;
 
