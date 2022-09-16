@@ -78,7 +78,7 @@ ecm_generate_headers(UpnpLibQt_HEADERS
 
 install(TARGETS UpnpLibQt
         EXPORT UpnpLibQtTargets
-        ${KF5_INSTALL_TARGETS_DEFAULT_ARGS})
+        ${KDE_INSTALL_TARGETS_DEFAULT_ARGS})
 
 install(FILES
             ${CMAKE_CURRENT_BINARY_DIR}/upnplibqt_export.h
