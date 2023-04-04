@@ -19,7 +19,7 @@ The SOAP part is done via the [KDSoap](https://www.kdab.com/development-resource
 
 **upnp-lib-qt** depends on the following libaries:
 
- * Qt >= 5.12
+ * Qt >= 6.4
  * CMake >= 3.8
  * CMake Extra Modules >= 5.59.0
  * KDSoap >= 1.5.0
