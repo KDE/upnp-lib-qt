@@ -97,7 +97,7 @@ if(BUILD_QCH)
             ${UpnpLibQt_HEADERS}
         MD_MAINPAGE "${CMAKE_SOURCE_DIR}/README.md"
         LINK_QCHS
-            Qt5Core_QCH
+            Qt6Core_QCH
         BLANK_MACROS
             UPNPLIBQT_EXPORT
         TAGFILE_INSTALL_DESTINATION ${KDE_INSTALL_QTQCHDIR}
@@ -113,10 +113,10 @@ install(FILES ${PRI_FILENAME}
 
 target_link_libraries(UpnpLibQt
     LINK_PUBLIC
-        Qt5::Core
-        Qt5::Network
+        Qt::Core
+        Qt::Network
     LINK_PRIVATE
-        Qt5::Xml
+        Qt::Xml
         KDSoap::kdsoap
         KDSoap::kdsoap-server
 )

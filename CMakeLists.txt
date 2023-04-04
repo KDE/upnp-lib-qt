@@ -23,11 +23,11 @@ include(KDEFrameworkCompilerSettings NO_POLICY_SCOPE)
 include(KDECMakeSettings)
 include(GenerateExportHeader)
 
-set(REQUIRED_QT_VERSION 5.12.0)
-find_package(Qt5 ${REQUIRED_QT_VERSION} CONFIG REQUIRED Core Network Xml)
-find_package(Qt5 ${REQUIRED_QT_VERSION} CONFIG OPTIONAL_COMPONENTS Qml Quick Widgets Test)
+set(REQUIRED_QT_VERSION 6.4.0)
+find_package(Qt6 ${REQUIRED_QT_VERSION} CONFIG REQUIRED Core Network Xml)
+find_package(Qt6 ${REQUIRED_QT_VERSION} CONFIG OPTIONAL_COMPONENTS Qml Quick Widgets Test)
 
-find_package(KDSoap 1.5.0 CONFIG REQUIRED)
+find_package(KDSoap-qt6 1.5.0 CONFIG REQUIRED)
 
 include(ECMSetupVersion)
 include(ECMGenerateHeaders)
@@ -38,7 +38,7 @@ option(BUILD_QCH "Build API documentation in QCH format (for e.g. Qt Assistant, 
 add_feature_info(QCH ${BUILD_QCH} "API documentation in QCH format (for e.g. Qt Assistant, Qt Creator & KDevelop)")
 
 ecm_setup_version(PROJECT
-    VARIABLE_PREFIX KARCHIVE
+    VARIABLE_PREFIX UPNPLIBQT
     VERSION_HEADER "${CMAKE_CURRENT_BINARY_DIR}/upnplibqt_version.h"
     PACKAGE_VERSION_FILE "${CMAKE_CURRENT_BINARY_DIR}/UpnpLibQtConfigVersion.cmake"
     SOVERSION 5)
@@ -72,7 +72,7 @@ configure_package_config_file(
 )
 
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/upnplibqt_version.h
-        DESTINATION ${KDE_INSTALL_INCLUDEDIR_KF5}
+        DESTINATION ${KDE_INSTALL_INCLUDEDIR}
         COMPONENT Devel)
 
 install(FILES

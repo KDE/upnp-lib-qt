@@ -7,5 +7,5 @@ set(ssdplistener_SRCS
 )
 
 add_executable(ssdpListener ${ssdplistener_SRCS})
-target_link_libraries(ssdpListener Qt5::Core UpnpLibQt)
+target_link_libraries(ssdpListener Qt::Core UpnpLibQt)
 

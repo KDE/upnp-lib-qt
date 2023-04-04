@@ -8,8 +8,8 @@ set(ssdpTests_SRCS
     ssdptests.cpp
 )
 
-if (Qt5Test_FOUND)
+if (Qt6Test_FOUND)
     add_executable(ssdpTests ${ssdpTests_SRCS})
-    target_link_libraries(ssdpTests Qt5::Test Qt5::Core Qt5::Network UpnpLibQt)
+    target_link_libraries(ssdpTests Qt::Test Qt::Core Qt::Network UpnpLibQt)
     add_test(NAME ssdpUnitTest COMMAND ssdpTests)
 endif()
