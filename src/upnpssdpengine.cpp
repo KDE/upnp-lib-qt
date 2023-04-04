@@ -16,6 +16,8 @@
 #include "upnpdevicedescription.h"
 #include "upnpservicedescription.h"
 
+#include "ssdplogging.h"
+
 #include <QHostAddress>
 #include <QNetworkInformation>
 #include <QNetworkInterface>
@@ -55,7 +57,12 @@ UpnpSsdpEngine::UpnpSsdpEngine(QObject *parent)
     : QObject(parent)
     , d(std::make_unique<UpnpSsdpEnginePrivate>())
 {
-    connect(QNetworkInformation::instance(), &QNetworkInformation::reachabilityChanged, this, &UpnpSsdpEngine::networkReachabilityChanged);
+    if (QNetworkInformation::loadDefaultBackend()) {
+        qCInfo(orgKdeUpnpLibQtSsdp) << "network connectivity information is available";
+        connect(QNetworkInformation::instance(), &QNetworkInformation::reachabilityChanged, this, &UpnpSsdpEngine::networkReachabilityChanged);
+    } else {
+        qCWarning(orgKdeUpnpLibQtSsdp) << "cannot get network connectivity information";
+    }
 
     connect(&d->mTimeoutTimer, &QTimer::timeout, this, &UpnpSsdpEngine::discoveryResultTimeout);
     d->mTimeoutTimer.setSingleShot(false);
