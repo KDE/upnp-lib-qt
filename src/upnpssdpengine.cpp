@@ -17,8 +17,7 @@
 #include "upnpservicedescription.h"
 
 #include <QHostAddress>
-#include <QNetworkConfiguration>
-#include <QNetworkConfigurationManager>
+#include <QNetworkInformation>
 #include <QNetworkInterface>
 #include <QUdpSocket>
 
@@ -43,8 +42,6 @@ public:
 
     QString mServerInformation;
 
-    QNetworkConfigurationManager mNetworkManager;
-
     QString mActiveConfiguration;
 
     QTimer mTimeoutTimer;
@@ -58,11 +55,7 @@ UpnpSsdpEngine::UpnpSsdpEngine(QObject *parent)
     : QObject(parent)
     , d(std::make_unique<UpnpSsdpEnginePrivate>())
 {
-    connect(&d->mNetworkManager, &QNetworkConfigurationManager::configurationAdded, this, &UpnpSsdpEngine::networkConfigurationAdded);
-    connect(&d->mNetworkManager, &QNetworkConfigurationManager::configurationRemoved, this, &UpnpSsdpEngine::networkConfigurationRemoved);
-    connect(&d->mNetworkManager, &QNetworkConfigurationManager::configurationChanged, this, &UpnpSsdpEngine::networkConfigurationChanged);
-    connect(&d->mNetworkManager, &QNetworkConfigurationManager::onlineStateChanged, this, &UpnpSsdpEngine::networkOnlineStateChanged);
-    connect(&d->mNetworkManager, &QNetworkConfigurationManager::updateCompleted, this, &UpnpSsdpEngine::networkUpdateCompleted);
+    connect(QNetworkInformation::instance(), &QNetworkInformation::reachabilityChanged, this, &UpnpSsdpEngine::networkReachabilityChanged);
 
     connect(&d->mTimeoutTimer, &QTimer::timeout, this, &UpnpSsdpEngine::discoveryResultTimeout);
     d->mTimeoutTimer.setSingleShot(false);
@@ -350,51 +343,13 @@ void UpnpSsdpEngine::discoveryResultTimeout()
     }
 }
 
-void UpnpSsdpEngine::networkConfigurationAdded(const QNetworkConfiguration &config)
+void UpnpSsdpEngine::networkReachabilityChanged(QNetworkInformation::Reachability newReachability)
 {
-    qCInfo(orgKdeUpnpLibQtSsdp()) << "UpnpSsdpEngine::networkConfigurationAdded" << config.name();
+    qCInfo(orgKdeUpnpLibQtSsdp()) << "UpnpSsdpEngine::networkReachabilityChanged" << newReachability;
 
-    if (config.isValid() && config.state().testFlag(QNetworkConfiguration::Active)) {
-        if (d->mActiveConfiguration != config.name()) {
-            reconfigureNetwork();
-            d->mActiveConfiguration = config.name();
-        }
-    }
+    reconfigureNetwork();
 
     Q_EMIT networkChanged();
-}
-
-void UpnpSsdpEngine::networkConfigurationRemoved(const QNetworkConfiguration &config)
-{
-    qCInfo(orgKdeUpnpLibQtSsdp()) << "UpnpSsdpEngine::networkConfigurationRemoved" << config.name();
-
-    if (config.isValid() && config.state().testFlag(QNetworkConfiguration::Active)) {
-        if (d->mActiveConfiguration != config.name()) {
-            reconfigureNetwork();
-            d->mActiveConfiguration = config.name();
-        }
-    }
-
-    Q_EMIT networkChanged();
-}
-
-void UpnpSsdpEngine::networkConfigurationChanged(const QNetworkConfiguration &config)
-{
-    qCInfo(orgKdeUpnpLibQtSsdp()) << "UpnpSsdpEngine::networkConfigurationChanged" << config.name();
-
-    if (config.isValid() && config.state().testFlag(QNetworkConfiguration::Active)) {
-        if (d->mActiveConfiguration != config.name()) {
-            reconfigureNetwork();
-            d->mActiveConfiguration = config.name();
-        }
-    }
-
-    Q_EMIT networkChanged();
-}
-
-void UpnpSsdpEngine::networkOnlineStateChanged(bool isOnline)
-{
-    qCDebug(orgKdeUpnpLibQtSsdp()) << "UpnpSsdpEngine::networkOnlineStateChanged" << (isOnline ? "true" : "false");
 }
 
 void UpnpSsdpEngine::networkUpdateCompleted()

@@ -10,7 +10,7 @@
 #include "upnplibqt_export.h"
 
 #include <QHostAddress>
-#include <QNetworkConfiguration>
+#include <QNetworkInformation>
 
 #include <QObject>
 #include <QString>
@@ -178,13 +178,7 @@ private Q_SLOTS:
 
     void discoveryResultTimeout();
 
-    void networkConfigurationAdded(const QNetworkConfiguration &config);
-
-    void networkConfigurationRemoved(const QNetworkConfiguration &config);
-
-    void networkConfigurationChanged(const QNetworkConfiguration &config);
-
-    void networkOnlineStateChanged(bool isOnline);
+    void networkReachabilityChanged(QNetworkInformation::Reachability newReachability);
 
     void networkUpdateCompleted();
 
