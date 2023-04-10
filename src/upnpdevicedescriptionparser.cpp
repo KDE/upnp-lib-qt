@@ -87,27 +87,32 @@ void UpnpDeviceDescriptionParser::parseDeviceDescription(QIODevice *deviceDescri
     QDomDocument deviceDescriptionDocument;
     deviceDescriptionDocument.setContent(deviceDescriptionContent);
 
+    qCDebug(orgKdeUpnpLibQtUpnp()) << "device description" << deviceDescriptionDocument.toString();
+
     const QDomElement &documentRoot = deviceDescriptionDocument.documentElement();
 
     QVariantMap deviceDescription;
 
-    QDomNode currentChild = documentRoot.firstChild();
-    while (!currentChild.isNull()) {
-        if (currentChild.isElement() && !currentChild.firstChild().isNull() && !currentChild.firstChild().hasChildNodes()) {
-            deviceDescription[currentChild.nodeName()] = currentChild.toElement().text();
-        }
-        currentChild = currentChild.nextSibling();
-    }
-
     const QDomElement &deviceRoot = documentRoot.firstChildElement(QStringLiteral("device"));
 
-    currentChild = deviceRoot.firstChild();
+    auto currentChild = deviceRoot.firstChild();
     while (!currentChild.isNull()) {
         if (currentChild.isElement() && !currentChild.firstChild().isNull() && !currentChild.firstChild().hasChildNodes()) {
             deviceDescription[currentChild.nodeName()] = currentChild.toElement().text();
         }
         currentChild = currentChild.nextSibling();
     }
+
+    const QDomElement &iconListRoot = deviceRoot.firstChildElement(QStringLiteral("iconList"));
+    auto currentIconListRootChild = iconListRoot.firstChild();
+    while (!currentIconListRootChild.isNull()) {
+        if (currentIconListRootChild.isElement() && !currentIconListRootChild.firstChild().isNull()) {
+            qCDebug(orgKdeUpnpLibQtUpnp()) << "icon" << currentIconListRootChild.toElement().text();
+        }
+        currentIconListRootChild = currentIconListRootChild.nextSibling();
+    }
+
+    qCDebug(orgKdeUpnpLibQtUpnp()) << "device description" << deviceDescription;
 
     d->mDeviceDescription.setUDN(deviceDescription[QStringLiteral("UDN")].toString());
     d->mDeviceDescription.setUPC(deviceDescription[QStringLiteral("UPC")].toString());
@@ -134,6 +139,19 @@ void UpnpDeviceDescriptionParser::parseDeviceDescription(QIODevice *deviceDescri
             auto newService = UpnpServiceDescription {};
 
             const QDomNode &serviceTypeNode = serviceNode.firstChildElement(QStringLiteral("serviceType"));
+
+            QVariantMap serviceDescription;
+
+            auto currentServiceChild = serviceNode.firstChild();
+            while (!currentServiceChild.isNull()) {
+                if (currentServiceChild.isElement() && !currentServiceChild.firstChild().isNull() && !currentServiceChild.firstChild().hasChildNodes()) {
+                    serviceDescription[currentServiceChild.nodeName()] = currentServiceChild.toElement().text();
+                }
+                currentServiceChild = currentServiceChild.nextSibling();
+            }
+
+            qCDebug(orgKdeUpnpLibQtUpnp()) << "service description" << serviceDescription;
+
 #if 0
             if (!serviceTypeNode.isNull()) {
                 if (serviceTypeNode.toElement().text() == QStringLiteral("urn:schemas-upnp-org:service:AVTransport:1")) {

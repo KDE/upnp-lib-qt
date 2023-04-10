@@ -142,6 +142,8 @@ public:
 
     int addService(UpnpServiceDescription newService);
 
+    [[nodiscard]] QUrl iconUrl() const;
+
 private:
     std::unique_ptr<UpnpDeviceDescriptionPrivate> d;
 };

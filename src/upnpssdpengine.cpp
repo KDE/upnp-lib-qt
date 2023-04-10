@@ -559,6 +559,7 @@ void UpnpSsdpEngine::parseSsdpAnnounceDatagram(const QByteArray &datagram, const
         qCDebug(orgKdeUpnpLibQtSsdp()) << "new service";
         qCDebug(orgKdeUpnpLibQtSsdp()) << "DeviceId:" << newDiscovery.usn();
         qCDebug(orgKdeUpnpLibQtSsdp()) << "DeviceType:" << newDiscovery.nt();
+        qCDebug(orgKdeUpnpLibQtSsdp()) << "NotificationSubType:" << newDiscovery.nts();
         qCDebug(orgKdeUpnpLibQtSsdp()) << "Location:" << newDiscovery.location();
         qCDebug(orgKdeUpnpLibQtSsdp()) << "new service";
         //        qCInfo(orgKdeUpnpLibQtSsdp()) << "DeviceId:" << searchResult->DeviceId;

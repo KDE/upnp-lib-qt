@@ -67,6 +67,8 @@ void UpnpServiceDescriptionParser::parseServiceDescription(QIODevice *serviceDes
     QDomDocument serviceDescriptionDocument;
     serviceDescriptionDocument.setContent(serviceDescriptionContent);
 
+    qCDebug(orgKdeUpnpLibQtUpnp()) << "service description" << serviceDescriptionDocument.toString();
+
     const QDomElement &scpdRoot = serviceDescriptionDocument.documentElement();
 
     const QDomElement &actionListRoot = scpdRoot.firstChildElement(QStringLiteral("actionList"));
