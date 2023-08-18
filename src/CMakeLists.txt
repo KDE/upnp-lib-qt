@@ -43,7 +43,7 @@ generate_export_header(UpnpLibQt BASE_NAME UpnpLibQt)
 
 
 target_include_directories(UpnpLibQt
-    INTERFACE "$<INSTALL_INTERFACE:${KDE_INSTALL_INCLUDEDIR_KF5}/UpnpLibQt>"
+    INTERFACE "$<INSTALL_INTERFACE:${KDE_INSTALL_INCLUDEDIR_KF}/UpnpLibQt>"
 )
 
 set_target_properties(UpnpLibQt PROPERTIES
@@ -83,7 +83,7 @@ install(TARGETS UpnpLibQt
 install(FILES
             ${CMAKE_CURRENT_BINARY_DIR}/upnplibqt_export.h
             ${UpnpLibQt_HEADERS}
-        DESTINATION ${KDE_INSTALL_INCLUDEDIR_KF5}/UpnpLibQt
+        DESTINATION ${KDE_INSTALL_INCLUDEDIR_KF}/UpnpLibQt
         COMPONENT Devel)
 
 if(BUILD_QCH)
@@ -107,7 +107,7 @@ if(BUILD_QCH)
 endif()
 
 include(ECMGeneratePriFile)
-ecm_generate_pri_file(BASE_NAME UpnpLibQt LIB_NAME UpnpLibQt DEPS "core" FILENAME_VAR PRI_FILENAME INCLUDE_INSTALL_DIR ${KDE_INSTALL_INCLUDEDIR_KF5}/UpnpLibQt)
+ecm_generate_pri_file(BASE_NAME UpnpLibQt LIB_NAME UpnpLibQt DEPS "core" FILENAME_VAR PRI_FILENAME INCLUDE_INSTALL_DIR ${KDE_INSTALL_INCLUDEDIR_KF}/UpnpLibQt)
 install(FILES ${PRI_FILENAME}
         DESTINATION ${ECM_MKSPECS_INSTALL_DIR})
 
