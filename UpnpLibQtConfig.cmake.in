@@ -4,10 +4,10 @@
 
 @PACKAGE_INIT@
 
-find_package(Qt5 @REQUIRED_QT_VERSION@ CONFIG REQUIRED Core Network)
+find_package(Qt6 @REQUIRED_QT_VERSION@ CONFIG REQUIRED Core Network)
 
-find_package(KDSoap CONFIG REQUIRED)
-set_package_properties(KDSoap PROPERTIES
+find_package(KDSoap-qt6 CONFIG REQUIRED)
+set_package_properties(KDSoap-qt6 PROPERTIES
     DESCRIPTION "Tool for creating client applications for web services."
     URL "https://www.kdab.com/development-resources/qt-tools/kd-soap/"
     TYPE OPTIONAL)
